@@ -1,0 +1,348 @@
+% $ biblatex auxiliary file $
+% $ biblatex version 2.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\entry{Bunder2015a}{article}{}
+  \name{author}{3}{}{%
+    {{}%
+     {Bunder}{B.}%
+     {Judith}{J.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Roberts}{R.}%
+     {A.~J.}{A.~J.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Kevrekidis}{K.}%
+     {Ioannis~G.}{I.~G.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{BJRAJKIG1}
+  \strng{fullhash}{BJRAJKIG1}
+  \field{labelyear}{2016}
+  \field{sortinit}{B}
+  \field{abstract}{%
+  Massive parallelisation has lead to a dramatic increase in available
+  computational power. However, data transfer speeds have failed to keep pace
+  and are the major limiting factor in the development of exascale computing.
+  New algorithms must be developed which minimise the transfer of data. Patch
+  dynamics is a computational macroscale modelling scheme which provides a
+  coarse macroscale solution of a problem defined on a fine microscale by
+  dividing the domain into many nonoverlapping, coupled patches. Patch dynamics
+  is readily adaptable to massive parallelisation as each processor can
+  evaluate the dynamics on one, or a few, patches. However, patch coupling
+  conditions interpolate across the unevaluated parts of the domain between
+  patches, and are typically reevaluated at every microscale time step, thus
+  requiring almost continuous data transfer. We propose a modified patch
+  dynamics scheme which minimises data transfer by only reevaluating the patch
+  coupling conditions at `mesoscale' time scales which are significantly larger
+  than the microscale time of the microscale problem. We analyse the error
+  arising from patch dynamics with mesoscale temporal coupling as a function of
+  the mesoscale time interval, patch size, and ratio between the microscale and
+  macroscale.%
+  }
+  \verb{doi}
+  \verb 10.1137/15M1015005
+  \endverb
+  \field{number}{4}
+  \field{pages}{C335\bibrangedash C371}
+  \field{title}{Accuracy of patch dynamics with mesoscale temporal coupling for
+  efficient massively parallel simulations}
+  \field{volume}{38}
+  \field{journaltitle}{SIAM Journal on Scientific Computing}
+  \field{year}{2016}
+\endentry
+
+\entry{Gustafsson1975}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Gustafsson}{G.}%
+     {Bertil}{B.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{GB1}
+  \strng{fullhash}{GB1}
+  \field{labelyear}{1975}
+  \field{sortinit}{G}
+  \field{number}{10}
+  \field{pages}{396\bibrangedash 406}
+  \field{title}{The convergence rate for difference approximations to mixed
+  initial boundary value problems}
+  \field{volume}{29}
+  \field{journaltitle}{Mathematics of Computation}
+  \field{year}{1975}
+\endentry
+
+\entry{Kevrekidis09a}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Kevrekidis}{K.}%
+     {Ioannis~G.}{I.~G.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Samaey}{S.}%
+     {Giovanni}{G.}%
+     {}{}%
+     {}{}}%
+  }
+  \keyw{complex systems, equation-free methods, simulation, bifurcation
+  analysis, patch dynamics}
+  \strng{namehash}{KIGSG1}
+  \strng{fullhash}{KIGSG1}
+  \field{labelyear}{2009}
+  \field{sortinit}{K}
+  \field{abstract}{%
+  In traditional physicochemical modeling, one derives evolution equations at
+  the (macroscopic, coarse) scale of interest; these are used to perform a
+  variety of tasks (simulation, bifurcation analysis, optimization) using an
+  arsenal of analytical and numerical techniques. For many complex systems,
+  however, although one observes evolution at a macroscopic scale of interest,
+  accurate models are only given at a more detailed (fine-scale, microscopic)
+  level of description (e.g., lattice Boltzmann, kinetic Monte Carlo, molecular
+  dynamics). Here, we review a framework for computer-aided multiscale
+  analysis, which enables macroscopic computational tasks (over extended
+  spatiotemporal scales) using only appropriately initialized microscopic
+  simulation on short time and length scales. The methodology bypasses the
+  derivation of macroscopic evolution equations when these equations
+  conceptually exist but are not available in closed form---hence the term
+  equation-free. We selectively discuss basic algorithms and underlying
+  principles and illustrate the approach through representative applications.
+  We also discuss potential difficulties and outline areas for future
+  research.%
+  }
+  \verb{doi}
+  \verb 10.1146/annurev.physchem.59.032607.093610
+  \endverb
+  \field{pages}{321\bibrangedash 44}
+  \field{title}{Equation-Free Multiscale Computation: Algorithms and
+  Applications}
+  \field{volume}{60}
+  \field{journaltitle}{Annu. Rev. Phys. Chem.}
+  \field{year}{2009}
+\endentry
+
+\entry{LAMMPS}{misc}{}
+  \name{author}{7}{}{%
+    {{}%
+     {Plimpton}{P.}%
+     {Steve}{S.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Thompson}{T.}%
+     {Aidan}{A.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Shan}{S.}%
+     {Ray}{R.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Moore}{M.}%
+     {Stan}{S.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Kohlmeyer}{K.}%
+     {Axel}{A.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Crozier}{C.}%
+     {Paul}{P.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Stevens}{S.}%
+     {Mark}{M.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{PS+1}
+  \strng{fullhash}{PSTASRMSKACPSM1}
+  \field{labelyear}{2016}
+  \field{sortinit}{P}
+  \field{title}{Large-scale Atomic/Molecular Massively Parallel Simulator}
+  \verb{url}
+  \verb http://lammps.sandia.gov
+  \endverb
+  \field{year}{2016}
+\endentry
+
+\entry{Roberts06d}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Roberts}{R.}%
+     {A.~J.}{A.~J.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Kevrekidis}{K.}%
+     {I.~G.}{I.~G.}%
+     {}{}%
+     {}{}}%
+  }
+  \keyw{multiscale computation; gap-tooth scheme; coupling boundary conditions;
+  high order consistency}
+  \strng{namehash}{RAJKIG1}
+  \strng{fullhash}{RAJKIG1}
+  \field{labelyear}{2007}
+  \field{sortinit}{R}
+  \field{abstract}{%
+  We are developing a framework for multiscale computation which enables models
+  at a ``microscopic'' level of description, for example, lattice Boltzmann,
+  Monte Carlo, or molecular dynamics simulators, to perform modeling tasks at
+  ``macroscopic'' length scales of interest. The plan is to use the microscopic
+  rules restricted to small ``patches'' of the domain, the ``teeth,'' using
+  interpolation to bridge the ``gaps.'' Here we explore general boundary
+  conditions coupling the widely separated ``teeth'' of the microscopic
+  simulation that achieve high order accuracy over the macroscale. We present
+  the simplest case when the microscopic simulator is the quintessential
+  example of a PDE. We argue that classic high order interpolation of the
+  macroscopic field provides the correct forcing in whatever boundary condition
+  is required by the microsimulator. Such interpolation leads to tooth boundary
+  conditions, which achieve arbitrarily high order consistency. The high order
+  consistency is demonstrated on a class of linear PDEs in two ways: first
+  through the eigenvalues of the scheme for selected numerical problems, and
+  second using the dynamical systems approach of holistic discretization on a
+  general class of linear PDEs. Analytic modeling shows that, for a wide class
+  of microscopic systems, the subgrid fields and the effective macroscopic
+  model are largely independent of the tooth size and the particular tooth
+  boundary conditions. When applied to patches of microscopic simulations these
+  tooth boundary conditions promise efficient macroscale simulation. We expect
+  the same approach will also accurately couple patch simulations in higher
+  spatial dimensions.%
+  }
+  \verb{doi}
+  \verb 10.1137/060654554
+  \endverb
+  \field{number}{4}
+  \field{pages}{1495\bibrangedash 1510}
+  \field{title}{General tooth boundary conditions for equation free modelling}
+  \field{volume}{29}
+  \field{journaltitle}{SIAM J.~Scientific Computing}
+  \field{year}{2007}
+\endentry
+
+\entry{Roberts99b}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Roberts}{R.}%
+     {A.~J.}{A.~J.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Li}{L.}%
+     {Zhenquan}{Z.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{RAJLZ1}
+  \strng{fullhash}{RAJLZ1}
+  \field{labelyear}{2006}
+  \field{sortinit}{R}
+  \verb{doi}
+  \verb 10.1017/S0022112006008640
+  \endverb
+  \field{pages}{33\bibrangedash 73}
+  \field{title}{An accurate and comprehensive model of thin fluid flows with
+  inertia on curved substrates}
+  \field{volume}{553}
+  \field{journaltitle}{J.~Fluid Mech.}
+  \field{month}{04}
+  \field{year}{2006}
+\endentry
+
+\entry{Samaey08}{incollection}{}
+  \name{author}{3}{}{%
+    {{}%
+     {Samaey}{S.}%
+     {G.}{G.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Roberts}{R.}%
+     {A.~J.}{A.~J.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Kevrekidis}{K.}%
+     {I.~G.}{I.~G.}%
+     {}{}%
+     {}{}}%
+  }
+  \name{editor}{1}{}{%
+    {{}%
+     {Fish}{F.}%
+     {Jacob}{J.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Oxford University Press}%
+  }
+  \strng{namehash}{SGRAJKIG1}
+  \strng{fullhash}{SGRAJKIG1}
+  \field{labelyear}{2010}
+  \field{sortinit}{S}
+  \field{booktitle}{Multiscale methods: bridging the scales in science and
+  engineering}
+  \field{chapter}{8}
+  \field{isbn}{978-0-19-923385-4}
+  \field{pages}{216\bibrangedash 246}
+  \field{title}{Equation-free computation: an overview of patch dynamics}
+  \field{year}{2010}
+\endentry
+
+\entry{Svard2006}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Sv\"ard}{S.}%
+     {Magnus}{M.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Nordstr\"om}{N.}%
+     {Jan}{J.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{SMNJ1}
+  \strng{fullhash}{SMNJ1}
+  \field{labelyear}{2006}
+  \field{sortinit}{S}
+  \verb{doi}
+  \verb 10.1016/j.jcp.2006.02.014
+  \endverb
+  \field{pages}{333\bibrangedash 352}
+  \field{title}{On the order of accuracy for difference approximations of
+  initial-boundary value problems}
+  \field{volume}{218}
+  \field{journaltitle}{Journal of Computational Physics}
+  \field{year}{2006}
+\endentry
+
+\lossort
+\endlossort
+
+\endinput

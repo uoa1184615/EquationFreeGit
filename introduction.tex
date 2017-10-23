@@ -1,0 +1,98 @@
+%Initially by AJR, Apr 2017
+%!TEX root = equationFreeDoc.tex
+\section{Introduction}
+
+\paragraph{Users}
+Place this toolbox's folder in a path searched by \script.
+Then read the subsection that documents the function of interest.
+
+
+\paragraph{Blackbox scenario}
+Assume that a researcher\slash practitioner has a detailed and \emph{trustworthy} computational simulation of some problem of interest.
+The simulation may be written in terms of micro-positional coordinates~\(\xv_i(t)\) in `space' at which there are micro-field variable values~\(\uv_i(t)\) for indices~\(i\) in some (large) set of integers and for time~\(t\).
+In lattice problems the positions~\(\xv_i\) would be fixed in time (unless employing a moving mesh on the microscale); in particle problems the positions would evolve.
+The positional coordinates are \(\xv_i\in\RR^{d}\) where for spatial problems integer \(d=1,2,3\), but it may be more when solving for a distribution of velocities, or pore sizes, or trader's beliefs, etc.
+The mirco-field variables could be in~\(\RR^{p}\) for any \(p=1,2,\ldots,\infty\).
+
+Further, assume that the computational simulation is too expensive over all the desired spatial domain~\(\XX\subset\RR^{d}\).
+Thus we aim a toolbox to simulate only on macroscale distributed patches.
+
+
+
+\paragraph{Developers}
+The aim of this project is to collectively develop a \script\ toolbox of equation-free algorithms.
+Initially the algorithms will be simple, and the plan is to subsequently develop more and more capability.
+
+\textsc{Matlab} appears the obvious choice for a first version since it is widespread, reasonably efficient, supports various parallel modes, and development costs are reasonably low.
+Further it is built on \textsc{blas} and \textsc{lapack} so potentially the cache and superscalar \cpu{} are well utilised.
+Let's develop functions that work for both \script.
+
+
+
+
+\subsection{Create, document and test algorithms}
+
+For developers to create and document the various functions, we use an idea due to Neil~D. Lawrence of the University of Sheffield:
+\autoref{sec:rk2ids} gives an example of the following structure to use.
+
+\begin{itemize}
+\item Each class of toolbox functions is located in separate directories in the repository, say~\verb|Dir|.
+
+\item Each toolbox function is documented as a separate subsection, with tests and examples as separate subsections.
+
+\item For each function, say~\verb|fun.m|, create a \LaTeX\ file~\verb|Dir/fun.tex| of a section that \verb|\input{Dir/*.m}|s the  files of the function-subsection and the test-subsections, \autoref{tbl:funtex}.
+Each such \verb|Dir/fun.tex| file is to be \verb|\include{}|ed from the main \LaTeX\ file \verb|equationFreeDoc.tex| so that people can most easily work on one section at a time.  
+
+\item Each function-subsection and test-subsection is to be created as a \script\ \verb|Dir/*.m| file, say \verb|Dir/fun.m|, so that users simply invoke the function in \script\ as usual by \verb|fun(...)|.
+
+Some editors may need to be told that \verb|fun.m| is a \LaTeX\ file.  For example, TexShop on the Mac requires one to execute in a Terminal
+\begin{verbatim}
+defaults write TeXShop OtherTeXExtensions -array-add "m"
+\end{verbatim}
+
+\begin{table}
+\caption{\label{tbl:funtex}example \texttt{Dir/*.tex} file to typeset in the master document a function-subsection, say \texttt{fun.m}, and the test\slash example-subsections.}
+\begin{minted}{latex}
+% input *.m files for ... author, date
+%!TEX root = ../equationFreeDoc.tex
+\section{...}
+\label{sec:...}
+introduction...
+\input{Dir/fun.m}
+\input{Dir/funExample.m}
+...
+\end{minted}
+\hrulefill
+%%%%%%%%%%
+\caption{\label{tbl:format}template for a function-subsection \texttt{Dir/*.m} file.}
+\begin{minted}{latex}
+%Short explanation for users typing "help fun"
+%Author, date
+%!TEX root = ../equationFreeDoc.tex
+%{
+\subsection{\texttt{...}}
+\label{sec:...}
+Summary LaTeX explanation.
+\begin{matlab}
+%}
+function ...
+%{
+\end{matlab}
+Repeated as desired:
+LaTeX between end-matlab and begin-matlab
+\begin{matlab}
+%}
+Matlab code between %} and %{
+%{
+\end{matlab}
+Concluding LaTeX before following final line.
+%}
+\end{minted}
+\hrulefill
+\end{table}
+\item \autoref{tbl:format} gives the template for the \verb|Dir/*.m| function-subsections.
+The format for a example\slash test-subsection is similar.
+
+\item Currently I use the beautiful \verb|minted| package to list code, but it does require a little more effort when installing.
+
+\end{itemize}

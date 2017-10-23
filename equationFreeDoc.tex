@@ -1,0 +1,67 @@
+\documentclass[11pt,a5paper]{article}
+\IfFileExists{ajr.sty}{\usepackage{ajr}}
+{\usepackage[a5paper,margin=11mm]{geometry}}
+
+\title{Equation-Free function toolbox for Matlab/Octave}
+\author{A. J. Roberts\thanks{%
+\url{http://www.maths.adelaide.edu.au/anthony.roberts},
+\url{http://orcid.org/0000-0001-8930-1552}}
+\and et al.}
+\date{\today}
+
+
+% uncomment the sections to typeset
+\includeonly{
+introduction
+,ProjInt/projInt
+,RKInt/rk2int
+,apptpd
+}
+
+
+
+% Use biblatex for references, also see defns.sty
+\usepackage[backend=bibtex8
+    ,style=authoryear
+    ,backref=true % optional
+    ]{biblatex}
+\AtEndDocument{\printbibliography}
+% bib data from local; merge with 'bibexport equationFreeDoc'
+\IfFileExists{ajr.sty}{\bibliography{bibexport,ajr,bib}}{}
+
+
+
+%\usepackage{verbatim}
+%\newenvironment{matlab}{\verbatim}{\endverbatim}
+
+\usepackage{minted}
+\newminted[matlab]{matlab}{linenos,firstnumber=last}
+%\usepackage{pgfplots}\pgfplotsset{compat=newest}% avoid as too few use
+
+\usepackage{microtype,amsmath,defns,graphicx,hyperref}
+\def\script{\textsc{Matlab}\slash Octave}
+\newcommand{\cpu}{\textsc{cpu}}
+\Vec f\Vec x\Vec u \Vec X \Vec U
+\Bb R  \Bb X
+
+
+
+
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\include{introduction}
+
+\include{ProjInt/projInt}
+
+\include{RKInt/rk2int}
+
+\appendix
+\include{apptpd}
+
+
+\end{document}

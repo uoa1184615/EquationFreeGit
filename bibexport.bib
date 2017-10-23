@@ -1,0 +1,184 @@
+
+
+@{biblatex-control,
+}
+
+@article{Roberts06d,
+  author =        {Roberts, A.~J. and Kevrekidis, I.~G.},
+  journal =       {SIAM J.~Scientific Computing},
+  number =        {4},
+  pages =         {1495--1510},
+  title =         {General tooth boundary conditions for equation free
+                   modelling},
+  volume =        {29},
+  year =          {2007},
+  abstract =      {We are developing a framework for multiscale
+                   computation which enables models at a ``microscopic''
+                   level of description, for example, lattice Boltzmann,
+                   Monte Carlo, or molecular dynamics simulators, to
+                   perform modeling tasks at ``macroscopic'' length
+                   scales of interest. The plan is to use the
+                   microscopic rules restricted to small ``patches'' of
+                   the domain, the ``teeth,'' using interpolation to
+                   bridge the ``gaps.'' Here we explore general boundary
+                   conditions coupling the widely separated ``teeth'' of
+                   the microscopic simulation that achieve high order
+                   accuracy over the macroscale. We present the simplest
+                   case when the microscopic simulator is the
+                   quintessential example of a PDE. We argue that
+                   classic high order interpolation of the macroscopic
+                   field provides the correct forcing in whatever
+                   boundary condition is required by the microsimulator.
+                   Such interpolation leads to tooth boundary
+                   conditions, which achieve arbitrarily high order
+                   consistency. The high order consistency is
+                   demonstrated on a class of linear PDEs in two ways:
+                   first through the eigenvalues of the scheme for
+                   selected numerical problems, and second using the
+                   dynamical systems approach of holistic discretization
+                   on a general class of linear PDEs. Analytic modeling
+                   shows that, for a wide class of microscopic systems,
+                   the subgrid fields and the effective macroscopic
+                   model are largely independent of the tooth size and
+                   the particular tooth boundary conditions. When
+                   applied to patches of microscopic simulations these
+                   tooth boundary conditions promise efficient
+                   macroscale simulation. We expect the same approach
+                   will also accurately couple patch simulations in
+                   higher spatial dimensions.},
+  doi =           {10.1137/060654554},
+}
+
+@article{Bunder2015a,
+  author =        {Bunder, Judith and Roberts, A.~J. and
+                   Kevrekidis, Ioannis~G.},
+  journal =       {SIAM Journal on Scientific Computing},
+  number =        {4},
+  pages =         {C335--C371},
+  title =         {Accuracy of patch dynamics with mesoscale temporal
+                   coupling for efficient massively parallel
+                   simulations},
+  volume =        {38},
+  year =          {2016},
+  abstract =      {Massive parallelisation has lead to a dramatic
+                   increase in available computational power. However,
+                   data transfer speeds have failed to keep pace and are
+                   the major limiting factor in the development of
+                   exascale computing. New algorithms must be developed
+                   which minimise the transfer of data. Patch dynamics
+                   is a computational macroscale modelling scheme which
+                   provides a coarse macroscale solution of a problem
+                   defined on a fine microscale by dividing the domain
+                   into many nonoverlapping, coupled patches. Patch
+                   dynamics is readily adaptable to massive
+                   parallelisation as each processor can evaluate the
+                   dynamics on one, or a few, patches. However, patch
+                   coupling conditions interpolate across the
+                   unevaluated parts of the domain between patches, and
+                   are typically reevaluated at every microscale time
+                   step, thus requiring almost continuous data transfer.
+                   We propose a modified patch dynamics scheme which
+                   minimises data transfer by only reevaluating the
+                   patch coupling conditions at `mesoscale' time scales
+                   which are significantly larger than the microscale
+                   time of the microscale problem. We analyse the error
+                   arising from patch dynamics with mesoscale temporal
+                   coupling as a function of the mesoscale time
+                   interval, patch size, and ratio between the
+                   microscale and macroscale.},
+  doi =           {10.1137/15M1015005},
+}
+
+@incollection{Samaey08,
+  author =        {Samaey, G. and Roberts, A.~J. and Kevrekidis, I.~G.},
+  booktitle =     {Multiscale methods: bridging the scales in science
+                   and engineering},
+  chapter =       {8},
+  editor =        {Fish, Jacob},
+  pages =         {216--246},
+  publisher =     {Oxford University Press},
+  title =         {Equation-free computation: an overview of patch
+                   dynamics},
+  year =          {2010},
+  isbn =          {978-0-19-923385-4},
+}
+
+@article{Kevrekidis09a,
+  author =        {Kevrekidis, Ioannis~G. and Samaey, Giovanni},
+  journal =       {Annu. Rev. Phys. Chem.},
+  pages =         {321---44},
+  title =         {Equation-Free Multiscale Computation: Algorithms and
+                   Applications},
+  volume =        {60},
+  year =          {2009},
+  abstract =      {In traditional physicochemical modeling, one derives
+                   evolution equations at the (macroscopic, coarse)
+                   scale of interest; these are used to perform a
+                   variety of tasks (simulation, bifurcation analysis,
+                   optimization) using an arsenal of analytical and
+                   numerical techniques. For many complex systems,
+                   however, although one observes evolution at a
+                   macroscopic scale of interest, accurate models are
+                   only given at a more detailed (fine-scale,
+                   microscopic) level of description (e.g., lattice
+                   Boltzmann, kinetic Monte Carlo, molecular dynamics).
+                   Here, we review a framework for computer-aided
+                   multiscale analysis, which enables macroscopic
+                   computational tasks (over extended spatiotemporal
+                   scales) using only appropriately initialized
+                   microscopic simulation on short time and length
+                   scales. The methodology bypasses the derivation of
+                   macroscopic evolution equations when these equations
+                   conceptually exist but are not available in closed
+                   form---hence the term equation-free. We selectively
+                   discuss basic algorithms and underlying principles
+                   and illustrate the approach through representative
+                   applications. We also discuss potential difficulties
+                   and outline areas for future research.},
+  doi =           {10.1146/annurev.physchem.59.032607.093610},
+}
+
+@article{Roberts99b,
+  author =        {Roberts, A.~J. and Li, Zhenquan},
+  journal =       {J.~Fluid Mech.},
+  month =         apr,
+  pages =         {33--73},
+  title =         {An accurate and comprehensive model of thin fluid
+                   flows with inertia on curved substrates},
+  volume =        {553},
+  year =          {2006},
+  doi =           {10.1017/S0022112006008640},
+}
+
+@article{Gustafsson1975,
+  author =        {Gustafsson, Bertil},
+  journal =       {Mathematics of Computation},
+  number =        {10},
+  pages =         {396--406},
+  title =         {The convergence rate for difference approximations to
+                   mixed initial boundary value problems},
+  volume =        {29},
+  year =          {1975},
+}
+
+@article{Svard2006,
+  author =        {Sv\"ard, Magnus and Nordstr\"om, Jan},
+  journal =       {Journal of Computational Physics},
+  pages =         {333--352},
+  title =         {On the order of accuracy for difference
+                   approximations of initial-boundary value problems},
+  volume =        {218},
+  year =          {2006},
+  doi =           {10.1016/j.jcp.2006.02.014},
+}
+
+@{LAMMPS,
+  author =        {Plimpton, Steve and Thompson, Aidan and Shan, Ray and
+                   Moore, Stan and Kohlmeyer, Axel and Crozier, Paul and
+                   Stevens, Mark},
+  title =         {Large-scale Atomic/Molecular Massively Parallel
+                   Simulator},
+  year =          {2016},
+  url =           {http://lammps.sandia.gov},
+}
+
