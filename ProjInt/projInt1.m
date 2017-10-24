@@ -11,7 +11,7 @@ This is a basic example of projective integration of a given system of stiff det
 
 \begin{matlab}
 %}
-function [xs]=projInt1(fun,x0,Ts,rank,dt,nTimeSteps)
+function [xs,xss,tss]=projInt1(fun,x0,Ts,rank,dt,nTimeSteps)
 %{
 \end{matlab}
 
@@ -32,8 +32,10 @@ Suspect \verb|rank| should be at least one more than the number of slow variable
 
 \paragraph{Output}
 \begin{itemize}
-\item  \verb|xs|, array in \(\RR^{n\times\ell}\) of approximate solution vector at the specified times---but the transpose of what \Matlab\ does!
+\item  \verb|xs|,  \(n\times\ell\) array of approximate solution vector at the specified times (the transpose of what \Matlab\ integrators do!)
 %\item \verb|errs|, vector in \(\RR^{1\times\ell}\) of error estimate for  the step from \(t_{k-1}\) to~\(t_k\).
+\item \verb|xss|, optional, \(n\times\text{big}\) array of the microscale simulation bursts---separated by NaNs for possible plotting.
+\item \verb|tss|, optional, \(1\times\text{big}\) vector of times corresponding to the columns of~\verb|xss|.
 \end{itemize}
 
 Compute the time steps and create storage for outputs.
@@ -42,6 +44,7 @@ Compute the time steps and create storage for outputs.
 DT=diff(Ts);
 n=length(x0);
 xs=nan(n,length(Ts));
+xss=[];tss=[];
 %{
 \end{matlab}
 Initialise first result to the given initial condition.
@@ -66,11 +69,19 @@ for i=1:sum(nTimeSteps)
 end
 %{
 \end{matlab}
+If user requests microscale bursts, then store.
+\begin{matlab}
+%}
+if nargout>1,xss=[xss x nan(n,1)];
+if nargout>2,tss=[tss Ts(k)+(0:sum(nTimeSteps))*dt nan];
+end,end
+%{
+\end{matlab}
 Grossly check on whether the microscale integration is stable.
 \begin{matlab}
 %}
 if norm(x(:,nTimeSteps(1)+(1:nTimeSteps(2)))) ...
-  > 10*norm(x(:,1:nTimeSteps(1)))
+  > 3*norm(x(:,1:nTimeSteps(1)))
   xMicroscaleIntegration=x, macroTime=Ts(k)
   error('**** projInt1: microscale integration appears unstable')
 end
@@ -96,7 +107,7 @@ S=diag(S);
 Ur = U(:,1:rank); % truncate to rank=r, nxr
 Sr = S(1:rank); % rx1
 Vr = V(:,1:rank); % mxr where m is length of DMD analysis
-AUr=bsxfun(@rdivide,X2*Vr,Sr'); % nxr
+AUr=bsxfun(@rdivide,X2*Vr,Sr.'); % nxr
 Atilde = Ur'*AUr; % low-rank dynamics, rxr
 [Wr, D] = eig(Atilde); % rxr
 Phi = AUr*Wr; % DMD modes, nxr
@@ -108,7 +119,6 @@ Perhaps should test \verb|omega| and abort if 'large' and positive??
 \begin{matlab}
 %}
 omega = log(diag(D))/dt % continuous-time eigenvalues, rx1
-%Phi=Phi
 bFin=Phi\x(:,iFin); % rx1
 x0=Phi(1:n,:)*(bFin.*exp(omega*(DT(k)-iFin*dt))); % nx1
 xs(:,k+1)=x0;
@@ -122,5 +132,13 @@ end
 %{
 \end{matlab}
 
+If requested, then add the final point to the microscale data.
+\begin{matlab}
+%}
+if nargout>1,xss=[xss x0];
+if nargout>2,tss=[tss Ts(end)];
+end,end
+%{
+\end{matlab}
 End of the function with result vectors returned in columns of~\verb|xs|, one column for each time in~\verb|Ts|.
 %}
