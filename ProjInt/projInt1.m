@@ -6,7 +6,7 @@
 \label{sec:projInt1}
 \def\dmd{\textsc{dmd}}
 
-This is a basic example of projective integration of a given system of stiff deterministic \ode{}s via Dynamic Mode Decomposition (\dmd).
+This is a basic example of projective integration of a given system of stiff deterministic \ode{}s via \dmd, the Dynamic Mode Decomposition \cite[]{Kutz2016}.
 
 
 \begin{matlab}
@@ -18,7 +18,8 @@ function [xs,xss,tss]=projInt1(fun,x0,Ts,rank,dt,nTimeSteps)
 \paragraph{Input}
 \begin{itemize}
 \item \verb|fun()| is a function such as \verb|dxdt=fun(x,t)| that computes the right-hand side of the \ode\ \(d\xv/dt=\fv(\xv,t)\) where \xv~is a column vector, say in \(\RR^n\) for \(n\geq1\)\,, \(t\)~is a scalar, and the result~\fv\ is a column vector in~\(\RR^n\).
-\item \verb|x0| is an \(\RR^n\) vector of initial values at the time \verb|ts(1)|.
+\item \verb|x0| is an \(n\)-vector of initial values at the time \verb|ts(1)|.  
+If any entries in~\verb|x0| are~\verb|NaN|, then \verb|fun()| must cope, and only the non-\verb|NaN| entries are projected in time.
 \item \verb|Ts| is a vector of times to compute the approximate solution, say in~\(\RR^\ell\) for \(\ell\geq2\)\,.
 \item \verb|rank| is the rank of the \dmd\ extrapolation over macroscale time steps.  
 Suspect \verb|rank| should be at least one more than the number of slow variables.
@@ -45,6 +46,13 @@ DT=diff(Ts);
 n=length(x0);
 xs=nan(n,length(Ts));
 xss=[];tss=[];
+%{
+\end{matlab}
+If any~\verb|x0| are \verb|NaN|, then assume the time derivative routine can cope, and here we just exclude these from \dmd\ projection and from any error estimation.
+This allows a user to have space in the solutions for breaks in the data vector (that, for example, may be filled in with boundary values for a \pde\ discretisation).
+\begin{matlab}
+%}
+j=find(~isnan(x0));
 %{
 \end{matlab}
 Initialise first result to the given initial condition.
@@ -78,10 +86,11 @@ end,end
 %{
 \end{matlab}
 Grossly check on whether the microscale integration is stable.
+Is this any use??
 \begin{matlab}
 %}
-if norm(x(:,nTimeSteps(1)+(1:nTimeSteps(2)))) ...
-  > 3*norm(x(:,1:nTimeSteps(1)))
+if norm(x(j,nTimeSteps(1)+(1:nTimeSteps(2)))) ...
+  > 3*norm(x(j,1:nTimeSteps(1)))
   xMicroscaleIntegration=x, macroTime=Ts(k)
   error('**** projInt1: microscale integration appears unstable')
 end
@@ -89,25 +98,23 @@ end
 \end{matlab}
 
 \paragraph{DMD extrapolation over the macroscale}
-\dmd\ appears to work better when ones are adjoined to the data vectors for somet unknown reason.
+\dmd\ appears to work better when ones are adjoined to the data vectors for some unknown reason.
 \begin{matlab}
 %}
 iFin=1+sum(nTimeSteps);
 iStart=1+nTimeSteps(1);
-x=[x;ones(1,iFin)];
+x=[x;ones(1,iFin)]; j1=[j;n+1];
 %{
 \end{matlab}
 Then the basic \dmd\ algorithm: first the fit.
 \begin{matlab}
 %}
-X1=x(:,iStart:iFin-1);
-X2=x(:,iStart+1:iFin);
-[U,S,V]=svd(X1,'econ');
+[U,S,V]=svd(x(j1,iStart:iFin-1),'econ');
 S=diag(S);
 Ur = U(:,1:rank); % truncate to rank=r, nxr
-Sr = S(1:rank); % rx1
+Sr = S(1:rank) % rx1
 Vr = V(:,1:rank); % mxr where m is length of DMD analysis
-AUr=bsxfun(@rdivide,X2*Vr,Sr.'); % nxr
+AUr=bsxfun(@rdivide,x(j1,iStart+1:iFin)*Vr,Sr.'); % nxr
 Atilde = Ur'*AUr; % low-rank dynamics, rxr
 [Wr, D] = eig(Atilde); % rxr
 Phi = AUr*Wr; % DMD modes, nxr
@@ -115,13 +122,20 @@ Phi = AUr*Wr; % DMD modes, nxr
 \end{matlab}
 Second, reconstruct a prediction for the time step.
 The current micro-simulation time is \verb|dt*iFin|, so step forward an amount to predict the systems state at \verb|Ts(k+1)|.
-Perhaps should test \verb|omega| and abort if 'large' and positive??
+Perhaps should test~\(\omega\) and abort if 'large' and/or positive??
+Answer: not necessarily as if the rank is large then the omega could contain large negative values.
 \begin{matlab}
 %}
 omega = log(diag(D))/dt % continuous-time eigenvalues, rx1
-bFin=Phi\x(:,iFin); % rx1
-x0=Phi(1:n,:)*(bFin.*exp(omega*(DT(k)-iFin*dt))); % nx1
-xs(:,k+1)=x0;
+bFin=Phi\x(j1,iFin); % rx1
+x0(j)=Phi(1:end-1,:)*(bFin.*exp(omega*(DT(k)-iFin*dt))); % nx1
+%{
+\end{matlab}
+Since some of the~\(\omega\) may be complex, if the simulation burst is real, then force the \dmd\ prediction to be real.
+\begin{matlab}
+%}
+if isreal(x), x0=real(x0); end
+xs(:,k+1)=x0;  
 %{
 \end{matlab}
 

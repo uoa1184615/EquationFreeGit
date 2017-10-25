@@ -18,18 +18,9 @@ introduction
 ,apptpd
 }
 
-
-
-% Use biblatex for references, also see defns.sty
-\usepackage[backend=bibtex8
-    ,style=authoryear
-    ,backref=true % optional
-    ]{biblatex}
-\AtEndDocument{\printbibliography}
-% bib data from local; merge with 'bibexport equationFreeDoc'
-\IfFileExists{ajr.sty}{\bibliography{bibexport,ajr,bib}}{}
-
-
+\usepackage{natbib}
+\bibliographystyle{agsm}
+\let\harvardurl\url
 
 %\usepackage{verbatim}
 %\newenvironment{matlab}{\verbatim}{\endverbatim}
@@ -63,5 +54,8 @@ introduction
 \appendix
 \include{apptpd}
 
+
+% bib data from local; merge with 'bibexport equationFreeDoc'
+\IfFileExists{ajr.sty}{\bibliography{bibexport,ajr,bib}}{}
 
 \end{document}

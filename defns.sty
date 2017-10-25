@@ -290,9 +290,3 @@
 \AtBeginDocument{{\def\and{, }%
   \hypersetup{pdfauthor={AJR et al.},pdftitle={Equation-Free functions for Matlab}}}}
 
-
-% for biblatex
-\let\citet\textcite
-\let\citep\parencite
-\def\cite{\@ifnextchar[{\parencite}{\textcite}}% fails??
-

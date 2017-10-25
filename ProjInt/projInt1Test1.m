@@ -30,8 +30,8 @@ Set the initial condition to parabola or some skewed random positive values.
 \begin{matlab}
 %}
 x=linspace(-1,1,n+2)';
-%u0=1-x(2:n+1).^2 +1e-9*randn(n,1);
-u0=rand(n,1).*(1+x(2:n+1));
+%u0=(1-x.^2).*(1+1e-9*randn(n+2,1));
+u0=rand(n+2,1).*(1-x.^2);
 %{
 \end{matlab}
 Projectively integrate in time one step for the moment with: 
@@ -46,7 +46,7 @@ guessed numbers of transient~(15) and slow~(7) steps.
 Plot the macroscale predictions to draw \autoref{fig:pit1u}.
 \begin{matlab}
 %}
-plot(x,[0*ts;us;0*ts],'o-')
+clf,plot(x,us,'o-')
 xlabel('space x'),ylabel('u(x,t)')
 %matlab2tikz('projInt1Test1u.ltx','noSize',true)
 print('-depsc2',['projInt1Test1u' num2str(n)])
@@ -60,7 +60,7 @@ Also plot a surface of the microscale bursts as shown in \autoref{fig:pit1micro}
 \end{figure}
 \begin{matlab}
 %}
-surf(tss,x,[0*tss;uss;0*tss])
+clf,surf(tss,x,uss)
 ylabel('space x'),xlabel('time t'),zlabel('u(x,t)')
 view([40 30])
 print('-depsc2',['projInt1Test1micro' num2str(n)])
@@ -75,15 +75,16 @@ end
 \end{matlab}
 
 \paragraph{The nonlinear PDE discretisation}
-Code the simple centred difference discretisation of the nonlinear diffusion \pde\ with zero boundary values.
+Code the simple centred difference discretisation of the nonlinear diffusion \pde\ with constant (usually zero) boundary values.
 \begin{matlab}
 %}
 function ut=dudt(u,t)
 n=length(u);
-h=2/(n+1);
-j=2:n+1;
-u=[0;u;0];
-ut=u(j).*(u(j+1)-2*u(j)+u(j-1))/h^2;
+dx=2/(n-1);
+j=2:n-1;
+ut=[0
+    u(j).*(u(j+1)-2*u(j)+u(j-1))/dx^2
+    0];
 end
 %{
 \end{matlab}
