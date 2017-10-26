@@ -3,7 +3,7 @@
 % on a simple nonlinear ODE.  
 % AJR, 29 Mar 2017
 %!TEX root = ../equationFreeDoc.tex
-\subsection{A 1D test of RK2 integration}
+\subsection{\texttt{rk2intTest1}: A 1D test of RK2 integration}
 \label{sec:2tpi}
 
 Try the nonlinear, but separable, \ode

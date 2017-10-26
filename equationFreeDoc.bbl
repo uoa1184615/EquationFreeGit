@@ -28,8 +28,8 @@ Kutz, J.~N., Brunton, S.~L., Brunton, B.~W. \harvardand\ Proctor, J.~L.
   Crozier \harvardand\ Stevens}{2016}{LAMMPS}
 Plimpton, S., Thompson, A., Shan, R., Moore, S., Kohlmeyer, A., Crozier, P.
   \harvardand\ Stevens, M.  \harvardyearleft 2016\harvardyearright ,
-  `Large-scale atomic/molecular massively parallel simulator'.
-\newline\harvardurl{http://lammps.sandia.gov}
+  Large-scale atomic/molecular massively parallel simulator, Technical report,
+  \url{http://lammps.sandia.gov}.
 
 \harvarditem{Roberts \harvardand\ Kevrekidis}{2007}{Roberts06d}
 Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft

@@ -3,7 +3,7 @@
 % on discretisation of nonlinear diffusion PDE.  
 % AJR, Oct 2017
 %!TEX root = ../equationFreeDoc.tex
-\subsection{A first test of basic projective integration}
+\subsection{\texttt{projInt1Test1}: A first test of basic projective integration}
 \label{sec:ftbpi}
 
 Seek to simulate the nonlinear diffusion \pde\

@@ -3,16 +3,15 @@
 % on patch simulation of Burgers PDE.  
 % AJR, Oct 2017
 %!TEX root = ../equationFreeDoc.tex
-\subsection{Projective integration of patch scheme}
+\subsection{\texttt{projInt1Patches}: Projective integration of patch scheme}
 \label{sec:pips}
 
-Seek to simulate the nonlinear diffusion \pde\
+Seek to simulate the nonlinear Burgers' \pde\
 \begin{equation*}
 \D tu+cu\D xu=\DD xu\quad \text{for $2\pi$-periodic }u,
 \end{equation*}
-for \(c=30\), and
-with various initial conditions.
-Use a patch scheme to only compute on part of space as shown in \autoref{fig:pit1psu}.
+for \(c=30\), and with various initial conditions.
+Use a patch scheme \cite[]{Roberts06d} to only compute on part of space as shown in \autoref{fig:pit1psu}.
 
 \begin{figure}
 \centering
@@ -147,7 +146,7 @@ dddmu=dmu(jp)-2*dmu(j)+dmu(jm);
 ddddu=ddu(jp)-2*ddu(j)+ddu(jm);
 %{
 \end{matlab}
-Use these differences to interpolate fluxes on the patch boundaries and hence set the edge values on the patch.
+Use these differences to interpolate fluxes on the patch boundaries and hence set the edge values on the patch \cite[]{Roberts06d}.
 \begin{matlab}
 %}
 u(end,j)=u(end-1,j)+(dx/H)*(dmu+ratio*ddu ...

@@ -3,7 +3,7 @@
 % on a simple nonlinear system of ODEs.  
 % AJR, 29 Mar 2017
 %!TEX root = ../equationFreeDoc.tex
-\subsection{A 2D test of RK2 integration}
+\subsection{\texttt{rk2intTest2}: A 2D test of RK2 integration}
 \label{sec:2tpi}
 
 Try the nonlinear fast-slow system

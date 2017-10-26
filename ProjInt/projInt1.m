@@ -19,10 +19,10 @@ function [xs,xss,tss]=projInt1(fun,x0,Ts,rank,dt,nTimeSteps)
 \begin{itemize}
 \item \verb|fun()| is a function such as \verb|dxdt=fun(x,t)| that computes the right-hand side of the \ode\ \(d\xv/dt=\fv(\xv,t)\) where \xv~is a column vector, say in \(\RR^n\) for \(n\geq1\)\,, \(t\)~is a scalar, and the result~\fv\ is a column vector in~\(\RR^n\).
 \item \verb|x0| is an \(n\)-vector of initial values at the time \verb|ts(1)|.  
-If any entries in~\verb|x0| are~\verb|NaN|, then \verb|fun()| must cope, and only the non-\verb|NaN| entries are projected in time.
+If any entries in~\verb|x0| are~\verb|NaN|, then \verb|fun()| must cope, and only the non-\verb|NaN| components are projected in time.
 \item \verb|Ts| is a vector of times to compute the approximate solution, say in~\(\RR^\ell\) for \(\ell\geq2\)\,.
 \item \verb|rank| is the rank of the \dmd\ extrapolation over macroscale time steps.  
-Suspect \verb|rank| should be at least one more than the number of slow variables.
+Suspect \verb|rank| should be at least one more than the effective number of slow variables.
 \item \verb|dt| is the size of the microscale time-step.  Must be small enough so that RK2 integration of the \ode{}s is stable.
 \item \verb|nTimeSteps| is a two element vector: 
 \begin{itemize}
@@ -111,11 +111,9 @@ Then the basic \dmd\ algorithm: first the fit.
 %}
 [U,S,V]=svd(x(j1,iStart:iFin-1),'econ');
 S=diag(S);
-Ur = U(:,1:rank); % truncate to rank=r, nxr
 Sr = S(1:rank) % rx1
-Vr = V(:,1:rank); % mxr where m is length of DMD analysis
-AUr=bsxfun(@rdivide,x(j1,iStart+1:iFin)*Vr,Sr.'); % nxr
-Atilde = Ur'*AUr; % low-rank dynamics, rxr
+AUr=bsxfun(@rdivide,x(j1,iStart+1:iFin)*V(:,1:rank),Sr.');%nxr
+Atilde = U(:,1:rank)'*AUr; % low-rank dynamics, rxr
 [Wr, D] = eig(Atilde); % rxr
 Phi = AUr*Wr; % DMD modes, nxr
 %{

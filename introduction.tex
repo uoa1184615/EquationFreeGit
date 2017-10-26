@@ -33,7 +33,7 @@ Let's develop functions that work for both \script.
 \subsection{Create, document and test algorithms}
 
 For developers to create and document the various functions, we use an idea due to Neil~D. Lawrence of the University of Sheffield:
-\autoref{sec:rk2ids} gives an example of the following structure to use.
+\autoref{sec:rk2int} gives an example of the following structure to use.
 
 \begin{itemize}
 \item Each class of toolbox functions is located in separate directories in the repository, say~\verb|Dir|.
@@ -52,42 +52,10 @@ defaults write TeXShop OtherTeXExtensions -array-add "m"
 
 \begin{table}
 \caption{\label{tbl:funtex}example \texttt{Dir/*.tex} file to typeset in the master document a function-subsection, say \texttt{fun.m}, and the test\slash example-subsections.}
-\begin{minted}{latex}
-% input *.m files for ... author, date
-%!TEX root = ../equationFreeDoc.tex
-\section{...}
-\label{sec:...}
-introduction...
-\input{Dir/fun.m}
-\input{Dir/funExample.m}
-...
-\end{minted}
+\inputminted[]{latex}{sectionTemplate.tex}
 \hrulefill
-%%%%%%%%%%
 \caption{\label{tbl:format}template for a function-subsection \texttt{Dir/*.m} file.}
-\begin{minted}{latex}
-%Short explanation for users typing "help fun"
-%Author, date
-%!TEX root = ../equationFreeDoc.tex
-%{
-\subsection{\texttt{...}}
-\label{sec:...}
-Summary LaTeX explanation.
-\begin{matlab}
-%}
-function ...
-%{
-\end{matlab}
-Repeated as desired:
-LaTeX between end-matlab and begin-matlab
-\begin{matlab}
-%}
-Matlab code between %} and %{
-%{
-\end{matlab}
-Concluding LaTeX before following final line.
-%}
-\end{minted}
+\inputminted[]{latex}{functionTemplate.m}
 \hrulefill
 \end{table}
 \item \autoref{tbl:format} gives the template for the \verb|Dir/*.m| function-subsections.
