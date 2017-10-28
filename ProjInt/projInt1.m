@@ -17,7 +17,7 @@ function [xs,xss,tss]=projInt1(fun,x0,Ts,rank,dt,nTimeSteps)
 
 \paragraph{Input}
 \begin{itemize}
-\item \verb|fun()| is a function such as \verb|dxdt=fun(x,t)| that computes the right-hand side of the \ode\ \(d\xv/dt=\fv(\xv,t)\) where \xv~is a column vector, say in \(\RR^n\) for \(n\geq1\)\,, \(t\)~is a scalar, and the result~\fv\ is a column vector in~\(\RR^n\).
+\item \verb|fun()| is a function such as \verb|dxdt=fun(t,x)| that computes the right-hand side of the \ode\ \(d\xv/dt=\fv(t,\xv)\) where \xv~is a column vector, say in \(\RR^n\) for \(n\geq1\)\,, \(t\)~is a scalar, and the result~\fv\ is a column vector in~\(\RR^n\).
 \item \verb|x0| is an \(n\)-vector of initial values at the time \verb|ts(1)|.  
 If any entries in~\verb|x0| are~\verb|NaN|, then \verb|fun()| must cope, and only the non-\verb|NaN| components are projected in time.
 \item \verb|Ts| is a vector of times to compute the approximate solution, say in~\(\RR^\ell\) for \(\ell\geq2\)\,.
@@ -72,8 +72,8 @@ Microscale integration is simple, second order, Runge--Kutta method.
 %}
 x=[x0(:) nan(n,sum(nTimeSteps))];
 for i=1:sum(nTimeSteps)
-    xh=x(:,i)+dt/2*fun(x(:,i),Ts(k)+(i-1)*dt);
-    x(:,i+1)=x(:,i)+dt*fun(xh,Ts(k)+(i-0.5)*dt);
+    xh=x(:,i)+dt/2*fun(Ts(k)+(i-1)*dt,x(:,i));
+    x(:,i+1)=x(:,i)+dt*fun(Ts(k)+(i-0.5)*dt,xh);
 end
 %{
 \end{matlab}
@@ -92,7 +92,7 @@ Is this any use??
 if norm(x(j,nTimeSteps(1)+(1:nTimeSteps(2)))) ...
   > 3*norm(x(j,1:nTimeSteps(1)))
   xMicroscaleIntegration=x, macroTime=Ts(k)
-  error('**** projInt1: microscale integration appears unstable')
+  error('projInt1: microscale integration appears unstable')
 end
 %{
 \end{matlab}

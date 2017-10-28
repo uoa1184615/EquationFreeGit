@@ -1,8 +1,8 @@
-%{
 % Script to test the time integration function rk2int() 
 % on a simple nonlinear ODE.  
 % AJR, 29 Mar 2017
 %!TEX root = ../equationFreeDoc.tex
+%{
 \subsection{\texttt{rk2intTest1}: A 1D test of RK2 integration}
 \label{sec:2tpi}
 

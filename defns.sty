@@ -45,18 +45,10 @@
 %\renewcommand{\vec}[1]{\text{\boldmath$#1$}}
 \newcommand{\qtq}[1]{\quad\text{#1}\quad}
 % \renewcommand{\vec}[1]{\mathbf{#1}}
-% need to use \(\) in the following as otherwise \listoftables and \listoffigures
-% gets stuffed up.  And even then, with captions one still has to put these into $...$
-% and not anything else!
-%\newcommand{\Ord}[1]{\ensuremath{\mathcal O\big(#1\big)}}
 \newcommand{\Ord}[1]{\ensuremath{\mathcal O
 \mathchoice{\big(#1\big)}{\big(#1\big)}{(#1)}{(#1)}
 }}
 \newcommand{\ord}[1]{\ensuremath{o\big(#1\big)}}
-%\newcommand{\Ord}[1]{\ifmmode\mathcal O\big(#1\big)
-%\else\(\mathcal O\big(#1\big)\)\fi}
-%\newcommand{\ord}[1]{\ifmmode o\big(#1\big)
-%\else\(o\big(#1\big)\)\fi}
 \newcommand{\divv}{\vec\nabla\cdot}
 \newcommand{\grad}{\vec\nabla}
 \newcommand{\curl}{\vec\nabla\times}
@@ -64,20 +56,12 @@
 \ifx\iint\@undefined\newcommand{\iint}{\int\!\!\!\int}\fi
 \ifx\iiint\@undefined\newcommand{\iiint}{\int\!\!\!\int\!\!\!\int}\fi
 \newcommand{\etal}{{et al.}}
+\def\nan{\texttt{NaN}}
 
 % for bibliography
 \def\arcproject#1{}
 \def\arcstatement#1{}
 
-% % stroked fractions
-% \newcommand{\strokefrac}[2]{\leavevmode\kern.1em
-% \raise.5ex\hbox{\the\scriptfont0 #1}\kern-.1em
-% /\kern-.15em\lower.25ex\hbox{\the\scriptfont0 #2}}
-\newcommand{\half}{\mbox{$\frac12$}}
-\newcommand{\third}{\mbox{$\frac13$}}
-\newcommand{\quarter}{\mbox{$\frac14$}}
-\newcommand{\sfrac}[2]{{\textstyle\frac{#1}{#2}}}
-\newcommand{\rat}[2]{{\textstyle\frac{#1}{#2}}}
 
 \newcommand{\sde}{\textsc{sde}}
 \newcommand{\spde}{\textsc{spde}}
@@ -119,19 +103,6 @@
 }
 \makeatother
 
-% default graphics
-% \usepackage{graphicx}
-%\setkeys{Gin}{width=0.9\textwidth,height=0.7\textheight,keepaspectratio}
-
-% by default use url package
-% \usepackage{url}
-
-%\def\doi{}
-%\ifx\href\undefined
-%     \renewcommand{\doi}[1]{\url{http://dx.doi.org/#1}}
-%\else\renewcommand{\doi}[1]{\href{http://dx.doi.org/#1}{doi:#1}}
-%\fi
-%\RequirePackage{doi}% doi file does hyperef things which screws 
 
 % define some useful indexing commands
 \ifx\idx\undefined%
@@ -220,25 +191,6 @@
   \else\IgnoringTooManyAtBeginsForThisCommand%
   \fi\fi%
   }
-%\newcommand{\atBegin}[2]{%
-%  \@ifundefined{#1h@@ka}{%
-%    \expandafter\let\csname#1h@@ka\expandafter\endcsname%
-%      \csname#1\endcsname
-%    \expandafter\def\csname#1\endcsname%
-%      {#2\csname#1h@@ka\endcsname}%
-%  }{\@ifundefined{#1h@@kb}{%
-%    \expandafter\let\csname#1h@@kb\expandafter\endcsname%
-%      \csname#1\endcsname
-%    \expandafter\def\csname#1\endcsname%
-%      {#2\csname#1h@@kb\endcsname}%
-%  }{\IgnoringTooManyAtBeginsForThisCommand%
-%  }%endifundefined
-%  }%endifundefined
-%  }
-%\newcommand{\atBegin}[2]{
-%  \expandafter\let\csname#1h@@k\expandafter\endcsname\csname#1\endcsname
-%  \expandafter\def\csname#1\endcsname{#2\csname#1h@@k\endcsname}
-%  }
 
 % Provide commands to consistently define vecs et al.
 % finds first char and the rest of a string

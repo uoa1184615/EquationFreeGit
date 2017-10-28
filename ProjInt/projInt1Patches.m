@@ -1,8 +1,8 @@
-%{
 % Script to test the time integration function projInt1() 
 % on patch simulation of Burgers PDE.  
 % AJR, Oct 2017
 %!TEX root = ../equationFreeDoc.tex
+%{
 \subsection{\texttt{projInt1Patches}: Projective integration of patch scheme}
 \label{sec:pips}
 
@@ -16,14 +16,14 @@ Use a patch scheme \cite[]{Roberts06d} to only compute on part of space as shown
 \begin{figure}
 \centering
 \caption{\label{fig:pit1psu}field \(u(x,t)\) tests basic projective integration of a basic patch scheme of Burgers' \pde.}
-\includegraphics[width=\linewidth]{ProjInt/projInt1PatchesU}
+\includegraphics[width=\linewidth]{ProjInt/pi1PatchesU}
 \end{figure}
 
 Function header and variables needed by discrete patch scheme.
 \begin{matlab}
 %}
 function projInt1Patches
-global dx H ratio j jp jm i I
+global dx DX ratio j jp jm i I
 %{
 \end{matlab}
 
@@ -34,7 +34,7 @@ the patch size to macroscale ratio.
 \begin{matlab}
 %}
 nPatch=8
-nMicro=11
+nSubP=11
 ratio=0.1
 %{
 \end{matlab}
@@ -42,20 +42,20 @@ The points in the microscale, sub-patch, grid are indexed by~\verb|i|, and \verb
 The macroscale patches are indexed by~\verb|j| and the neighbours by \verb|jp| and \verb|jm|.
 \begin{matlab}
 %}
-i=2:nMicro-1; % microscopic internal points for PDE
-I=round((nMicro+1)/2); % midpoint of each patch
+i=2:nSubP-1; % microscopic internal points for PDE
+I=round((nSubP+1)/2); % midpoint of each patch
 j=1:nPatch; jp=mod(j,nPatch)+1; jm=mod(j-2,nPatch)+1; % patch index
 %{
 \end{matlab}
-Make the spatial grid of patches centred at~\(X_j\) and of half-size \(h=rH\).
+Make the spatial grid of patches centred at~\(X_j\) and of half-size \(h=r\Delta X\).
 To suit Neumann boundary conditions on the patches make the micro-grid straddle the patch boundary by setting \(dx=2h/(n_\mu-2)\).
 In order for the microscale simulation to be stable, we should have \(dt\ll dx^2\).
 Then generate the microscale grid locations for all patches: \(x_{ij}\)~is the location of the \(i\)th~micro-point in the \(j\)th~patch.
 \begin{matlab}
 %}
 X=linspace(0,2*pi,nPatch+1); X=X(j); % patch mid-points
-H=X(2)-X(1) % spacing of mid-patch points
-dx=2*ratio*H/(nMicro-2) % micro-grid size 
+DX=X(2)-X(1) % spacing of mid-patch points
+dx=2*ratio*DX/(nSubP-2) % micro-grid size 
 dt=0.4*dx^2; % micro-time-step
 x=bsxfun(@plus,dx*(-I+1:I-1)',X); % micro-grids
 %{
@@ -97,25 +97,26 @@ for k=1:size(ls,2)
   legend(num2str(ts(ls(:,k))'))
 end
 xlabel('space x')
-%matlab2tikz('projInt1Test1u.ltx','noSize',true)
-print('-depsc2','projInt1PatchesU')
+%matlab2tikz('pi1Test1u.ltx','noSize',true)
+%print('-depsc2','pi1PatchesU')
 %{
 \end{matlab}
 Also plot a surface of the microscale bursts as shown in \autoref{fig:piBurgersMicro}.
 \begin{figure}
 \centering
 \caption{\label{fig:piBurgersMicro}stereo pair of the field \(u(x,t)\) during each of the microscale bursts used in the projective integration.}
-\includegraphics[width=\linewidth]{ProjInt/projInt1PatchesMicro}
+\includegraphics[width=\linewidth]{ProjInt/pi1PatchesMicro}
 \end{figure}
 \begin{matlab}
 %}
+tss(end)=nan; %omit end time-point
 figure(2),clf
 for k=1:2, subplot(2,2,k)
-  surf(tss,x(:),uss)
+  surf(tss,x(:),uss,'EdgeColor','none')
   ylabel('x'),xlabel('t'),zlabel('u(x,t)')
-  view(121-4*k,45)
+  axis tight, view(121-4*k,45)
 end
-print('-depsc2','projInt1PatchesMicro')
+%print('-depsc2','pi1PatchesMicro')
 %{
 \end{matlab}
 
@@ -131,8 +132,8 @@ end
 Code the simple centred difference discretisation of the nonlinear Burgers' \pde, \(2\pi\)-periodic in space.
 \begin{matlab}
 %}
-function ut=dudt(u,t)
-global dx H ratio j jp jm i I
+function ut=dudt(t,u)
+global dx DX ratio j jp jm i I
 nPatch=j(end);
 u=reshape(u,[],nPatch);
 %{
@@ -149,9 +150,9 @@ ddddu=ddu(jp)-2*ddu(j)+ddu(jm);
 Use these differences to interpolate fluxes on the patch boundaries and hence set the edge values on the patch \cite[]{Roberts06d}.
 \begin{matlab}
 %}
-u(end,j)=u(end-1,j)+(dx/H)*(dmu+ratio*ddu ...
+u(end,j)=u(end-1,j)+(dx/DX)*(dmu+ratio*ddu ...
 	-(dddmu*(1/6-ratio^2/2)+ddddu*ratio*(1/12-ratio^2/6)));
-u(1,j)=u(2,j)      -(dx/H)*(dmu-ratio*ddu ...
+u(1,j)=u(2,j)      -(dx/DX)*(dmu-ratio*ddu ...
 	-(dddmu*(1/6-ratio^2/2)-ddddu*ratio*(1/12-ratio^2/6)));	
 %{
 \end{matlab}

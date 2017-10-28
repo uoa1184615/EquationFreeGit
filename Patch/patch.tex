@@ -1,0 +1,21 @@
+% input *.m files for ... AJR, Nov 2017
+%!TEX root = ../equationFreeDoc.tex
+\section{Patch scheme for given microscale discrete space system}
+\label{sec:patch}
+
+The spatial discrete system is to be on a lattice such as obtained from finite difference approximation of a \pde.
+Usually continuous in time.
+
+\input{Patch/patchSmooth1.m}
+\input{Patch/makePatches.m}
+\input{Patch/BurgersTest.m}
+
+\subsection{To do}
+\begin{itemize}
+\item Testing is so far only qualitative.  Need to be quantitative.
+\item Multiple space dimensions.
+\item Heterogeneous microscale via averaging regions.
+\item Parallel processing versions.
+\item ??
+\item Adapt to maps in micro-time?
+\end{itemize}
