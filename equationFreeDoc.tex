@@ -15,7 +15,6 @@
 introduction
 ,ProjInt/projInt
 ,Patch/patch
-,RKInt/rk2int
 ,apptpd
 }
 
@@ -43,6 +42,14 @@ introduction
 
 \maketitle
 
+\begin{abstract}
+This `equation-free toolbox' facilitates the computer-assisted analysis of complex, multiscale systems.
+Its aim is to enable microscopic simulators to perform system level tasks and analysis.
+The methodology bypasses the derivation of macroscopic evolution equations by using only short bursts of microscale simulations which are often the best available description of a system
+\cite[e.g.]{Kevrekidis09a, Kevrekidis04a, Kevrekidis03b}.
+We propose that a suite of functions will empower users to implement the methods, but so far we have only just started.
+\end{abstract}
+
 \tableofcontents
 
 \include{introduction}
@@ -51,7 +58,7 @@ introduction
 
 \include{Patch/patch}
 
-\include{RKInt/rk2int}
+%\include{RKInt/rk2int}
 
 \appendix
 \include{apptpd}
