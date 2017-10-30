@@ -1,6 +1,13 @@
 \begin{thebibliography}{xx}
 
 \harvarditem[Bunder et~al.]{Bunder, Roberts \harvardand\
+  Kevrekidis}{2017}{Bunder2013b}
+Bunder, J.~E., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
+  2017\harvardyearright , `Good coupling for the multiscale patch scheme on
+  systems with microscale heterogeneity', {\em J.~Computational Physics} {\bf
+  accepted 2 Feb 2017}.
+
+\harvarditem[Bunder et~al.]{Bunder, Roberts \harvardand\
   Kevrekidis}{2016}{Bunder2015a}
 Bunder, J., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
   2016\harvardyearright , `Accuracy of patch dynamics with mesoscale temporal

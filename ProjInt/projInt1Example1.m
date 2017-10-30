@@ -1,9 +1,9 @@
-% Script to test the time integration function projInt1() 
+% Example of the time integration function projInt1() 
 % on discretisation of nonlinear diffusion PDE.  
 % AJR, Oct 2017
 %!TEX root = ../equationFreeDoc.tex
 %{
-\subsection{\texttt{projInt1Test1}: A first test of basic projective integration}
+\subsection{\texttt{projInt1Example1}: A first test of basic projective integration}
 \label{sec:ftbpi}
 
 Seek to simulate the nonlinear diffusion \pde\
@@ -15,13 +15,13 @@ with random positive initial condition.
 \begin{figure}
 \centering
 \caption{\label{fig:pit1u}field \(u(x,t)\) tests basic projective integration.}
-\includegraphics[width=\linewidth]{ProjInt/pi1Test1u9}
+\includegraphics[width=\linewidth]{ProjInt/pi1Example1u9}
 \end{figure}
 
 Set the number of interior points in the domain~\([-1,1]\), and the macroscale time step. 
 \begin{matlab}
 %}
-function projInt1Test1
+function projInt1Example1
 n=9
 ts=0:2:6
 %{
@@ -48,15 +48,15 @@ Plot the macroscale predictions to draw \autoref{fig:pit1u}.
 %}
 clf,plot(x,us,'o-')
 xlabel('space x'),ylabel('u(x,t)')
-%matlab2tikz('pi1Test1u.ltx','noSize',true)
-%print('-depsc2',['pi1Test1u' num2str(n)])
+%matlab2tikz('pi1Example1u.ltx','noSize',true)
+%print('-depsc2',['pi1Example1u' num2str(n)])
 %{
 \end{matlab}
 Also plot a surface of the microscale bursts as shown in \autoref{fig:pit1micro}.
 \begin{figure}
 \centering
 \caption{\label{fig:pit1micro}field \(u(x,t)\) during each of the microscale bursts used in the projective integration.}
-\includegraphics[width=\linewidth]{ProjInt/pi1Test1micro9}
+\includegraphics[width=\linewidth]{ProjInt/pi1Example1micro9}
 \end{figure}
 \begin{matlab}
 %}
@@ -64,7 +64,7 @@ tss(end)=nan;% omit the last time point
 clf,surf(tss,x,uss,'EdgeColor','none')
 ylabel('space x'),xlabel('time t'),zlabel('u(x,t)')
 view([40 30])
-%print('-depsc2',['pi1Test1micro' num2str(n)])
+%print('-depsc2',['pi1Example1micro' num2str(n)])
 %{
 \end{matlab}
 

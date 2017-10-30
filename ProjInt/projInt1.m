@@ -111,7 +111,7 @@ Then the basic \dmd\ algorithm: first the fit.
 %}
 [U,S,V]=svd(x(j1,iStart:iFin-1),'econ');
 S=diag(S);
-Sr = S(1:rank) % rx1
+Sr = S(1:rank); % singular values, rx1
 AUr=bsxfun(@rdivide,x(j1,iStart+1:iFin)*V(:,1:rank),Sr.');%nxr
 Atilde = U(:,1:rank)'*AUr; % low-rank dynamics, rxr
 [Wr, D] = eig(Atilde); % rxr
@@ -124,7 +124,7 @@ Perhaps should test~\(\omega\) and abort if 'large' and/or positive??
 Answer: not necessarily as if the rank is large then the omega could contain large negative values.
 \begin{matlab}
 %}
-omega = log(diag(D))/dt % continuous-time eigenvalues, rx1
+omega = log(diag(D))/dt; % continuous-time eigenvalues, rx1
 bFin=Phi\x(j1,iFin); % rx1
 x0(j)=Phi(1:end-1,:)*(bFin.*exp(omega*(DT(k)-iFin*dt))); % nx1
 %{

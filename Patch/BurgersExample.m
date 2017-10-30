@@ -3,8 +3,8 @@
 %AJR, Nov 2017
 %!TEX root = ../equationFreeDoc.tex
 %{
-\subsection{\texttt{BurgersTest}: simulate Burgers' PDE on patches}
-\label{sec:BurgersTest}
+\subsection{\texttt{BurgersExample}: simulate Burgers' PDE on patches}
+\label{sec:BurgersExample}
 
 \begin{figure}
 \centering
@@ -16,7 +16,7 @@ The inter-patch coupling is realised by fourth-order interpolation to the patch 
 
 \begin{matlab}
 %}
-function BurgersTest
+function BurgersExample
 %{
 \end{matlab}
 

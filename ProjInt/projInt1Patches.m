@@ -1,12 +1,12 @@
-% Script to test the time integration function projInt1() 
-% on patch simulation of Burgers PDE.  
+% Example of the time integration function projInt1() 
+% on a patch simulation of Burgers PDE.  
 % AJR, Oct 2017
 %!TEX root = ../equationFreeDoc.tex
 %{
 \subsection{\texttt{projInt1Patches}: Projective integration of patch scheme}
 \label{sec:pips}
 
-Seek to simulate the nonlinear Burgers' \pde\
+As an example of the use of projective integration, seek to simulate the nonlinear Burgers' \pde\
 \begin{equation*}
 \D tu+cu\D xu=\DD xu\quad \text{for $2\pi$-periodic }u,
 \end{equation*}
@@ -15,7 +15,7 @@ Use a patch scheme \cite[]{Roberts06d} to only compute on part of space as shown
 
 \begin{figure}
 \centering
-\caption{\label{fig:pit1psu}field \(u(x,t)\) tests basic projective integration of a basic patch scheme of Burgers' \pde.}
+\caption{\label{fig:pit1psu}field \(u(x,t)\) tests basic projective integration of a basic patch scheme of Burgers' \pde, from randomly corrupted initial conditions.}
 \includegraphics[width=\linewidth]{ProjInt/pi1PatchesU}
 \end{figure}
 

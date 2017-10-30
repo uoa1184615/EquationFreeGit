@@ -5,7 +5,7 @@ Users: Place this toolbox's folder in a path searched by
 Matlab/Octave.   Then read the subsection of
 equationFreeDoc.pdf that documents the function of interest.
 
-Developers: The aim of this project is to collectively
+Contributors: The aim of this project is to collectively
 develop a Matlab/Octave toolbox of equation-free algorithms.
 Initially the algorithms will be simple, and the plan is to
 subsequently develop more and more capability.  Read the
