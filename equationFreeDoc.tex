@@ -1,12 +1,14 @@
-\documentclass[11pt,a5paper]{article}
+\documentclass[11pt,a5paper,twoside]{article}
 \IfFileExists{ajr.sty}{\usepackage{ajr}}
 {\usepackage[a5paper,margin=11mm]{geometry}}
 
 \title{Equation-Free function toolbox for Matlab/Octave}
+
 \author{A. J. Roberts\thanks{%
 \url{http://www.maths.adelaide.edu.au/anthony.roberts},
 \url{http://orcid.org/0000-0001-8930-1552}}
 \and et al.\thanks{Be the first to appear here for your contribution.}}
+
 \date{\today}
 
 
@@ -18,15 +20,18 @@ introduction
 ,apptpd
 }
 
+% verbatim listing is quick and reliable
+\usepackage{verbatim}
+\newenvironment{matlab}{\verbatim}{\endverbatim}
+%\usepackage{mcode} %[framed,numbered,autolinebreaks,useliterate]
+%\renewenvironment{matlab}{\lstlisting}{\endlstlisting}
+
+%\usepackage{pgfplots}\pgfplotsset{compat=newest}% avoid as too few use
+
+
 \usepackage{natbib}
 \bibliographystyle{agsm}
 \let\harvardurl\url
-
-%\usepackage{verbatim}
-%\newenvironment{matlab}{\verbatim}{\endverbatim}
-\usepackage{minted}
-\newminted[matlab]{matlab}{linenos}
-%\usepackage{pgfplots}\pgfplotsset{compat=newest}% avoid as few use
 
 \usepackage{microtype,amsmath,defns,graphicx,hyperref}
 \def\script{\textsc{Matlab}\slash Octave}
@@ -34,6 +39,15 @@ introduction
 \Vec f\Vec x\Vec u \Vec X \Vec U
 \Bb R  \Bb X
 
+% These are recommended by Rob J Hyndman (2011)
+% \footnote{\url{http://robjhyndman.com/researchtips/latex-floats/}}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
 
 
 
@@ -47,7 +61,7 @@ This `equation-free toolbox' facilitates the computer-assisted analysis of compl
 Its aim is to enable microscopic simulators to perform system level tasks and analysis.
 The methodology bypasses the derivation of macroscopic evolution equations by using only short bursts of microscale simulations which are often the best available description of a system
 \cite[e.g.]{Kevrekidis09a, Kevrekidis04a, Kevrekidis03b}.
-We propose that a suite of functions will empower users to implement the methods, but so far we have only just started.
+This suite of functions should empower users to start implementing such methods---but so far we have only just started.
 \end{abstract}
 
 \tableofcontents

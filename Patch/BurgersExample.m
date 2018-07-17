@@ -20,7 +20,7 @@ function BurgersExample
 %{
 \end{matlab}
 
-Establish global data struct for Burgers' \pde\ solved on \(2\pi\)-periodic domain, with eight patches, each patch of half-size~\(0.1\), and with eleven points within each patch.
+Establish global data struct for Burgers' \pde\ solved on \(2\pi\)-periodic domain, with eight patches, each patch of half-size~\(0.1\),  with eleven points within each patch, and fourth order interpolation  provides values for the inter-patch coupling conditions.
 \begin{matlab}
 %}
 global patches
@@ -28,7 +28,7 @@ nPatch=8
 ratio=0.1
 nSubP=7
 Len=2*pi;
-makePatches(@burgerspde,0,Len,nPatch,ratio,nSubP);
+makePatches(@burgerspde,0,Len,nPatch,4,ratio,nSubP);
 %{
 \end{matlab}
 

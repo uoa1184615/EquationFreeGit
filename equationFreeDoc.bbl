@@ -14,6 +14,28 @@ Bunder, J., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
   coupling for efficient massively parallel simulations', {\em SIAM Journal on
   Scientific Computing} {\bf 38}(4),~C335--C371.
 
+\harvarditem{Calderon}{2007}{Calderon2007}
+Calderon, C.~P.  \harvardyearleft 2007\harvardyearright , `Local diffusion
+  models for stochastic reacting systems: estimation issues in equation-free
+  numerics', {\em Molecular Simulation} {\bf 33}(9---10),~713---731.
+
+\harvarditem{Cao \harvardand\ Roberts}{2012}{Cao2012}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2012\harvardyearright ,
+  Modelling 3d turbulent floods based upon the smagorinski large eddy closure,
+  {\em in} P.~A. Brandner \harvardand\ B.~W. Pearce, eds, `18th Australasian
+  Fluid Mechanics Conference'.
+\newline\harvardurl{http://people.eng.unimelb.edu.au/imarusic/proceedings/18/70%20-%20Cao.pdf}
+
+\harvarditem{Cao \harvardand\ Roberts}{2016{\em a}}{Cao2014b}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016{\em
+  a}\harvardyearright , `Modelling suspended sediment in environmental
+  turbulent fluids', {\em J.~Engrg.\ Maths} {\bf 98}(1),~187--204.
+
+\harvarditem{Cao \harvardand\ Roberts}{2016{\em b}}{Cao2014a}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016{\em
+  b}\harvardyearright , `Multiscale modelling couples patches of nonlinear
+  wave-like simulations', {\em IMA J.~Applied Maths.} {\bf 81}(2),~228--254.
+
 \harvarditem{Gear \harvardand\ Kevrekidis}{2003{\em a}}{Gear02b}
 Gear, C.~W. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft 2003{\em
   a}\harvardyearright , `Projective methods for stiff differential equations:
@@ -43,7 +65,8 @@ Gustafsson, B.  \harvardyearleft 1975\harvardyearright , `The convergence rate
 Hyman, J.~M.  \harvardyearleft 2005\harvardyearright , `Patch dynamics for
   multiscale problems', {\em Computing in Science \& Engineering} {\bf
   7}(3),~47--53.
-\newline\harvardurl{http://scitation.aip.org/content/aip/journal/cise/7/3/10.1109/MCSE.2005.57}
+\newline\harvardurl{http://scitation.aip.org/content/aip/journal/cise/7/3/
+  10.1109/MCSE.2005.57}
 
 \harvarditem[Kevrekidis et~al.]{Kevrekidis, Gear \harvardand\
   Hummer}{2004}{Kevrekidis04a}
@@ -78,7 +101,8 @@ Liu, P., Samaey, G., Gear, C.~W. \harvardand\ Kevrekidis, I.~G.
   \harvardyearleft 2015\harvardyearright , `On the acceleration of spatially
   distributed agent-based computations: A patch dynamics scheme', {\em Applied
   Numerical Mathematics} {\bf 92},~54--69.
-\newline\harvardurl{http://www.sciencedirect.com/science/article/pii/S0168927414002086}
+\newline\harvardurl{http://www.sciencedirect.com/science/article/pii/
+  S0168927414002086}
 
 \harvarditem[Plimpton et~al.]{Plimpton, Thompson, Shan, Moore, Kohlmeyer,
   Crozier \harvardand\ Stevens}{2016}{LAMMPS}

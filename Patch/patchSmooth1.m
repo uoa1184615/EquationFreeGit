@@ -18,12 +18,20 @@ global patches
 
 \paragraph{Input}
 \begin{itemize}
-\item \verb|u| is a vector of size \(\verb|nSubP|\cdot \verb|nPatch|\cdot \verb|nVars|\) where there are \verb|nVars| field values at each of the points in the \(\verb|nSubP|\times \verb|nPatch|\) grid.
+\item \verb|u| is a vector of length \(\verb|nSubP|\cdot \verb|nPatch|\cdot \verb|nVars|\) where there are \verb|nVars| field values at each of the points in the \(\verb|nSubP|\times \verb|nPatch|\) grid.
 \item \verb|t| is the current time to be passed to the user's time derivative function.
-\item \verb|patches.fun| is the name of the user's function \verb|fun(t,u,x)| that computes the time derivatives on the patchy lattice. The array~\verb|u| has size \(\verb|nSubP|\cdot \verb|nPatch|\cdot \verb|nVars|\).
-The time derivatives must be computed into the same sized array, but the patch edge values will be overwritten by zeros.
-\item \verb|patches.x| is \(\verb|nSubP|\times \verb|nPatch|\) array of the spatial locations~\(x_{ij}\) of the microscale grid points in every patch.  
+\item \verb|patches| a struct set by \verb|makePatches()| with the following information.
+\begin{itemize}
+\item \verb|.fun| is the name of the user's function \verb|fun(t,u,x)| that computes the time derivatives on the patchy lattice. 
+The array~\verb|u| has size \(\verb|nSubP|\times \verb|nPatch|\times \verb|nVars|\).
+Time derivatives must be computed into the same sized array, but the patch edge values will be overwritten by zeros.
+\item \verb|.x| is \(\verb|nSubP|\times \verb|nPatch|\) array of the spatial locations~\(x_{ij}\) of the microscale grid points in every patch.  
 Currently it \emph{must} be a regular lattice on both macro- and micro-scales.
+\item \verb|.ordCC|
+\item \verb|.alt|
+\item \verb|.Cwtsr| and \verb|.Cwtsl|
+\end{itemize}
+
 \end{itemize}
 
 
@@ -41,7 +49,7 @@ nV=round(numel(u)/numel(patches.x));
 u=reshape(u,nM,nP,nV);
 %{
 \end{matlab}
-With Dirichlet conditions on the patch edge, the half-length of a patch is \(h=dx(n_\mu-1)/2\) (or~\(-2\) for specified flux), and the ratio needed for interpolation is then \(r=h/\Delta X\).
+With Dirichlet patches, the half-length of a patch is \(h=dx(n_\mu-1)/2\) (or~\(-2\) for specified flux), and the ratio needed for interpolation is then \(r=h/\Delta X\).
 Compute lattice sizes from inside the patches as the edge values may be \nan{}s, etc.
 \begin{matlab}
 %}
@@ -52,6 +60,7 @@ r=dx*(nM-1)/2/DX;
 \end{matlab}
 
 For the moment?? assume the physical domain is macroscale periodic so that the coupling formulas are simplest.  
+Should cater for periodic, odd-mid-gap, even-mid-gap, even-mid-patch, dirichlet, neumann, ??
 These index vectors point to patches and their two immediate neighbours.
 \begin{matlab}
 %}
@@ -65,36 +74,40 @@ i0=round((nM+1)/2);
 %{
 \end{matlab}
 So compute centred differences of the mid-patch values for the macro-interpolation, of all fields.
-For the moment?? assumes the domain is macro-periodic.
+Assumes the domain is macro-periodic.
 \begin{matlab}
 %}
-dmu=(u(i0,jp,:)-u(i0,jm,:))/2; % \mu\delta
-ddu=(u(i0,jp,:)-2*u(i0,j,:)+u(i0,jm,:)); % \delta^2
-dddmu=dmu(1,jp,:)-2*dmu(1,j,:)+dmu(1,jm,:); % \mu\delta^3
-ddddu=ddu(1,jp,:)-2*ddu(1,j,:)+ddu(1,jm,:); % \delta^4
-%dddddmu=dddmu(jp,:)-2*dddmu(j,:)+dddmu(jm,:); % \mu\delta^5
-%ddddddu=ddddu(jp,:)-2*ddddu(j,:)+ddddu(jm,:); % \delta^6
+dmu=nan(patches.ordCC,nP,nV);
+if patches.alt % use only odd numbered neighbours
+    dmu(1,:,:)=(u(i0,jp,:)+u(i0,jm,:))/2; % \mu
+    dmu(2,:,:)= u(i0,jp,:)-u(i0,jm,:); % \delta
+    jp=jp(jp); jm=jm(jm); % increase shifts to \pm2
+else % standard
+    dmu(1,:,:)=(u(i0,jp,:)-u(i0,jm,:))/2; % \mu\delta
+    dmu(2,:,:)=(u(i0,jp,:)-2*u(i0,j,:)+u(i0,jm,:)); % \delta^2
+end% if
 %{
 \end{matlab}
-Interpolate macro-values to be Dirichlet edge values for each patch \cite[]{Roberts06d}.
-Here interpolate to fourth order.
+Recursively take \(\delta^2\) of these to form higher order centred differences (could unroll a little to cater for two in parallel).
 \begin{matlab}
 %}
-u(nM,j,:)=u(i0,j,:)+r*dmu+r^2/2*ddu ...
-   +dddmu*(-1+r^2)*r/6+ddddu*(-1+r^2)*r^2/24;
-u(1,j,:)=u(i0,j,:)-r*dmu+r^2/2*ddu ...
-   -dddmu*(-1+r^2)*r/6+ddddu*(-1+r^2)*r^2/24;
+for k=3:patches.ordCC
+    dmu(k,:,:)=dmu(k-2,jp,:)-2*dmu(k-2,j,:)+dmu(k-2,jm,:);
+end
 %{
 \end{matlab}
-The following additions, respectively, is potentially sixth order.
-\begin{verbatim}
-   +dddddmu*(r/30-r^3/24+r^5/120) ...
-   +ddddddu*(r^2/180-r^4/144+r^6/720);
-   -dddddmu*(r/30-r^3/24+r^5/120) ...
-   +ddddddu*(r^2/180-r^4/144+r^6/720);
-\end{verbatim}
+Interpolate macro-values to be Dirichlet edge values for each patch \cite[]{Roberts06d}, using weights computed in \verb|makePatches()| .
+Here interpolate to specified order.
+\begin{matlab}
+%}
+u(nM,j,:)=u(i0,j,:)*(1-patches.alt) ...
+    +sum(bsxfun(@times,patches.Cwtsr,dmu));
+u( 1,j,:)=u(i0,j,:)*(1-patches.alt) ...
+    +sum(bsxfun(@times,patches.Cwtsl,dmu));
+%{
+\end{matlab}
 
-Ask the user for the time derivatives, overwrite edge values, the return as column vector.
+Ask the user for the time derivatives computed in the array, overwrite its edge values, then return to an integrator as column vector.
 \begin{matlab}
 %}
 dudt=patches.fun(t,u,patches.x);

@@ -34,13 +34,14 @@ x=linspace(-1,1,n+2)';
 u0=rand(n+2,1).*(1-x.^2);
 %{
 \end{matlab}
-Projectively integrate in time one step for the moment with: 
+Projectively integrate in time with: 
 rank-two DMD projection; 
-guessed microscale time-step; and 
-guessed numbers of transient~(15) and slow~(7) steps.
+guessed microscale time-step but chosen so an integral number of micro-steps fits into a macro-step for comparison; and 
+guessed transient time~\(0.4\) and \(7\)~micro-steps `on the slow manifold'.
 \begin{matlab}
 %}
-[us,uss,tss]=projInt1(@dudt,u0,ts,2,2/n^2,[round(n^2/5.4) 7])
+dt=2/n^2
+[us,uss,tss]=projInt1(@dudt,u0,ts,2,dt,[0.4 7*dt])
 %{
 \end{matlab}
 Plot the macroscale predictions to draw \autoref{fig:pit1u}.

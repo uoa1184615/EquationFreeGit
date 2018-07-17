@@ -3,7 +3,7 @@
 %AJR, Nov 2017
 %!TEX root = ../equationFreeDoc.tex
 %{
-\subsection{\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
+\subsection[\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]{\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
 \label{sec:HomogenisationExample}
 
 \begin{figure}
@@ -35,6 +35,7 @@ cHomo=1/mean(1./cDiff)
 \end{matlab}
 
 Establish global data struct for heterogeneous diffusion\ solved on \(2\pi\)-periodic domain, with eight patches, each patch of half-size~\(0.1\), and the number of points in a patch being one more than an even multiple of the microscale periodicity (which \cite{Bunder2013b} showed is accurate).
+Fourth order interpolation provides values for the inter-patch coupling conditions.
 \begin{matlab}
 %}
 global patches
@@ -42,7 +43,7 @@ nPatch=8
 ratio=0.2
 nSubP=2*mPeriod+1
 Len=2*pi;
-makePatches(@heteroDiff,0,Len,nPatch,ratio,nSubP);
+makePatches(@heteroDiff,0,Len,nPatch,4,ratio,nSubP);
 %{
 \end{matlab}
 Can add to the global data struct~\verb|patches| for use by the time derivative function (for example): here include the diffusivity coefficients, repeated to fill up a patch.

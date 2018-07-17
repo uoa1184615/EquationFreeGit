@@ -1,0 +1,58 @@
+% This file was created by matlab2tikz.
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\definecolor{mycolor1}{rgb}{0.13359,0.48867,0.73828}%
+\definecolor{mycolor2}{rgb}{0.46758,0.53789,0.00000}%
+%
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=3.824in,
+height=3.016in,
+at={(0.641in,0.407in)},
+scale only axis,
+xmode=log,
+xmin=0.1,
+xmax=10,
+xminorticks=true,
+xlabel={projective time-step},
+ymode=log,
+ymin=0.01,
+ymax=1,
+yminorticks=true,
+ylabel={steps error},
+xmajorgrids,
+xminorgrids,
+ymajorgrids,
+yminorgrids,
+legend style={legend cell align=left, align=left, legend plot pos=left, draw=black}
+]
+\addplot [color=mycolor1, dotted, mark=o, mark options={solid, mycolor1}]
+  table[row sep=crcr]{%
+0.1	0.0133778908409039\\
+0.2	0.0130737566221462\\
+0.4	0.0161539754098054\\
+0.6	0.0236064217114764\\
+1	0.0492306119993099\\
+1.6	0.0943449824040831\\
+2.6	0.163820482721433\\
+};
+\addlegendentry{one}
+
+\addplot [color=mycolor2, dotted, mark=o, mark options={solid, mycolor2}]
+  table[row sep=crcr]{%
+0.1	0.0151430771453361\\
+0.2	0.0135433688275805\\
+0.4	0.0136295695880406\\
+0.6	0.0165432301717667\\
+1	0.0270729855707163\\
+1.6	0.0441264407055157\\
+2.6	0.0686676415124699\\
+};
+\addlegendentry{two}
+
+\end{axis}
+\end{tikzpicture}%

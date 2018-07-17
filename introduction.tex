@@ -51,17 +51,21 @@ Some editors may need to be told that \verb|fun.m| is a \LaTeX\ file.  For examp
 defaults write TeXShop OtherTeXExtensions -array-add "m"
 \end{verbatim}
 
-\begin{table}
-\caption{\label{tbl:funtex}example \texttt{Dir/*.tex} file to typeset in the master document a function-subsection, say \texttt{fun.m}, and the test\slash example-subsections.}
-\inputminted[]{latex}{sectionTemplate.tex}
-\hrulefill
-\caption{\label{tbl:format}template for a function-subsection \texttt{Dir/*.m} file.}
-\inputminted[]{latex}{functionTemplate.m}
-\hrulefill
-\end{table}
 \item \autoref{tbl:format} gives the template for the \verb|Dir/*.m| function-subsections.
 The format for a example\slash test-subsection is similar.
 
 \item Currently I use the beautiful \verb|minted| package to list code, but it does require a little more effort when installing.
 
 \end{itemize}
+
+\begin{table}
+\caption{\label{tbl:funtex}example \texttt{Dir/*.tex} file to typeset in the master document a function-subsection, say \texttt{fun.m}, and the test\slash example-subsections.}
+\verbatiminput{sectionTemplate.tex}
+%\hrulefill
+%\end{table}\begin{table}
+\caption{\label{tbl:format}template for a function-subsection \texttt{Dir/*.m} file.}
+\verbatiminput{functionTemplate.m}
+%\hrulefill
+\end{table}
+
+
