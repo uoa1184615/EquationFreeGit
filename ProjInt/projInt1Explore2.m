@@ -6,6 +6,7 @@
 %{
 \subsection{\texttt{projInt1Explore2}: explore effect of varying parameters}
 \label{sec:pi1eevp}
+\localtableofcontents
 
 Seek to simulate the nonlinear diffusion \pde\
 \begin{equation*}

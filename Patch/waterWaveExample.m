@@ -5,6 +5,7 @@
 %{
 \subsection{\texttt{waterWaveExample}: simulate a water wave PDE on patches}
 \label{sec:waterWaveExample}
+\localtableofcontents
 
 \begin{figure}
 \centering

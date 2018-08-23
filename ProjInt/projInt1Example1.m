@@ -5,6 +5,7 @@
 %{
 \subsection{\texttt{projInt1Example1}: A first test of basic projective integration}
 \label{sec:ftbpi}
+\localtableofcontents
 
 Seek to simulate the nonlinear diffusion \pde\
 \begin{equation*}

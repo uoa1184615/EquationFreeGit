@@ -1,0 +1,98 @@
+% This etocx package aims to be a simple front-end for 
+% basic use of the etoc package.  AJR, 12 Jul 2018
+% http://orcid.org/0000-0001-8930-1552
+\def\fileversion{0.1c}
+\def\filedate{2018/08/23}
+\typeout{-- Package `etocx' \fileversion\space <\filedate> --}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{etocx}[\filedate\space\fileversion]
+
+% process options
+% The default is to truncate all tocs at tocdepth,
+% but these options truncate tocs at the same relative depth.
+% Perhaps twodeep is generally best.
+\def\etocXdeep{9} % Default is truncated at tocdepth
+\DeclareOption{onedeep}{\def\etocXdeep{1}}
+\DeclareOption{twodeep}{\def\etocXdeep{2}}
+\DeclareOption{threedeep}{\def\etocXdeep{3}}
+\ProcessOptions
+
+% Build upon the etoc package
+\typeout{-- `etocx' requires the etoc package --}
+\usepackage{etoc}
+
+% try to identify article classes 
+\newif\ifetocXChaps
+\etocXChapstrue
+\@ifclassloaded{refart}{\etocXChapsfalse}{}
+\@ifclassloaded{article}{\etocXChapsfalse}{}
+\@ifclassloaded{scrartcl}{\etocXChapsfalse}{}
+\@ifclassloaded{extarticle}{\etocXChapsfalse}{}
+\ifetocXChaps\def\etocXHead{% chapter class
+      \chapter*{Contents}\ifcase\etocXdeep
+      \or\etocsettocdepth{chapter}
+      \or\etocsettocdepth{section}
+      \else\fi}
+   \else\def\etocXHead{% section class
+      \section*{Contents}\ifcase\etocXdeep
+      \or\etocsettocdepth{section}
+      \or\etocsettocdepth{subsection}
+      \else\fi}
+   \fi
+
+
+\newcommand\EtocXheader{% from article.cls
+    \@startsection{subsubsection}{3}{\z@}%
+    {-3.25ex\@plus -1ex \@minus -.2ex}%
+    {1.5ex \@plus .2ex}%
+    {\normalfont\normalsize\itshape}}
+                                     
+\etocchecksemptiness% required for following to work
+% Set basic format of the various contents
+\ifcase\etocXdeep
+\or% 
+\setcounter{tocdepth}{5}%need to store deep info
+\etocsettocstyle{% one deep
+  \ifcase\Etoc@level\section*{Part contents}\etocsettocdepth{chapter}%
+  \or\subsection*{Chapter contents}\etocsettocdepth{section}%
+  \or\EtocXheader*{Section contents}\etocsettocdepth{subsection}%
+  \or\EtocXheader*{Subsection contents}\etocsettocdepth{subsubsection}%
+  \or\EtocXheader*{Subsubsection contents}\etocsettocdepth{paragraph}%
+  \or%empty
+  \or%empty
+  \else\etocXHead%
+  \fi}{\bigskip\noindent}
+\or% 
+\setcounter{tocdepth}{5}%need to store deep info
+\etocsettocstyle{% two deep
+  \ifcase\Etoc@level\section*{Part contents}\etocsettocdepth{section}%
+  \or\subsection*{Chapter contents}\etocsettocdepth{subsection}%
+  \or\EtocXheader*{Section contents}\etocsettocdepth{subsubsection}%
+  \or\EtocXheader*{Subsection contents}\etocsettocdepth{paragraph}%
+  \or\EtocXheader*{Subsubsection contents}\etocsettocdepth{subparagraph}%
+  \or%empty
+  \or%empty
+  \else\etocXHead%
+  \fi}{\bigskip\noindent}
+\else% 
+\etocsettocstyle{% default case
+  \ifcase\Etoc@level\section*{Part contents}%
+  \or\subsection*{Chapter contents}%
+  \or\EtocXheader*{Section contents}%
+  \or\EtocXheader*{Subsection contents}%
+  \or\EtocXheader*{Subsubsection contents}%
+  \or%empty
+  \or%empty
+  \else\etocXHead%
+  \fi}{\bigskip\noindent}
+\fi%end-case of how deep
+
+
+% Use minitoc commands to invoke etocs
+% Should this be \AtBeginDocument?
+\let\secttoc\localtableofcontents
+\let\minitoc\localtableofcontents
+\let\parttoc\localtableofcontents
+\let\doparttoc\relax
+\let\dominitoc\relax
+\let\dosecttoc\relax

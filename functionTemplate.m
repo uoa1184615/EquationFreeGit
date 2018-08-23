@@ -4,6 +4,7 @@
 %{
 \subsection{\texttt{...}: ...}
 \label{sec:...}
+\localtableofcontents
 Summary LaTeX explanation.
 \begin{matlab}
 %}

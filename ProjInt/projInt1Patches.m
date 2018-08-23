@@ -5,6 +5,7 @@
 %{
 \subsection{\texttt{projInt1Patches}: Projective integration of patch scheme}
 \label{sec:pips}
+\localtableofcontents
 
 As an example of the use of projective integration, seek to simulate the nonlinear Burgers' \pde\
 \begin{equation*}

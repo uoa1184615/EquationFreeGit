@@ -5,6 +5,7 @@
 %{
 \subsection{\texttt{rk2int()}}
 \label{sec:rk2int}
+\localtableofcontents
 
 This is a simple example of Runge--Kutta, 2nd order, integration of a given deterministic \ode.
 

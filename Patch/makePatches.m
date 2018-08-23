@@ -5,8 +5,9 @@
 %{
 \subsection{\texttt{makePatches()}: makes the spatial patches for the suite}
 \label{sec:makePatches}
+\localtableofcontents
 
-Makes the struct~\verb|patches| for use by the patch\slash gap-tooth function~\verb|patchSmooth1()|.
+Makes the struct~\verb|patches| for use by the patch\slash gap-tooth time derivative function~\verb|patchSmooth1()|.
 
 \begin{matlab}
 %}
@@ -44,6 +45,7 @@ patches.fun=fun;
 \end{matlab}
 
 Second, store the order of interpolation that is to provide the values for the inter-patch coupling conditions.
+Maybe allow \verb|ordCC| of~0 and~\(-1\) to request spectral coupling??
 \begin{matlab}
 %}
 if ~ismember(ordCC,[1:8])
@@ -59,7 +61,7 @@ ordCC=ordCC+patches.alt;
 patches.ordCC=ordCC;
 %{
 \end{matlab}
-Might as well precompute the weightings for the interpolation of field values for coupling. (What about coupling via derivative values??)
+Might as well precompute the weightings for the interpolation of field values for coupling. (What about coupling via derivative values??  what about spectral coupling??)
 \begin{matlab}
 %}
 if patches.alt  % eqn (7) in \cite{Cao2014a}

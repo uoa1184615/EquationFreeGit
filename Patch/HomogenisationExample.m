@@ -5,6 +5,7 @@
 %{
 \subsection[\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]{\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
 \label{sec:HomogenisationExample}
+\localtableofcontents
 
 \begin{figure}
 \centering

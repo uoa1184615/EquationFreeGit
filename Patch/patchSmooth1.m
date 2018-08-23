@@ -6,6 +6,7 @@
 %{
 \subsection{\texttt{patchSmooth1()}}
 \label{sec:patchSmooth1}
+\localtableofcontents
 
 Couples patches across space so a spatially discrete system can be integrated in time via the patch or gap-tooth scheme \cite[]{Roberts06d}.
 Need to pass patch-design variables to this function, so use the global struct~\verb|patches|.
@@ -41,7 +42,7 @@ Currently it \emph{must} be a regular lattice on both macro- and micro-scales.
 \end{itemize}
 
 Try to figure out sizes of things.
-An error in the reshape indicates~\verb|u| has the wrong length.
+Any error arising in the reshape indicates~\verb|u| has the wrong length.
 \begin{matlab}
 %}
 [nM,nP]=size(patches.x);

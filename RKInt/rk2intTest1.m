@@ -5,6 +5,7 @@
 %{
 \subsection{\texttt{rk2intTest1}: A 1D test of RK2 integration}
 \label{sec:2tpi}
+\localtableofcontents
 
 Try the nonlinear, but separable, \ode
 \begin{equation*}

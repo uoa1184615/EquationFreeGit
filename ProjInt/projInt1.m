@@ -4,6 +4,7 @@
 %{
 \subsection{\texttt{projInt1()}}
 \label{sec:projInt1}
+\localtableofcontents
 \def\dmd{\textsc{dmd}}
 
 This is a basic example of projective integration of a given system of stiff deterministic \ode{}s via \dmd, the Dynamic Mode Decomposition \cite[]{Kutz2016}.

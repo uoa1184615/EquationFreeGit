@@ -5,6 +5,7 @@
 %{
 \subsection{\texttt{BurgersExample}: simulate Burgers' PDE on patches}
 \label{sec:BurgersExample}
+\localtableofcontents
 
 \begin{figure}
 \centering
