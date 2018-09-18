@@ -21,8 +21,14 @@ introduction
 }
 
 % verbatim listing is quick and reliable
-\usepackage{verbatim}
-\newenvironment{matlab}{\verbatim}{\endverbatim}
+%\usepackage{verbatim}
+%\newenvironment{matlab}{\verbatim}{\endverbatim}
+% But fancyvrb does more, such as line numbers
+\usepackage{fancyvrb}
+\let\verbatiminput\VerbatimInput
+\newenvironment{matlab}%
+    {\Verbatim[numbers=left,firstnumber=\the\inputlineno]}%
+    {\endVerbatim}
 %\usepackage{mcode} %[framed,numbered,autolinebreaks,useliterate]
 %\renewenvironment{matlab}{\lstlisting}{\endlstlisting}
 

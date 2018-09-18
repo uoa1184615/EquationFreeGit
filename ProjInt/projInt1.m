@@ -152,9 +152,9 @@ if DTgap*sign(dt)<=1e-9
 Consider the one variable linear \ode\ \(\dot x=f+J(x-x_0)\) with \(x(0)=x_0\) (as from a local linearisation of nonlinear \ode).
 The solution is \(x(t)=(x_0-f/J)+(f/J)e^{Jt}\) which sampled at a time-step~\(\tau\) is \(x_k=(x_0-f/J)+(f/J)G^k\) for \(G:=e^{J\tau}\).
 Then \(x_{k+1}\neq ax_k\) for any~\(a\).
-However, \(\begin{bmatrix} x_{k+1}\\1 \end{bmatrix}
-=\begin{bmatrix} G&a\\0&1 \end{bmatrix}
-\begin{bmatrix} x_k\\1 \end{bmatrix}\) for a constant \(a:=(x_0-f/J)(1-G)\).
+However, \(\begin{bmat} x_{k+1}\\1 \end{bmat}
+=\begin{bmat} G&a\\0&1 \end{bmat}
+\begin{bmat} x_k\\1 \end{bmat}\) for a constant \(a:=(x_0-f/J)(1-G)\).
 That is, with ones adjoined, the data from the \ode\ fits the \dmd\ approach.
 }
 \begin{matlab}
