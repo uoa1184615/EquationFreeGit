@@ -44,7 +44,7 @@ nPatch=8
 ratio=0.2
 nSubP=2*mPeriod+1
 Len=2*pi;
-makePatches(@heteroDiff,0,Len,nPatch,4,ratio,nSubP);
+makePatches(@heteroDiff,[0,Len],nan,nPatch,4,ratio,nSubP);
 %{
 \end{matlab}
 Can add to the global data struct~\verb|patches| for use by the time derivative function (for example): here include the diffusivity coefficients, repeated to fill up a patch.

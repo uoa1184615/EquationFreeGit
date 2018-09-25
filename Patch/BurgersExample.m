@@ -21,19 +21,20 @@ function BurgersExample
 %{
 \end{matlab}
 
-Establish global data struct for Burgers' \pde\ solved on \(2\pi\)-periodic domain, with eight patches, each patch of half-size~\(0.1\),  with eleven points within each patch, and fourth order interpolation  provides values for the inter-patch coupling conditions.
+Establish global data struct for Burgers' \pde\ solved on \(2\pi\)-periodic domain, with eight patches, each patch of half-size ratio~\(0.2\),  with seven points within each patch, and say fourth order\slash spectral interpolation provides values for the inter-patch coupling conditions.
 \begin{matlab}
 %}
 global patches
 nPatch=8
-ratio=0.1
+ratio=0.2
 nSubP=7
 Len=2*pi;
-makePatches(@burgerspde,0,Len,nPatch,4,ratio,nSubP);
+interpOrd=0
+makePatches(@burgerspde,[0,Len],nan,nPatch,interpOrd,ratio,nSubP);
 %{
 \end{matlab}
 
-Set an initial condition, and test evaluation of the time derivative.
+Set an initial condition, and check evaluation of the time derivative.
 \begin{matlab}
 %}
 u0=0.3*(1+sin(patches.x))+0.05*randn(size(patches.x));
@@ -54,15 +55,38 @@ end
 %{
 \end{matlab}
 
-Plot the simulation.
+Plot the simulation, but here use only the microscale values interior to the patches.
+Use \verb|nan| in the \(x\)-edges to leave gaps.
 \begin{matlab}
 %}
 figure(1),clf
 xs=patches.x; xs([1 end],:)=nan;
 surf(ts,xs(:),ucts')
-xlabel('time t'),ylabel('space x'),zlabel('u(x,t)')
+title('Use standard integrators for stiff systems')
+xlabel('time t'), ylabel('space x'), zlabel('interior field u(x,t)')
 view(60,40)
 %print('-depsc2','ps1BurgersCtsU')
+%{
+\end{matlab}
+Alternatively, plot all the patch values via interpolation.
+Usually want to seperate the patches by gaps using \verb|nan|.
+\begin{matlab}
+%}
+figure(2),clf()
+u=patchEdgeInt1(ucts'); 
+u=[u; nan(1,size(u,2),size(u,3))];
+xs=[patches.x; nan(1,size(patches.x,2))]; 
+surf(ts,xs(:),reshape(u,[],length(ts)))
+title('Use standard integrators for stiff systems')
+xlabel('time t'), ylabel('space x'), zlabel('field u(x,t)')
+view(60,40)
+%{
+\end{matlab}
+
+Exit now until we get the new projective integration working.
+\begin{matlab}
+%}
+return
 %{
 \end{matlab}
 

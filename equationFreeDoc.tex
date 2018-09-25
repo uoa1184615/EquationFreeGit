@@ -14,10 +14,10 @@
 
 % uncomment the sections to typeset
 \includeonly{
-introduction
-,ProjInt/projInt
+%introduction
+%,ProjInt/projInt
 ,Patch/patch
-,apptpd
+%,apptpd
 }
 
 % verbatim listing is quick and reliable
@@ -29,6 +29,14 @@ introduction
 \newenvironment{matlab}%
     {\Verbatim[numbers=left,firstnumber=\the\inputlineno]}%
     {\endVerbatim}
+% also get fancyvrb to omit %{ and %} pairs, but requires they always be used
+\makeatletter
+\edef\FancyVerbStartString{\@percentchar\@charrb} 
+\edef\FancyVerbStopString{\@percentchar\@charlb} 
+\makeatother
+% could change appearance with e.g. \renewcommand{\theFancyVerbLine}{%
+%  \textcolor{red}{\small 8.\alph{FancyVerbLine}}}
+
 %\usepackage{mcode} %[framed,numbered,autolinebreaks,useliterate]
 %\renewenvironment{matlab}{\lstlisting}{\endlstlisting}
 

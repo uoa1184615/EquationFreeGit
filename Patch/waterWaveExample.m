@@ -65,7 +65,7 @@ nPatch=8
 ratio=0.2
 nSubP=11 % of form 4*?-1
 Len=2*pi;
-makePatches(@simpleWavepde,0,Len,nPatch,3,ratio,nSubP);
+makePatches(@simpleWavepde,[0,Len],nan,nPatch,3,ratio,nSubP);
 %{
 \end{matlab}
 
@@ -227,7 +227,7 @@ end
 
 
 \subsubsection{Simple wave PDE}
-This function codes the staggered lattice equation inside the patches for the simple wave PDE system \(h_t=-u_x\) and \(u_t=-h_x\).
+This function codes the staggered lattice equation inside the patches for the simple wave \pde\ system \(h_t=-u_x\) and \(u_t=-h_x\).
 Here code for a staggered microscale grid of staggered macroscale patches: the array
 \begin{equation*}
 U_{ij}=\begin{cases} u_{ij}&i+j\text{ even},\\
@@ -245,7 +245,7 @@ Ut=nan(size(U));
 ht=Ut;
 %{
 \end{matlab}
-Compute the PDE derivatives at points internal to the patches.
+Compute the \pde\ derivatives at points internal to the patches.
 \begin{matlab}
 %}
 i=2:size(U,1)-1;
@@ -275,7 +275,7 @@ end
 
 
 \subsubsection{Water wave PDE}
-This function codes the staggered lattice equation inside the patches for the nonlinear wave-like PDE system~\eqref{eqs:patch:N}.
+This function codes the staggered lattice equation inside the patches for the nonlinear wave-like \pde\ system~\eqref{eqs:patch:N}.
 As before, set the micro-grid spacing, reserve space for time derivatives, and index the internal points of the micro-grid.
 \begin{matlab}
 %}

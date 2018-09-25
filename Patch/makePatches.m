@@ -11,7 +11,7 @@ Makes the struct~\verb|patches| for use by the patch\slash gap-tooth time deriva
 
 \begin{matlab}
 %}
-function makePatches(fun,Xa,Xb,nPatch,ordCC,ratio,nSubP)
+function makePatches(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP)
 global patches
 %{
 \end{matlab}
@@ -19,10 +19,11 @@ global patches
 \paragraph{Input}
 \begin{itemize}
 \item \verb|fun| is the name of the user function, \verb|fun(t,u,x)|, that will compute time derivatives of quantities on the patches.
-\item \verb|Xa,Xb| give the macro-space domain of the computation: patches are spread evenly over the interior of the interval~\([\verb|Xa|,\verb|Xb|]\).
-Currently the system is assumed macro-periodic in this domain.
+\item \verb|Xlim| give the macro-space domain of the computation: patches are spread evenly over the interior of the interval~\([\verb|Xlim(1)|,\verb|Xlim(2)|]\).
+\item \verb|BCs| somehow will define the macroscale boundary conditions.
+Currently \verb|BCs| is ignored and the system is assumed macro-periodic in the domain.
 \item \verb|nPatch| is the number of evenly spaced patches.
-\item \verb|ordCC| is the order of interpolation across empty space of the macroscale mid-patch values to the edge of the patches for inter-patch coupling: currently must be in~\(\{2,4,6\}\).
+\item \verb|ordCC| is the order of interpolation across empty space of the macroscale mid-patch values to the edge of the patches for inter-patch coupling: currently must be in~\(\{-1,0,\ldots,8\}\).
 \item \verb|ratio| (real) is the ratio of the half-width of a patch to the spacing of the patch mid-points: so \(\verb|ratio|=\tfrac12\) means the patches abut; and \(\verb|ratio|=1\) is overlapping patches as in holistic discretisation.
 \item \verb|nSubP| is the number of microscale lattice points in each patch.  Must be odd so that there is a central lattice point.
 \end{itemize}
@@ -48,20 +49,28 @@ Second, store the order of interpolation that is to provide the values for the i
 Maybe allow \verb|ordCC| of~0 and~\(-1\) to request spectral coupling??
 \begin{matlab}
 %}
-if ~ismember(ordCC,[1:8])
-    error('makePatch: ordCC out of allowed range [1:8]')
+if ~ismember(ordCC,[-1:8])
+    error('makePatch: ordCC out of allowed range [-1:8]')
 end
 %{
 \end{matlab}
 For odd~\verb|ordCC| do interpolation based upon odd neighbouring patches as is useful for staggered grids.
 \begin{matlab}
 %}
-patches.alt=rem(ordCC,2);
+patches.alt=mod(ordCC,2);
 ordCC=ordCC+patches.alt;
 patches.ordCC=ordCC;
 %{
 \end{matlab}
-Might as well precompute the weightings for the interpolation of field values for coupling. (What about coupling via derivative values??  what about spectral coupling??)
+Check for staggered grid and periodic case.
+\begin{matlab}
+%}
+  if patches.alt & (mod(nPatch,2)==1)
+    error('Must have an even number of patches for a staggered grid')
+  end
+%{
+\end{matlab}
+Might as well precompute the weightings for the interpolation of field values for coupling. (What about coupling via derivative values??)
 \begin{matlab}
 %}
 if patches.alt  % eqn (7) in \cite{Cao2014a}
@@ -92,7 +101,7 @@ patches.Cwtsl=(-1).^((1:ordCC)'-patches.alt).*patches.Cwtsr;
 Third, set the centre of the patches in a the macroscale grid of patches assuming periodic macroscale domain.
 \begin{matlab}
 %}
-X=linspace(Xa,Xb,nPatch+1);
+X=linspace(Xlim(1),Xlim(2),nPatch+1);
 X=X(1:nPatch)+diff(X)/2;
 DX=X(2)-X(1);
 %{
