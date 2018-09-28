@@ -1,5 +1,6 @@
 \documentclass[11pt,a5paper,twoside]{article}
 \IfFileExists{ajr.sty}{\usepackage{ajr}}
+\IfFileExists{jm.sty}{\usepackage{jm}}
 {\usepackage[a5paper,margin=11mm]{geometry}}
 
 \title{Equation-Free function toolbox for Matlab/Octave}
@@ -84,6 +85,8 @@ This suite of functions should empower users to start implementing such methods-
 
 \include{introduction}
 
+\include{newPI/PI}
+
 \include{ProjInt/projInt}
 
 \include{Patch/patch}
@@ -96,5 +99,6 @@ This suite of functions should empower users to start implementing such methods-
 
 % bib data from local; merge with 'bibexport equationFreeDoc'
 \IfFileExists{ajr.sty}{\bibliography{bibexport,ajr,bib}}{}
+\IfFileExists{jm.sty}{\bibliography{bibexport,jm,bib}}{}
 
 \end{document}
