@@ -119,7 +119,7 @@ guessed numbers of transient and slow steps.
 \begin{matlab}
 %}
 addpath('../ProjInt')
-[us,uss,tss]=projInt1(@patchSmooth1,u0(:),ts ...
+[us,tss,uss]=PIRK2(@patchSmooth1,u0(:),ts ...
     ,nPatch+1,dt,[20 nPatch*2]);
 %{
 \end{matlab}

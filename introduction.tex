@@ -34,7 +34,7 @@ Let's develop functions that work for both \script.
 \subsection{Create, document and test algorithms}
 
 For developers to create and document the various functions, we use an idea due to Neil~D. Lawrence of the University of Sheffield:
-\autoref{sec:rk2int} gives an example of the following structure to use.
+%\autoref{sec:rk2int} gives an example of the following structure to use.
 
 \begin{itemize}
 \item Each class of toolbox functions is located in separate directories in the repository, say~\verb|Dir|.
@@ -56,16 +56,21 @@ The format for a example\slash test-subsection is similar.
 
 %\item Currently I use the beautiful \verb|minted| package to list code, but it does require a little more effort when installing.
 
+\item Any figures from examples should be generated and then saved for later inclusion with the following (which finally works properly for \textsc{Matlab} 2017+)
+\begin{verbatim}
+set(gcf,'PaperPosition',[0 0 14 10])
+print('-depsc2',filename)
+\end{verbatim}
+
 \end{itemize}
+
 
 \begin{table}\small
 \caption{\label{tbl:funtex}example \texttt{Dir/*.tex} file to typeset in the master document a function-subsection, say \texttt{fun.m}, and the test\slash example-subsections.}
-\verbatiminput{sectionTemplate.tex}
-%\hrulefill
+\VerbatimInput[numbers=left]{sectionTemplate.tex}
 %\end{table}\begin{table}
 \caption{\label{tbl:format}template for a function-subsection \texttt{Dir/*.m} file.}
-\verbatiminput{functionTemplate.m}
-%\hrulefill
+\VerbatimInput[numbers=left]{functionTemplate.m}
 \end{table}
 
 
