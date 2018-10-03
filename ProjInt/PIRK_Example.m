@@ -87,7 +87,7 @@ For verification, we also compute the trajectories using a standard solver.
 \end{matlab}
 
 \begin{figure}
-\includegraphics[]{ProjInt/PIRK}
+\includegraphics[scale=0.85]{ProjInt/PIRK}
 \caption{Demonstration of PIRK4(). 
 From initial conditions, the system rapidly trannsitions to an attracting invariant manifold. 
 The \textsc{pi} solution accurately tracks the evolution of the variables over time while requiring only a fraction of the computations of the standard solver.}\label{fig:PIRK}
