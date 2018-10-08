@@ -47,18 +47,18 @@ Each row is an estimated state at the corresponding time in \verb|tSpan|.
 The simplest usage is then \verb|x = PIRK2(solver,bT,tSpan,x0)|.
 
 However, microscale details of the underlying Projective Integration computations may be helpful. 
-\verb|PIRK2()| provides two to four additional outputs of the microscale bursts. 
+\verb|PIRK2()| provides two to four optional outputs of the microscale bursts. 
 
-\item \verb|tms| is an \(L\) dimensional column vector containing microscale times of burst simulations, each burst separated by~\verb|NaN|; 
-\item \verb|xms| is an \(L\times n\) array of the corresponding microscale states---this data is an accurate simulation of the state and may help visualise more details of the solution. 
+\item \verb|tms|, optional, is an \(L\) dimensional column vector containing microscale times of burst simulations, each burst separated by~\verb|NaN|; 
+\item \verb|xms|, optional, is an \(L\times n\) array of the corresponding microscale states---this data is an accurate simulation of the state and may help visualise more details of the solution. 
 
-\item \verb|rm|, a struct containing the `remaining' applications of the microsolver required by the Projective Integration method during the calculation of the macrostep: \begin{itemize}
+\item \verb|rm|, optional, a struct containing the `remaining' applications of the microsolver required by the Projective Integration method during the calculation of the macrostep: \begin{itemize}
 \item \verb|rm.t|~is a column vector of microscale times; and 
 \item \verb|rm.x|~is the array of corresponding burst states.
 \end{itemize}
 The states \verb|rm.x| do not have the same physical interpretation as those in \verb|xms|; they are required in order to estimate the slow vector field during the calculation of the Runge--Kutta increments, and do not in general resemble the true dynamics.
 
-\item  \verb|svf|, a struct containing the Projective Integration estimates of the slow vector field. \begin{itemize}
+\item  \verb|svf|, optional, a struct containing the Projective Integration estimates of the slow vector field. \begin{itemize}
 \item \verb|svf.t| is an \(2\ell\) dimensional column vector containing all times at which the Projective Integration scheme extrapolated along microsolver data to form a macrostep. 
 \item \verb|svf.dx| is an \(2\ell\times n\) array containing the estimated slow vector field.
 \end{itemize}
@@ -129,11 +129,22 @@ end
 \end{matlab}
 
 
-Loop over the macroscale time steps.
+\paragraph{Loop over the macroscale time steps}
 \begin{matlab}
 %}
 for jT = 2:nT
     T = tSpan(jT-1);
+%{
+\end{matlab}
+If we might as well simulate for the entire macroscale time-step, then do so (setting some internal states to \verb|NaN|), else proceed to projective step.
+\begin{matlab}
+%}
+    if 2*abs(bT)>=abs(tSpan(jT)-T) & bT*(tSpan(jT)-T)>0
+        [t1,xm1] = solver(T, x(jT-1,:), tSpan(jT)-T);
+        x(jT,:) = xm1(end,:);
+        t2=nan; xm2=nan(1,size(xm1,2));
+        dx1=xm2; dx2=xm2;
+    else
 %{
 \end{matlab}
 
@@ -143,6 +154,16 @@ Extract the size of the final time step.
 %}
     [t1,xm1] = solver(T, x(jT-1,:), bT);
     del = t1(end)-t1(end-1);
+%{
+\end{matlab}
+Check for round-off error.
+\begin{matlab}
+%}
+    xt=[reshape(t1(end-1:end),[],1) xm1(end-1:end,:)];
+    roundingTol=1e-8;
+    if norm(diff(xt))/norm(xt,'fro') < roundingTol
+    warning(['significant round-off error in 1st projection at T=' num2str(T)])
+    end
 %{
 \end{matlab}
 
@@ -163,12 +184,27 @@ Project along \verb|dx1| to form an intermediate approximation of \verb|x|; run 
     dx2 = (xm2(end,:)-xm2(end-1,:))/del; 
 %{
 \end{matlab}
+Check for round-off error.
+\begin{matlab}
+%}
+    xt=[reshape(t2(end-1:end),[],1) xm2(end-1:end,:)];
+    if norm(diff(xt))/norm(xt,'fro') < roundingTol
+    warning(['significant round-off error in 2nd projection at T=' num2str(T)])
+    end
+%{
+\end{matlab}
 
 Use the weighted average of the estimates of the slow vector field to take a macrostep.
 \begin{matlab}
 %}
     x(jT,:) = xm1(end,:) + Dt*(dx1+dx2)/2; 
+%{
+\end{matlab}
 
+Now end the if-statement that tests whether a projective step saves simulation time.
+\begin{matlab}
+%}
+    end
 %{
 \end{matlab}
 
