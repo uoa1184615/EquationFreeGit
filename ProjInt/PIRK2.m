@@ -56,10 +56,12 @@ and often represent boundaries in space fields.
 \end{itemize}
 
 \paragraph{Output}
+If there are no output arguments specified, then a plot is 
+drawn of the computed solution~\verb|x| versus \verb|tSpan|.
 \begin{itemize}
 \item  \verb|x|, an \(\ell \times n\) array of the
 approximate solution vector. Each row is an estimated state
-at the corresponding time in \verb|tSpan|. The simplest
+at the corresponding time in \verb|tSpan|.  The simplest
 usage is then \verb|x = PIRK2(solver,bT,tSpan,x0)|.
 
 However, microscale details of the underlying Projective
@@ -152,14 +154,14 @@ scheme.
 %}
 function [ts, xs] = MMburst(ti, xi, bT) 
     dMMdt = @(t,x) [ -x(1)+(x(1)+0.5)*x(2)
-          1/epsilon*( x(1)-(x(1)+1)*x(2) ) ]';
+          1/epsilon*( x(1)-(x(1)+1)*x(2) ) ];
     ts = linspace(ti,ti+bT,ceil(bT*5/epsilon))';
     dt = ts(2)-ts(1);
     xs = nan(length(ts),length(xi));
     xs(1,:) = xi;
     for j = 1:length(ts)-1
-        xMidpoint = xs(j,:)+dt/2*dMMdt(ts(j),xs(j,:));
-        xs(j+1,:) = xs(j,:)+dt*dMMdt(ts(j)+dt/2,xMidpoint);
+      xMidpoint = xs(j,:)+dt/2*dMMdt(ts(j),xs(j,:)).';
+      xs(j+1,:) = xs(j,:)+dt*dMMdt(ts(j)+dt/2,xMidpoint).';
     end
 end
 %{
@@ -184,10 +186,10 @@ Get the number of expected outputs and set logical indices
 to flag what data should be saved.
 \begin{matlab}
 %}
-nargs=nargout(); 
-saveMicro = (nargs>1); 
-saveFullMicro = (nargs>3); 
-saveSvf = (nargs>4); 
+nArgs=nargout(); 
+saveMicro = (nArgs>1); 
+saveFullMicro = (nArgs>3); 
+saveSvf = (nArgs>4); 
 %{
 \end{matlab}
 
@@ -391,6 +393,17 @@ if saveMicro
         rm.t = cell2mat(rm.t);
         rm.x = cell2mat(rm.x);
     end
+end
+%{
+\end{matlab}
+
+
+\subsubsection{If no output specified, then plot simulation}
+\begin{matlab}
+%}
+if nArgs==0
+    figure, plot(tSpan,x,'o:')
+    title('Projective Simulation with PIRK2')
 end
 %{
 \end{matlab}
