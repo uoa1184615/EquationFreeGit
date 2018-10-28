@@ -4,19 +4,28 @@
 \label{sec:patch}
 \secttoc
 
-The patch scheme applies to spatio-temporal systems where the spatial domain is larger than what can be computed in reasonable time.
-Then one may simulate only on small patches of the space-time domain, and produce correct macroscale predictions by craftily coupling the patches across unsimulated space \cite[e.g.]{Hyman2005, Samaey03b, Samaey04, Roberts06d, Liu2015}.
+The patch scheme applies to spatio-temporal systems where
+the spatial domain is larger than what can be computed in
+reasonable time. Then one may simulate only on small patches
+of the space-time domain, and produce correct macroscale
+predictions by craftily coupling the patches across
+unsimulated space \cite[e.g.]{Hyman2005, Samaey03b,
+Samaey04, Roberts06d, Liu2015}.
 
-The spatial discrete system is to be on a lattice such as obtained from finite difference approximation of a \pde.
+The spatial discrete system is to be on a lattice such as
+obtained from finite difference approximation of a \pde.
 Usually continuous in time.
 
+\paragraph{Quick start}
+For an example, see \cref{sec:configPatches1eg} for basic code that uses the provided functions to simulate Burgers'~\pde.
+
+\input{Patch/configPatches1.m}
 \input{Patch/patchSmooth1.m}
-\input{Patch/makePatches.m}
 \input{Patch/patchEdgeInt1.m}
-\input{Patch/patchEdgeInt1test.m}
 \input{Patch/BurgersExample.m}
 \input{Patch/HomogenisationExample.m}
 \input{Patch/waterWaveExample.m}
+
 
 \subsection{To do}
 \begin{itemize}
@@ -25,5 +34,9 @@ Usually continuous in time.
 \item Heterogeneous microscale via averaging regions.
 \item Parallel processing versions.
 \item ??
-\item Adapt to maps in micro-time?
+\item Adapt to maps in micro-time?  Surely easy, just an example.
 \end{itemize}
+
+
+\subsection{Miscellaneous tests}
+\input{Patch/patchEdgeInt1test.m}

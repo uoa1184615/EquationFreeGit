@@ -1,4 +1,4 @@
-%Initially by AJR, Apr 2017
+%Initially by AJR, Apr 2017 -- Oct 2018
 %!TEX root = equationFreeDoc.tex
 \section{Introduction}
 \secttoc
@@ -27,50 +27,5 @@ Initially the algorithms will be simple, and the plan is to subsequently develop
 \textsc{Matlab} appears the obvious choice for a first version since it is widespread, reasonably efficient, supports various parallel modes, and development costs are reasonably low.
 Further it is built on \textsc{blas} and \textsc{lapack} so potentially the cache and superscalar \cpu{} are well utilised.
 Let's develop functions that work for both \script.
-
-
-
-
-\subsection{Create, document and test algorithms}
-
-For developers to create and document the various functions, we use an idea due to Neil~D. Lawrence of the University of Sheffield:
-%\autoref{sec:rk2int} gives an example of the following structure to use.
-
-\begin{itemize}
-\item Each class of toolbox functions is located in separate directories in the repository, say~\verb|Dir|.
-
-\item Each toolbox function is documented as a separate subsection, with tests and examples as separate subsections.
-
-\item For each function, say~\verb|fun.m|, create a \LaTeX\ file~\verb|Dir/fun.tex| of a section that \verb|\input{Dir/*.m}|s the  files of the function-subsection and the test-subsections, \autoref{tbl:funtex}.
-Each such \verb|Dir/fun.tex| file is to be \verb|\include{}|ed from the main \LaTeX\ file \verb|equationFreeDoc.tex| so that people can most easily work on one section at a time.  
-
-\item Each function-subsection and test-subsection is to be created as a \script\ \verb|Dir/*.m| file, say \verb|Dir/fun.m|, so that users simply invoke the function in \script\ as usual by \verb|fun(...)|.
-
-Some editors may need to be told that \verb|fun.m| is a \LaTeX\ file.  For example, TexShop on the Mac requires one to execute in a Terminal
-\begin{verbatim}
-defaults write TeXShop OtherTeXExtensions -array-add "m"
-\end{verbatim}
-
-\item \autoref{tbl:format} gives the template for the \verb|Dir/*.m| function-subsections.
-The format for a example\slash test-subsection is similar.
-
-%\item Currently I use the beautiful \verb|minted| package to list code, but it does require a little more effort when installing.
-
-\item Any figures from examples should be generated and then saved for later inclusion with the following (which finally works properly for \textsc{Matlab} 2017+)
-\begin{verbatim}
-set(gcf,'PaperPosition',[0 0 14 10])
-print('-depsc2',filename)
-\end{verbatim}
-
-\end{itemize}
-
-
-\begin{table}\small
-\caption{\label{tbl:funtex}example \texttt{Dir/*.tex} file to typeset in the master document a function-subsection, say \texttt{fun.m}, and the test\slash example-subsections.}
-\VerbatimInput[numbers=left]{sectionTemplate.tex}
-%\end{table}\begin{table}
-\caption{\label{tbl:format}template for a function-subsection \texttt{Dir/*.m} file.}
-\VerbatimInput[numbers=left]{functionTemplate.m}
-\end{table}
-
+\cref{sec:contribute} outlines some details for contributors.
 

@@ -3,7 +3,7 @@
 %AJR, 26 Sep 2018
 %!TEX root = ../equationFreeDoc.tex
 %{
-\subsubsection{\texttt{patchEdgeInt1test}: test spectral interpolation}
+\subsubsection{\texttt{patchEdgeInt1test}: test the spectral interpolation}
 \label{sec:patchEdgeInt1test}
 \localtableofcontents
 A script to test the spectral interpolation of function \verb|patchEdgeInt1()|
@@ -25,7 +25,7 @@ for nPatch=5:10
 nPatch=nPatch
 Len=10*rand
 ratio=0.5*rand
-makePatches(@sin,[0,Len],nan,nPatch,0,ratio,nSubP);
+configPatches1(@sin,[0,Len],nan,nPatch,0,ratio,nSubP);
 kMax=floor((nPatch-1)/2);
 %{
 \end{matlab}
@@ -81,7 +81,7 @@ nPatch=nPatch
 ratio=0.5*rand
 nSubP=3; % of form 4*N-1
 Len=10*rand
-makePatches(@simpleWavepde,[0,Len],nan,nPatch,-1,ratio,nSubP);
+configPatches1(@simpleWavepde,[0,Len],nan,nPatch,-1,ratio,nSubP);
 kMax=floor((nPatch/2-1)/2)
 %{
 \end{matlab}

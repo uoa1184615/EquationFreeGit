@@ -15,11 +15,12 @@
 
 % uncomment the sections to typeset
 \includeonly{
-introduction
-,ProjInt/projInt
-%%%%,ProjIntDMD/projIntDMD
+%introduction
+%,ProjInt/projInt
+%%%,ProjIntDMD/projIntDMD
 ,Patch/patch
-%%%%,RKInt/rk2int
+%%%,RKInt/rk2int
+%,appContribute
 %,apptpd
 }
 
@@ -66,7 +67,7 @@ introduction
 \newcommand{\cpu}{\textsc{cpu}}
 \Vec f\Vec x\Vec u \Vec X \Vec U
 \Bb R  \Bb X
-
+\def\into{\(\leftrightarrow\)\ }
 
 
 % These are recommended by Rob J Hyndman (2011)
@@ -110,6 +111,9 @@ This suite of functions should empower users to start implementing such methods-
 %\include{RKInt/rk2int}
 
 \appendix
+\let\FancyVerbStartString\relax 
+\let\FancyVerbStopString\relax
+\include{appContribute}
 \include{apptpd}
 
 
