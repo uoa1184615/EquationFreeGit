@@ -66,7 +66,7 @@ function~\verb|MMburst()|. Second, here set macroscale times
 of computation and interest into vector~\verb|ts|. Then,
 invoke Projective Integration with \verb|PIRK2()| applied to
 the burst function, say using bursts of simulations of
-length~\(\propto\epsilon\), and starting from the initial
+length~\(2\epsilon\), and starting from the initial
 condition for the Michaelis--Menten system of
 \((x(0),y(0))=(1,0)\) (off the slow manifold).
 \begin{matlab}
@@ -84,39 +84,15 @@ dts=dts
 Plot results.
 \begin{matlab}
 %}
-figure(1)
 clf(),loglog(dts,xerrs,'o:'), ylim([1e-6 1])
 xlabel('macro time-step'), ylabel('error at Tend')
 title(['\epsilon = ' num2str(epsilon) ',  for different burst lengths'])
 legend(num2str(meps', '%i\\epsilon'))
 grid off, grid
 set(gcf,'PaperPosition',[0 0 14 10])
-%print -depsc2 egPIerrs.eps
+print -depsc2 egPIerrs.eps
 %{
 \end{matlab}
-%Third, look at errors for \(h/H=0.29708629\)
-%\begin{matlab}
-%%}
-%yerrs=nan(nlogdt);
-%for j=1:nlogdt
-%  ts = linspace(0,Tend,nSteps(j)+1);
-%  xs = PIRK2(@MMburst, 0.29708629*diff(ts(1:2)), ts, x0);
-%  yerrs(j)=norm(xs(end,:)-xend);
-%end
-%%{
-%\end{matlab}
-%Plot
-%\begin{matlab}
-%%}
-%figure(2)
-%clf(),loglog(dts,yerrs,'o:'), ylim([1e-6 1])
-%xlabel('macro time-step'), ylabel('error at Tend')
-%title(['\epsilon = ' num2str(epsilon) ',  for special burst lengths'])
-%grid off, grid
-%set(gcf,'PaperPosition',[0 0 14 10])
-%%print -depsc2 egPIerrt.eps
-%%{
-%\end{matlab}
 
 
 \subsubsection{Code an accurate burst of Michaelis--Menten enzyme kinetics}

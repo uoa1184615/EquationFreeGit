@@ -14,7 +14,7 @@ clear
 Set time scale separation and model.
 \begin{matlab}
 %}
-epsilon = 1e-5;
+epsilon = 1e-4;
 f=@(t,x) [cos(x(1))*sin(x(2))*cos(t); (cos(x(1))-x(2))/epsilon];
 %{
 \end{matlab}
@@ -22,8 +22,8 @@ f=@(t,x) [cos(x(1))*sin(x(2))*cos(t); (cos(x(1))-x(2))/epsilon];
 Set the `black box' microsolver to be an integration using a standard solver, and set the standard time of simulation for the microsolver.
 \begin{matlab}
 %}
-micro.solver = @(tIC, xIC,T) feval('ode45',f,[tIC tIC+T],xIC);
-micro.bT=20*epsilon;
+solver = @(tIC, xIC,T) feval('ode45',f,[tIC tIC+T],xIC);
+bT=20*epsilon;
 %{
 \end{matlab}
 
@@ -42,7 +42,7 @@ Now time and integrate the above system over \verb|tspan| using \verb|PIG()| and
 \begin{matlab}
 %}
 tic
-[x,xmicro] = PIG(micro,macro,IC);
+[t,x,tms,xms] = PIG(solver,bT,macro,IC);
 tPI=toc;
 fprintf(['PI took %f seconds, using ode45 as the '...
     'macrosolver.\n'],tPI)
@@ -61,8 +61,8 @@ Plot the output on two figures, showing the truth and macrosteps on both, and al
 %}
 figure; set(gcf,'PaperPosition',[0 0 14 10])
 hold on
-PIm=plot(xmicro{1},xmicro{2},'b.');
-PI=plot(x{1},x{2},'bo');
+PIm=plot(tms,xms,'b.');
+PI=plot(t,x,'bo');
 ODE45=plot(t45,xode45,'r-','LineWidth',2);
 legend([PI(1),ODE45(1),PIm(1)],'PI Solution',...
     'Standard Solution','PI microsolver')
@@ -72,7 +72,7 @@ axis([0 40 0 3])
 
 figure; set(gcf,'PaperPosition',[0 0 14 10])
 hold on
-PI2=plot(x{1},x{2},'bo');
+PI2=plot(t,x,'bo');
 ODE452=plot(t45,xode45,'r-','LineWidth',2);
 
 legend([PI2(1),ODE452(1)],'PI Solution','Standard Solution')

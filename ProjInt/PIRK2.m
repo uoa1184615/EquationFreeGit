@@ -4,6 +4,7 @@
 % JM and AJR, Oct 2018.  Execute with no arguments to see an
 % example.  See the LaTeX generated pdf document for details.
 %!TEX root = ../equationFreeDoc.tex
+
 %{
 \subsection{\texttt{PIRK2()}: projective integration of second order accuracy}
 \label{sec:PIRK2}
@@ -24,15 +25,15 @@ itself to the Michaelis--Menton example: see the code in
 \cref{sec:pirk2eg} as a basic template of how to use.
 \begin{itemize}
 \item \verb|solver()|, a function that produces output from
-the user-specified code for micro-scale simulation. 
+the user-specified code for microscale simulation. 
 \begin{verbatim}
-[tOut, xOut] = solver(tStart, xStart, bT)
+[tOut, xOut] = solver(tStart, xStart, tSim)
 \end{verbatim}
 \begin{itemize}
 \item Inputs:
   \verb|tStart|,~the start time of a burst of simulation;
   \(\verb|xStart|\),~the row \(n\)-vector of the starting
-  state; \verb|bT|,~the total time to simulate in the burst. 
+  state; \verb|tSim|,~the total time to simulate in the burst. 
 \item Outputs:
   \verb|tOut|,~the column vector of solution times; and 
   \verb|xOut|, an array in which each \emph{row} contains
@@ -85,7 +86,7 @@ macrostep: \begin{itemize}
 \item \verb|rm.x|~is the array of corresponding burst states.
 \end{itemize}
 The states \verb|rm.x| do not have the same physical
-interpretation as those in \verb|xms|; they are required in
+interpretation as those in \verb|xms|; the \verb|rm.x| are required in
 order to estimate the slow vector field during the
 calculation of the Runge--Kutta increments, and do not in
 general resemble the true dynamics.
@@ -93,11 +94,11 @@ general resemble the true dynamics.
 \item  \verb|svf|, optional, a struct containing the
 Projective Integration estimates of the slow vector field.
 \begin{itemize}
-\item \verb|svf.t| is an \(2\ell\) dimensional column vector
+\item \verb|svf.t| is a \(2\ell\) dimensional column vector
 containing all times at which the Projective Integration
-scheme extrapolated along microsolver data to form a
+scheme is extrapolated along microsolver data to form a
 macrostep. 
-\item \verb|svf.dx| is an \(2\ell\times n\) array containing
+\item \verb|svf.dx| is a \(2\ell\times n\) array containing
 the estimated slow vector field.
 \end{itemize}
 
@@ -128,8 +129,8 @@ bursts of length~\(3\epsilon\).
 %}
 epsilon = 0.05
 ts = 0:6
-[xs,tMicro,xMicro] = PIRK2(@MMburst, 3*epsilon, ts, [1;0]);
-figure, plot(ts,xs,'o:',tMicro,xMicro)
+[x,tms,xms,rm,svf] = PIRK2(@MMburst, 3*epsilon, ts, [1;0]);
+figure, plot(ts,x,'o:',tms,xms)
 title('Projective integration of Michaelis--Menten enzyme kinetics')
 xlabel('time t'), legend('x(t)','y(t)')
 %{
@@ -247,9 +248,9 @@ for jT = 2:nT
     T = tSpan(jT-1);
 %{
 \end{matlab}
-If we might as well simulate for the entire macroscale
+If two applications of the microsolver would cover the entire macroscale
 time-step, then do so (setting some internal states to
-\verb|NaN|), else proceed to projective step.
+\verb|NaN|); else proceed to projective step.
 \begin{matlab}
 %}
     if 2*abs(bT)>=abs(tSpan(jT)-T) & bT*(tSpan(jT)-T)>0

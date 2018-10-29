@@ -11,7 +11,7 @@ Perhaps start by looking at \cref{sec:egPIMM} which codes the introductory examp
 \paragraph{Scenario}
 When you are interested in a complex system with many interacting parts or agents, you usually are primarily interested in the self-organised emergent macroscale characteristics.
 Projective integration empowers us to efficiently simulate such long-time emergent dynamics.
-We suppose you have coded some accurate, fine scale simulation of the interesting system, and call such code a microsolver.
+We suppose you have coded some accurate, fine scale simulation of the complex system, and call such code a microsolver.
 
 The Projective Integration section of this toolbox consists of several functions.
 Each function implements over the long-time scale a variant of a standard numerical method to simulate the emergent dynamics of the complex system.
@@ -22,15 +22,15 @@ Each function has standardised inputs and outputs.
 \item Projective Integration by second or fourth order Runge--Kutta, \verb|PIRK2()| and \verb|PIRK4()| respectively.
 These schemes are suitable for precise simulation of the slow dynamics, provided the time period spanned by an application of the microsolver is not too large.
 \item Projective Integration with a General solver, \verb|PIG()|.
-This function enables a Projective Integration implementation of any solver with coarse scale time steps.
+This function enables a Projective Integration implementation of any solver with macroscale time steps.
 It does not matter whether the solver is a standard Matlab or Octave algorithm, or one supplied by the user.
 As explored in later examples, \verb|PIG()| should only be used in very stiff systems. 
 \end{itemize}
 The above functions share dependence on a user-specified `microsolver', that accurately simulates some problem of interest. 
 \paragraph{Minor functions}
 \begin{itemize}
-\item ``Constraint-defined manifold computing", \verb|cdmc()|.
-This helper function, based on the method introduced in \cite{GearKevrekidis05},  iteratively applies the microsolver and project the output backwards in time.
+\item `Constraint-defined manifold computing', \verb|cdmc()|.
+This helper function, based on the method introduced in \cite{GearKevrekidis05},  iteratively applies the microsolver and projects the output backwards in time.
 The result is to constrain the fast variables close to the slow manifold, without advancing the current time by the duration of an application of the microsolver.
 This function can be used to reduce errors related to the simulation length of the microsolver in either the \verb|PIRK| or \verb|PIG| functions.
 In particular, it enables \verb|PIG()| to be used on problems that are not particularly stiff.

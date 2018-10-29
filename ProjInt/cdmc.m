@@ -19,9 +19,10 @@
 \item \verb|tout|, a vector of times. \verb|tout(end)| will equal \verb|t|.
 \item \verb|xout|, an array of state estimates produced by \verb|solver()|. 
 \end{itemize}
-This function is intended to be used as a wrapper for the microsolver. That is, for instance if the problem of interest is a dynamical system that is not too stiff, and which can be simulated by the solver \verb|sol(t,x,T)|, one would define 
-\verb|micro.solver = @(t,x,T) cdmc(sol,t,x,T)|.
-The original solver \verb|sol()| would create large errors if used in a PI scheme; but the output of \verb|cdmc()| will not.
+This function is a wrapper for the microsolver. For instance if the problem of interest is a dynamical system that is not too stiff, and which can be simulated by the solver \verb|sol(t,x,T)|, one would define\\ 
+\verb|cSol = @(t,x,T) cdmc(sol,t,x,T)|,\\
+ and thereafter use \verb|csol()| in place of \verb|sol()| as the solver for any PI scheme.
+The original solver \verb|sol()| would create large errors if used in a PI scheme, but the output of \verb|cdmc()| will not.
 
 \begin{matlab}
 %}

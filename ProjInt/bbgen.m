@@ -20,7 +20,7 @@ function bb = bbgen(solver,f,dt)
 \end{itemize}
 \paragraph{Output}
 
-\verb|bb = bb|\((t_{in},x_{in},T)\) a `black box' microsolver that takes initial conditions \( (t_{in},x_{in}) \) and simulates forward a duration \(T\). \\
+\verb|bb = bb|\((t_{in},x_{in},T)\) a `black box' microsolver that initialises at \( (t_{in},x_{in}) \) and simulates forward a duration \(T\). \\
 
 
 \begin{matlab}

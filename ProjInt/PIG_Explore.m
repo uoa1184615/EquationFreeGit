@@ -3,7 +3,7 @@
 %{
 \subsection{Explore: PI using constraint-defined manifold computing}
 \label{sec:Excdmc}
-In this example the PI-General scheme is applied to a singularly perturbed ordinary differential equation in which the time scale separation is not too strong. The resulting simulation is not accurate. In parallel, we run the same scheme but with \verb|cdmc()| used as a wrapper for the microsolver. This implementation successfully replicates the true dynamics.
+In this example the PI-General scheme is applied to a singularly perturbed ordinary differential equation in which the time scale separation is not too strong. The resulting simulation is not accurate. In parallel, we run the same scheme but with \verb|cdmc()| used as a wrapper for the microsolver. This second implementation successfully replicates the true dynamics.
 \begin{matlab}
 %}
 clear
@@ -21,15 +21,14 @@ f=@(t,x) [cos(x(1))*sin(x(2))*cos(t); (cos(x(1))-x(2))/epsilon];
 Set the `naive' microsolver to be an integration using a standard solver, and set the standard time of simulation for the microsolver.
 \begin{matlab}
 %}
-naivemicro.solver = @(tIC, xIC,T) feval('ode45',f,[tIC tIC+T],xIC);
-naivemicro.bT=5*epsilon;
+naiveSol = @(tIC, xIC,T) feval('ode45',f,[tIC tIC+T],xIC);
+bT=5*epsilon;
 %{
 \end{matlab}
 Create a second struct in which the solver is the output of \verb|cdmc()|.
 \begin{matlab}
 %}
-cdmicro.solver = @(t,x,T) cdmc(naivemicro.solver,t,x,T);
-cdmicro.bT = naivemicro.bT;
+cSol = @(t,x,T) cdmc(naiveSol,t,x,T);
 %{
 \end{matlab}
 
@@ -47,8 +46,8 @@ macro.solver = 'ode45';
 Simulate using \verb|PIG()| with each of the above microsolvers. Generate a trusted solution using standard numerical methods.
 \begin{matlab}
 %}
-naivex = PIG(naivemicro,macro,IC);
-x = PIG(cdmicro,macro,IC);
+[nt,nx] = PIG(naiveSol,bT,macro,IC);
+[ct,cx] = PIG(cSol,bT,macro,IC);
 [t45,xode45] = ode45(f,[tspan(1) tspan(end)],IC);
 %{
 \end{matlab}
@@ -60,8 +59,8 @@ Plot the output.
 %}
 figure; set(gcf,'PaperPosition',[0 0 14 10])
 hold on
-nPI = plot(naivex{1},naivex{2},'bo');
-PI=plot(x{1},x{2},'ko');
+nPI = plot(nt,nx,'bo');
+PI=plot(ct,cx,'ko');
 ODE45=plot(t45,xode45,'r-','LineWidth',2);
 
 legend([nPI(1),PI(1),ODE45(1)],'Naive PIG Solution',...
