@@ -8,7 +8,7 @@
 \label{sec:patchEdgeInt1}
 \localtableofcontents
 
-Couples patches across space by computing their edge values
+Couples 1D patches across 1D space by computing their edge values
 from macroscale interpolation. Consequently a spatially
 discrete system could be integrated in time via the patch or
 gap-tooth scheme \cite[]{Roberts06d}. Assumes that the
@@ -31,15 +31,8 @@ global patches
 \verb|nVars| field values at each of the points in the
 \(\verb|nSubP|\times \verb|nPatch|\) grid.
 \item \verb|patches| a struct set by \verb|configPatches1()|
-with the following information.
+which includes the following.
 \begin{itemize}
-\item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,x)| that computes the time derivatives (or
-time-steps) on the patchy lattice. The array~\verb|u| has
-size \(\verb|nSubP|\times \verb|nPatch|\times
-\verb|nVars|\). Time derivatives must be computed into the
-same sized array, but the patch edge values are overwritten
-by zeros.
 \item \verb|.x| is \(\verb|nSubP|\times \verb|nPatch|\)
 array of the spatial locations~\(x_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
@@ -57,7 +50,7 @@ equi-spaced lattice on both macro- and micro-scales.
 \paragraph{Output}
 \begin{itemize}
 \item \verb|u| is \(\verb|nSubP|\times \verb|nPatch|\times
-\verb|nVars|\) array of the fields with edge values set by
+\verb|nVars|\) 2/3D array of the fields with edge values set by
 interpolation.
 \end{itemize}
 
@@ -153,7 +146,7 @@ j/N}\) where \(C'_k=C_ke^{ikr2\pi/N}\). For
 \verb|nPatch|~patches we resolve `wavenumbers'
 \(|k|<\verb|nPatch|/2\), so set row vector
 \(\verb|ks|=k2\pi/N\) for `wavenumbers'
-\(k=(0,1,\ldots,k_{\max},-k_{\max},\ldots,-1)\).
+\(k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)\) for odd~\(N\), and \(k=(0,1, \ldots, k_{\max}, \pm(k_{\max}+1), -k_{\max}, \ldots, -1)\) for even~\(N\).
 \begin{matlab}
 %}
 else% spectral interpolation

@@ -210,7 +210,7 @@ patch.  Store the results in rows to be consistent with
 %{
 \end{matlab}
 Linearly interpolate (extrapolate) to get the field values
-at the final time of the burst.  Then return.
+at the precise final time of the burst.  Then return.
 \begin{matlab}
 %}
   ts(ndt+1) = ti+bT;
