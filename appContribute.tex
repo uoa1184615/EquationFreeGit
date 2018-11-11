@@ -32,14 +32,16 @@ The format for a example\slash test-subsection is similar.
 set(gcf,'PaperPosition',[0 0 14 10])
 print('-depsc2',filename)
 \end{verbatim}
+Include with \quad \verb|\includegraphics[scale=0.85]{filename}|
 
 \end{itemize}
 
 
-\begin{table}\small
+\begin{table}
 \caption{\label{tbl:funtex}example \texttt{Dir/*.tex} file to typeset in the master document a function-subsection, say \texttt{fun.m}, and the test\slash example-subsections.}
 \VerbatimInput[numbers=left]{sectionTemplate.tex}
-%\end{table}\begin{table}
+\end{table}
+\begin{table}
 \caption{\label{tbl:format}template for a function-subsection \texttt{Dir/*.m} file.}
 \VerbatimInput[numbers=left]{functionTemplate.m}
 \end{table}

@@ -66,6 +66,7 @@ micro-scales.
 derivatives, but with patch edge values set to zero.
 \end{itemize}
 
+\begin{body}
 Reshape the fields~\verb|u| as a 4/5D-array, and sets the
 edge values from macroscale interpolation of centre-patch
 values. \cref{sec:patchEdgeInt2} describes
@@ -89,5 +90,6 @@ dudt=reshape(dudt,[],1);
 %{
 \end{matlab}
 Fin.
+\end{body}
 %}
  

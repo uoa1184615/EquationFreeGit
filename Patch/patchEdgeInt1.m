@@ -43,7 +43,6 @@ equi-spaced lattice on both macro- and micro-scales.
 (alternating) interpolation.
 \item \verb|.Cwtsr| and \verb|.Cwtsl|
 \end{itemize}
-
 \end{itemize}
 
 
@@ -54,6 +53,8 @@ equi-spaced lattice on both macro- and micro-scales.
 interpolation.
 \end{itemize}
 
+
+\begin{body}
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
@@ -238,4 +239,5 @@ end% if spectral
 %{
 \end{matlab}
 Fin, returning the 2/3D array of field values.  
+\end{body}
 %}

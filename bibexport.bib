@@ -59,162 +59,6 @@
   year =          {2003},
 }
 
-@article{Gear02b,
-  author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
-  journal =       {SIAM Journal on Scientific Computing},
-  number =        {4},
-  pages =         {1091--1106},
-  publisher =     {SIAM},
-  title =         {Projective Methods for Stiff Differential Equations:
-                   Problems with Gaps in Their Eigenvalue Spectrum},
-  volume =        {24},
-  year =          {2003},
-  abstract =      {We show that there exist classes of explicit
-                   numerical integration methods that can handle very
-                   stiff problems if the eigenvalues are separated into
-                   two clusters, one containing the "stiff," or fast,
-                   components, and one containing the slow components.
-                   These methods have large average step sizes relative
-                   to the fast components. Conventional implicit methods
-                   involve the solution of nonlinear equations at each
-                   step, which for large problems requires significant
-                   communication between processors on a multiprocessor
-                   machine. For such problems the methods proposed here
-                   have significant potential for speed improvement.},
-  doi =           {10.1137/S1064827501388157},
-  url =           {http://link.aip.org/link/?SCE/24/1091/1},
-}
-
-@article{Gear03c,
-  author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
-  journal =       {Journal of Computational Physics},
-  pages =         {95--109},
-  title =         {Telescopic projective methods for parabolic
-                   differential equations},
-  volume =        {187},
-  year =          {2003},
-}
-
-@article{Givon06,
-  author =        {Givon, Dror and Kevrekidis, Ioannis~G. and
-                   Kupferman, Raz},
-  journal =       {Comm. Math. Sci.},
-  number =        {4},
-  pages =         {707--729},
-  title =         {Strong convergence of projective integration schemes
-                   for singularly perturbed stochastic differential
-                   systems},
-  volume =        {4},
-  year =          {2006},
-  abstract =      {We study the convergence of the slow (or
-                   ``essential'') components of singularly perturbed
-                   stochastic differential systems to solutions of lower
-                   dimensional stochastic systems (the ``effective'', or
-                   ``coarse'' dynamics). We prove strong, mean-square
-                   convergence in systems where both fast and slow
-                   components are driven by noise, with full coupling
-                   between fast and slow components. We analyze a class
-                   of ``projective integration'' methods, which consist
-                   of a hybridization between a standard solver for the
-                   slow components, and short runs for the fast
-                   dynamics, which are used to estimate the effect that
-                   the fast components have on the slow ones. We obtain
-                   explicit bounds for the discrepancy between the
-                   results of the projective integration method and the
-                   slow components of the original system.},
-}
-
-@book{Kutz2016,
-  author =        {Kutz, J. Nathan and Brunton, Steven L. and
-                   Brunton, Bingni W. and Proctor, Joshua L.},
-  number =        {149},
-  publisher =     {SIAM, Philadelphia},
-  series =        {Other titles in applied mathematics},
-  title =         {Dynamic Mode Decomposition: Data-driven Modeling of
-                   Complex Systems},
-  year =          {2016},
-  abstract =      {Data-driven dynamical systems is a burgeoning
-                   field---it connects how measurements of nonlinear
-                   dynamical systems and/or complex systems can be used
-                   with well-established methods in dynamical systems
-                   theory. This is a critically important new direction
-                   because the governing equations of many problems
-                   under consideration by practitioners in various
-                   scientific fields are not typically known. Thus,
-                   using data alone to help derive, in an optimal sense,
-                   the best dynamical system representation of a given
-                   application allows for important new insights. The
-                   recently developed dynamic mode decomposition (DMD)
-                   is an innovative tool for integrating data with
-                   dynamical systems theory. The DMD has deep
-                   connections with traditional dynamical systems theory
-                   and many recent innovations in compressed sensing and
-                   machine learning. Dynamic Mode Decomposition:
-                   Data-Driven Modeling of Complex Systems, the first
-                   book to address the DMD algorithm, presents a
-                   pedagogical and comprehensive approach to all aspects
-                   of DMD currently developed or under development;
-                   blends theoretical development, example codes, and
-                   applications to showcase the theory and its many
-                   innovations and uses; highlights the numerous
-                   innovations around the DMD algorithm and demonstrates
-                   its efficacy using example problems from engineering
-                   and the physical and biological sciences; and
-                   provides extensive MATLAB code, data for intuitive
-                   examples of key methods, and graphical presentations.
-                   The core audience for this book is engineers and
-                   applied mathematicians working in the physical and
-                   biological sciences. It can be used in courses that
-                   integrate data analysis with dynamical systems.},
-  isbn =          {9781611974492},
-}
-
-@article{Roberts06d,
-  author =        {Roberts, A.~J. and Kevrekidis, I.~G.},
-  journal =       {SIAM J.~Scientific Computing},
-  number =        {4},
-  pages =         {1495--1510},
-  title =         {General tooth boundary conditions for equation free
-                   modelling},
-  volume =        {29},
-  year =          {2007},
-  abstract =      {We are developing a framework for multiscale
-                   computation which enables models at a ``microscopic''
-                   level of description, for example, lattice Boltzmann,
-                   Monte Carlo, or molecular dynamics simulators, to
-                   perform modeling tasks at ``macroscopic'' length
-                   scales of interest. The plan is to use the
-                   microscopic rules restricted to small ``patches'' of
-                   the domain, the ``teeth,'' using interpolation to
-                   bridge the ``gaps.'' Here we explore general boundary
-                   conditions coupling the widely separated ``teeth'' of
-                   the microscopic simulation that achieve high order
-                   accuracy over the macroscale. We present the simplest
-                   case when the microscopic simulator is the
-                   quintessential example of a PDE. We argue that
-                   classic high order interpolation of the macroscopic
-                   field provides the correct forcing in whatever
-                   boundary condition is required by the microsimulator.
-                   Such interpolation leads to tooth boundary
-                   conditions, which achieve arbitrarily high order
-                   consistency. The high order consistency is
-                   demonstrated on a class of linear PDEs in two ways:
-                   first through the eigenvalues of the scheme for
-                   selected numerical problems, and second using the
-                   dynamical systems approach of holistic discretization
-                   on a general class of linear PDEs. Analytic modeling
-                   shows that, for a wide class of microscopic systems,
-                   the subgrid fields and the effective macroscopic
-                   model are largely independent of the tooth size and
-                   the particular tooth boundary conditions. When
-                   applied to patches of microscopic simulations these
-                   tooth boundary conditions promise efficient
-                   macroscale simulation. We expect the same approach
-                   will also accurately couple patch simulations in
-                   higher spatial dimensions.},
-  doi =           {10.1137/060654554},
-}
-
 @article{Hyman2005,
   author =        {Hyman, James M.},
   journal =       {Computing in Science \& Engineering},
@@ -225,7 +69,7 @@
   year =          {2005},
   doi =           {10.1109/MCSE.2005.57},
   url =           {http://scitation.aip.org/content/aip/journal/cise/7/3/
-                  10.1109/MCSE.2005.57},
+                   10.1109/MCSE.2005.57},
 }
 
 @article{Samaey03b,
@@ -299,6 +143,52 @@
   doi =           {10.1016/j.jcp.2005.08.010},
 }
 
+@article{Roberts06d,
+  author =        {Roberts, A.~J. and Kevrekidis, I.~G.},
+  journal =       {SIAM J.~Scientific Computing},
+  number =        {4},
+  pages =         {1495--1510},
+  title =         {General tooth boundary conditions for equation free
+                   modelling},
+  volume =        {29},
+  year =          {2007},
+  abstract =      {We are developing a framework for multiscale
+                   computation which enables models at a ``microscopic''
+                   level of description, for example, lattice Boltzmann,
+                   Monte Carlo, or molecular dynamics simulators, to
+                   perform modeling tasks at ``macroscopic'' length
+                   scales of interest. The plan is to use the
+                   microscopic rules restricted to small ``patches'' of
+                   the domain, the ``teeth,'' using interpolation to
+                   bridge the ``gaps.'' Here we explore general boundary
+                   conditions coupling the widely separated ``teeth'' of
+                   the microscopic simulation that achieve high order
+                   accuracy over the macroscale. We present the simplest
+                   case when the microscopic simulator is the
+                   quintessential example of a PDE. We argue that
+                   classic high order interpolation of the macroscopic
+                   field provides the correct forcing in whatever
+                   boundary condition is required by the microsimulator.
+                   Such interpolation leads to tooth boundary
+                   conditions, which achieve arbitrarily high order
+                   consistency. The high order consistency is
+                   demonstrated on a class of linear PDEs in two ways:
+                   first through the eigenvalues of the scheme for
+                   selected numerical problems, and second using the
+                   dynamical systems approach of holistic discretization
+                   on a general class of linear PDEs. Analytic modeling
+                   shows that, for a wide class of microscopic systems,
+                   the subgrid fields and the effective macroscopic
+                   model are largely independent of the tooth size and
+                   the particular tooth boundary conditions. When
+                   applied to patches of microscopic simulations these
+                   tooth boundary conditions promise efficient
+                   macroscale simulation. We expect the same approach
+                   will also accurately couple patch simulations in
+                   higher spatial dimensions.},
+  doi =           {10.1137/060654554},
+}
+
 @article{Liu2015,
   author =        {Liu, Ping and Samaey, Giovanni and Gear, C. William and
                    Kevrekidis, Ioannis G.},
@@ -344,7 +234,7 @@
                    domain.},
   doi =           {http://dx.doi.org/10.1016/j.apnum.2014.12.007},
   url =           {http://www.sciencedirect.com/science/article/pii/
-                  S0168927414002086},
+                   S0168927414002086},
 }
 
 @article{Bunder2013b,
@@ -386,6 +276,156 @@
                    computational simulation of a range of systems with
                    microscale heterogeneity.},
   doi =           {10.1016/j.jcp.2017.02.004},
+}
+
+@inproceedings{Cao2012,
+  author =        {Cao, Meng and Roberts, A. J.},
+  booktitle =     {18th Australasian Fluid Mechanics Conference},
+  editor =        {Brandner, P.~A. and Pearce, B.~W.},
+  month =         {Dec},
+  title =         {Modelling 3D turbulent floods based upon the
+                   Smagorinski large eddy closure},
+  year =          {2012},
+  url =           {http://people.eng.unimelb.edu.au/imarusic/proceedings/18/
+                  70%20-%20Cao.pdf},
+}
+
+@article{Cao2014b,
+  author =        {Cao, Meng and Roberts, A. J.},
+  institution =   {[\url{http://arxiv.org/abs/1407.1579}]},
+  journal =       {J.~Engrg.\ Maths},
+  number =        {1},
+  pages =         {187--204},
+  title =         {Modelling suspended sediment in environmental
+                   turbulent fluids},
+  volume =        {98},
+  year =          {2016},
+  abstract =      {Modelling sediment transport in environmental
+                   turbulent fluids is a challenge. This article
+                   develops a model of the longitudinal transport of
+                   suspended sediment in environmental fluid flows such
+                   as floods and tsunamis. The model is systematically
+                   derived from a three-dimensional turbulence model
+                   based on the Smagorinski large eddy closure.
+                   Embedding the physical dynamics into a family of
+                   problems and analysing the linear dynamics of the
+                   system, the centre manifold theory indicates the
+                   existence of a slow manifold parameterised by
+                   macroscale variables. Computer algebra then
+                   constructs the slow manifold in terms of fluid depth,
+                   depth-averaged longitudinal velocities, and suspended
+                   sediment concentration. The model includes the
+                   effects of sediment erosion, advection and dispersion
+                   and the interactions between the sediment and
+                   turbulent fluid flow. Vertical distributions of the
+                   velocity and concentration in steady flow agree with
+                   established experimental data. For a pilot study,
+                   numerical simulations of the suspended sediment under
+                   long waves show that the developed model predicts
+                   physically reasonable sediment flow interaction.},
+  doi =           {10.1007/s10665-015-9817-7},
+}
+
+@article{Gear02b,
+  author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
+  journal =       {SIAM Journal on Scientific Computing},
+  number =        {4},
+  pages =         {1091--1106},
+  publisher =     {SIAM},
+  title =         {Projective Methods for Stiff Differential Equations:
+                   Problems with Gaps in Their Eigenvalue Spectrum},
+  volume =        {24},
+  year =          {2003},
+  abstract =      {We show that there exist classes of explicit
+                   numerical integration methods that can handle very
+                   stiff problems if the eigenvalues are separated into
+                   two clusters, one containing the "stiff," or fast,
+                   components, and one containing the slow components.
+                   These methods have large average step sizes relative
+                   to the fast components. Conventional implicit methods
+                   involve the solution of nonlinear equations at each
+                   step, which for large problems requires significant
+                   communication between processors on a multiprocessor
+                   machine. For such problems the methods proposed here
+                   have significant potential for speed improvement.},
+  doi =           {10.1137/S1064827501388157},
+  url =           {http://link.aip.org/link/?SCE/24/1091/1},
+}
+
+@article{Gear03c,
+  author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
+  journal =       {Journal of Computational Physics},
+  pages =         {95--109},
+  title =         {Telescopic projective methods for parabolic
+                   differential equations},
+  volume =        {187},
+  year =          {2003},
+}
+
+@article{Givon06,
+  author =        {Givon, Dror and Kevrekidis, Ioannis~G. and
+                   Kupferman, Raz},
+  journal =       {Comm. Math. Sci.},
+  number =        {4},
+  pages =         {707--729},
+  title =         {Strong convergence of projective integration schemes
+                   for singularly perturbed stochastic differential
+                   systems},
+  volume =        {4},
+  year =          {2006},
+  abstract =      {We study the convergence of the slow (or
+                   ``essential'') components of singularly perturbed
+                   stochastic differential systems to solutions of lower
+                   dimensional stochastic systems (the ``effective'', or
+                   ``coarse'' dynamics). We prove strong, mean-square
+                   convergence in systems where both fast and slow
+                   components are driven by noise, with full coupling
+                   between fast and slow components. We analyze a class
+                   of ``projective integration'' methods, which consist
+                   of a hybridization between a standard solver for the
+                   slow components, and short runs for the fast
+                   dynamics, which are used to estimate the effect that
+                   the fast components have on the slow ones. We obtain
+                   explicit bounds for the discrepancy between the
+                   results of the projective integration method and the
+                   slow components of the original system.},
+}
+
+@article{Cao2014a,
+  author =        {Cao, Meng and Roberts, A. J.},
+  journal =       {IMA J.~Applied Maths.},
+  number =        {2},
+  pages =         {228--254},
+  title =         {Multiscale modelling couples patches of nonlinear
+                   wave-like simulations},
+  volume =        {81},
+  year =          {2016},
+  abstract =      {The multiscale gap-tooth scheme is built from given
+                   microscale simulations of complicated physical
+                   processes to empower macroscale simulations. By
+                   coupling small patches of simulations over
+                   unsimulated physical gaps, large savings in
+                   computational time are possible. So far the gap-tooth
+                   scheme has been developed for dissipative systems,
+                   but wave systems are also of great interest. This
+                   article develops the gap-tooth scheme to the case of
+                   nonlinear microscale simulations of wave-like
+                   systems. Classic macroscale interpolation provides a
+                   generic coupling between patches that achieves
+                   arbitrarily high order consistency between the
+                   multiscale scheme and the underlying microscale
+                   dynamics. Eigen-analysis indicates that the resultant
+                   gap-tooth scheme empowers feasible computation of
+                   large scale simulations of wave-like dynamics with
+                   complicated underlying physics. As an pilot study, we
+                   implement numerical simulations of dam-breaking waves
+                   by the gap-tooth scheme. Comparison between a
+                   gap-tooth simulation, a microscale simulation over
+                   the whole domain, and some published experimental
+                   data on dam breaking, demonstrates that the gap-tooth
+                   scheme feasibly computes large scale wave-like
+                   dynamics with computational savings.},
+  doi =           {10.1093/imamat/hxv034},
 }
 
 @article{Bunder2015a,
@@ -440,6 +480,50 @@
                    dynamics},
   year =          {2010},
   isbn =          {978-0-19-923385-4},
+}
+
+@article{Calderon2007,
+  author =        {Calderon, C.~P.},
+  journal =       {Molecular Simulation},
+  month =         {August},
+  number =        {9---10},
+  pages =         {713---731},
+  title =         {Local diffusion models for stochastic reacting
+                   systems: estimation issues in equation-free numerics},
+  volume =        {33},
+  year =          {2007},
+  abstract =      {Extracting coarse-grained derivative information from
+                   fine scale, atomistic/stochastic simulations
+                   constitutes an important component of multiscale
+                   numerics for reacting systems. In this paper, we
+                   demonstrate the use of local parametric diffusion
+                   models; observing the output of short bursts of
+                   stochastic simulation, the drift and diffusion
+                   coefficients of such local models are obtained ``on
+                   demand'' by maximizing an approximation of the
+                   likelihood function. The parametric fit utilizes the
+                   likelihood expansion of Ait-Sahalia, giving
+                   closed-form expressions for the transition density of
+                   both scalar and multivariate processes. The fine
+                   scale simulations generating the data are the
+                   Gillespie stochastic simulation algorithm as well as
+                   stochastic differential equations (SDEs). The
+                   postulated local parametric diffusion models are SDEs
+                   with affine drift and diffusion functions; the
+                   information extracted from these (estimated) local
+                   parametric models is utilized in various
+                   ``equation-free'' computational tasks. We demonstrate
+                   how such local diffusion modeling can (1) contribute
+                   to linking stochastic simulation with traditional,
+                   continuum numerical methods such as fixed point and
+                   initial value problem solving algorithms as well as
+                   variational integration; (2) aid in extracting
+                   quantitative information about the invariant
+                   distribution associated with the underlying
+                   stochastic system; and (3) be used in computational
+                   model reduction motivated by singular perturbation
+                   theory.},
+  doi =           {10.1080/08927020701344740},
 }
 
 @article{Roberts99b,

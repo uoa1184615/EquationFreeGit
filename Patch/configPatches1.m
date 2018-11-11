@@ -14,7 +14,7 @@ gap-tooth time derivative function~\verb|patchSmooth1()|.
 
 \begin{matlab}
 %}
-function configPatches1(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP)
+function configPatches1(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,nEdge)
 global patches
 %{
 \end{matlab}
@@ -47,6 +47,11 @@ discretisation.
 \item \verb|nSubP| is the number of equi-spaced microscale
 lattice points in each patch. Must be odd so that there is a
 central lattice point.
+\item \verb|nEdge| is, for each patch, the number of edge
+values set by interpolation at the edge regions of each
+patch.  May be omitted. The default is one (suitable for
+microscale lattices with only nearest neighbour
+interactions).
 \end{itemize}
 
 \paragraph{Output} The \emph{global} struct \verb|patches|
@@ -67,10 +72,13 @@ with patch:macroscale ratio as specified.
 \item \verb|.x| is \(\verb|nSubP|\times \verb|nPatch|\)
 array of the regular spatial locations~\(x_{ij}\) of the
 microscale grid points in every patch.  
+\item \verb|.nEdge| is, for each patch, the number of edge
+values set by interpolation at the edge regions of each
+patch.
 \end{itemize}
 
 
-
+\begin{body}
 
 \subsubsection{If no arguments, then execute an example}
 \label{sec:configPatches1eg}
@@ -157,6 +165,18 @@ end
 
 
 \subsubsection{The code to make patches}
+
+Set one edge-value to compute by interpolation if not 
+specified by the user. Store in the struct.
+\begin{matlab}
+%}
+if nargin<8, nEdge=1; end
+if nEdge>1, error('multi-edge-value interp not yet implemented'), end
+if 2*nEdge+1>nSubP, error('too many edge values requested'), end
+patches.nEdge=nEdge;
+%{
+\end{matlab}
+
 
 First, store the pointer to the time derivative function in
 the struct.
@@ -245,4 +265,5 @@ end% function
 %{
 \end{matlab}
 Fin.
+\end{body}
 %}

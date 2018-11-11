@@ -1,7 +1,7 @@
-%Initially by AJR, Apr 2017 -- Oct 2018
+%Initially by AJR, Apr 2017 -- Nov 2018
 %!TEX root = equationFreeDoc.tex
 \section{Introduction}
-\secttoc
+\localtableofcontents
 
 \paragraph{Users}
 Place this toolbox's folder in a path searched by \script.
@@ -28,4 +28,24 @@ Initially the algorithms will be simple, and the plan is to subsequently develop
 Further it is built on \textsc{blas} and \textsc{lapack} so potentially the cache and superscalar \cpu{} are well utilised.
 Let's develop functions that work for both \script.
 \cref{sec:contribute} outlines some details for contributors.
+
+
+
+
+
+\section{Overview of major functions and example scripts}
+\label{sec:smf}
+\localtableofcontents
+
+{% excluding the body gives overview of each function/script
+    \renewcommand{\label}[1]{}%
+    \let\section\subsection%
+    \let\subsection\subsubsection%
+    \let\subsubsection\paragraph%
+    \let\paragraph\subparagraph%
+    \fancyvrbStartStop%
+    \excludeversion{body}
+    \input{Patch/patch}
+    \includeversion{body}
+}%end-exclusion
 

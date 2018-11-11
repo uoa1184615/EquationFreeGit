@@ -48,9 +48,7 @@ equi-spaced lattice on both macro- and micro-scales.
 %(alternating) interpolation.
 \item \verb|.Cwtsr| and \verb|.Cwtsl|---not yet used
 \end{itemize}
-
 \end{itemize}
-
 
 \paragraph{Output}
 \begin{itemize}
@@ -59,17 +57,20 @@ equi-spaced lattice on both macro- and micro-scales.
 the fields with edge values set by interpolation.
 \end{itemize}
 
+
+\begin{body}
+
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
 %}
-[ny,Ny]=size(patches.y);
-[nx,Nx]=size(patches.x);
-nVars=round(numel(u)/numel(patches.x)/numel(patches.y));
-if numel(u)~=nx*ny*Nx*Ny*nVars
+[ny,Ny] = size(patches.y);
+[nx,Nx] = size(patches.x);
+nVars = round(numel(u)/numel(patches.x)/numel(patches.y));
+if numel(u) ~= nx*ny*Nx*Ny*nVars
   nSubP=[nx ny], nPatch=[Nx Ny], nVars=nVars, sizeu=size(u)
 end
-u=reshape(u,[nx ny Nx Ny nVars]);
+u = reshape(u,[nx ny Nx Ny nVars]);
 %{
 \end{matlab}
 With Dirichlet patches, the half-length of a patch is
@@ -79,12 +80,12 @@ Compute lattice sizes from inside the patches as the edge
 values may be \nan{}s, etc.
 \begin{matlab}
 %}
-dx=patches.x(3,1)-patches.x(2,1);
-DX=patches.x(2,2)-patches.x(2,1);
-rx=dx*(nx-1)/2/DX;
-dy=patches.y(3,1)-patches.y(2,1);
-DY=patches.y(2,2)-patches.y(2,1);
-ry=dy*(ny-1)/2/DY;
+dx = patches.x(3,1)-patches.x(2,1);
+DX = patches.x(2,2)-patches.x(2,1);
+rx = dx*(nx-1)/2/DX;
+dy = patches.y(3,1)-patches.y(2,1);
+DY = patches.y(2,2)-patches.y(2,1);
+ry = dy*(ny-1)/2/DY;
 %{
 \end{matlab}
 
@@ -103,8 +104,8 @@ The centre of each patch (as \verb|nx| and~\verb|ny| are
 odd) is at
 \begin{matlab}
 %}
-i0=round((nx+1)/2);
-j0=round((ny+1)/2);
+i0 = round((nx+1)/2);
+j0 = round((ny+1)/2);
 %{
 \end{matlab}
 
@@ -186,8 +187,8 @@ the middle of the gaps and swapped.
 %    nPatch=nPatch/2; % halve the number of patches
 %    nVars=nVars*2;   % double the number of fields
 %  else % the values for standard spectral
-    altShift=0;  
-    iV=1:nVars;  
+    altShift = 0;  
+    iV = 1:nVars;
 %  end
 %{
 \end{matlab}
@@ -197,18 +198,18 @@ wavenumber zig-zag mode, \(\mathcode`\,="213B k=(0,1,
 \ldots, k_{\max}, +(k_{\max}+1) -k_{\max}, \ldots, -1)\).
 \begin{matlab}
 %}
-  kMax=floor((Nx-1)/2); 
-  krx=rx*2*pi/Nx*(mod((0:Nx-1)+kMax,Nx)-kMax); 
-  kMay=floor((Ny-1)/2); 
-  kry=ry*2*pi/Ny*(mod((0:Ny-1)+kMay,Ny)-kMay); 
+  kMax = floor((Nx-1)/2); 
+  krx = rx*2*pi/Nx*(mod((0:Nx-1)+kMax,Nx)-kMax); 
+  kMay = floor((Ny-1)/2); 
+  kry = ry*2*pi/Ny*(mod((0:Ny-1)+kMay,Ny)-kMay); 
 %{
 \end{matlab}
 Test for reality of the field values, and define a function
 accordingly.
 \begin{matlab}
 %}
-  if imag(u(i0,j0,:,:,:))==0, uclean=@(u) real(u);
-     else uclean=@(u) u; end
+  if imag(u(i0,j0,:,:,:))==0, uclean = @(u) real(u);
+     else uclean = @(u) u; end
 %{
 \end{matlab}
 Compute the Fourier transform of the patch centre-values for
@@ -217,7 +218,7 @@ zero the zig-zag mode in the \textsc{ft} and add it in later
 as cosine.
 \begin{matlab}
 %}
-  Ck=fft2(squeeze(u(i0,j0,:,:,:)));
+  Ck = fft2(squeeze(u(i0,j0,:,:,:)));
 %{
 \end{matlab}
 The inverse Fourier transform gives the edge values via a
@@ -228,21 +229,21 @@ modes when there are an even number of patches in the
 directions.
 \begin{matlab}
 %}
-nFTx=2-mod(Nx,2);
-nFTy=2-mod(Ny,2);
-unj=nan(1,ny,Nx,Ny,nVars,nFTx*nFTy);
-u1j=nan(1,ny,Nx,Ny,nVars,nFTx*nFTy);
-uin=nan(nx,1,Nx,Ny,nVars,nFTx*nFTy);
-ui1=nan(nx,1,Nx,Ny,nVars,nFTx*nFTy);
+nFTx = 2-mod(Nx,2);
+nFTy = 2-mod(Ny,2);
+unj = nan(1,ny,Nx,Ny,nVars,nFTx*nFTy);
+u1j = nan(1,ny,Nx,Ny,nVars,nFTx*nFTy);
+uin = nan(nx,1,Nx,Ny,nVars,nFTx*nFTy);
+ui1 = nan(nx,1,Nx,Ny,nVars,nFTx*nFTy);
 %{
 \end{matlab}
 Loop over the required \textsc{ifft}s.
 \begin{matlab}
 %}
-iFT=0;
-for iFTx=1:nFTx
-for iFTy=1:nFTy
-iFT=iFT+1;
+iFT = 0;
+for iFTx = 1:nFTx
+for iFTy = 1:nFTy
+iFT = iFT+1;
 %{
 \end{matlab}
 First interpolate onto \(x\)-limits of the patches. (It may
@@ -251,8 +252,8 @@ instead of exponential of array---only for \(N>100\).  Can
 this be vectorised further??)
 \begin{matlab}
 %}
-for jj=1:ny 
-  ks=(jj-j0)*2/(ny-1)*kry; % fraction of kry along the edge
+for jj = 1:ny 
+  ks = (jj-j0)*2/(ny-1)*kry; % fraction of kry along the edge
   unj(1,jj,:,:,iV,iFT) = ifft2( bsxfun(@times,Ck ...
       ,exp(1i*bsxfun(@plus,altShift+krx',ks))));
   u1j(1,jj,:,:,iV,iFT) = ifft2( bsxfun(@times,Ck ...
@@ -263,8 +264,8 @@ end
 Second interpolate onto \(y\)-limits of the patches.
 \begin{matlab}
 %}
-for i=1:nx 
-  ks=(i-i0)*2/(nx-1)*krx; % fraction of krx along the edge
+for i = 1:nx 
+  ks = (i-i0)*2/(nx-1)*krx; % fraction of krx along the edge
   uin(i,1,:,:,iV,iFT) = ifft2( bsxfun(@times,Ck ...
       ,exp(1i*bsxfun(@plus,ks',altShift+kry))));
   ui1(i,1,:,:,iV,iFT) = ifft2( bsxfun(@times,Ck ...
@@ -276,9 +277,9 @@ When either direction have even number of patches then swap
 the zig-zag wavenumber to the conjugate.
 \begin{matlab}
 %}
-if nFTy==2, kry(Ny/2+1)=-kry(Ny/2+1); end
+if nFTy==2, kry(Ny/2+1) = -kry(Ny/2+1); end
 end% iFTy-loop
-if nFTx==2, krx(Nx/2+1)=-krx(Nx/2+1); end
+if nFTx==2, krx(Nx/2+1) = -krx(Nx/2+1); end
 end% iFTx-loop
 %{
 \end{matlab}
@@ -308,5 +309,6 @@ end% function patchEdgeInt2
 %{
 \end{matlab}
 Fin, returning the 4/5D array of field values with
-interpolated edges.  
+interpolated edges. 
+\end{body} 
 %}

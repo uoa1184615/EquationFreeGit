@@ -1,5 +1,5 @@
 % Simulate heterogeneous diffusion in 1D on patches as an
-% example of its application.
+% example application of patches in space.
 % AJR, Nov 2017 -- Oct 2018
 %!TEX root = ../equationFreeDoc.tex
 %{
@@ -14,13 +14,22 @@ heterogeneous diffusion makes valid predictions was
 established by \cite{Bunder2013b} who proved that the scheme
 is accurate when the number of points in a patch is one more
 than an even multiple of the microscale periodicity.
+
+The first part of the script implements the following gap-tooth scheme
+(arrows indicate function recursion).
+\begin{enumerate}\def\itemsep{-1.5ex}
+\item configPatches1 
+\item ode15s \into patchSmooth1 \into heteroDiff
+\item process results
+\end{enumerate}
+
+\begin{body}
 \begin{figure}
 \centering \caption{\label{fig:ps1HomogenisationCtsU}the
 diffusing field~\(u(x,t)\) in the patch (gap-tooth) scheme
 applied to microscale heterogeneous diffusion.}
 \includegraphics[scale=0.85]{Patch/ps1HomogenisationCtsU}
 \end{figure}%
-
 Consider a lattice of values~\(u_i(t)\), with lattice
 spacing~\(dx\), and governed by the heterogeneous diffusion 
 \begin{equation}
@@ -32,13 +41,6 @@ diffusion should be the harmonic mean of these coefficients.
 
 
 \subsubsection{Script to simulate via stiff or projective integration}
-This first part of the script implements the following gap-tooth scheme
-(arrows indicate function recursion).
-\begin{enumerate}\def\itemsep{-1.5ex}
-\item configPatches1 
-\item ode15s \into patchSmooth1 \into heteroDiff
-\item process results
-\end{enumerate}
 Set the desired microscale periodicity, and microscale
 diffusion coefficients (with subscripts shifted by a half).
 \begin{matlab}
@@ -60,7 +62,7 @@ the inter-patch coupling conditions.
 \begin{matlab}
 %}
 global patches
-nPatch = 8
+nPatch = 9
 ratio = 0.2
 nSubP = 2*mPeriod+1
 Len = 2*pi;
@@ -86,7 +88,8 @@ efficiently here.  Integrate the interface
 microscale differential equations.
 \begin{matlab}
 %}
-u0 = sin(patches.x)+0.2*randn(nSubP,nPatch);
+%u0 = sin(patches.x)+0.2*randn(nSubP,nPatch);
+u0 = exp(-2*(patches.x-Len/2).^2).*(1+0.1*rand(nSubP,nPatch));
 [ts,ucts] = ode15s(@patchSmooth1, [0 2/cHomo], u0(:));
 %{
 \end{matlab}
@@ -138,7 +141,7 @@ to the diffusion time between adjacent points in the
 microscale lattice.
 \begin{matlab}
 %}
-ts = linspace(0,2/cHomo,5)
+ts = linspace(0,2/cHomo,7)
 bT = 3*( ratio*Len/nPatch )^2/cHomo
 addpath('../ProjInt','../RKint')
 [us,tss,uss] = PIRK2(@heteroBurst, bT, ts, u0(:));
@@ -199,7 +202,7 @@ function ut = heteroDiff(t,u,x)
   dx = diff(x(2:3)); % space step
   i = 2:size(u,1)-1; % interior points in a patch
   ut = nan(size(u)); % preallocate output array
-  ut(i,:) = diff(bsxfun(@times,patches.c,diff(u)))/dx^2 ;
+  ut(i,:) = diff(bsxfun(@times,patches.c,diff(u.^2)))/dx^2 ;
 end% function
 %{
 \end{matlab}
@@ -225,11 +228,12 @@ function [ts, ucts] = heteroBurst(ti, ui, bT)
   switch 'rk2'
   case '23',  [ts,ucts] = ode23 (@patchSmooth1,[ti ti+bT],ui(:));
   case '15s', [ts,ucts] = ode15s(@patchSmooth1,[ti ti+bT],ui(:));
-  case 'rk2', ts = linspace(ti,ti+bT,100)';
+  case 'rk2', ts = linspace(ti,ti+bT,200)';
               ucts = rk2int(@patchSmooth1,ts,ui(:));
   end
 end
 %{
 \end{matlab}
 Fin.
+\end{body}
 %}

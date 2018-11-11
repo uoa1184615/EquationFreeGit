@@ -2,7 +2,7 @@
 %!TEX root = ../equationFreeDoc.tex
 \section{Patch scheme for given microscale discrete space system}
 \label{sec:patch}
-\secttoc
+\localtableofcontents
 
 The patch scheme applies to spatio-temporal systems where
 the spatial domain is larger than what can be computed in
@@ -17,7 +17,7 @@ obtained from finite difference approximation of a \pde.
 Usually continuous in time.
 
 \paragraph{Quick start}
-For an example, see \cref{sec:configPatches1eg} for basic code that uses the provided functions to simulate Burgers'~\pde.
+For an example, see \cref{sec:configPatches1eg,sec:configPatches2eg}  for basic code that uses the provided functions to simulate Burgers'~\pde\ and a nonlinear `diffusion' \pde.
 
 \input{Patch/configPatches1.m}
 \input{Patch/patchSmooth1.m}
@@ -29,8 +29,11 @@ For an example, see \cref{sec:configPatches1eg} for basic code that uses the pro
 \input{Patch/configPatches2.m}
 \input{Patch/patchSmooth2.m}
 \input{Patch/patchEdgeInt2.m}
+\input{Patch/wave2D.m}
 
 
+
+\begin{body}
 \subsection{To do}
 \begin{itemize}
 \item Testing is so far only qualitative.  Need to be quantitative.
@@ -44,3 +47,6 @@ For an example, see \cref{sec:configPatches1eg} for basic code that uses the pro
 
 \subsection{Miscellaneous tests}
 \input{Patch/patchEdgeInt1test.m}
+\input{Patch/patchEdgeInt2test.m}
+
+\end{body}

@@ -16,24 +16,26 @@ functions to a microscale space-time map
 derived as a micro-scale space-time discretisation of
 Burgers'~\pde.  Then this example applies projective
 integration to simulate further in time.
-\begin{figure}
-\centering \caption{\label{fig:ps1BurgersMapU}a short time
-simulation of the Burgers' map (\cref{sec:burgersMap}) on
-patches in space. It requires many very small time steps
-only just visible in this mesh.}
-\includegraphics[scale=0.85]{Patch/ps1BurgersMapU}
-\end{figure}
 
-
-\subsubsection{Script code to simulate a micro-scale space-time map}
-
-This first part of the script implements the following gap-tooth scheme 
+The first part of the script implements the following gap-tooth scheme 
 (arrows indicate function recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches1 
 \item burgerBurst \into patchSmooth1 \into burgersMap
 \item process results
 \end{enumerate}
+
+\begin{body}
+\begin{figure}
+\centering \caption{\label{fig:ps1BurgersMapU}a short time
+simulation of the Burgers' map (\cref{sec:burgersMap}) on
+patches in space. It requires many very small time steps
+only just visible in this mesh.}
+\includegraphics[scale=0.85]{Patch/ps1BurgersMapU}
+\end{figure}%
+
+
+\subsubsection{Script code to simulate a micro-scale space-time map}
 
 Establish global data struct for the Burgers' map
 (\cref{sec:burgersMap}) solved on \(2\pi\)-periodic domain,
@@ -220,4 +222,5 @@ end
 %{
 \end{matlab}
 Fin.
+\end{body}
 %}

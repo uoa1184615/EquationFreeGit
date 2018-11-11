@@ -14,7 +14,7 @@ gap-tooth time derivative function~\verb|patchSmooth2()|.
 
 \begin{matlab}
 %}
-function configPatches2(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP)
+function configPatches2(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,nEdge)
 global patches
 %{
 \end{matlab}
@@ -57,6 +57,11 @@ lattice points in each patch: if scalar, then use the same
 number in both directions, otherwise \verb|nSubP(1:2)| gives
 the number in each direction. Must be odd so that there is a
 central lattice point.
+\item \verb|nEdge| is, for each patch, the number of edge
+values set by interpolation at the edge regions of each
+patch.  May be omitted. The default is one (suitable for
+microscale lattices with only nearest neighbours.
+interactions).
 \end{itemize}
 
 \paragraph{Output} The \emph{global} struct \verb|patches|
@@ -80,10 +85,13 @@ microscale grid points in every patch.
 \item \verb|.y| is \(\verb|nSubP(2)|\times \verb|nPatch(2)|\)
 array of the regular spatial locations~\(y_{ij}\) of the
 microscale grid points in every patch.  
+\item \verb|.nEdge| is, for each patch, the number of edge
+values set by interpolation at the edge regions of each
+patch.
 \end{itemize}
 
 
-
+\begin{body}
 
 \subsubsection{If no arguments, then execute an example}
 \label{sec:configPatches2eg}
@@ -97,7 +105,7 @@ may have the following three steps (arrows indicate function
 recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches2 
-\item ode15s integrator \into patchSmooth2 \into user's ??PDE
+\item ode15s integrator \into patchSmooth2 \into user's nonDiffPDE
 \item process results
 \end{enumerate}
 
@@ -187,10 +195,10 @@ end%if no arguments
 \end{matlab}
 
 \paragraph{Example of nonlinear diffusion PDE inside patches}
-As a microscale discretisation of \(u_t=\delsq(u^2)\),
+As a microscale discretisation of \(u_t=\delsq(u^3)\),
 code \(\dot u_{ijkl} =\frac1{\delta x^2}
-(u_{i+1,j,k,l}^2 -2u_{i,j,k,l}^2 +u_{i-1,j,k,l}^2) + \frac1{\delta y^2}
-(u_{i,j+1,k,l}^2 -2u_{i,j,k,l}^2 +u_{i,j-1,k,l}^2)\).
+(u_{i+1,j,k,l}^3 -2u_{i,j,k,l}^3 +u_{i-1,j,k,l}^3) + \frac1{\delta y^2}
+(u_{i,j+1,k,l}^3 -2u_{i,j,k,l}^3 +u_{i,j-1,k,l}^3)\).
 \begin{matlab}
 %}
 function ut=nonDiffPDE(t,u,x,y)
@@ -219,6 +227,18 @@ if numel(ratio)==1, ratio=repmat(ratio,1,2); end
 if numel(nSubP)==1, nSubP=repmat(nSubP,1,2); end
 %{
 \end{matlab}
+
+Set one edge-value to compute by interpolation if not 
+specified by the user. Store in the struct.
+\begin{matlab}
+%}
+if nargin<8, nEdge=1; end
+if nEdge>1, error('multi-edge-value interp not yet implemented'), end
+if 2*nEdge+1>nSubP, error('too many edge values requested'), end
+patches.nEdge=nEdge;
+%{
+\end{matlab}
+
 
 First, store the pointer to the time derivative function in
 the struct.
@@ -316,4 +336,5 @@ end% function
 %{
 \end{matlab}
 Fin.
+\end{body}
 %}

@@ -47,7 +47,6 @@ array of the spatial locations~\(x_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and micro-scales.
 \end{itemize}
-
 \end{itemize}
 
 
@@ -58,6 +57,8 @@ equi-spaced lattice on both macro- and micro-scales.
 edge values set to zero.
 \end{itemize}
 
+
+\begin{body}
 Reshape the fields~\verb|u| as a 2/3D-array, and sets the
 edge values from macroscale interpolation of centre-patch
 values. \cref{sec:patchEdgeInt1} describes
@@ -80,5 +81,6 @@ dudt=reshape(dudt,[],1);
 %{
 \end{matlab}
 Fin.
+\end{body}
 %}
  

@@ -1,16 +1,19 @@
-%Short explanation for users typing "help fun"
-%Author, date
+% Short explanation for users typing "help fun"
+% Author, date
 %!TEX root = ../equationFreeDoc.tex
 %{
 \subsection{\texttt{...}: ...}
 \label{sec:...}
 \localtableofcontents
-Summary LaTeX explanation.
+Overview LaTeX explanation.
 \begin{matlab}
 %}
 function ...
 %{
 \end{matlab}
+\paragraph{Input} ...
+\paragraph{Output} ...
+\begin{body}
 Repeated as desired:
 LaTeX between end-matlab and begin-matlab
 \begin{matlab}
@@ -18,5 +21,6 @@ LaTeX between end-matlab and begin-matlab
 Matlab code between %} and %{
 %{
 \end{matlab}
-Concluding LaTeX before following final line.
+Concluding LaTeX before following final lines.
+\end{body}
 %}
