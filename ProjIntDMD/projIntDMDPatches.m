@@ -1,7 +1,7 @@
 % Example of the time integration function projIntDMD() 
 % on a patch simulation of Burgers PDE.  
 % AJR, Oct 2017
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{\texttt{projIntDMDPatches}: Projective integration of patch scheme}
 \label{sec:pips}

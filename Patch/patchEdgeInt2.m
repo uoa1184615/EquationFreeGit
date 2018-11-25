@@ -2,7 +2,7 @@
 % of simulations of a smooth lattice system such as PDE
 % discretisations.
 %AJR, Nov 2018
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection[\texttt{patchEdgeInt2()}: 2D patch edge values from 2D interpolation]{\texttt{patchEdgeInt2()}: sets 2D patch edge values from 2D macroscale interpolation}
 \label{sec:patchEdgeInt2}

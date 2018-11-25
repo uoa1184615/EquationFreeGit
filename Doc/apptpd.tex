@@ -1,0 +1,130 @@
+%Initiated by AJR, Apr 2017
+%!TEX root = equationFreeDoc.tex
+\section{Aspects of developing a `toolbox' for patch dynamics}
+\secttoc
+
+This appendix documents sketchy further thoughts on aspects of the development.
+
+
+\subsection{Macroscale grid}
+
+The patches are to be distributed on a macroscale grid: the \(j\)th~patch `centred' at position~\(\Xv_j\in\XX\).
+In principle the patches could move, but let's keep them fixed in the first version.
+The simplest macroscale grid will be rectangular (\texttt{meshgrid}), but we plan to allow a deformed grid to secondly cater for boundary fitting to quite general domain shapes~\XX.
+And plan to later allow for more general interconnect networks for more topologies in application.
+
+
+
+
+\subsection{Macroscale field variables}
+
+The researcher\slash practitioner has to know an appropriate set of macroscale field variables~\(\Uv(t)\in\RR^{d_{\Uv}}\) for each patch.  
+For example, first they might be a simple average over a core of a patch of all of the micro-field variables; second, they might be a subset of the average micro-field variables; and third in general the macro-variables might be a nonlinear function of the micro-field variables (such as temperature is the average speed squared).
+The core might be just one point, or a sizeable fraction of the patch.
+
+The mapping from microscale variable to macroscale variables is often termed the restriction.
+
+In practice, users may not choose an appropriate set of macro-variables, so will eventually need to code some diagnostic to indicate a failure of the assumed closure.
+
+
+
+
+\subsection{Boundary and coupling conditions}
+
+The physical domain boundary conditions are distinct from the conditions coupling the patches together.
+Start with physical boundary conditions of periodicity in the macroscale.
+
+Second, assume the physical boundary conditions are that the macro-variables are known at macroscale grid points around the boundary.  
+Then the issue is to adjust the interpolation to cater for the boundary presence and shape.
+The coupling conditions for the patches should cater for the range of Robin-like boundary conditions, from Dirichlet to Neumann.
+Two possibilities arise: direct imposition of the coupling action \citep{Roberts06d}, or control by the action.
+
+Third, assume that some of the patches have some edges coincident with the boundary of the macroscale domain~\XX, and it is on these edges that macroscale physical boundary conditions are applied.
+Then the interpolation from the core of these edge patches is the same as the second case of prescribed boundary macro-variables.
+An issue is that each boundary patch should be big enough to cater for any spatial boundary layers transitioning from the applied boundary condition to the interior slow evolution.
+
+Alternatively, we might have the physical boundary condition constrain the interpolation between patches.
+
+Often microscale simulations are easiest to write when `periodic' in microscale space.  
+To cater for this we should also allow a control at perhaps the quartiles of a micro-periodic simulator.
+
+
+
+
+
+\subsection{Mesotime communication}
+
+Since communication limits large scale parallelism, a first step in reducing communication will be to implement only updating the coupling conditions when necessary.
+Error analysis indicates that updating on times longer the microscale times and shorter than the macroscale times can be effective
+\citep{Bunder2015a}.
+Implementations can communicate one or more derivatives in time, as well as macroscale variables.
+
+At this stage we can effectively parallelise over patches: first by simply using Matlab's \texttt{parfor}.   
+Probably not using a \textsc{gpu} as we probably want to leave \textsc{gpu}s for the black box to utilise within each patch.
+
+
+
+
+\subsection{Projective integration}
+
+To take macroscale time steps, invoke several possible projective integration schemes: simple Euler projection, Heun-like method, etc
+\citep{Samaey08}.
+Need to decide how long a microscale burst needs to be.
+
+Should not need an implicit scheme as the fast dynamics are meant to be only in the micro variables, and the slow dynamics only in the macroscale variables.
+However, it could be that the macroscale variables have fast oscillations and it is only the amplitude of the oscillations that are slow.  
+Perhaps need to detect and then fix or advise.
+
+A further stage is to implement a projective integration scheme for stochastic macroscale variables: this is important because the averaging over a core of microscale roughness will almost invariably have at least some stochastic legacy effect.
+\cite{Calderon2007} did some useful research on stochastic projective intergration.
+
+
+
+
+\subsection{Lift to many internal modes}
+
+In most problems the number of macroscale variables at any given position in space,~\(d_{\Uv}\), is less than the number of microscale variables at a position,~\(d_{\uv}\); often much less \citep[e.g.]{Kevrekidis09a}.
+In this case, every time we start a patch simulation we need to provide  \(d_{\uv}-d_{\Uv}\) data at each position in the patch: this is lifting.
+The first methodology is to first guess, then run repeated short bursts with reinitialisation, until the simulation reaches a slow manifold.
+Then run the real simulation.
+
+If the time taken to reach a local quasi-equilibrium is too long, then it is likely that the macroscale closure is bad and the macroscale variables need to be extended.
+
+A second step is to cater for cases where the slow manifold is stochastic or is surrounded by fast waves: when it is hard to detect the slow manifold, or the slow manifold is not attractive.
+
+
+
+
+
+\subsection{Macroscale closure}
+
+In some circumstances a researcher\slash practitioner will not code the appropriately set of macroscale variables for a complete closure of the macroscale.
+For example, in thin film fluid dynamics at low Reynolds number the only macroscale variable is the fluid depth; however, at higher Reynolds number, circa ten, the inertia of the fluid becomes important and the macroscale variables must additionally include a measure of the mean lateral velocity\slash momentum \citep[e.g.]{Roberts99b}.
+
+At some stage we need to detect any flaw in the closure, and perhaps suggest additional appropriate macroscale variables, or at least their characteristics.
+Indeed, a poor closure and a stochastic slow manifold are really two faces of the same problem: the problem is that the chosen macroscale variables do not have a unique evolution in terms of themselves. 
+A good resolution of the issue will account for both faces.
+
+
+
+
+\subsection{Exascale fault tolerance}
+
+Matlab is probably not an appropriate vehicle to deal with real exascale faults.  
+However, we should cater by coding procedures for fault tolerance and testing them at least synthetically.
+Eventually provide hooks to a user routine to be invoked under various potential scenarios.
+The nature of fault tolerant algorithms will vary depending upon the scenario, even assuming that each patch burst is executed on one \cpu\ (or closely coupled \cpu{}s): if there are much more \cpu{}s than patches, then maybe simply duplicate all patch simulations;  if much less \cpu{}s than patches, then an asynchronous scheduling of patch bursts should effectively cater for recomputation of failed bursts; if comparable \cpu{}s to patches, then more subtle action is needed.
+
+Once mesotime communication and projective integration is provided, a recomputation approach to intermittent hardware faults should be effective because we then have the tools to restart a burst from available macroscale data.
+Should also explore proceeding with a lower order interpolation that misses the faulty burst---because an isolated lower order interpolation probably will not affect the global order of error (it does not in approximating some boundary conditions \citep{Gustafsson1975, Svard2006}
+
+
+
+
+\subsection{Link to established packages}
+
+Several molecular\slash particle\slash agent based codes are well developed and used by a wide community of researchers.  
+Plan to develop hooks to use some such codes as the microscale simulators on patches.
+First, plan to connect to \textsc{lammps} \cite[]{LAMMPS}.
+Second, will evaluate performance, issues, and then consider what other established packages are most promising.
+

@@ -1,7 +1,7 @@
 % Explore the time integration function projIntDMD() 
 % on discretisation of a nonlinear diffusion PDE.  
 % AJR, Jan 2018
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{\texttt{projIntDMDExplore1}: explore effect of varying parameters}
 \label{sec:pi1eevp}

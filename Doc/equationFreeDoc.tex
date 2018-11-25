@@ -1,0 +1,137 @@
+\documentclass[11pt,a5paper,twoside]{article}
+\IfFileExists{ajr.sty}{\usepackage{ajr}}{
+  \IfFileExists{jm.sty}{\usepackage{jm}}{
+    \usepackage[a5paper,margin=11mm]{geometry}}}
+
+\title{Equation-Free function toolbox for Matlab/Octave}
+
+\author{A. J. Roberts\thanks{%
+\url{http://www.maths.adelaide.edu.au/anthony.roberts},
+\url{http://orcid.org/0000-0001-8930-1552}}
+\and John Maclean\thanks{%
+\url{http://www.adelaide.edu.au/directory/john.maclean}}
+\and et al.\thanks{Appear here for your contribution.}
+}
+
+\date{\today}
+
+
+% uncomment the sections to typeset
+%\includeonly{
+%introduction
+%%%,../ProjInt/projInt
+%,projInt
+%%%,../ProjIntDMD/projIntDMD
+%%%,../Patch/patch
+%,patch
+%%%%,../RKInt/rk2int
+%,appContribute
+%,apptpd
+%}
+
+% verbatim listing is quick and reliable
+%\usepackage{verbatim}
+%\newenvironment{matlab}{\verbatim}{\endverbatim}
+% But fancyvrb does more, such as line numbers
+\usepackage{fancyvrb}
+\newenvironment{matlab}%
+    {\Verbatim[numbers=left,firstnumber=\the\inputlineno]}%
+    {\endVerbatim}
+% also get fancyvrb to omit %{ and %} pairs, but requires they always be used
+\makeatletter
+\def\fancyvrbStartStop{%
+  \edef\FancyVerbStartString{\@percentchar\@charrb} 
+  \edef\FancyVerbStopString{\@percentchar\@charlb} }
+\makeatother
+% could change appearance with e.g. \renewcommand{\theFancyVerbLine}{%
+%  \textcolor{red}{\small 8.\alph{FancyVerbLine}}}
+
+%\usepackage{mcode} %[framed,numbered,autolinebreaks,useliterate]
+%\renewenvironment{matlab}{\lstlisting}{\endlstlisting}
+
+%\usepackage{pgfplots}\pgfplotsset{compat=newest}% avoid as too few use??
+
+
+\usepackage{natbib}
+\bibliographystyle{agsm}
+\let\harvardurl\url
+
+% used to in/exclude
+\usepackage{versions}
+\newenvironment{body}{}{}
+
+\usepackage[onedeep]{etocx}% for mini-local-tableofconents
+\usepackage{microtype,amsmath,defns,graphicx,hyperref}
+% Invoke cleverref
+\usepackage[capitalise,nameinlink,noabbrev]{cleveref}
+\crefname{equation}{}{}
+% Default "Item" useless, use enumitem and ref=
+\crefname{enumi}{}{}
+\crefname{enumii}{}{}
+\crefname{enumiii}{}{}
+\crefname{enumiv}{}{}
+
+% command definitions
+\def\script{\textsc{Matlab}\slash Octave}
+\newcommand{\cpu}{\textsc{cpu}}
+\Vec f\Vec x\Vec u \Vec X \Vec U
+\Bb R  \Bb X
+\def\into{\(\leftrightarrow\)\ }
+
+
+% These are recommended by Rob J Hyndman (2011)
+% \footnote{\url{http://robjhyndman.com/researchtips/latex-floats/}}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
+
+
+
+
+
+\begin{document}
+\epstopdfsetup{suffix=} % must be after begin{document}
+
+\maketitle
+
+\begin{abstract}
+This `equation-free toolbox' facilitates the computer-assisted analysis of complex, multiscale systems.
+Its aim is to enable microscopic simulators to perform system level tasks and analysis.
+The methodology bypasses the derivation of macroscopic evolution equations by using only short bursts of microscale simulations which are often the best available description of a system
+\cite[e.g.]{Kevrekidis09a, Kevrekidis04a, Kevrekidis03b}.
+This suite of functions should empower users to start implementing such methods---but so far we have only just started.
+\end{abstract}
+
+\tableofcontents
+
+\include{introduction}
+
+\fancyvrbStartStop 
+
+\include{projInt}
+%\include{../ProjInt/projInt}
+
+%\include{../ProjIntDMD/projIntDMD}
+
+\include{patch}
+%\include{../Patch/patch}
+
+%\include{../RKInt/rk2int}
+
+\appendix
+\let\FancyVerbStartString\relax 
+\let\FancyVerbStopString\relax
+\include{appContribute}
+\include{apptpd}
+
+
+% get bib data from shared and local files; 
+% add required local to shared with 'bibexport equationFreeDoc'
+\IfFileExists{ajr.sty}{\bibliography{bibexport,ajr,bib}}{}
+\IfFileExists{jm.sty}{\bibliography{bibexport,jm,bib}}{}
+
+\end{document}

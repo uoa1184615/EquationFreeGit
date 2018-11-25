@@ -1,7 +1,7 @@
 %Simulate water waves on patches as an example of wave
 %systems in the form h_t=u_x+... and u_u=h_x+...
 %AJR, Nov 2017 -- Oct 2018
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{\texttt{waterWaveExample}: simulate a water wave PDE on patches}
 \label{sec:waterWaveExample}
@@ -17,7 +17,7 @@ For example, the differential equations of \cref{sec:waterWavePDE} describes the
 \begin{figure}
 \centering \caption{\label{fig:ps1WaveCtsUH}water depth~\(h(x,t)\) (above) and velocity field~\(u(x,t)\) (below) of the gap-tooth scheme applied to the simple wave \pde~\cref{eq:genwaveqn}, linearised.
 The micro-scale random component to the initial condition has long lasting effects on the simulation---but the macroscale wave still propagates.}
-\includegraphics[scale=0.85]{Patch/ps1WaveCtsUH}
+\includegraphics[scale=0.85]{../Patch/ps1WaveCtsUH}
 \end{figure}%
 Often, wave-like systems are written in terms of two conjugate variables, for example, position and momentum density, electric and magnetic fields, and water depth~\(h(x,t)\) and mean lateral velocity~\(u(x,t)\) as herein.
 The approach developed in this section applies to any wave-like system in the form
@@ -44,7 +44,7 @@ The momentum \pde~\cref{patch:Nu} represents  the effects of turbulent bed drag~
 \begin{figure}
 \centering \caption{\label{fig:ps1WaterWaveCtsUH}water depth~\(h(x,t)\) (above) and velocity field~\(u(x,t)\) (below) of the gap-tooth scheme applied to the Smagorinski shallow water wave \pde{}s~\cref{eqs:patch:N}.
 The micro-scale random initial component decays where the water speed is non-zero due to `turbulent' dissipation.}
-\includegraphics[scale=0.85]{Patch/ps1WaterWaveCtsUH}
+\includegraphics[scale=0.85]{../Patch/ps1WaterWaveCtsUH}
 \end{figure}%
 
 
@@ -150,7 +150,7 @@ As yet a simple implementation appears to fail, so it needs more exploration and
 %\begin{figure}
 %\centering
 %\caption{\label{fig:ps1WaterWaveU}basic projective integration of the patch scheme function applied to a water Wave' \pde.}
-%%\includegraphics[scale=0.85]{Patch/ps1WaterWaveU}
+%%\includegraphics[scale=0.85]{../Patch/ps1WaterWaveU}
 %\end{figure}%
 %Now wrap around the patch time derivative function, \verb|patchSmooth1|, the projective integration function for patch simulations as illustrated by \cref{fig:ps1WaterWaveU}.
 %
@@ -198,7 +198,7 @@ As yet a simple implementation appears to fail, so it needs more exploration and
 %\begin{figure}
 %\centering
 %\caption{\label{fig:ps1WaterWaveMicro}stereo pair of the field \(u(x,t)\) during each of the microscale bursts used in the projective integration.}
-%%\includegraphics[scale=0.85]{Patch/ps1WaterWaveMicro}
+%%\includegraphics[scale=0.85]{../Patch/ps1WaterWaveMicro}
 %\end{figure}
 %\begin{matlab}
 %%}

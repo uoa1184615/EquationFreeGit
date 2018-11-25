@@ -1,7 +1,7 @@
 %Creates a data struct of the design of patches for later
 %use by the patch functions such as smoothPatch1() 
 %AJR, Nov 2017
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{\texttt{configPatches1()}: configures spatial patches in 1D}
 \label{sec:configPatches1}
@@ -131,7 +131,7 @@ xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 \begin{figure}
 \centering \caption{\label{fig:ps1BurgersCtsU}field
 \(u(x,t)\) of the patch scheme applied to Burgers'~\pde.}
-\includegraphics[scale=0.85]{Patch/ps1BurgersCtsU}
+\includegraphics[scale=0.85]{../Patch/ps1BurgersCtsU}
 \end{figure}
 
 Upon finishing execution of the example, exit this function.

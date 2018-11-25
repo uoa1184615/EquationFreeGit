@@ -2,7 +2,7 @@
 % a user-specified microsolver.  The macrosolver adapts the
 % explicit fourth-order Runge--Kutta scheme.
 % JM, Oct 2018.  See the LaTeX generated pdf document for details.
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 
 %{
 \subsection{\texttt{PIRK4()}: projective integration of fourth order accuracy}
@@ -99,6 +99,7 @@ the estimated slow vector field.
 
 \end{itemize}
 
+\begin{body}
 
 \subsubsection{The projective integration code}
 
@@ -357,5 +358,6 @@ This concludes \verb|PIRK4()|.
 end
 %{
 \end{matlab}
+\end{body}
 %}
 

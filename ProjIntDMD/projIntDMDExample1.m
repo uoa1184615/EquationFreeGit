@@ -1,7 +1,7 @@
 % Example of the time integration function projIntDMD() 
 % on discretisation of nonlinear diffusion PDE.  
 % AJR, Oct 2017
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{\texttt{projIntDMDExample1}: A first test of basic projective integration}
 \label{sec:ftbpi}

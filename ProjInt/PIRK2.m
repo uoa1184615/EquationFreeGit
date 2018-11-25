@@ -3,7 +3,7 @@
 % explicit second-order Runge--Kutta Improved Euler scheme.
 % JM and AJR, Oct 2018.  Execute with no arguments to see an
 % example.  See the LaTeX generated pdf document for details.
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 
 %{
 \subsection{\texttt{PIRK2()}: projective integration of second order accuracy}
@@ -104,7 +104,7 @@ the estimated slow vector field.
 
 \end{itemize}
 
-
+\begin{body}
 
 \subsubsection{If no arguments, then execute an example}
 \label{sec:pirk2eg}
@@ -415,6 +415,7 @@ This concludes \verb|PIRK2()|.
 end
 %{
 \end{matlab}
+\end{body}
 %}
 
 

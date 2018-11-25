@@ -1,0 +1,52 @@
+%Initially by AJR, Apr 2017 -- Nov 2018
+%!TEX root = equationFreeDoc.tex
+\section{Introduction}
+\localtableofcontents
+
+\paragraph{Users}
+Place this toolbox's folder in a path searched by \script.
+Then read the subsection that documents the function of interest.
+
+
+\paragraph{Blackbox scenario}
+Assume that a researcher\slash practitioner has a detailed and \emph{trustworthy} computational simulation of some problem of interest.
+The simulation may be written in terms of micro-positional coordinates~\(\xv_i(t)\) in `space' at which there are micro-field variable values~\(\uv_i(t)\) for indices~\(i\) in some (large) set of integers and for time~\(t\).
+In lattice problems the positions~\(\xv_i\) would be fixed in time (unless employing a moving mesh on the microscale); in particle problems the positions would evolve.
+The positional coordinates are \(\xv_i\in\RR^{d}\) where for spatial problems integer \(d=1,2,3\), but it may be more when solving for a distribution of velocities, or pore sizes, or trader's beliefs, etc.
+The mirco-field variables could be in~\(\RR^{p}\) for any \(p=1,2,\ldots,\infty\).
+
+Further, assume that the computational simulation is too expensive over all the desired spatial domain~\(\XX\subset\RR^{d}\).
+Thus we aim a toolbox to simulate only on macroscale distributed patches.
+
+
+
+\paragraph{Contributors}
+The aim of this project is to collectively develop a \script\ toolbox of equation-free algorithms.
+Initially the algorithms will be simple, and the plan is to subsequently develop more and more capability.
+
+\textsc{Matlab} appears the obvious choice for a first version since it is widespread, reasonably efficient, supports various parallel modes, and development costs are reasonably low.
+Further it is built on \textsc{blas} and \textsc{lapack} so potentially the cache and superscalar \cpu{} are well utilised.
+Let's develop functions that work for both \script.
+\cref{sec:contribute} outlines some details for contributors.
+
+
+
+
+
+\section{Overview of major functions and example scripts}
+\label{sec:smf}
+\localtableofcontents
+
+{% excluding the body gives overview of each function/script
+    \renewcommand{\label}[1]{}%
+    \let\section\subsection%
+    \let\subsection\subsubsection%
+    \let\subsubsection\paragraph%
+    \let\paragraph\subparagraph%
+    \fancyvrbStartStop%
+    \excludeversion{body}
+    \input{../ProjInt/projInt}
+    \input{../Patch/patch}
+    \includeversion{body}
+}%end-exclusion
+

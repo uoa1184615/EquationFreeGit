@@ -1,7 +1,7 @@
 % Simulate the simple wave PDE in 2D on patches.
 % First it checks the spectrum of the system.
 % AJR, Nov 2018
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{\texttt{wave2D}: example of a wave on patches in 2D}
 \label{sec:wave2D}
@@ -128,7 +128,7 @@ field~\(u(x,y,t)\) at time \(t=0\) of the patch scheme
 applied to the simple wave~\pde:
 \cref{fig:wave2Dt6} plots the computed field at time
 \(t=6\).}
-\includegraphics[scale=0.8]{Patch/wave2Dic}
+\includegraphics[scale=0.8]{../Patch/wave2Dic}
 \end{figure}
 Integrate in time using standard functions.
 \begin{matlab}
@@ -159,7 +159,7 @@ print('-depsc',['wave2Dt' num2str(ts(end)) '.eps'])
 \caption{\label{fig:wave2Dt6}field~\(u(x,y,t)\) at
 time \(t=6\) of the patch scheme applied to the simple wave~\pde\ with initial condition in
 \cref{fig:wave2Dic}.}
-\includegraphics[scale=0.8]{Patch/wave2Dt6}
+\includegraphics[scale=0.8]{../Patch/wave2Dt6}
 \end{figure}
 
 

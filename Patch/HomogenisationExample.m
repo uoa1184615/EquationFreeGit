@@ -1,7 +1,7 @@
 % Simulate heterogeneous diffusion in 1D on patches as an
 % example application of patches in space.
 % AJR, Nov 2017 -- Oct 2018
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection[\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]{\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
 \label{sec:HomogenisationExample}
@@ -28,7 +28,7 @@ The first part of the script implements the following gap-tooth scheme
 \centering \caption{\label{fig:ps1HomogenisationCtsU}the
 diffusing field~\(u(x,t)\) in the patch (gap-tooth) scheme
 applied to microscale heterogeneous diffusion.}
-\includegraphics[scale=0.85]{Patch/ps1HomogenisationCtsU}
+\includegraphics[scale=0.85]{../Patch/ps1HomogenisationCtsU}
 \end{figure}%
 Consider a lattice of values~\(u_i(t)\), with lattice
 spacing~\(dx\), and governed by the heterogeneous diffusion 
@@ -110,7 +110,7 @@ print('-depsc2','ps1HomogenisationCtsU')
 \centering \caption{\label{fig:ps1HomogenisationU}field
 \(u(x,t)\) shows basic projective integration of patches of
 heterogeneous diffusion.}
-\includegraphics[scale=0.85]{Patch/ps1HomogenisationU}
+\includegraphics[scale=0.85]{../Patch/ps1HomogenisationU}
 \end{figure}%
 Now take \verb|patchSmooth1|, the interface to the time
 derivatives, and wrap around it the projective integration
@@ -165,7 +165,7 @@ in \cref{fig:ps1HomogenisationMicro}.
 \centering \caption{\label{fig:ps1HomogenisationMicro}stereo
 pair of the field~\(u(x,t)\) during each of the microscale
 bursts used in the projective integration.}
-\includegraphics[scale=0.85]{Patch/ps1HomogenisationMicro}
+\includegraphics[scale=0.85]{../Patch/ps1HomogenisationMicro}
 \end{figure}
 \begin{matlab}
 %}

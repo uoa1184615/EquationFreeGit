@@ -2,7 +2,7 @@
 %numerical method, an ordinary differential equation, and a given upper
 %bound on the time step.
 %JM,Sept 2018.
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsubsection{\texttt{bbgen()}}
 \label{sec:bbgen}
@@ -19,10 +19,9 @@ function bb = bbgen(solver,f,dt)
 \item \verb|dt|, a time step suitable for simulation with \verb|f|
 \end{itemize}
 \paragraph{Output}
+\verb|bb = bb|\((t_{in},x_{in},T)\) a `black box' microsolver that initialises at \( (t_{in},x_{in}) \) and simulates forward a duration \(T\). 
 
-\verb|bb = bb|\((t_{in},x_{in},T)\) a `black box' microsolver that initialises at \( (t_{in},x_{in}) \) and simulates forward a duration \(T\). \\
-
-
+\begin{body}
 \begin{matlab}
 %}
 bb = @(t_in,x_in,T) feval(solver,f,...
@@ -30,4 +29,5 @@ linspace(t_in,t_in+T,1+ceil(T/dt)),x_in);
 end
 %{
 \end{matlab}
+\end{body}
 %}

@@ -1,10 +1,11 @@
 %Basic example of PIG. JM, Sept 18.
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{Example 2: PI using General macrosolvers }
 \label{sec:ExPIG}
 In this example the PI-General scheme is applied to a singularly perturbed ordinary differential equation. The aim is to allow a standard non-stiff numerical integrator, e.g. \verb|ode45()|, to be applied to a stiff problem on a slow, long time scale.
 
+\begin{body}
 \begin{matlab}
 %}
 clear
@@ -82,8 +83,8 @@ ylabel('State')
 \end{matlab}
 The output is plotted in Figure~\ref{fig:PIG}.
 \begin{figure}
-%\includegraphics[width=0.5\textwidth]{ProjInt/PIG}
-\includegraphics[width=0.8\textwidth]{ProjInt/PIGm}
+%\includegraphics[width=0.5\textwidth]{../ProjInt/PIG}
+\includegraphics[width=0.8\textwidth]{../ProjInt/PIGm}
 \caption{Accurate simulation of a stiff nonautonomous system by PIG(). The microsolver is called on-the-fly by the macrosolver (here ode45).}\label{fig:PIG}
 \end{figure}
 
@@ -93,4 +94,6 @@ Notes:
 \item the problem may be made more, or less, stiff by changing the time scale parameter \verb|epsilon|. \verb|PIG()| will handle a stiffer problem with ease; but if the problem is insufficiently stiff, then the algorithm will produce nonsense. This problem is handled by \verb|cdmc()|; see Section~\ref{sec:Excdmc}.
 \item The mildly stiff problem in Example~\ref{sec:ExPIRK} may be efficiently solved by a standard solver, e.g. \verb|ode45()|. The stiff but low dimensional problem in this example can be solved efficiently by a standard stiff solver, e.g. \verb|ode15s()|. The real advantage of the PI schemes is in high dimensional stiff problems, that cannot be efficiently solved by most standard methods.
 \end{itemize}
+
+\end{body}
 %}

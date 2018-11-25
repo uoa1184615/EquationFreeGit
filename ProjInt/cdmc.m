@@ -2,7 +2,7 @@
 %set of coordinates near the slow manifold. This scheme introduces non-
 %trivial error if the fast dynamics is insufficiently stiff.
 %JM, July 2018
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsubsection{\texttt{cdmc()}}
 \label{sec:cdmc}
@@ -19,9 +19,13 @@
 \item \verb|tout|, a vector of times. \verb|tout(end)| will equal \verb|t|.
 \item \verb|xout|, an array of state estimates produced by \verb|solver()|. 
 \end{itemize}
-This function is a wrapper for the microsolver. For instance if the problem of interest is a dynamical system that is not too stiff, and which can be simulated by the solver \verb|sol(t,x,T)|, one would define\\ 
-\verb|cSol = @(t,x,T) cdmc(sol,t,x,T)|,\\
- and thereafter use \verb|csol()| in place of \verb|sol()| as the solver for any PI scheme.
+
+\begin{body}
+This function is a wrapper for the microsolver. For instance if the problem of interest is a dynamical system that is not too stiff, and which can be simulated by the solver \verb|sol(t,x,T)|, one would define
+\begin{verbatim}
+cSol = @(t,x,T) cdmc(sol,t,x,T)|
+\end{verbatim}
+and thereafter use \verb|csol()| in place of \verb|sol()| as the solver for any PI scheme.
 The original solver \verb|sol()| would create large errors if used in a PI scheme, but the output of \verb|cdmc()| will not.
 
 \begin{matlab}
@@ -50,4 +54,6 @@ tr=2*tt(1)-tt(end);
 %{
 \end{matlab}
 This concludes the function.
+
+\end{body}
 %}

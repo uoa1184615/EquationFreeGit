@@ -1,7 +1,7 @@
 %Michaelis--Menton example of projective integrating
 %fast-slow system.  This example simply introduces basic
 %usage of the PIRK2() function. AJR, 29 Sep 2018
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{\texttt{egPIMM}: Example projective integration
 of Michaelis--Menton kinetics}
@@ -20,7 +20,7 @@ variable~\(x(t)\) evolves on a time scale of one, whereas
 the fast variable~\(y(t)\) evolves on a time scale of the
 small parameter~\(\epsilon\).
 
-
+\begin{body}
 \subsubsection{Invoke projective integration}
 
 Clear, and set the scale separation parameter~\(\epsilon\)
@@ -60,7 +60,7 @@ manifold.
 \caption{\label{fig:egPIMM1}Michaelis--Menten enzyme
 kinetics simulated with the projective integration of
 \texttt{PIRK2()}: macroscale samples.}
-\includegraphics[scale=0.85]{ProjInt/egPIMM1}
+\includegraphics[scale=0.85]{../ProjInt/egPIMM1}
 \end{figure}
 
 
@@ -92,7 +92,7 @@ kinetics simulated with the projective integration of
 \texttt{PIRK2()}: the microscale bursts show the initial
 transients on a time scale of \(\epsilon=0.1\), and then the
 alignment along the slow manifold.}
-\includegraphics[scale=0.85]{ProjInt/egPIMM2}
+\includegraphics[scale=0.85]{../ProjInt/egPIMM2}
 \end{figure}
 
 
@@ -120,7 +120,7 @@ kinetics simulated backwards with the projective integration
 of \texttt{PIRK2()}: the microscale bursts show the short
 forward simulations used to project backwards in time at
 \(\epsilon=0.1\).}
-\includegraphics[scale=0.85]{ProjInt/egPIMM3}
+\includegraphics[scale=0.85]{../ProjInt/egPIMM3}
 \end{figure}
 
 
@@ -145,4 +145,5 @@ function [ts, xs] = MMburst(ti, xi, bT)
 end
 %{
 \end{matlab}
+\end{body}
 %}

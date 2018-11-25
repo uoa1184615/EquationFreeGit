@@ -1,7 +1,7 @@
 %rk2int() is a simple example of Runge--Kutta, 2nd order, 
 %integration of a given deterministic ODE.
 %AJR, 29 Mar 2017
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{\texttt{rk2int()}}
 \label{sec:rk2int}

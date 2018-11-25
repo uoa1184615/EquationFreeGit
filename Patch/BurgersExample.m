@@ -2,7 +2,7 @@
 % discretised.  Simulate on spatial patches and via
 % projective integration.
 % AJR, Nov 2017 -- Oct 2018
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{\texttt{BurgersExample}: simulate Burgers' PDE on patches}
 \label{sec:BurgersExample}
@@ -31,7 +31,7 @@ The first part of the script implements the following gap-tooth scheme
 simulation of the Burgers' map (\cref{sec:burgersMap}) on
 patches in space. It requires many very small time steps
 only just visible in this mesh.}
-\includegraphics[scale=0.85]{Patch/ps1BurgersMapU}
+\includegraphics[scale=0.85]{../Patch/ps1BurgersMapU}
 \end{figure}%
 
 
@@ -86,7 +86,7 @@ print('-depsc2','ps1BurgersMapU')
 space-time field \(u(x,t)\) in a basic projective
 integration of the patch scheme applied to the micro-scale
 Burgers' map.}
-\includegraphics[scale=0.85]{Patch/ps1BurgersU}
+\includegraphics[scale=0.85]{../Patch/ps1BurgersU}
 \end{figure}%
 Around the micro-scale burst \verb|burgerBurst()|, wrap the
 projective integration function \verb|PIRK2()| of
@@ -141,7 +141,7 @@ of the fine microscale mesh are almost invisible.
 \centering \caption{\label{fig:ps1BurgersMicro}the field
 \(u(x,t)\) during each of the microscale bursts used in the
 projective integration.  View this stereo pair cross-eyed.}
-\includegraphics[scale=0.85]{Patch/ps1BurgersMicro}
+\includegraphics[scale=0.85]{../Patch/ps1BurgersMicro}
 \end{figure}
 \begin{matlab}
 %}

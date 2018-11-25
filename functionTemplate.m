@@ -1,6 +1,6 @@
 % Short explanation for users typing "help fun"
 % Author, date
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{\texttt{...}: ...}
 \label{sec:...}

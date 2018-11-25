@@ -1,9 +1,10 @@
 %Exploration of cdmc. JM, Sept 18.
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{Explore: PI using constraint-defined manifold computing}
 \label{sec:Excdmc}
 In this example the PI-General scheme is applied to a singularly perturbed ordinary differential equation in which the time scale separation is not too strong. The resulting simulation is not accurate. In parallel, we run the same scheme but with \verb|cdmc()| used as a wrapper for the microsolver. This second implementation successfully replicates the true dynamics.
+\begin{body}
 \begin{matlab}
 %}
 clear
@@ -72,7 +73,8 @@ axis([0 40 0 3])
 \end{matlab}
 The output is plotted in Figure~\ref{fig:PIGE}. The source of the error in the standard \verb|PIG()| scheme is the burst length \verb|bT|, that is significant on the slow time scale. Set \verb|bT| to \verb|20*epsilon| or \verb|50*epsilon|\footnote{this example is quite extreme: at bT=50*epsilon, it would be computationally much cheaper to simulate the entire length of tspan using the microsolver alone.} to worsen the error in both schemes. This example reflects a general principle, that most PI schemes will incur a global error term which is proportional to the simulation time of the microsolver and independent of the order of the microsolver. The \verb|PIRK()| schemes have been written to minimise, if not eliminate entirely, this error, but by design \verb|PIG()| works with any user-defined macrosolver and cannot reduce this error. The function \verb|cdmc()| reduces this error term by attempting to mimic the microsolver without advancing time. 
 \begin{figure}
-\includegraphics[width=0.8\textwidth]{ProjInt/PIGExplore}
+\includegraphics[width=0.8\textwidth]{../ProjInt/PIGExplore}
 \caption{Accurate simulation of a weakly stiff nonautonomous system by PIG() using cdmc(), and an inaccurate solution using a naive application of PIG().}\label{fig:PIGE}
 \end{figure}
+\end{body}
 %}

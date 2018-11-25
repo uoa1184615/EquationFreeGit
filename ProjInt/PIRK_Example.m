@@ -1,10 +1,11 @@
 %Linear example of PIRK. JM, Sept 18.
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection{Example: PI using Runge--Kutta macrosolvers }
 \label{sec:ExPIRK}
 This script is a demonstration of the \verb|PIRK()| schemes, that use a Runge--Kutta macrosolver, applied to a simple linear system with some slow and fast directions. 
 
+\begin{body}
 Clear workspace and set a seed.
 \begin{matlab}
 %}
@@ -87,7 +88,7 @@ For verification, we also compute the trajectories using a standard solver.
 \end{matlab}
 
 \begin{figure}
-\includegraphics[width=\textwidth]{ProjInt/PIRK}
+\includegraphics[width=\textwidth]{../ProjInt/PIRK}
 \caption{Demonstration of PIRK4(). 
 From initial conditions, the system rapidly trannsitions to an attracting invariant manifold. 
 The \textsc{pi} solution accurately tracks the evolution of the variables over time while requiring only a fraction of the computations of the standard solver.}\label{fig:PIRK}
@@ -115,4 +116,5 @@ set(gcf,'PaperPosition',[0 0 14 10])
 print('-depsc2','PIRK')
 %{
 \end{matlab}
+\end{body}
 %}

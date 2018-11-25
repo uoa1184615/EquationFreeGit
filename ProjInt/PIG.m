@@ -1,7 +1,7 @@
 %PIG implements Projective Integration scheme with any user-specified
 %solver for the coarse variables, and a user-specified microsolver.
 %JM, September 2018.
-%!TEX root = ../equationFreeDoc.tex
+%!TEX root = ../Doc/equationFreeDoc.tex
 
 %{
 \subsection{\texttt{PIG()}: Projective Integration with a General macrosolver}
@@ -60,7 +60,8 @@ It is also possible to return the microsolver applications called by the PI meth
 \item  \verb|dx|, a cell array containing the PI estimates of the slow vector field. \verb|dx{1}| is an \(\ell\) dimensional column vector containing all times at which the PI scheme extrapolated along microsolver data to form a macrostep. \verb|dx{2}| is an \(\ell\times n\) array containing the estimated slow vector field.
 \end{itemize}
 
-The main body of the function now follows.\\
+\begin{body}
+The main body of the function now follows.
 
 Get microscale and macroscale information from inputs, and compute the number of time steps at which output is expected.
 \begin{matlab}
@@ -215,4 +216,5 @@ This concludes \verb|PIG()|.
 end
 %{
 \end{matlab}
+\end{body}
 %}
