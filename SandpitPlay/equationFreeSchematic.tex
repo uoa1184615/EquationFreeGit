@@ -1,0 +1,84 @@
+\documentclass[11pt,a4paper,twoside]{article}
+
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
+
+
+\usepackage{pgfplots} 
+\pgfplotsset{compat=1.15} %,tikz
+%\IfFileExists{ajr.sty}{}{
+%    \pgfplotsset{compat=1.10}
+ %   }
+\usepgfplotslibrary{external} %exports an external pdf for each tikz figure
+\tikzexternalize
+% The following forces redraw of all tikz graphics;
+\tikzset{external/force remake}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{positioning}
+
+\begin{document}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[node distance = 0.5cm, auto]
+\tikzstyle{bigblock} = [rectangle, draw, thick,   text badly centered,fill=red!10, 
+    text width=6cm, rounded corners, minimum height=2em]
+\tikzstyle{block} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
+    text width=5cm, rounded corners, minimum height=4em]
+ \tikzstyle{smallblock} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
+    text width=3.4cm, rounded corners, minimum height=4em]   
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{lined} = [draw, latex'-latex']
+\node [bigblock,draw=red!80!black] (pi) {Projective integration scheme\\
+    \begin{tikzpicture}[node distance = 1cm, auto]
+    \node [block] (configPatches) {First step};
+    \node [block, below=of configPatches] (microPDE) {The next step};
+    \node [block, below=1cm of microPDE] (process) {process results and plot};    
+    \path [line] (configPatches) -- (microPDE);
+    \path [line] (microPDE) -- (process);
+    \end{tikzpicture}
+    };   
+\end{tikzpicture}
+\caption{A schematic of the projective integration scheme.}\label{fig:pischeme}
+\end{figure}
+    
+\begin{figure}
+\centering
+\begin{tikzpicture}[node distance = 0.5cm, auto]
+\tikzstyle{bigblock} = [rectangle, draw, thick,   text badly centered, 
+    text width=12cm, rounded corners, minimum height=2em]
+\tikzstyle{block} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
+    text width=5cm, rounded corners, minimum height=4em]
+ \tikzstyle{smallblock} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
+    text width=3.4cm, rounded corners, minimum height=4em]   
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{lined} = [draw, latex'-latex']
+\node [bigblock,draw=blue!80!black,fill=blue!10] (gaptooth) {Gap-tooth scheme\\
+    \begin{tikzpicture}[node distance = 1cm, auto]
+    \node [block] (configPatches) {\texttt{configPatches1}\\ construct patches across space};
+    \node [block, below=of configPatches] (microPDE) {standard \textsc{pde} solver \texttt{ode15s}\\ input  \texttt{patchSmooth1}};
+    \node [smallblock, above right=-1.2cm and 0.8cm of microPDE] (patchSmooth1) {\texttt{patchSmooth1}\\ interface with microscale \textsc{pde} and patch coupling conditions};
+    \node [smallblock, below left=0.5cm and -1.5cm of patchSmooth1] (coupling) {\texttt{patchEdge1}\\ coupling conditions};
+    \node [smallblock, below right=0.5cm and -1.5cm of patchSmooth1] (micropde) {\texttt{heteroDiff}\\ microscale \textsc{pde}};
+    \node [block, below=2cm of microPDE] (process) {process results and plot};    
+    \path [line] (configPatches) -- (microPDE);
+    \path [lined] (microPDE) to[out=0,in=180] (patchSmooth1);
+    \path [lined] (patchSmooth1) to[out=240,in=60] (coupling);
+    \path [lined] (patchSmooth1) to[out=300,in=120] (micropde);
+    \path [line] (microPDE) -- (process);
+    \end{tikzpicture}
+    };   
+\node [bigblock,draw=red!80!black,fill=red!10,below=of gaptooth] (pi) {Projective integration scheme};
+ \path [lined] (gaptooth) -- (pi);
+\end{tikzpicture}
+\caption{A schematic for \texttt{HomogenisationExample}.
+This example has two major steps: the gap-tooth scheme (blue) which evaluates the microscale \textsc{pde} within discrete patches; and projective integration (red) for which Figure~\ref{fig:pischeme} provides further details. }\label{fig:homogenisationex}
+\end{figure}
+
+\end{document}
