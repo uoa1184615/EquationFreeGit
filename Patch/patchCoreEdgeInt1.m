@@ -12,10 +12,10 @@ Couples 1D patches across 1D space by computing their edge values
 from macroscale interpolation. Consequently a spatially
 discrete system could be integrated in time via the patch or
 gap-tooth scheme \cite[]{Roberts06d}. Assumes that the
-sub-patch structure is \emph{smooth} so that the patch
-centre-values are sensible macroscale variables, and patch
+sub-patch structure or core averages are \emph{smooth} so are 
+sensible macroscale variables, and patch
 edge values are determined by macroscale interpolation of
-the patch-centre values. Communicate patch-design variables
+the patch-centre values or patch cores. Communicate patch-design variables
 via the global struct~\verb|patches|.
 \begin{matlab}
 %}

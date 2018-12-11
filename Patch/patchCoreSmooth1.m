@@ -4,18 +4,23 @@
 %AJR, Nov 2017 -- Sep 2018
 %!TEX root = ../Doc/equationFreeDoc.tex
 %{
-\subsection{\texttt{patchSmooth1()}: interface to time integrators}
+\subsection{\texttt{patchCoreSmooth1()}: interface to time integrators}
 \label{sec:patchSmooth1}
 \localtableofcontents
 
 To simulate in time with spatial patches we often need to
 interface a users time derivative function with time
 integration routines such as \verb|ode15s| or~\verb|PIRK2|.
-This function provides an interface. It assumes that the
-sub-patch structure is \emph{smooth} so that the patch
-centre-values are sensible macroscale variables, and patch
+This function provides an interface. Either the sub-patch
+structure is \emph{smooth} so that the patch
+centre-values are sensible macroscale variables, or the 
+user chooses to average over a \emph{core} of 
+values in the centre of each patch with these averages providing
+sensible macroscale variables (no core averaging corresponds 
+to a core of size one). Patch
 edge values are determined by macroscale interpolation of
-the patch-centre values. Communicate patch-design variables
+the patch-centre values or core-averaged values. 
+Communicate patch-design variables
 to this function using the previously established global
 struct~\verb|patches|.
 \begin{matlab}
