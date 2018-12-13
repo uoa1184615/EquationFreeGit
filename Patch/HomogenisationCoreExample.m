@@ -127,7 +127,7 @@ we use the ensemble described by \cite{Bunder2013b} which includes all
 reflected and translated configurations of \verb|patches.cDiff|.
 \begin{matlab}
 %}
-patches.EnsAve=1;
+patches.EnsAve=0;
 if patches.EnsAve    
   if mPeriod>2
     nVars=2*mPeriod;
@@ -177,7 +177,9 @@ figure(1),clf
 xs = patches.x;  xs([1 end],:) = nan;
 mesh(ts,xs(:),uctsAve'),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-set(gcf,'paperposition',[0 0 7 5])
+
+set(gcf,'PaperUnits','centimeters');
+set(gcf,'PaperPosition',[0 0 14 10]);
 if patches.EnsAve
   print('-depsc2','ps1HomogenisationCoreCtsUEnsAve')
 else
@@ -231,8 +233,8 @@ to the diffusion time between adjacent points in the
 microscale lattice.
 \begin{matlab}
 %}
-ts = linspace(0,2/cHomo,7)
-bT = 3*( ratio*Len/nPatch )^2/cHomo
+ts = linspace(0,2/cHomo,7) 
+bT = 3*( ratio*Len/nPatch )^2/cHomo 
 addpath('../ProjInt','../RKint')
 [us,tss,uss] = PIRK2(@heteroBurst, bT, ts, u0(:));
 %{
@@ -254,7 +256,8 @@ figure(2),clf
 plot(xs(:),usAve','.')
 ylabel('u(x,t)'), xlabel('space x')
 legend(num2str(ts',3))
-set(gcf,'paperposition',[0 0 7 5])
+set(gcf,'PaperUnits','centimeters');
+set(gcf,'PaperPosition',[0 0 14 10]);
 if patches.EnsAve
   print('-depsc2','ps1HomogenisationCoreUEnsAve')
 else
@@ -280,12 +283,13 @@ bursts used in the projective integration with ensemble averaging.}
 \begin{matlab}
 %}
 figure(3),clf
-for k = 1:2, subplot(2,2,k)
+for k = 1:2, subplot(1,2,k)
   surf(tss,xs(:),ussAve',  'EdgeColor','none')
   ylabel('x'), xlabel('t'), zlabel('u(x,t)')
   axis tight, view(126-4*k,45)
 end
-set(gcf,'paperposition',[0 0 7 5])
+set(gcf,'PaperUnits','centimeters');
+set(gcf,'PaperPosition',[0 0 14 6]);
 if patches.EnsAve
   print('-depsc2','ps1HomogenisationCoreMicroEnsAve')
 else
