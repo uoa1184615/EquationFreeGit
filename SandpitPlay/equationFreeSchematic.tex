@@ -28,18 +28,18 @@
 \centering
 \begin{tikzpicture}[node distance = 0.5cm, auto]
 \tikzstyle{bigblock} = [rectangle, draw, thick,   text badly centered,fill=red!10, 
-    text width=6cm, rounded corners, minimum height=2em]
+    text width=6cm, rounded corners, minimum height=4ex]
 \tikzstyle{block} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
-    text width=5cm, rounded corners, minimum height=4em]
+    text width=5cm, rounded corners, minimum height=4ex]
  \tikzstyle{smallblock} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
-    text width=3.4cm, rounded corners, minimum height=4em]   
+    text width=3.4cm, rounded corners, minimum height=8ex]   
 \tikzstyle{line} = [draw, -latex']
 \tikzstyle{lined} = [draw, latex'-latex']
 \node [bigblock,draw=red!80!black] (pi) {Projective integration scheme\\
-    \begin{tikzpicture}[node distance = 1cm, auto]
+    \begin{tikzpicture}[node distance = 3ex, auto]
     \node [block] (configPatches) {First step};
     \node [block, below=of configPatches] (microPDE) {The next step};
-    \node [block, below=1cm of microPDE] (process) {process results and plot};    
+    \node [block, below=of microPDE] (process) {process results and plot};    
     \path [line] (configPatches) -- (microPDE);
     \path [line] (microPDE) -- (process);
     \end{tikzpicture}
@@ -50,17 +50,17 @@
     
 \begin{figure}
 \centering
-\begin{tikzpicture}[node distance = 0.5cm, auto]
+\begin{tikzpicture}[node distance = 3ex, auto]
 \tikzstyle{bigblock} = [rectangle, draw, thick,   text badly centered, 
-    text width=12cm, rounded corners, minimum height=2em]
+    text width=12cm, rounded corners, minimum height=4ex]
 \tikzstyle{block} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
-    text width=5cm, rounded corners, minimum height=4em]
+    text width=5cm, rounded corners, minimum height=8ex]
  \tikzstyle{smallblock} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
-    text width=3.4cm, rounded corners, minimum height=4em]   
+    text width=3.4cm, rounded corners, minimum height=8ex]   
 \tikzstyle{line} = [draw, -latex']
 \tikzstyle{lined} = [draw, latex'-latex']
 \node [bigblock,draw=blue!80!black,fill=blue!10] (gaptooth) {Gap-tooth scheme\\
-    \begin{tikzpicture}[node distance = 1cm, auto]
+    \begin{tikzpicture}[node distance = 3ex, auto]
     \node [block] (configPatches) {\texttt{configPatches1}\\ construct patches across space};
     \node [block, below=of configPatches] (microPDE) {standard \textsc{pde} solver \texttt{ode15s}\\ input  \texttt{patchSmooth1}};
     \node [smallblock, above right=-1.2cm and 0.8cm of microPDE] (patchSmooth1) {\texttt{patchSmooth1}\\ interface with microscale \textsc{pde} and patch coupling conditions};

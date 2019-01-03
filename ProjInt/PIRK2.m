@@ -116,7 +116,8 @@ if nargin==0
 \paragraph{Example code for Michaelis--Menton dynamics} The
 Michaelis--Menten enzyme kinetics is expressed as a
 singularly perturbed system of differential equations for
-\(x(t)\) and~\(y(t)\) (encoded in function \verb|MMburst|):
+\(x(t)\) and~\(y(t)\) (encoded in function \verb|MMburst| 
+in the next paragraph):
 \begin{equation*}
 \frac{dx}{dt}=-x+(x+\tfrac12)y \quad\text{and}\quad
 \frac{dy}{dt}=\frac1\epsilon\big[x-(x+1)y\big].
@@ -149,25 +150,27 @@ Michaelis--Menten enzyme kinetics at parameter~\(\epsilon\)
 inherited from above. Code \textsc{ode}s in
 function~\verb|dMMdt| with variables \(x=\verb|x(1)|\) and
 \(y=\verb|x(2)|\).  Starting at time~\verb|ti|, and
-state~\verb|xi| (row), here code the midpoint integration
-scheme.
+state~\verb|xi| (row), we here simply use \verb|ode23| to 
+integrate in time.
 \begin{matlab}
 %}
 function [ts, xs] = MMburst(ti, xi, bT) 
     dMMdt = @(t,x) [ -x(1)+(x(1)+0.5)*x(2)
           1/epsilon*( x(1)-(x(1)+1)*x(2) ) ];
-    ts = linspace(ti,ti+bT,ceil(bT*5/epsilon))';
-    dt = ts(2)-ts(1);
-    xs = nan(length(ts),length(xi));
-    xs(1,:) = xi;
-    for j = 1:length(ts)-1
-      xMidpoint = xs(j,:)+dt/2*dMMdt(ts(j),xs(j,:)).';
-      xs(j+1,:) = xs(j,:)+dt*dMMdt(ts(j)+dt/2,xMidpoint).';
-    end
+    [ts, xs] = ode23(dMMdt, [ti ti+bT], xi);
 end
 %{
 \end{matlab}
 
+% At one stage used this instead of ode23---cannot remember why.
+%    ts = linspace(ti,ti+bT,ceil(bT*5/epsilon))';
+%    dt = ts(2)-ts(1);
+%    xs = nan(length(ts),length(xi));
+%    xs(1,:) = xi;
+%    for j = 1:length(ts)-1
+%      xMidpoint = xs(j,:)+dt/2*dMMdt(ts(j),xs(j,:)).';
+%      xs(j+1,:) = xs(j,:)+dt*dMMdt(ts(j)+dt/2,xMidpoint).';
+%    end
 
 
 

@@ -87,10 +87,8 @@
 \newcommand{\pde}{\textsc{pde}}
 \newcommand{\Reduce}{{Reduce}}
 \newcommand{\Matlab}{\textsc{Matlab}}
-\ifx\matlab\@undefined
-\newcommand{\matlab}{\textsc{Matlab}}
-\fi
-
+\def\script{\textsc{Matlab}\slash Octave}
+\newcommand{\cpu}{\textsc{cpu}}
 % units
 \newcommand{\m}{\operatorname{m}}
 \newcommand{\cm}{\operatorname{cm}}
@@ -192,10 +190,6 @@
 \makeatother
 \newtheorem{example}{Example}
     \def\exampleautorefname{Example}
-%\newenvironment{proof}%
-%{\par\emph{\theoremcolour Proof:\quad}}%
-%%{\hfill{\theoremcolour$\spadesuit$}\par}
-%{\hfill\penalty50\quad\mbox{}\hfill\theoremcolour$\spadesuit$\penalty-10000}
 \fi
 
 % environment quoted gives an attributed quote with the attribution
@@ -320,6 +314,14 @@
 
     
 \AtBeginDocument{{\def\and{, }%
-  \hypersetup{pdfauthor={AJR et al.},pdftitle={Equation-Free functions for Matlab}}}}
+  \hypersetup{pdfauthor={AJR et al.},pdftitle={Equation-Free function toolbox for Matlab/Octave}}}}
+
+
+\pagestyle{headings}% Default heading pagestyle,
+% except we very naughtily crunch \MakeUppercase
+\renewcommand{\MakeUppercase}[1]{\color{teal}\textsf{#1}}
+% A footer gives date of typesetting
+\def\@oddfoot {\hfill\footnotesize\sf\color{cyan}\today}
+\def\@evenfoot{\footnotesize\sf\color{cyan}\today\hfill}
 
 

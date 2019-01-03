@@ -109,7 +109,8 @@ print('-depsc2','ps1HomogenisationCtsU')
 \begin{figure}
 \centering \caption{\label{fig:ps1HomogenisationU}field
 \(u(x,t)\) shows basic projective integration of patches of
-heterogeneous diffusion.}
+heterogeneous diffusion: different colours correspond to 
+the times in the legend.}
 \includegraphics[scale=0.85]{../Patch/ps1HomogenisationU}
 \end{figure}%
 Now take \verb|patchSmooth1|, the interface to the time

@@ -61,8 +61,9 @@ manifold.
 kinetics simulated with the projective integration of
 \texttt{PIRK2()}: macroscale samples.}
 \includegraphics[scale=0.85]{../ProjInt/egPIMM1}
-\end{figure}
-
+\end{figure}%
+\cite{Sieber2018} [\S4] used this system as an example of 
+their analysis of the convergence of Projective Integration.
 
 
 \paragraph{Optional: request and plot the microscale bursts}
