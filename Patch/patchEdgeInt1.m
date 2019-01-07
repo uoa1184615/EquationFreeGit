@@ -97,6 +97,7 @@ i0=round((nSubP+1)/2);
 %{
 \end{matlab}
 
+
 \paragraph{Lagrange interpolation gives patch-edge values}
 So compute centred differences of the mid-patch values for
 the macro-interpolation, of all fields. Assumes the domain
