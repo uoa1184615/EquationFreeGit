@@ -4,7 +4,7 @@
 \label{sec:ProjInt}
 \localtableofcontents
 
-This section provides some good projective integration functions \cite[e.g.]{Gear02b, Gear03c, Givon06}.
+This section provides some good projective integration functions \cite[e.g.]{Gear02b, Gear03c, Givon06, Sieber2018}.
 The goal is to enable computationally expensive dynamic simulations to be run over long time scales.
 Perhaps start by looking at \cref{sec:egPIMM} which codes the introductory example of a long time simulation of the Michaelis--Menton multiscale system of differential equations.
 
@@ -40,16 +40,18 @@ This simple function takes as input a standard solver with a recommended time st
 \end{itemize}
 
 The following sections describe the \verb|PIRK2()| and \verb|PIG()| functions in detail, providing an example for each.
+Then \verb|PIRK4()| is very similar to \verb|PIRK2()|.
 Descriptions for the minor functions follow, and an example of the use of \verb|cdmc()|.
-\verb|PIRK4()| (which is very similar to \verb|PIRK2()|) concludes the section.
 
 \end{body}
 
 
-\input{../ProjInt/egPIMM.m}
 \input{../ProjInt/PIRK2.m}
-\input{../ProjInt/PIRK_Example.m}
+\input{../ProjInt/egPIMM.m}
 \input{../ProjInt/PIG.m}
+\input{../ProjInt/PIRK4.m}
+\begin{body}
+\input{../ProjInt/PIRK_Example.m}
 \input{../ProjInt/PIG_Example.m}
 
 \subsection{Minor functions}
@@ -57,11 +59,9 @@ Descriptions for the minor functions follow, and an example of the use of \verb|
 \input{../ProjInt/cdmc.m}
 \input{../ProjInt/bbgen.m}
 \input{../ProjInt/PIG_Explore.m}
-\input{../ProjInt/PIRK4.m}
 
 
 
-\begin{body}
 \subsection{To do/discuss}
 \begin{itemize}
 \item JM: did not change the introduction - seems to have been done? JB comments included?

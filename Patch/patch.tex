@@ -12,9 +12,9 @@ predictions by craftily coupling the patches across
 unsimulated space \cite[e.g.]{Hyman2005, Samaey03b,
 Samaey04, Roberts06d, Liu2015}.
 
-The spatial discrete system is to be on a lattice such as
-obtained from finite difference approximation of a \pde.
-Usually continuous in time.
+The spatial structure is to be on a lattice such as obtained
+from finite difference approximation of a \pde. Usually
+continuous in time.
 
 \paragraph{Quick start}
 For an example, see \cref{sec:configPatches1eg,sec:configPatches2eg}  for basic code that uses the provided functions to simulate Burgers'~\pde\ and a nonlinear `diffusion' \pde.
@@ -22,6 +22,7 @@ For an example, see \cref{sec:configPatches1eg,sec:configPatches2eg}  for basic 
 \input{../Patch/configPatches1.m}
 \input{../Patch/patchSmooth1.m}
 \input{../Patch/patchEdgeInt1.m}
+\begin{body}
 \input{../Patch/BurgersExample.m}
 \input{../Patch/HomogenisationExample.m}
 %\input{../Patch/configPatches1.m}
@@ -30,15 +31,16 @@ For an example, see \cref{sec:configPatches1eg,sec:configPatches2eg}  for basic 
 %\input{../Patch/BurgersExample.m}
 %\input{../Patch/HomogenisationCoreExample.m}
 \input{../Patch/waterWaveExample.m}
+\end{body}
 % 2D stuff
 \input{../Patch/configPatches2.m}
 \input{../Patch/patchSmooth2.m}
 \input{../Patch/patchEdgeInt2.m}
+\begin{body}
 \input{../Patch/wave2D.m}
 
 
 
-\begin{body}
 \subsection{To do}
 \begin{itemize}
 \item Testing is so far only qualitative.  Need to be quantitative.

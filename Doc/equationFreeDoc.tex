@@ -3,41 +3,45 @@
   \IfFileExists{jm.sty}{\usepackage{jm}}{
     \usepackage[a5paper,margin=11mm]{geometry}}}
 
+
 \title{Equation-Free function toolbox for Matlab/Octave}
 
 \author{A. J. Roberts\thanks{%
+School of Mathematical Sciences, University of Adelaide, South Australia.
 \url{http://www.maths.adelaide.edu.au/anthony.roberts},
 \url{http://orcid.org/0000-0001-8930-1552}}
+
 \and John Maclean\thanks{%
+School of Mathematical Sciences, University of Adelaide, South Australia.
 \url{http://www.adelaide.edu.au/directory/john.maclean}}
+
+\and J.~E. Bunder\thanks{%
+School of Mathematical Sciences, University of Adelaide, South Australia.
+\protect\url{mailto:judith.bunder@adelaide.edu.au},
+\protect\url{http://orcid.org/0000-0001-5355-2288}}
 \and et al.\thanks{Appear here for your contribution.}
 }
 
 \date{\today}
 
 
-% uncomment the sections to typeset
+% Uncomment the sections to typeset
 %\includeonly{
 %introduction
-%%%,../ProjInt/projInt
 %,projInt
-%%%,../ProjIntDMD/projIntDMD
-%%%,../Patch/patch
 %,patch
-%%%%,../RKInt/rk2int
 %,appContribute
 %,apptpd
 %}
 
-% verbatim listing is quick and reliable
-%\usepackage{verbatim}
-%\newenvironment{matlab}{\verbatim}{\endverbatim}
-% But fancyvrb does more, such as line numbers
+
+% fancyvrb does code listing, including line numbers
 \usepackage{fancyvrb}
 \newenvironment{matlab}%
     {\Verbatim[numbers=left,firstnumber=\the\inputlineno]}%
     {\endVerbatim}
-% also get fancyvrb to omit %{ and %} pairs, but requires they always be used
+% Also get fancyvrb to omit %{ and %} pairs, 
+% but this requires they always be used
 \makeatletter
 \def\fancyvrbStartStop{%
   \edef\FancyVerbStartString{\@percentchar\@charrb} 
@@ -46,8 +50,6 @@
 % could change appearance with e.g. \renewcommand{\theFancyVerbLine}{%
 %  \textcolor{red}{\small 8.\alph{FancyVerbLine}}}
 
-%\usepackage{mcode} %[framed,numbered,autolinebreaks,useliterate]
-%\renewenvironment{matlab}{\lstlisting}{\endlstlisting}
 
 %\usepackage{pgfplots}\pgfplotsset{compat=newest}% avoid as too few use??
 
@@ -72,22 +74,10 @@
 \crefname{enumiv}{}{}
 
 % command definitions
-\def\script{\textsc{Matlab}\slash Octave}
-\newcommand{\cpu}{\textsc{cpu}}
+\def\into{\(\leftrightarrow\)\ }
 \Vec f\Vec x\Vec u \Vec X \Vec U
 \Bb R  \Bb X
-\def\into{\(\leftrightarrow\)\ }
 
-
-% These are recommended by Rob J Hyndman (2011)
-% \footnote{\url{http://robjhyndman.com/researchtips/latex-floats/}}
-\setcounter{topnumber}{2}
-\setcounter{bottomnumber}{2}
-\setcounter{totalnumber}{4}
-\renewcommand{\topfraction}{0.85}
-\renewcommand{\bottomfraction}{0.85}
-\renewcommand{\textfraction}{0.15}
-\renewcommand{\floatpagefraction}{0.7}
 
 
 
