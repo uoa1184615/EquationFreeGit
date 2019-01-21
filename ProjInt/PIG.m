@@ -60,7 +60,7 @@ It is also possible to return the microsolver applications called by the PI meth
 \item  \verb|dx|, a cell array containing the PI estimates of the slow vector field. \verb|dx{1}| is an \(\ell\) dimensional column vector containing all times at which the PI scheme extrapolated along microsolver data to form a macrostep. \verb|dx{2}| is an \(\ell\times n\) array containing the estimated slow vector field.
 \end{itemize}
 
-\begin{body}
+\begin{funDescription}
 The main body of the function now follows.
 
 Get microscale and macroscale information from inputs, and compute the number of time steps at which output is expected.
@@ -216,5 +216,5 @@ This concludes \verb|PIG()|.
 end
 %{
 \end{matlab}
-\end{body}
+\end{funDescription}
 %}

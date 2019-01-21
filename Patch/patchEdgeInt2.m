@@ -1,7 +1,6 @@
 % Provides the interpolation across 2D space for 2D patches
 % of simulations of a smooth lattice system such as PDE
-% discretisations.
-%AJR, Nov 2018
+% discretisations.  AJR, Nov 2018
 %!TEX root = ../Doc/equationFreeDoc.tex
 %{
 \subsection[\texttt{patchEdgeInt2()}: 2D patch edge values from 2D interpolation]{\texttt{patchEdgeInt2()}: sets 2D patch edge values from 2D macroscale interpolation}
@@ -9,8 +8,8 @@
 \localtableofcontents
 
 
-Couples 2D patches across 2D space by computing their edge values
-via macroscale interpolation.  Assumes that the
+Couples 2D patches across 2D space by computing their edge
+values via macroscale interpolation.  Assumes that the
 sub-patch structure is \emph{smooth} so that the patch
 centre-values are sensible macroscale variables, and patch
 edge values are determined by macroscale interpolation of
@@ -58,7 +57,7 @@ the fields with edge values set by interpolation.
 \end{itemize}
 
 
-\begin{body}
+\begin{funDescription}
 
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
@@ -310,5 +309,5 @@ end% function patchEdgeInt2
 \end{matlab}
 Fin, returning the 4/5D array of field values with
 interpolated edges. 
-\end{body} 
+\end{funDescription} 
 %}

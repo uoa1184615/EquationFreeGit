@@ -8,15 +8,17 @@
 \label{sec:patchEdgeInt1}
 \localtableofcontents
 
-Couples 1D patches across 1D space by computing their edge values
-from macroscale interpolation. Consequently a spatially
-discrete system could be integrated in time via the patch or
-gap-tooth scheme \cite[]{Roberts06d}. Assumes that the
-sub-patch structure is \emph{smooth} so that the patch
-centre-values are sensible macroscale variables, and patch
-edge values are determined by macroscale interpolation of
-the patch-centre values. Communicate patch-design variables
-via the global struct~\verb|patches|.
+Couples 1D patches across 1D space by computing their edge
+values from macroscale interpolation.  This function is
+primarily used by \verb|patchSmooth1| but is also useful for
+user graphics. Consequently a spatially discrete system
+could be integrated in time via the patch or gap-tooth
+scheme \cite[]{Roberts06d}. Assumes that the sub-patch
+structure is \emph{smooth} so that the patch centre-values
+are sensible macroscale variables, and patch edge values are
+determined by macroscale interpolation of the patch-centre
+values. Communicate patch-design variables via the global
+struct~\verb|patches|.
 \begin{matlab}
 %}
 function u=patchEdgeInt1(u)
@@ -50,11 +52,11 @@ equi-spaced lattice on both macro- and micro-scales.
 \begin{itemize}
 \item \verb|u| is \(\verb|nSubP|\times \verb|nPatch|\times
 \verb|nVars|\) 2/3D array of the fields with edge values set by
-interpolation.
+interpolation of patch centre-values.
 \end{itemize}
 
 
-\begin{body}
+\begin{funDescription}
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
@@ -239,5 +241,5 @@ end% if spectral
 %{
 \end{matlab}
 Fin, returning the 2/3D array of field values.  
-\end{body}
+\end{funDescription}
 %}

@@ -3,6 +3,7 @@
 % AJR, Nov 2017 -- Oct 2018
 %!TEX root = ../Doc/equationFreeDoc.tex
 %{
+\begin{userExample}
 \subsection[\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]{\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
 \label{sec:HomogenisationExample}
 \localtableofcontents
@@ -23,7 +24,7 @@ The first part of the script implements the following gap-tooth scheme
 \item process results
 \end{enumerate}
 
-\begin{body}
+
 \begin{figure}
 \centering \caption{\label{fig:ps1HomogenisationCtsU}the
 diffusing field~\(u(x,t)\) in the patch (gap-tooth) scheme
@@ -109,7 +110,8 @@ print('-depsc2','ps1HomogenisationCtsU')
 \begin{figure}
 \centering \caption{\label{fig:ps1HomogenisationU}field
 \(u(x,t)\) shows basic projective integration of patches of
-heterogeneous diffusion.}
+heterogeneous diffusion: different colours correspond to 
+the times in the legend.}
 \includegraphics[scale=0.85]{../Patch/ps1HomogenisationU}
 \end{figure}%
 Now take \verb|patchSmooth1|, the interface to the time
@@ -235,5 +237,5 @@ end
 %{
 \end{matlab}
 Fin.
-\end{body}
+\end{userExample}
 %}
