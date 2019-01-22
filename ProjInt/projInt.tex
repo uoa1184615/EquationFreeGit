@@ -6,7 +6,9 @@
 
 This section provides some good projective integration functions \cite[e.g.]{Gear02b, Gear03c, Givon06, Sieber2018}.
 The goal is to enable computationally expensive dynamic simulations to be run over long time scales.
+\begin{userExample} 
 Perhaps start by looking at \cref{sec:egPIMM} which codes the introductory example of a long time simulation of the Michaelis--Menton multiscale system of differential equations.
+\end{userExample}
 
 \paragraph{Scenario}
 When you are interested in a complex system with many interacting parts or agents, you usually are primarily interested in the self-organised emergent macroscale characteristics.
@@ -17,7 +19,7 @@ The Projective Integration section of this toolbox consists of several functions
 Each function implements over the long-time scale a variant of a standard numerical method to simulate the emergent dynamics of the complex system.
 Each function has standardised inputs and outputs.
 
-\begin{body}
+
 \paragraph{Main functions}
 \begin{itemize}
 \item Projective Integration by second or fourth order Runge--Kutta, \verb|PIRK2()| and \verb|PIRK4()| respectively.
@@ -43,9 +45,6 @@ The following sections describe the \verb|PIRK2()| and \verb|PIG()| functions in
 Then \verb|PIRK4()| is very similar to \verb|PIRK2()|.
 Descriptions for the minor functions follow, and an example of the use of \verb|cdmc()|.
 
-\end{body}
-
-
 \input{../ProjInt/PIRK2.m}
 \input{../ProjInt/egPIMM.m}
 \input{../ProjInt/PIG.m}
@@ -64,18 +63,10 @@ Descriptions for the minor functions follow, and an example of the use of \verb|
 
 \subsection{To do/discuss}
 \begin{itemize}
-\item JM: did not change the introduction - seems to have been done? JB comments included?
-\item JM: need to discuss bibliography and style file handling. Do not understand current standard.
-\item JM: this file blends the standard code documentation with line-by-line code explanations and examples. Should have a preface/appendix/etc with just the standard code documentation
-\item JM: current code documentation (paragraph for Inputs and another for Outputs) goes counter to Matlab standard. Revert?
-\item AJR: inconsistency between description~\(n\) and~\(\ell\), and the code's \verb|N| and~\verb|n|??  Proposed a partial answer.  Also need to be clear what need to be row/column vectors.
-\item AJR: is there any advantage to \verb|reshape(t2,[],1)| over \verb|t2(:)|?  Answer appears to be nothing either way.
-\item AJR: can this code `integrate' backwards in time using the forward time bursts? Answer: yes. But need to test its accuracy??
-\item AJR: remember, if used, cater for complex variable simulation by using real transpose~\verb|.'|.
 \item could implement Projective Integration by `arbitrary' Runge--Kutta scheme; that is, by having the user input a particular Butcher table---surely only specialists would be interested
-\item can `reverse' the order of projection and microsolver applications.
-The output at each user-requested coarse time would then be the end point of an application of the microsolver.
-\item Can maybe implement microsolvers that terminate a burst when the fast dynamics have settles using, for example, the 'Events' function handle in ode23. 
+\item can `reverse' the order of projection and microsolver applications with a little fiddling.
+Then output at each user-requested coarse time is the end point of an application of the microsolver - better predictions for fast variables.
+\item Can maybe implement microsolvers that terminate a burst when the fast dynamics have settled using, for example, the 'Events' function handle in ode23. 
 \end{itemize}
 
 \end{body}

@@ -17,6 +17,7 @@ function [x, tms, xms, rm, svf] = PIRK4(solver, bT, tSpan, x0)
 \end{matlab}
 
 The inputs and outputs are standardised with \verb|PIRK2()|.
+\begin{funDescription}
 \paragraph{Input}
 \begin{itemize}
 \item \verb|solver()|, a function that produces output from
@@ -99,7 +100,6 @@ the estimated slow vector field.
 
 \end{itemize}
 
-\begin{body}
 
 \subsubsection{The projective integration code}
 
@@ -358,6 +358,6 @@ This concludes \verb|PIRK4()|.
 end
 %{
 \end{matlab}
-\end{body}
+\end{funDescription}
 %}
 

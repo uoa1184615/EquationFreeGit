@@ -25,7 +25,7 @@ The first part of the script implements the following gap-tooth scheme
 \item process results
 \end{enumerate}
 
-\begin{body}
+
 \begin{figure}
 \centering \caption{\label{fig:ps1BurgersMapU}a short time
 simulation of the Burgers' map (\cref{sec:burgersMap}) on
@@ -222,5 +222,5 @@ end
 %{
 \end{matlab}
 Fin.
-\end{body}
+
 %}

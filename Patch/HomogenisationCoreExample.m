@@ -1,3 +1,6 @@
+
+clear
+close all
 % Simulate heterogeneous diffusion in 1D on patches as an
 % example application of patches in space, 
 % with macroscale determined from a core average.
@@ -158,7 +161,8 @@ u0 = sin(patches.x)+0.2*randn(nSubP,nPatch);
 if patches.EnsAve
   u0 = repmat(u0,[1,1,nVars]);
 end
-[ts,ucts] = ode15s(@patchCoreSmooth1, [0 2/cHomo], u0(:));
+[ts,ucts] = ode15s(@patchCoreSmooth1, [0 2/cHomo], u0(:)); 
+% [ts,ucts] = ode15s(@patchCoreSmooth1, [0 2/dmax], u0(:));
 ucts=reshape(ucts,length(ts),length(patches.x(:)),[]);
 %{
 \end{matlab}
@@ -235,8 +239,8 @@ microscale lattice.
 %}
 ts = linspace(0,2/cHomo,7) 
 bT = 3*( ratio*Len/nPatch )^2/cHomo 
-addpath('../ProjInt','../RKint')
-[us,tss,uss] = PIRK2(@heteroBurst, bT, ts, u0(:));
+addpath('../ProjInt','../SandpitPlay/RKint')
+[us,tss,uss] = PIRK4(@heteroBurst, 20*bT, ts, u0(:));
 %{
 \end{matlab}
 Plot the macroscale predictions to draw
@@ -341,7 +345,7 @@ function [ts, ucts] = heteroBurst(ti, ui, bT)
   switch 'rk2'
   case '23',  [ts,ucts] = ode23 (@patchCoreSmooth1,[ti ti+bT],ui(:));
   case '15s', [ts,ucts] = ode15s(@patchCoreSmooth1,[ti ti+bT],ui(:));
-  case 'rk2', ts = linspace(ti,ti+bT,200)';
+  case 'rk2', ts = linspace(ti,ti+bT,8000)';
               ucts = rk2int(@patchCoreSmooth1,ts,ui(:));
   end
 end 

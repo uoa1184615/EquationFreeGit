@@ -1,0 +1,150 @@
+\documentclass[11pt,a5paper,twoside]{article}
+\IfFileExists{ajr.sty}{\usepackage{ajr}
+\usepackage[a5paper,margin=11mm]{geometry}}{}
+\IfFileExists{jm.sty}{\usepackage{jm}}{}
+
+    
+
+
+
+
+
+\title{Equation-Free function toolbox for Matlab/Octave}
+
+\author{A. J. Roberts\thanks{%
+School of Mathematical Sciences, University of Adelaide, South Australia.
+\url{http://www.maths.adelaide.edu.au/anthony.roberts},
+\url{http://orcid.org/0000-0001-8930-1552}}
+
+\and John Maclean\thanks{%
+School of Mathematical Sciences, University of Adelaide, South Australia.
+\url{http://www.adelaide.edu.au/directory/john.maclean}}
+
+\and J.~E. Bunder\thanks{%
+School of Mathematical Sciences, University of Adelaide, South Australia.
+\protect\url{mailto:judith.bunder@adelaide.edu.au},
+\protect\url{http://orcid.org/0000-0001-5355-2288}}
+\and et al.\thanks{Appear here for your contribution.}
+}
+
+\date{\today}
+
+\usepackage{pgfplots} 
+\pgfplotsset{compat=1.15} %,tikz
+\IfFileExists{ajr.sty}{}{
+    \pgfplotsset{compat=1.10}
+}
+%\usepgfplotslibrary{external} %exports an external pdf for each tikz figure
+%\tikzexternalize
+%% The following forces redraw of all tikz graphics;
+%\tikzset{external/force remake}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{shapes,arrows,fit}
+\usetikzlibrary{positioning}
+
+\usepackage{bold-extra}
+\usepackage[T1]{fontenc}
+\usepackage{caption}
+
+
+% Uncomment the sections to typeset
+%\includeonly{
+%introduction
+%,projInt
+%,patch
+%,appContribute
+%,apptpd
+%}
+
+
+% fancyvrb does code listing, including line numbers
+\usepackage{fancyvrb}
+\newenvironment{matlab}%
+    {\Verbatim[numbers=left,firstnumber=\the\inputlineno]}%
+    {\endVerbatim}
+% Also get fancyvrb to omit %{ and %} pairs, 
+% but this requires they always be used
+\makeatletter
+\def\fancyvrbStartStop{%
+  \edef\FancyVerbStartString{\@percentchar\@charrb} 
+  \edef\FancyVerbStopString{\@percentchar\@charlb} }
+\makeatother
+% could change appearance with e.g. \renewcommand{\theFancyVerbLine}{%
+%  \textcolor{red}{\small 8.\alph{FancyVerbLine}}}
+
+
+%\usepackage{pgfplots}\pgfplotsset{compat=newest}% avoid as too few use??
+
+
+\usepackage{natbib}
+\bibliographystyle{agsm}
+\let\harvardurl\url
+
+% used to in/exclude
+\usepackage{versions}
+\newenvironment{body}{}{}
+
+\newenvironment{userExample}{}{}
+\newenvironment{funDescription}{}{}
+
+\usepackage[onedeep]{etocx}% for mini-local-tableofconents
+\usepackage{microtype,amsmath,defns,graphicx,hyperref}
+% Invoke cleverref
+\usepackage[capitalise,nameinlink,noabbrev]{cleveref}
+\crefname{equation}{}{}
+% Default "Item" useless, use enumitem and ref=
+\crefname{enumi}{}{}
+\crefname{enumii}{}{}
+\crefname{enumiii}{}{}
+\crefname{enumiv}{}{}
+
+% command definitions
+\def\into{\(\leftrightarrow\)\ }
+\Vec f\Vec x\Vec u \Vec X \Vec U
+\Bb R  \Bb X
+
+
+
+\begin{document}
+\epstopdfsetup{suffix=} % must be after begin{document}
+
+\maketitle
+
+\begin{abstract}
+This `equation-free toolbox' facilitates the computer-assisted analysis of complex, multiscale systems.
+Its aim is to enable microscopic simulators to perform system level tasks and analysis.
+The methodology bypasses the derivation of macroscopic evolution equations by using only short bursts of microscale simulations which are often the best available description of a system
+\cite[e.g.]{Kevrekidis09a, Kevrekidis04a, Kevrekidis03b}.
+This suite of functions should empower users to start implementing such methods---but so far we have only just started.
+\end{abstract}
+
+\tableofcontents
+\excludeversion{userExample}
+\include{introduction}
+
+\fancyvrbStartStop 
+
+
+\include{projInt}
+%\include{../ProjInt/projInt}
+
+%\include{../ProjIntDMD/projIntDMD}
+
+\include{patch}
+%\include{../Patch/patch}
+
+%\include{../RKInt/rk2int}
+
+\appendix
+\let\FancyVerbStartString\relax 
+\let\FancyVerbStopString\relax
+\include{appContribute}
+\include{apptpd}
+
+
+% get bib data from shared and local files; 
+% add required local to shared with 'bibexport equationFreeDoc'
+\IfFileExists{ajr.sty}{\bibliography{bibexport,ajr,bib}}{}
+\IfFileExists{jm.sty}{\bibliography{bibexport,jm,bib}}{}
+
+\end{document}

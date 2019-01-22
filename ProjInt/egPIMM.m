@@ -3,6 +3,7 @@
 %usage of the PIRK2() function. AJR, 29 Sep 2018
 %!TEX root = ../Doc/equationFreeDoc.tex
 %{
+\begin{userExample}
 \subsection{\texttt{egPIMM}: Example projective integration
 of Michaelis--Menton kinetics}
 \label{sec:egPIMM}
@@ -20,7 +21,6 @@ variable~\(x(t)\) evolves on a time scale of one, whereas
 the fast variable~\(y(t)\) evolves on a time scale of the
 small parameter~\(\epsilon\).
 
-\begin{body}
 \subsubsection{Invoke projective integration}
 
 Clear, and set the scale separation parameter~\(\epsilon\)
@@ -146,5 +146,5 @@ function [ts, xs] = MMburst(ti, xi, bT)
 end
 %{
 \end{matlab}
-\end{body}
+\end{userExample}
 %}

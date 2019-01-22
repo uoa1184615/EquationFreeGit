@@ -104,7 +104,7 @@ the estimated slow vector field.
 
 \end{itemize}
 
-\begin{body}
+\begin{funDescription}
 
 \subsubsection{If no arguments, then execute an example}
 \label{sec:pirk2eg}
@@ -418,7 +418,7 @@ This concludes \verb|PIRK2()|.
 end
 %{
 \end{matlab}
-\end{body}
+\end{funDescription}
 %}
 
 

@@ -56,7 +56,7 @@ interpolation of patch centre-values.
 \end{itemize}
 
 
-\begin{body}
+\begin{funDescription}
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
@@ -242,5 +242,5 @@ end% if spectral
 %{
 \end{matlab}
 Fin, returning the 2/3D array of field values.  
-\end{body}
+\end{funDescription}
 %}

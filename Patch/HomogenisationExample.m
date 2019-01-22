@@ -3,6 +3,7 @@
 % AJR, Nov 2017 -- Oct 2018
 %!TEX root = ../Doc/equationFreeDoc.tex
 %{
+\begin{userExample}
 \subsection[\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]{\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
 \label{sec:HomogenisationExample}
 \localtableofcontents
@@ -23,7 +24,7 @@ The first part of the script implements the following gap-tooth scheme
 \item process results
 \end{enumerate}
 
-\begin{body}
+
 \begin{figure}
 \centering \caption{\label{fig:ps1HomogenisationCtsU}the
 diffusing field~\(u(x,t)\) in the patch (gap-tooth) scheme
@@ -144,7 +145,7 @@ microscale lattice.
 %}
 ts = linspace(0,2/cHomo,7)
 bT = 3*( ratio*Len/nPatch )^2/cHomo
-addpath('../ProjInt','../RKint')
+addpath('../ProjInt','../SandpitPlay/RKint')
 [us,tss,uss] = PIRK2(@heteroBurst, bT, ts, u0(:));
 %{
 \end{matlab}
@@ -236,5 +237,5 @@ end
 %{
 \end{matlab}
 Fin.
-\end{body}
+\end{userExample}
 %}

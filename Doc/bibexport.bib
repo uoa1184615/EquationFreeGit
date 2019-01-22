@@ -59,6 +59,71 @@
   year =          {2003},
 }
 
+@article{Gear02b,
+  author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
+  journal =       {SIAM Journal on Scientific Computing},
+  number =        {4},
+  pages =         {1091--1106},
+  publisher =     {SIAM},
+  title =         {Projective Methods for Stiff Differential Equations:
+                   Problems with Gaps in Their Eigenvalue Spectrum},
+  volume =        {24},
+  year =          {2003},
+  abstract =      {We show that there exist classes of explicit
+                   numerical integration methods that can handle very
+                   stiff problems if the eigenvalues are separated into
+                   two clusters, one containing the "stiff," or fast,
+                   components, and one containing the slow components.
+                   These methods have large average step sizes relative
+                   to the fast components. Conventional implicit methods
+                   involve the solution of nonlinear equations at each
+                   step, which for large problems requires significant
+                   communication between processors on a multiprocessor
+                   machine. For such problems the methods proposed here
+                   have significant potential for speed improvement.},
+  doi =           {10.1137/S1064827501388157},
+  url =           {http://link.aip.org/link/?SCE/24/1091/1},
+}
+
+@article{Gear03c,
+  author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
+  journal =       {Journal of Computational Physics},
+  pages =         {95--109},
+  title =         {Telescopic projective methods for parabolic
+                   differential equations},
+  volume =        {187},
+  year =          {2003},
+}
+
+@article{Givon06,
+  author =        {Givon, Dror and Kevrekidis, Ioannis~G. and
+                   Kupferman, Raz},
+  journal =       {Comm. Math. Sci.},
+  number =        {4},
+  pages =         {707--729},
+  title =         {Strong convergence of projective integration schemes
+                   for singularly perturbed stochastic differential
+                   systems},
+  volume =        {4},
+  year =          {2006},
+  abstract =      {We study the convergence of the slow (or
+                   ``essential'') components of singularly perturbed
+                   stochastic differential systems to solutions of lower
+                   dimensional stochastic systems (the ``effective'', or
+                   ``coarse'' dynamics). We prove strong, mean-square
+                   convergence in systems where both fast and slow
+                   components are driven by noise, with full coupling
+                   between fast and slow components. We analyze a class
+                   of ``projective integration'' methods, which consist
+                   of a hybridization between a standard solver for the
+                   slow components, and short runs for the fast
+                   dynamics, which are used to estimate the effect that
+                   the fast components have on the slow ones. We obtain
+                   explicit bounds for the discrepancy between the
+                   results of the projective integration method and the
+                   slow components of the original system.},
+}
+
 @article{Hyman2005,
   author =        {Hyman, James M.},
   journal =       {Computing in Science \& Engineering},
@@ -235,197 +300,6 @@
   doi =           {http://dx.doi.org/10.1016/j.apnum.2014.12.007},
   url =           {http://www.sciencedirect.com/science/article/pii/
                    S0168927414002086},
-}
-
-@article{Bunder2013b,
-  author =        {Bunder, J.~E. and Roberts, A.~J. and
-                   Kevrekidis, I.~G.},
-  journal =       {J.~Computational Physics},
-  title =         {Good coupling for the multiscale patch scheme on
-                   systems with microscale heterogeneity},
-  volume =        {accepted 2 Feb 2017},
-  year =          {2017},
-  abstract =      {Computational simulation of microscale detailed
-                   systems is frequently only feasible over spatial
-                   domains much smaller than the macroscale of interest.
-                   The `equation-free' methodology couples many small
-                   patches of microscale computations across space to
-                   empower efficient computational simulation over
-                   macroscale domains of interest. Motivated by
-                   molecular or agent simulations, we analyse the
-                   performance of various coupling schemes for patches
-                   when the microscale is inherently `rough'. As a
-                   canonical problem in this universality class, we
-                   systematically analyse the case of heterogeneous
-                   diffusion on a lattice. Computer algebra explores how
-                   the dynamics of coupled patches predict the large
-                   scale emergent macroscale dynamics of the
-                   computational scheme. We determine good design for
-                   the coupling of patches by comparing the macroscale
-                   predictions from patch dynamics with the emergent
-                   macroscale on the entire domain, thus minimising the
-                   computational error of the multiscale modelling. The
-                   minimal error on the macroscale is obtained when the
-                   coupling utilises averaging regions which are between
-                   a third and a half of the patch. Moreover, when the
-                   symmetry of the inter-patch coupling matches that of
-                   the underlying microscale structure, patch dynamics
-                   predicts the desired macroscale dynamics to any
-                   specified order of error. The results confirm that
-                   the patch scheme is useful for macroscale
-                   computational simulation of a range of systems with
-                   microscale heterogeneity.},
-  doi =           {10.1016/j.jcp.2017.02.004},
-}
-
-@inproceedings{Cao2012,
-  author =        {Cao, Meng and Roberts, A. J.},
-  booktitle =     {18th Australasian Fluid Mechanics Conference},
-  editor =        {Brandner, P.~A. and Pearce, B.~W.},
-  month =         {Dec},
-  title =         {Modelling 3D turbulent floods based upon the
-                   Smagorinski large eddy closure},
-  year =          {2012},
-  url =           {http://people.eng.unimelb.edu.au/imarusic/proceedings/18/
-                  70%20-%20Cao.pdf},
-}
-
-@article{Cao2014b,
-  author =        {Cao, Meng and Roberts, A. J.},
-  institution =   {[\url{http://arxiv.org/abs/1407.1579}]},
-  journal =       {J.~Engrg.\ Maths},
-  number =        {1},
-  pages =         {187--204},
-  title =         {Modelling suspended sediment in environmental
-                   turbulent fluids},
-  volume =        {98},
-  year =          {2016},
-  abstract =      {Modelling sediment transport in environmental
-                   turbulent fluids is a challenge. This article
-                   develops a model of the longitudinal transport of
-                   suspended sediment in environmental fluid flows such
-                   as floods and tsunamis. The model is systematically
-                   derived from a three-dimensional turbulence model
-                   based on the Smagorinski large eddy closure.
-                   Embedding the physical dynamics into a family of
-                   problems and analysing the linear dynamics of the
-                   system, the centre manifold theory indicates the
-                   existence of a slow manifold parameterised by
-                   macroscale variables. Computer algebra then
-                   constructs the slow manifold in terms of fluid depth,
-                   depth-averaged longitudinal velocities, and suspended
-                   sediment concentration. The model includes the
-                   effects of sediment erosion, advection and dispersion
-                   and the interactions between the sediment and
-                   turbulent fluid flow. Vertical distributions of the
-                   velocity and concentration in steady flow agree with
-                   established experimental data. For a pilot study,
-                   numerical simulations of the suspended sediment under
-                   long waves show that the developed model predicts
-                   physically reasonable sediment flow interaction.},
-  doi =           {10.1007/s10665-015-9817-7},
-}
-
-@article{Gear02b,
-  author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
-  journal =       {SIAM Journal on Scientific Computing},
-  number =        {4},
-  pages =         {1091--1106},
-  publisher =     {SIAM},
-  title =         {Projective Methods for Stiff Differential Equations:
-                   Problems with Gaps in Their Eigenvalue Spectrum},
-  volume =        {24},
-  year =          {2003},
-  abstract =      {We show that there exist classes of explicit
-                   numerical integration methods that can handle very
-                   stiff problems if the eigenvalues are separated into
-                   two clusters, one containing the "stiff," or fast,
-                   components, and one containing the slow components.
-                   These methods have large average step sizes relative
-                   to the fast components. Conventional implicit methods
-                   involve the solution of nonlinear equations at each
-                   step, which for large problems requires significant
-                   communication between processors on a multiprocessor
-                   machine. For such problems the methods proposed here
-                   have significant potential for speed improvement.},
-  doi =           {10.1137/S1064827501388157},
-  url =           {http://link.aip.org/link/?SCE/24/1091/1},
-}
-
-@article{Gear03c,
-  author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
-  journal =       {Journal of Computational Physics},
-  pages =         {95--109},
-  title =         {Telescopic projective methods for parabolic
-                   differential equations},
-  volume =        {187},
-  year =          {2003},
-}
-
-@article{Givon06,
-  author =        {Givon, Dror and Kevrekidis, Ioannis~G. and
-                   Kupferman, Raz},
-  journal =       {Comm. Math. Sci.},
-  number =        {4},
-  pages =         {707--729},
-  title =         {Strong convergence of projective integration schemes
-                   for singularly perturbed stochastic differential
-                   systems},
-  volume =        {4},
-  year =          {2006},
-  abstract =      {We study the convergence of the slow (or
-                   ``essential'') components of singularly perturbed
-                   stochastic differential systems to solutions of lower
-                   dimensional stochastic systems (the ``effective'', or
-                   ``coarse'' dynamics). We prove strong, mean-square
-                   convergence in systems where both fast and slow
-                   components are driven by noise, with full coupling
-                   between fast and slow components. We analyze a class
-                   of ``projective integration'' methods, which consist
-                   of a hybridization between a standard solver for the
-                   slow components, and short runs for the fast
-                   dynamics, which are used to estimate the effect that
-                   the fast components have on the slow ones. We obtain
-                   explicit bounds for the discrepancy between the
-                   results of the projective integration method and the
-                   slow components of the original system.},
-}
-
-@article{Cao2014a,
-  author =        {Cao, Meng and Roberts, A. J.},
-  journal =       {IMA J.~Applied Maths.},
-  number =        {2},
-  pages =         {228--254},
-  title =         {Multiscale modelling couples patches of nonlinear
-                   wave-like simulations},
-  volume =        {81},
-  year =          {2016},
-  abstract =      {The multiscale gap-tooth scheme is built from given
-                   microscale simulations of complicated physical
-                   processes to empower macroscale simulations. By
-                   coupling small patches of simulations over
-                   unsimulated physical gaps, large savings in
-                   computational time are possible. So far the gap-tooth
-                   scheme has been developed for dissipative systems,
-                   but wave systems are also of great interest. This
-                   article develops the gap-tooth scheme to the case of
-                   nonlinear microscale simulations of wave-like
-                   systems. Classic macroscale interpolation provides a
-                   generic coupling between patches that achieves
-                   arbitrarily high order consistency between the
-                   multiscale scheme and the underlying microscale
-                   dynamics. Eigen-analysis indicates that the resultant
-                   gap-tooth scheme empowers feasible computation of
-                   large scale simulations of wave-like dynamics with
-                   complicated underlying physics. As an pilot study, we
-                   implement numerical simulations of dam-breaking waves
-                   by the gap-tooth scheme. Comparison between a
-                   gap-tooth simulation, a microscale simulation over
-                   the whole domain, and some published experimental
-                   data on dam breaking, demonstrates that the gap-tooth
-                   scheme feasibly computes large scale wave-like
-                   dynamics with computational savings.},
-  doi =           {10.1093/imamat/hxv034},
 }
 
 @article{Bunder2015a,

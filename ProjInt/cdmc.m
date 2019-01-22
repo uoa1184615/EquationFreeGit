@@ -20,14 +20,14 @@
 \item \verb|xout|, an array of state estimates produced by \verb|solver()|. 
 \end{itemize}
 
-\begin{body}
+
 This function is a wrapper for the microsolver. For instance if the problem of interest is a dynamical system that is not too stiff, and which can be simulated by the solver \verb|sol(t,x,T)|, one would define
 \begin{verbatim}
 cSol = @(t,x,T) cdmc(sol,t,x,T)|
 \end{verbatim}
 and thereafter use \verb|csol()| in place of \verb|sol()| as the solver for any PI scheme.
 The original solver \verb|sol()| would create large errors if used in a PI scheme, but the output of \verb|cdmc()| will not.
-
+\begin{funDescription}
 \begin{matlab}
 %}
 function [tout, xout] = cdmc(solver,t,x,T)
@@ -55,5 +55,5 @@ tr=2*tt(1)-tt(end);
 \end{matlab}
 This concludes the function.
 
-\end{body}
+\end{funDescription}
 %}
