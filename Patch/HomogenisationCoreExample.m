@@ -73,9 +73,7 @@ mPeriod = 4
 rng('default'); rng(1);
 sc=4;
 cDiff = exp(sc*rand(mPeriod,1)); %2*abs(randn(mPeriod,1)); %exp(randn(mPeriod,1)); %2*abs(randn(mPeriod,1)); % 
-cHomo = 1/mean(1./cDiff);
-gmean=1/mean(1./cDiff);
-dmax=max(cDiff);
+cHomo = max(cDiff); %1/mean(1./cDiff);
 %{
 \end{matlab}
 
@@ -239,12 +237,8 @@ to the diffusion time between adjacent points in the
 microscale lattice.
 \begin{matlab}
 %}
-%ts = linspace(0,2/cHomo,7)
-%bT = 3*( ratio*Len/nPatch )^2/cHomo 
-bT = 3*( ratio*Len/nPatch )^2/dmax 
-Dt = 1/cHomo;
-ts = 0:Dt:4*Dt;
-%ts = linspace(0,6/dmax,3)
+ts = linspace(0,2/cHomo,7) 
+bT = 3*( ratio*Len/nPatch )^2/cHomo 
 addpath('../ProjInt','../RKint')
 [us,tss,uss] = PIRK4(@heteroBurst, 20*bT, ts, u0(:));
 %{

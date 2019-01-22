@@ -8,15 +8,18 @@
 
 
 
+
 \title{Equation-Free function toolbox for Matlab/Octave}
 
 \author{A. J. Roberts\thanks{%
 School of Mathematical Sciences, University of Adelaide, South Australia.
 \url{http://www.maths.adelaide.edu.au/anthony.roberts},
 \url{http://orcid.org/0000-0001-8930-1552}}
+
 \and John Maclean\thanks{%
 School of Mathematical Sciences, University of Adelaide, South Australia.
 \url{http://www.adelaide.edu.au/directory/john.maclean}}
+
 \and J.~E. Bunder\thanks{%
 School of Mathematical Sciences, University of Adelaide, South Australia.
 \protect\url{mailto:judith.bunder@adelaide.edu.au},
@@ -47,20 +50,14 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 % Uncomment the sections to typeset
 %\includeonly{
 %introduction
-%%%,../ProjInt/projInt
 %,projInt
-%%%,../ProjIntDMD/projIntDMD
-%%%,../Patch/patch
 %,patch
-%%%%,../RKInt/rk2int
 %,appContribute
 %,apptpd
 %}
 
-% verbatim listing is quick and reliable
-%\usepackage{verbatim}
-%\newenvironment{matlab}{\verbatim}{\endverbatim}
-% But fancyvrb does more, such as line numbers
+
+% fancyvrb does code listing, including line numbers
 \usepackage{fancyvrb}
 \newenvironment{matlab}%
     {\Verbatim[numbers=left,firstnumber=\the\inputlineno]}%
@@ -75,8 +72,6 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 % could change appearance with e.g. \renewcommand{\theFancyVerbLine}{%
 %  \textcolor{red}{\small 8.\alph{FancyVerbLine}}}
 
-%\usepackage{mcode} %[framed,numbered,autolinebreaks,useliterate]
-%\renewenvironment{matlab}{\lstlisting}{\endlstlisting}
 
 %\usepackage{pgfplots}\pgfplotsset{compat=newest}% avoid as too few use??
 
@@ -107,8 +102,6 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 \def\into{\(\leftrightarrow\)\ }
 \Vec f\Vec x\Vec u \Vec X \Vec U
 \Bb R  \Bb X
-\def\into{\(\leftrightarrow\)\ }
-
 
 
 
