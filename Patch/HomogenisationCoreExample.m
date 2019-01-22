@@ -161,8 +161,8 @@ u0 = sin(patches.x)+0.2*randn(nSubP,nPatch);
 if patches.EnsAve
   u0 = repmat(u0,[1,1,nVars]);
 end
-%[ts,ucts] = ode15s(@patchCoreSmooth1, [0 2/cHomo], u0(:)); 
-[ts,ucts] = ode15s(@patchCoreSmooth1, [0 2/dmax], u0(:));
+[ts,ucts] = ode15s(@patchCoreSmooth1, [0 2/cHomo], u0(:)); 
+% [ts,ucts] = ode15s(@patchCoreSmooth1, [0 2/dmax], u0(:));
 ucts=reshape(ucts,length(ts),length(patches.x(:)),[]);
 %{
 \end{matlab}
@@ -239,7 +239,7 @@ microscale lattice.
 %}
 ts = linspace(0,2/cHomo,7) 
 bT = 3*( ratio*Len/nPatch )^2/cHomo 
-addpath('../ProjInt','../RKint')
+addpath('../ProjInt','../SandpitPlay/RKint')
 [us,tss,uss] = PIRK4(@heteroBurst, 20*bT, ts, u0(:));
 %{
 \end{matlab}

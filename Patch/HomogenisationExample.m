@@ -145,7 +145,7 @@ microscale lattice.
 %}
 ts = linspace(0,2/cHomo,7)
 bT = 3*( ratio*Len/nPatch )^2/cHomo
-addpath('../ProjInt','../RKint')
+addpath('../ProjInt','../SandpitPlay/RKint')
 [us,tss,uss] = PIRK2(@heteroBurst, bT, ts, u0(:));
 %{
 \end{matlab}
