@@ -170,8 +170,8 @@ the values for the inter-patch coupling conditions. Spectral
 coupling is \verb|ordCC| of~\(0\) and~\(-1\).
 \begin{matlab}
 %}
-if ~ismember(ordCC,[-1:8])
-    error('ordCC out of allowed range [-1:8]')
+if (ordCC<-1) | ~(floor(ordCC)==ordCC)
+    error('ordCC out of allowed range integer>-2')
 end
 %{
 \end{matlab}
@@ -199,11 +199,17 @@ extend to coupling via derivative values.)
 %}
 patches.Cwtsr=zeros(ordCC,1);
 if patches.alt  % eqn (7) in \cite{Cao2014a}
-    patches.Cwtsr(1:2:ordCC)=[1 cumprod((ratio^2-(1:2:(ordCC-2)).^2)/4)./factorial(2*(1:(ordCC/2-1)))];    
-    patches.Cwtsr(2:2:ordCC)=[ratio/2 cumprod((ratio^2-(1:2:(ordCC-2)).^2)/4)./factorial(2*(1:(ordCC/2-1))+1)*ratio/2];
+    patches.Cwtsr(1:2:ordCC)=[1 ...
+      cumprod((ratio^2-(1:2:(ordCC-2)).^2)/4)./ ...
+      factorial(2*(1:(ordCC/2-1)))];    
+    patches.Cwtsr(2:2:ordCC)=[ratio/2 ...
+      cumprod((ratio^2-(1:2:(ordCC-2)).^2)/4)./ ...
+      factorial(2*(1:(ordCC/2-1))+1)*ratio/2];
 else % 
-    patches.Cwtsr(1:2:ordCC)=(cumprod(ratio^2-(((1:(ordCC/2))-1)).^2)./factorial(2*(1:(ordCC/2))-1)/ratio);
-    patches.Cwtsr(2:2:ordCC)=(cumprod(ratio^2-(((1:(ordCC/2))-1)).^2)./factorial(2*(1:(ordCC/2))));
+    patches.Cwtsr(1:2:ordCC)=(cumprod(ratio^2- ...
+      (((1:(ordCC/2))-1)).^2)./factorial(2*(1:(ordCC/2))-1)/ratio);
+    patches.Cwtsr(2:2:ordCC)=(cumprod(ratio^2- ...
+      (((1:(ordCC/2))-1)).^2)./factorial(2*(1:(ordCC/2))));
 end
 patches.Cwtsl=(-1).^((1:ordCC)'-patches.alt).*patches.Cwtsr;
 %{

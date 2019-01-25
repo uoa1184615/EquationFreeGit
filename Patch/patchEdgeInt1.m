@@ -37,7 +37,7 @@ which includes the following.
 array of the spatial locations~\(x_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and micro-scales.
-\item \verb|.ordCC| is order of interpolation\(\geq -1\).
+\item \verb|.ordCC| is order of interpolation integer \(\geq -1\).
 \item \verb|.alt| in \(\{0,1\}\) is one for staggered grid
 (alternating) interpolation.
 \item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling.
@@ -76,7 +76,7 @@ For \(\verb|patches.nCore|\neq 1\) the half width ratio is reduced, as
 described by \cite{Bunder2013b}.
 \begin{matlab}
 %}
-if isfield(patches,'nCore') == 0
+if ~isfield(patches,'nCore')
     patches.nCore=1;
 end
 r=dx*(nSubP-1)/2/DX*(nSubP - patches.nCore)/(nSubP - 1);
@@ -86,7 +86,7 @@ r=dx*(nSubP-1)/2/DX*(nSubP - patches.nCore)/(nSubP - 1);
 For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
 eventually cater for periodic, odd-mid-gap, even-mid-gap,
-even-mid-patch, dirichlet, neumann, ?? These index vectors
+even-mid-patch, Dirichlet, Neumann etc. These index vectors
 point to patches and their two immediate neighbours.
 \begin{matlab}
 %}
@@ -103,8 +103,8 @@ c=round((patches.nCore-1)/2);
 \end{matlab}
 
 \paragraph{Lagrange interpolation gives patch-edge values}
-So compute centred differences of the patch core averages for
-the macro-interpolation, of all fields. Assumes the domain
+so compute centred differences of the patch core averages for
+the macro-interpolation of all fields. Assumes the domain
 is macro-periodic.
 \begin{matlab}
 %}
@@ -150,11 +150,11 @@ each patch \cite[]{Roberts06d,Bunder2013b}, using weights computed in
       -sum(u(2:patches.nCore,:,:),1);
   else
     u(nSubP,j,:)=ucore(j,:)*(1-patches.alt) ...
-      - reshape(sum(u((nSubP-patches.nCore+1):(nSubP-1),j,:),1),nPatch,nVars) ...
-      +reshape(sum(bsxfun(@times,patches.Cwtsr,dmu)),nPatch,nVars);
+      + reshape(-sum(u((nSubP-patches.nCore+1):(nSubP-1),j,:),1) ...
+      +sum(bsxfun(@times,patches.Cwtsr,dmu)),nPatch,nVars);
     u(1,j,:)=ucore(j,:)*(1-patches.alt) ...      
-      -reshape(sum(u(2:patches.nCore,j,:),1),nPatch,nVars)  ...
-      +reshape(sum(bsxfun(@times,patches.Cwtsl,dmu)),nPatch,nVars);
+      +reshape(-sum(u(2:patches.nCore,j,:),1)  ...
+      +sum(bsxfun(@times,patches.Cwtsl,dmu)),nPatch,nVars);
   end;
 %{
 \end{matlab}
