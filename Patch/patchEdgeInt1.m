@@ -7,25 +7,23 @@
 \subsection{\texttt{patchEdgeInt1()}: sets edge values from interpolation over the macroscale}
 \label{sec:patchEdgeInt1}
 \localtableofcontents
-
 Couples 1D patches across 1D space by computing their edge
-values from macroscale interpolation.  This function is
-primarily used by \verb|patchSmooth1| but is also useful for
-user graphics. Consequently a spatially discrete system
+values from macroscale interpolation patch core averging.  
+This function is primarily used by \verb|patchSmooth1| but is also useful 
+for user graphics. Consequently a spatially discrete system
 could be integrated in time via the patch or gap-tooth
-scheme \cite[]{Roberts06d}. Assumes that the sub-patch
-structure is \emph{smooth} so that the patch centre-values
+scheme \cite[]{Roberts06d}. Assumes that the core averaged
+structure is \emph{smooth} so that these averages
 are sensible macroscale variables, and patch edge values are
-determined by macroscale interpolation of the patch-centre
-values. Communicate patch-design variables via the global
-struct~\verb|patches|.
+determined by macroscale interpolation of the core averaged
+values \citep{Bunder2013b}. Communicate patch-design variables via the 
+global struct~\verb|patches|.
 \begin{matlab}
 %}
 function u=patchEdgeInt1(u)
 global patches
 %{
 \end{matlab}
-
 \paragraph{Input}
 \begin{itemize}
 \item \verb|u| is a vector of length \(\verb|nSubP|\cdot
@@ -39,23 +37,18 @@ which includes the following.
 array of the spatial locations~\(x_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and micro-scales.
-\item \verb|.ordCC| is order of interpolation, currently in
-\(\{0,2,4,6,8\}\).
+\item \verb|.ordCC| is order of interpolation\(\geq -1\).
 \item \verb|.alt| in \(\{0,1\}\) is one for staggered grid
 (alternating) interpolation.
-\item \verb|.Cwtsr| and \verb|.Cwtsl|
+\item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling.
 \end{itemize}
 \end{itemize}
-
-
 \paragraph{Output}
 \begin{itemize}
 \item \verb|u| is \(\verb|nSubP|\times \verb|nPatch|\times
 \verb|nVars|\) 2/3D array of the fields with edge values set by
-interpolation of patch centre-values.
+interpolation of patch core averages.
 \end{itemize}
-
-
 \begin{funDescription}
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
@@ -69,16 +62,24 @@ if numel(u)~=nSubP*nPatch*nVars
 u=reshape(u,nSubP,nPatch,nVars);
 %{
 \end{matlab}
-With Dirichlet patches, the half-length of a patch is
-\(h=dx(n_\mu-1)/2\) (or~\(-2\) for specified flux), and the
-ratio needed for interpolation is then \(r=h/\Delta X\).
 Compute lattice sizes from inside the patches as the edge
 values may be \nan{}s, etc.
 \begin{matlab}
 %}
 dx=patches.x(3,1)-patches.x(2,1);
 DX=patches.x(2,2)-patches.x(2,1);
-r=dx*(nSubP-1)/2/DX;
+%{
+\end{matlab}
+If the user has not defined the patch core, then we
+assume it to be a single point in the middle of the patch.
+For \(\verb|patches.nCore|\neq 1\) the half width ratio is reduced, as
+described by \cite{Bunder2013b}.
+\begin{matlab}
+%}
+if isfield(patches,'nCore') == 0
+    patches.nCore=1;
+end
+r=dx*(nSubP-1)/2/DX*(nSubP - patches.nCore)/(nSubP - 1);
 %{
 \end{matlab}
 
@@ -92,29 +93,36 @@ point to patches and their two immediate neighbours.
 j=1:nPatch; jp=mod(j,nPatch)+1; jm=mod(j-2,nPatch)+1;
 %{
 \end{matlab}
-The centre of each patch (as \verb|nSubP| is odd) is at
+Calculate centre of each patch and the surrounding core.
+(\verb|nSubP| and \verb|nCore| are both odd)
 \begin{matlab}
 %}
 i0=round((nSubP+1)/2);
+c=round((patches.nCore-1)/2);
 %{
 \end{matlab}
 
-
 \paragraph{Lagrange interpolation gives patch-edge values}
-So compute centred differences of the mid-patch values for
+So compute centred differences of the patch core averages for
 the macro-interpolation, of all fields. Assumes the domain
 is macro-periodic.
 \begin{matlab}
 %}
 if patches.ordCC>0 % then non-spectral interpolation
-  dmu=nan(patches.ordCC,nPatch,nVars);
+  if patches.EnsAve
+    ucore=sum(mean(u((i0-c):(i0+c),j,:),3),1)';
+    dmu=zeros(patches.ordCC,nPatch);
+  else
+    ucore=reshape(sum(u((i0-c):(i0+c),j,:),1),nPatch,nVars);
+    dmu=zeros(patches.ordCC,nPatch,nVars);
+  end;
   if patches.alt % use only odd numbered neighbours
-    dmu(1,:,:)=(u(i0,jp,:)+u(i0,jm,:))/2; % \mu
-    dmu(2,:,:)= u(i0,jp,:)-u(i0,jm,:); % \delta
+    dmu(1,:,:)=(ucore(jp,:)+ucore(jm,:))/2; % \mu
+    dmu(2,:,:)=(ucore(jp,:)-ucore(jm,:)); % \delta
     jp=jp(jp); jm=jm(jm); % increase shifts to \pm2
   else % standard
-    dmu(1,:,:)=(u(i0,jp,:)-u(i0,jm,:))/2; % \mu\delta
-    dmu(2,:,:)=(u(i0,jp,:)-2*u(i0,j,:)+u(i0,jm,:)); % \delta^2
+    dmu(1,j,:)=(ucore(jp,:)-ucore(jm,:))/2; % \mu\delta
+    dmu(2,j,:)=(ucore(jp,:)-2*ucore(j,:)+ucore(jm,:))/2; % \delta^2
   end% if odd/even
 %{
 \end{matlab}
@@ -129,17 +137,27 @@ in parallel).
 %{
 \end{matlab}
 Interpolate macro-values to be Dirichlet edge values for
-each patch \cite[]{Roberts06d}, using weights computed in
+each patch \cite[]{Roberts06d,Bunder2013b}, using weights computed in
 \verb|configPatches1()| . Here interpolate to specified order.
 \begin{matlab}
 %}
-  u(nSubP,j,:)=u(i0,j,:)*(1-patches.alt) ...
-    +sum(bsxfun(@times,patches.Cwtsr,dmu));
-  u( 1,j,:)=u(i0,j,:)*(1-patches.alt) ...
-    +sum(bsxfun(@times,patches.Cwtsl,dmu));
+  if patches.EnsAve      
+    u(nSubP,j,:)=repmat(ucore(j)'*(1-patches.alt) ...      
+      +sum(bsxfun(@times,patches.Cwtsr,dmu)),[1,1,nVars]) ...
+      -sum(u((nSubP-patches.nCore+1):(nSubP-1),:,:),1);
+    u(1,j,:)=repmat(ucore(j)'*(1-patches.alt) ...      
+      +sum(bsxfun(@times,patches.Cwtsl,dmu)),[1,1,nVars]) ...
+      -sum(u(2:patches.nCore,:,:),1);
+  else
+    u(nSubP,j,:)=ucore(j,:)*(1-patches.alt) ...
+      - reshape(sum(u((nSubP-patches.nCore+1):(nSubP-1),j,:),1),nPatch,nVars) ...
+      +reshape(sum(bsxfun(@times,patches.Cwtsr,dmu)),nPatch,nVars);
+    u(1,j,:)=ucore(j,:)*(1-patches.alt) ...      
+      -reshape(sum(u(2:patches.nCore,j,:),1),nPatch,nVars)  ...
+      +reshape(sum(bsxfun(@times,patches.Cwtsl,dmu)),nPatch,nVars);
+  end;
 %{
 \end{matlab}
-
 \paragraph{Case of spectral interpolation}
 Assumes the domain is macro-periodic. As the macroscale
 fields are \(N\)-periodic, the macroscale Fourier transform

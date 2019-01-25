@@ -6,19 +6,15 @@
 \subsection{\texttt{configPatches1()}: configures spatial patches in 1D}
 \label{sec:configPatches1}
 \localtableofcontents
-
 Makes the struct~\verb|patches| for use by the patch\slash
 gap-tooth time derivative function~\verb|patchSmooth1()|.
 \cref{sec:configPatches1eg} lists an example of its use.
-
-
 \begin{matlab}
 %}
 function configPatches1(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,nEdge)
 global patches
 %{
 \end{matlab}
-
 \paragraph{Input}
 If invoked with no input arguments, then executes an example
 of simulating Burgers' \pde---see \cref{sec:configPatches1eg}
@@ -37,8 +33,8 @@ is assumed macro-periodic in the domain.
 patches.
 \item \verb|ordCC| is the `order' of interpolation across
 empty space of the macroscale mid-patch values to the edge
-of the patches for inter-patch coupling: currently must be
-in~\(\{-1,0,\ldots,8\}\).
+of the patches for inter-patch coupling: currently must 
+be~\(geq -1\).
 \item \verb|ratio| (real) is the ratio of the half-width of
 a patch to the spacing of the patch mid-points: so
 \(\verb|ratio|=\tfrac12\) means the patches abut; and
@@ -53,7 +49,6 @@ patch.  May be omitted. The default is one (suitable for
 microscale lattices with only nearest neighbour
 interactions).
 \end{itemize}
-
 \paragraph{Output} The \emph{global} struct \verb|patches|
 is created and set with the following components.
 \begin{itemize}
@@ -76,10 +71,7 @@ microscale grid points in every patch.
 values set by interpolation at the edge regions of each
 patch.
 \end{itemize}
-
-
 \begin{funDescription}
-
 \subsubsection{If no arguments, then execute an example}
 \label{sec:configPatches1eg}
 \begin{matlab}
@@ -95,7 +87,6 @@ indicate function recursion).
 \item ode15s integrator \into patchSmooth1 \into user's burgersPDE
 \item process results
 \end{enumerate}
-
 Establish global patch data struct to interface with a 
 function coding Burgers' \pde: to be solved on
 \(2\pi\)-periodic domain, with eight patches, spectral
@@ -133,7 +124,6 @@ xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 \(u(x,t)\) of the patch scheme applied to Burgers'~\pde.}
 \includegraphics[scale=0.85]{../Patch/ps1BurgersCtsU}
 \end{figure}
-
 Upon finishing execution of the example, exit this function.
 \begin{matlab}
 %}
@@ -141,7 +131,6 @@ return
 end%if no arguments
 %{
 \end{matlab}
-
 \paragraph{Example of Burgers PDE inside patches}
 As a microscale discretisation of \(u_t=u_{xx}-30uu_x\),
 code \(\dot u_{ij} =\frac1{\delta x^2}
@@ -158,14 +147,7 @@ function ut=BurgersPDE(t,u,x)
 end
 %{
 \end{matlab}
-
-
-
-
-
-
 \subsubsection{The code to make patches}
-
 Set one edge-value to compute by interpolation if not 
 specified by the user. Store in the struct.
 \begin{matlab}
@@ -176,8 +158,6 @@ if 2*nEdge+1>nSubP, error('too many edge values requested'), end
 patches.nEdge=nEdge;
 %{
 \end{matlab}
-
-
 First, store the pointer to the time derivative function in
 the struct.
 \begin{matlab}
@@ -185,7 +165,6 @@ the struct.
 patches.fun=fun;
 %{
 \end{matlab}
-
 Second, store the order of interpolation that is to provide
 the values for the inter-patch coupling conditions. Spectral
 coupling is \verb|ordCC| of~\(0\) and~\(-1\).
@@ -218,31 +197,17 @@ interpolation of field values for coupling. (Could sometime
 extend to coupling via derivative values.)
 \begin{matlab}
 %}
+patches.Cwtsr=zeros(ordCC,1);
 if patches.alt  % eqn (7) in \cite{Cao2014a}
-  patches.Cwtsr=[1
-    ratio/2
-    (-1+ratio^2)/8
-    (-1+ratio^2)*ratio/48
-    (9-10*ratio^2+ratio^4)/384
-    (9-10*ratio^2+ratio^4)*ratio/3840
-    (-225+259*ratio^2-35*ratio^4+ratio^6)/46080
-    (-225+259*ratio^2-35*ratio^4+ratio^6)*ratio/645120 ];
+    patches.Cwtsr(1:2:ordCC)=[1 cumprod((ratio^2-(1:2:(ordCC-2)).^2)/4)./factorial(2*(1:(ordCC/2-1)))];    
+    patches.Cwtsr(2:2:ordCC)=[ratio/2 cumprod((ratio^2-(1:2:(ordCC-2)).^2)/4)./factorial(2*(1:(ordCC/2-1))+1)*ratio/2];
 else % 
-  patches.Cwtsr=[ratio
-    ratio^2/2
-    (-1+ratio^2)*ratio/6
-    (-1+ratio^2)*ratio^2/24
-    (4-5*ratio^2+ratio^4)*ratio/120
-    (4-5*ratio^2+ratio^4)*ratio^2/720
-    (-36+49*ratio^2-14*ratio^4+ratio^6)*ratio/5040
-    (-36+49*ratio^2-14*ratio^4+ratio^6)*ratio^2/40320 ];
+    patches.Cwtsr(1:2:ordCC)=(cumprod(ratio^2-(((1:(ordCC/2))-1)).^2)./factorial(2*(1:(ordCC/2))-1)/ratio);
+    patches.Cwtsr(2:2:ordCC)=(cumprod(ratio^2-(((1:(ordCC/2))-1)).^2)./factorial(2*(1:(ordCC/2))));
 end
-patches.Cwtsr=patches.Cwtsr(1:ordCC);
 patches.Cwtsl=(-1).^((1:ordCC)'-patches.alt).*patches.Cwtsr;
 %{
 \end{matlab}
-
-
 Third, set the centre of the patches in a the macroscale
 grid of patches assuming periodic macroscale domain.
 \begin{matlab}
