@@ -2,7 +2,7 @@
 % discretised.  Simulate on spatial patches and via
 % projective integration.
 % AJR, Nov 2017 -- Oct 2018
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{BurgersExample}: simulate Burgers' PDE on patches}
 \label{sec:BurgersExample}

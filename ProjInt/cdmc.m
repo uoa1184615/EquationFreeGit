@@ -2,58 +2,56 @@
 %set of coordinates near the slow manifold. This scheme introduces non-
 %trivial error if the fast dynamics is insufficiently stiff.
 %JM, July 2018
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsubsection{\texttt{cdmc()}}
 \label{sec:cdmc}
-\verb|cdmc()| iteratively applies the microsolver and then projects backwards in time to the initial conditions. The cumulative effect is to relax the variables to the attracting slow manifold, while keeping the final time for the output the same as the input time.
- \paragraph{Input}
+\verb|cdmc()| iteratively applies the micro-burst and then projects backwards in time to the initial conditions. The cumulative effect is to relax the variables to the attracting slow manifold, while keeping the final time for the output the same as the input time.
+
+\begin{matlab}
+%}
+function [ts, xs] = cdmc(microBurst,t0,x0)
+%{
+\end{matlab}
+
+\paragraph{Input}
 \begin{itemize}
-\item \verb|solver|, a black box microsolver suitable for PI. See any of \\{\verb|PIRK2(), PIRK4(), PIG()|} for a description of \verb|solver()|.
-\item \verb|t|, an initial time
-\item \verb|x|, an initial state
-\item \verb|T|, a time period to apply \verb|solver()| for
+\item \verb|microBurst()|, a black box micro-burst function suitable for Projective Integration. See any of \verb|PIRK2()|, \verb|PIRK4()|, or \verb|PIG()| for a description of \verb|microBurst()|.
+\item \verb|t0|, an initial time
+\item \verb|x0|, an initial state
 \end{itemize}
 \paragraph{Output}
 \begin{itemize}
-\item \verb|tout|, a vector of times. \verb|tout(end)| will equal \verb|t|.
-\item \verb|xout|, an array of state estimates produced by \verb|solver()|. 
+\item \verb|ts|, a vector of times. \verb|tout(end)| will equal \verb|t|.
+\item \verb|xs|, an array of state estimates produced by \verb|microBurst()|. 
 \end{itemize}
 
 
-This function is a wrapper for the microsolver. For instance if the problem of interest is a dynamical system that is not too stiff, and which can be simulated by the solver \verb|sol(t,x,T)|, one would define
+This function is a wrapper for the micro-burst. For instance if the problem of interest is a dynamical system that is not too stiff, and which can be simulated by the microBurst \verb|sol(t,x,T)|, one would define
 \begin{verbatim}
-cSol = @(t,x,T) cdmc(sol,t,x,T)|
+cSol = @(t,x) cdmc(sol,t,x)|
 \end{verbatim}
-and thereafter use \verb|csol()| in place of \verb|sol()| as the solver for any PI scheme.
-The original solver \verb|sol()| would create large errors if used in a PI scheme, but the output of \verb|cdmc()| will not.
+and thereafter use \verb|csol()| in place of \verb|sol()| as the microBurst for any Projective Integration scheme.
+The original microBurst \verb|sol()| could create large errors if used in a Projective Integration scheme, but the output of \verb|cdmc()| should not.
+
 \begin{funDescription}
+Begin with a standard application of the micro-burst.
 \begin{matlab}
 %}
-function [tout, xout] = cdmc(solver,t,x,T)
+[ts,xs] = feval(microBurst,t0,x0);
+bT = ts(end)-ts(1);
 %{
 \end{matlab}
-Begin with a standard application of the microsolver.
-\begin{matlab}
-%}
-    [tt,xx]=feval(solver,t,x,T);
-%{
-\end{matlab}
-
-
 
 Project backwards to before the initial time, then
-simulate one burst forwards to obtain coordinates at t.
+simulate just one burst forward to obtain a simulation burst that ends at the original~\verb|t0|.
 \begin{matlab}
 %}
-del = (xx(end,:) - xx(end-1,:))/(tt(end) - tt(end-1));
-b_prop = 0.2; 
-x = xx(end,:) + (1+b_prop)*(tt(1)-tt(end))*del;
-tr=2*tt(1)-tt(end);
-[tout,xout]=feval(solver,tr,x',b_prop*T);
+dxdt = (xs(end,:) - xs(end-1,:))/(ts(end,:) - ts(end-1,:));
+x0 = xs(end,:)-2*bT*dxdt;
+t0 = ts(1)-bT;
+[ts,xs] = feval(microBurst,t0,x0.');
 %{
 \end{matlab}
-This concludes the function.
-
 \end{funDescription}
 %}

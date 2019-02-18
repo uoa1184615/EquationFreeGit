@@ -1,14 +1,15 @@
-%PIRK4 implements fourth-order Projective Integration with
+% PIRK4 implements fourth-order Projective Integration with
 % a user-specified microsolver.  The macrosolver adapts the
-% explicit fourth-order Runge--Kutta scheme.
-% JM, Oct 2018.  See the LaTeX generated pdf document for details.
-%!TEX root = ../Doc/equationFreeDoc.tex
+% explicit fourth-order Runge--Kutta scheme. JM, Oct 2018. 
+% See the LaTeX generated pdf document for details.
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
 \subsection{\texttt{PIRK4()}: projective integration of fourth order accuracy}
 \label{sec:PIRK4}
 
-This Projective Integration scheme implements a macrosolver analogous to the fourth order Runge--Kutta method.
+This Projective Integration scheme implements a macrosolver
+analogous to the fourth order Runge--Kutta method.
 
 \begin{matlab}
 %}
@@ -16,8 +17,73 @@ function [x, tms, xms, rm, svf] = PIRK4(solver, bT, tSpan, x0)
 %{
 \end{matlab}
 
-The inputs and outputs are standardised with \verb|PIRK2()|.
+See \cref{sec:PIRK2} as the inputs and outputs are the 
+same as \verb|PIRK2()|.
+
+\paragraph{If no arguments, then execute an example}
+%\label{sec:pirk4eg}
+\begin{matlab}
+%}
+if nargin==0
+%{
+\end{matlab}
+\subparagraph{Example of Michaelis--Menton backwards in time} 
+The Michaelis--Menten enzyme kinetics is expressed as a
+singularly perturbed system of differential equations for
+\(x(t)\) and~\(y(t)\) (encoded in function \verb|MMburst|):
+\begin{equation*}
+\frac{dx}{dt}=-x+(x+\tfrac12)y \quad\text{and}\quad
+\frac{dy}{dt}=\frac1\epsilon\big[x-(x+1)y\big].
+\end{equation*}
+With initial conditions \(x(0)=y(0)=0.2\), the following
+code uses forward time bursts in order to integrate
+backwards in time to \(t=-5\). It plots the computed
+solution over time \(-5\leq t\leq0\) for parameter
+\(\epsilon=0.1\)\,. Since the rate of decay is
+\(\beta\approx 1/\epsilon\) we choose a burst length
+\(\epsilon\log(|\Delta|/\epsilon)\) as here the macroscale
+time step \(\Delta=-1\).
+\begin{matlab}
+%}
+epsilon = 0.1
+ts = 0:-1:-5
+bT = epsilon*log(abs(ts(2)-ts(1))/epsilon)
+[x,tms,xms,rm,svf] = PIRK4(@MMburst, bT, ts, 0.2*[1;1]);
+figure, plot(ts,x,'o:',tms,xms)
+xlabel('time t'), legend('x(t)','y(t)')
+title('Backwards-time projective integration of Michaelis--Menten')
+%{
+\end{matlab}
+Upon finishing execution of the example, exit this function.
+\begin{matlab}
+%}
+return
+end%if no arguments
+%{
+\end{matlab}
+
+\subparagraph{Example function code for a burst of ODEs}
+Integrate a burst of length~\verb|bT| of the \ode{}s for the
+Michaelis--Menten enzyme kinetics at parameter~\(\epsilon\)
+inherited from above. Code \textsc{ode}s in
+function~\verb|dMMdt| with variables \(x=\verb|x(1)|\) and
+\(y=\verb|x(2)|\).  Starting at time~\verb|ti|, and
+state~\verb|xi| (row), we here simply use \verb|ode23| to 
+integrate in time.
+\begin{matlab}
+%}
+function [ts, xs] = MMburst(ti, xi, bT) 
+    dMMdt = @(t,x) [ -x(1)+(x(1)+0.5)*x(2)
+          1/epsilon*( x(1)-(x(1)+1)*x(2) ) ];
+    [ts, xs] = ode23(dMMdt, [ti ti+bT], xi);
+end
+%{
+\end{matlab}
+
+
 \begin{funDescription}
+
+
 \paragraph{Input}
 \begin{itemize}
 \item \verb|solver()|, a function that produces output from
@@ -82,10 +148,10 @@ macrostep: \begin{itemize}
 \item \verb|rm.x|~is the array of corresponding burst states.
 \end{itemize}
 The states \verb|rm.x| do not have the same physical
-interpretation as those in \verb|xms|; the \verb|rm.x| are required in
-order to estimate the slow vector field during the
-calculation of the Runge--Kutta increments, and do not in
-general resemble the true dynamics.
+interpretation as those in \verb|xms|; the \verb|rm.x| are
+required in order to estimate the slow vector field during
+the calculation of the Runge--Kutta increments, and do not
+in general resemble the true dynamics.
 
 \item  \verb|svf|, optional, a struct containing the
 Projective Integration estimates of the slow vector field.
@@ -177,9 +243,10 @@ for jT = 2:nT
     T = tSpan(jT-1);
 %{
 \end{matlab}
-If four applications of the microsolver would cover the entire macroscale
-time-step, then do so (setting some internal states to
-\verb|NaN|); else proceed to projective step.
+If four applications of the microsolver would cover the
+entire macroscale time-step, then do so (setting some
+internal states to \verb|NaN|); else proceed to projective
+step.
 \begin{matlab}
 %}
     if 4*abs(bT)>=abs(tSpan(jT)-T) & bT*(tSpan(jT)-T)>0

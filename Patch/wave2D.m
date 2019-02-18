@@ -1,7 +1,7 @@
 % Simulate the simple wave PDE in 2D on patches.
 % First it checks the spectrum of the system.
 % AJR, Nov 2018
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{wave2D}: example of a wave on patches in 2D}
 \label{sec:wave2D}

@@ -1,6 +1,6 @@
 % Test spectral interpolation in 2D with many random parameters
 % AJR, Nov 2018
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt2test}: tests 2D spectral interpolation}
 \label{sec:...}

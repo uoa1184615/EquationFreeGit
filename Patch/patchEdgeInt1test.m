@@ -1,7 +1,7 @@
 %Test the spectral interpolation of patchEdgeInt1()
 %All tests passed.
 %AJR, 26 Sep 2018
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsubsection{\texttt{patchEdgeInt1test}: test the spectral interpolation}
 \label{sec:patchEdgeInt1test}

@@ -1,7 +1,7 @@
 %Simulate water waves on patches as an example of wave
 %systems in the form h_t=u_x+... and u_u=h_x+...
 %AJR, Nov 2017 -- Oct 2018
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{waterWaveExample}: simulate a water wave PDE on patches}
 \label{sec:waterWaveExample}

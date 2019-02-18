@@ -1,6 +1,6 @@
 % projIntDMD() is a basic projective integration of a
 % given system of stiff deterministic ODEs.  AJR, Oct 2017
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{projIntDMD()}}
 \label{sec:projIntDMD}

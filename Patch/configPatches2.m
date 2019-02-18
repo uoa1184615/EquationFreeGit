@@ -1,7 +1,7 @@
 %Creates a data struct of the design of 2D patches for later
 %use by the patch functions such as smoothPatch2() 
 %AJR, Nov 2018
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{configPatches2()}: configures spatial patches in 2D}
 \label{sec:configPatches2}

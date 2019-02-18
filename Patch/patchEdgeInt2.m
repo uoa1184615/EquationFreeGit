@@ -1,7 +1,7 @@
 % Provides the interpolation across 2D space for 2D patches
 % of simulations of a smooth lattice system such as PDE
 % discretisations.  AJR, Nov 2018
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection[\texttt{patchEdgeInt2()}: 2D patch edge values from 2D interpolation]{\texttt{patchEdgeInt2()}: sets 2D patch edge values from 2D macroscale interpolation}
 \label{sec:patchEdgeInt2}

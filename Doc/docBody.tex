@@ -1,0 +1,135 @@
+% Common input to both userManual and to devManual.  
+% AJR, Feb 2019
+%!TEX root = eqnFreeDevMan.tex
+
+
+\author{A. J. Roberts\thanks{%
+School of Mathematical Sciences, University of Adelaide, South Australia.
+\url{http://www.maths.adelaide.edu.au/anthony.roberts},
+\url{http://orcid.org/0000-0001-8930-1552}}
+\and John Maclean\thanks{%
+School of Mathematical Sciences, University of Adelaide, South Australia.
+\url{http://www.adelaide.edu.au/directory/john.maclean}}
+\and J.~E. Bunder\thanks{%
+School of Mathematical Sciences, University of Adelaide, South Australia.
+\protect\url{mailto:judith.bunder@adelaide.edu.au},
+\protect\url{http://orcid.org/0000-0001-5355-2288}}
+\and et al.\thanks{Appear here for your contribution.}
+}
+
+\date{\today}
+
+% I guess we should abandon these alternatives
+\IfFileExists{ajr.sty}{\usepackage{ajr}}{
+  \IfFileExists{jm.sty}{\usepackage{jm}}{
+    \usepackage[a5paper,margin=11mm]{geometry}
+}}  
+
+
+
+\usepackage{pgfplots} 
+\pgfplotsset{compat=newest} % AJR: changed to newest aiming for flexible
+\usepgfplotslibrary{external} %exports an external pdf for each tikz figure
+%\tikzexternalize
+%% To force redraw of all tikz graphics (or rm *.md5):
+%\tikzset{external/force remake}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{shapes,arrows,fit}
+\usetikzlibrary{positioning}
+
+\usepackage{bold-extra}
+\usepackage[T1]{fontenc}
+\usepackage{caption}
+
+
+% fancyvrb does code listing, including line numbers
+\usepackage{fancyvrb}
+\newenvironment{matlab}%
+    {\Verbatim[numbers=left,firstnumber=\the\inputlineno]}%
+    {\endVerbatim}
+% Also get fancyvrb to omit %{ and %} pairs, 
+% but this requires they always be used
+\makeatletter
+\def\fancyvrbStartStop{%
+  \edef\FancyVerbStartString{\@percentchar\@charrb} 
+  \edef\FancyVerbStopString{\@percentchar\@charlb} }
+\makeatother
+% could change appearance with e.g. \renewcommand{\theFancyVerbLine}{%
+%  \textcolor{red}{\small 8.\alph{FancyVerbLine}}}
+
+
+\usepackage{natbib}
+\bibliographystyle{agsm}
+\let\harvardurl\url
+
+% used to in/exclude
+\usepackage{versions}
+\newenvironment{body}{}{}
+\newenvironment{userExample}{}{}
+\newenvironment{funDescription}{}{}
+
+
+\usepackage[onedeep]{etocx}% for mini-local-tableofconents
+\usepackage{microtype,amsmath,amssymb,defns,graphicx,hyperref}
+% Invoke cleverref
+\usepackage[capitalise,nameinlink,noabbrev]{cleveref}
+\crefname{equation}{}{}
+% Default "Item" useless, use enumitem and ref=
+\crefname{enumi}{}{}
+\crefname{enumii}{}{}
+\crefname{enumiii}{}{}
+\crefname{enumiv}{}{}
+
+% command definitions
+\def\into{\(\leftrightarrow\)\ }
+\Vec f\Vec x\Vec u \Vec X \Vec U
+\Bb R  \Bb X
+\def\into{\(\leftrightarrow\)\ }
+
+
+
+\begin{document}
+\epstopdfsetup{suffix=} % must be after begin{document}
+
+\maketitle
+
+\begin{abstract}
+This `equation-free toolbox' empowers the computer-assisted analysis of complex, multiscale systems.
+Its aim is to enable you to use microscopic simulators to perform system level tasks and analysis.
+The methodology bypasses the derivation of macroscopic evolution equations by using only short bursts of microscale simulations which are often the best available description of a system
+\cite[e.g.]{Kevrekidis09a, Kevrekidis04a, Kevrekidis03b}.
+This suite of functions should empower users to start implementing such methods---but so far we have only just started.
+\end{abstract}
+
+\tableofcontents
+
+\ifUserNotDev \excludeversion{funDescription}
+\else \excludeversion{userExample}
+\fi
+
+\include{introduction}
+
+\fancyvrbStartStop 
+
+
+\include{projInt}
+
+\include{patch}
+
+
+% only include appendices in the devManual
+\ifUserNotDev\else
+\appendix
+\let\FancyVerbStartString\relax 
+\let\FancyVerbStopString\relax
+\include{appContribute}
+\include{apptpd}
+\fi
+
+
+% get bib data from shared and local files; 
+% add required local to shared with 'bibexport equationFreeDoc'
+\IfFileExists{ajr.sty}{\bibliography{bibexport,ajr,bib}}{}
+\IfFileExists{jm.sty}{\bibliography{bibexport,jm,bib}}{}
+
+\end{document}

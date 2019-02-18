@@ -2,7 +2,7 @@
 % on patches in 2D coupled across space. The system must be
 % a smooth lattice system such as PDE discretisations.
 % AJR, Nov 2018
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchSmooth2()}: interface to time integrators}
 \label{sec:patchSmooth2}

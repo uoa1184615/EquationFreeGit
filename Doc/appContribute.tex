@@ -1,5 +1,5 @@
 %Initially by AJR, Apr 2017 -- Oct 2018
-%!TEX root = equationFreeDoc.tex
+%!TEX root = eqnFreeDevMan.tex
 \section{Create, document and test algorithms}
 \label{sec:contribute}
 \secttoc
@@ -13,9 +13,9 @@ For developers to create and document the various functions, we use an idea due 
 
 \item Create a \LaTeX\ file~\verb|Dir/funs.tex|: establish as one \LaTeX\ section that \verb|\input{Dir/*.m}|s the  files of the functions in the class, example scripts of use, and possibly test scripts, \autoref{tbl:funtex}.
 
-\item Each such \verb|Dir/funs.tex| file is to be included from the main \LaTeX\ file \verb|Doc/equationFreeDoc.tex| so that people can most easily work on one section at a time: 
+\item Each such \verb|Dir/funs.tex| file is to be included from the main \LaTeX\ file \verb|Doc/eqnFreeDevMan.tex| so that people can most easily work on one section at a time: 
 \begin{itemize}
-\item put \verb|\include{funs}| into \verb|Doc/equationFreeDoc.tex|;
+\item put \verb|\include{funs}| into \verb|Doc/eqnFreeDevMan.tex|;
 \item to include we have to use a soft link so at the command line in the directory~\verb|Doc| execute \verb|ln -s ../Dir/funs.tex|
 \footnote{Such soft links are necessary for at least my Mac \textsc{osx} and hopefully will work for other developers.  Further, it has the advantage that auxiliary files are also located in the \texttt{Doc} directory.}
 \end{itemize}

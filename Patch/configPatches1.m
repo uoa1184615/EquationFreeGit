@@ -1,7 +1,7 @@
 %Creates a data struct of the design of patches for later
 %use by the patch functions such as smoothPatch1() 
 %AJR, Nov 2017
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{configPatches1()}: configures spatial patches in 1D}
 \label{sec:configPatches1}

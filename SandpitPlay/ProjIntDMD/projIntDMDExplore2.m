@@ -2,7 +2,7 @@
 % on discretisation of a nonlinear diffusion PDE.  
 % Test dependence of errors on macro-time step.
 % AJR, Feb 2018
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{projIntDMDExplore2}: explore effect of varying parameters}
 \label{sec:pi1eevp}

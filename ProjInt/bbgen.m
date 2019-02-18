@@ -2,7 +2,7 @@
 %numerical method, an ordinary differential equation, and a given upper
 %bound on the time step.
 %JM,Sept 2018.
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsubsection{\texttt{bbgen()}}
 \label{sec:bbgen}

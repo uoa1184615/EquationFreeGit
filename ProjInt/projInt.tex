@@ -1,5 +1,5 @@
 % input *.m files for Projective Integration  AJR, Oct 2017
-%!TEX root = ../Doc/equationFreeDoc.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 \section{Projective integration of deterministic ODEs}
 \label{sec:ProjInt}
 \localtableofcontents
@@ -28,18 +28,21 @@ These schemes are suitable for precise simulation of the slow dynamics, provided
 This function enables a Projective Integration implementation of any solver with macroscale time steps.
 It does not matter whether the solver is a standard Matlab or Octave algorithm, or one supplied by the user.
 As explored in later examples, \verb|PIG()| should only be used in very stiff systems. 
-\end{itemize}
-The above functions share dependence on a user-specified `microsolver', that accurately simulates some problem of interest. 
-\paragraph{Minor functions}
-\begin{itemize}
+%\end{itemize}
+
+%\paragraph{Minor functions}
+%\begin{itemize}
 \item `Constraint-defined manifold computing', \verb|cdmc()|.
 This helper function, based on the method introduced in \cite{GearKevrekidis05},  iteratively applies the microsolver and projects the output backwards in time.
 The result is to constrain the fast variables close to the slow manifold, without advancing the current time by the duration of an application of the microsolver.
 This function can be used to reduce errors related to the simulation length of the microsolver in either the \verb|PIRK| or \verb|PIG| functions.
 In particular, it enables \verb|PIG()| to be used on problems that are not particularly stiff.
-\item Black box microsolver generator, \verb|bbgen()|.
-This simple function takes as input a standard solver with a recommended time step for microscale simulation, and returns a `black box' microsolver for the Projective Integration functions.
+%\item Black box microsolver generator, \verb|bbgen()|.
+%This simple function takes as input a standard solver with a recommended time step for microscale simulation, and returns a `black box' microsolver for the Projective Integration functions.
 \end{itemize}
+
+The above functions share dependence on a user-specified `microsolver', that accurately simulates some problem of interest. 
+
 
 The following sections describe the \verb|PIRK2()| and \verb|PIG()| functions in detail, providing an example for each.
 Then \verb|PIRK4()| is very similar to \verb|PIRK2()|.
@@ -49,15 +52,15 @@ Descriptions for the minor functions follow, and an example of the use of \verb|
 \input{../ProjInt/egPIMM.m}
 \input{../ProjInt/PIG.m}
 \input{../ProjInt/PIRK4.m}
-\begin{body}
-\input{../ProjInt/PIRK_Example.m}
-\input{../ProjInt/PIG_Example.m}
-
-\subsection{Minor functions}
-\label{sec:extras}
 \input{../ProjInt/cdmc.m}
-\input{../ProjInt/bbgen.m}
-\input{../ProjInt/PIG_Explore.m}
+\begin{body}
+
+%\subsection{Examples functions}
+%\label{sec:extras}
+%\input{../ProjInt/bbgen.m}
+\input{../ProjInt/PIRK_Example.m}
+\input{../ProjInt/PIGExample.m}
+\input{../ProjInt/PIGExplore.m}
 
 
 
