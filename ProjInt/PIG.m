@@ -33,7 +33,7 @@ variables onto the slow manifold without affecting the time.
 
 \begin{matlab}
 %}
-function [t,x,tms,xms,svf] = PIG(macroInt,microBurst,tSpan,x0)
+function [t,x,tms,xms,svf] = PIG(macroInt,microBurst,tSpan,x0,lift,restrict)
 %{
 \end{matlab}
 
@@ -172,7 +172,9 @@ with forward bursts.)
 \begin{matlab}
 %}
 tSpan = [0 6]; 
-[ts,xs,tms,xms] = PIG('ode23',microBurst,tSpan,[1 0]);
+lift = @(x) [x; 0.5];
+restrict = @(x) x(1);
+[ts,xs,tms,xms] = PIG('ode23',microBurst,tSpan,1, lift, restrict);
 %{
 \end{matlab}
 Plot output of this projective integration.
@@ -199,21 +201,26 @@ end%if no arguments
 \begin{funDescription}
 
 Find the number of time steps at which output is expected,
-and the number if variables.
+and the number of variables.
 \begin{matlab}
 %}
 nT=length(tSpan)-1;
-nx = length(x0);
+nx = length(lift(x0));
 %{
 \end{matlab}
 
 Get the number of expected outputs and set logical indices
-to flag what data should be saved.
+to flag what data should be saved. If no lifting/restriction operators were
+set, assign them.
 \begin{matlab}
 %}
 nArgs=nargout();
 saveMicro = (nArgs>1);
 saveSvf = (nArgs>2);
+if nargin < 5 %no lift/restrict operators
+    lift=@(x) x;
+    restrict=@(x) x;
+end
 %{
 \end{matlab}
 
@@ -226,7 +233,8 @@ from the attracting slow manifold.
 \begin{matlab}
 %}
 x0 = reshape(x0,[],1);
-[relax_t,relax_x0] = microBurst(tSpan(1),x0);
+[relax_t,x0_micro_relax] = microBurst(tSpan(1),lift(x0));
+x0_relax = restrict(x0_micro_relax);
 %{
 \end{matlab}
 
@@ -249,7 +257,7 @@ if saveMicro
     tms=cell(nT+1,1); xms=cell(nT+1,1);
     n=1;
     tms{n} = reshape(relax_t,[],1);
-    xms{n} = relax_x0;
+    xms{n} = x0_micro_relax;
     
     if saveSvf
         svf.t = cell(nT+1,1);
@@ -273,7 +281,7 @@ function [dx]=genProjection(tt,xx)
 Run a microBurst from the given initial conditions.
 \begin{matlab}
 %}
-    [t_tmp,x_micro_tmp] = microBurst(tt,reshape(xx,[],1));
+    [t_tmp,x_micro_tmp] = microBurst(tt,reshape(lift(xx),[],1));
 %{
 \end{matlab}
 Compute the standard Projective Integration approximation of
@@ -281,7 +289,7 @@ the slow vector field.
 \begin{matlab}
 %}
 	del = t_tmp(end)-t_tmp(end-1);
-	dx = (x_micro_tmp(end,:)-x_micro_tmp(end-1,:))'/(del);
+	dx = ( restrict(x_micro_tmp(end,:))-restrict(x_micro_tmp(end-1,:)) )'/(del);
 %{
 \end{matlab}
 Save the microscale data, and the Projective Integration
@@ -315,7 +323,7 @@ Do Projective Integration of \verb|ff()| with the
 user-specified microBurst.
 \begin{matlab}
 %}
-[t,x]=feval(macroInt,ff,tSpan,relax_x0(end,:)');
+[t,x]=feval(macroInt,ff,tSpan,x0_relax(end,:)');
 %{
 \end{matlab}
 
