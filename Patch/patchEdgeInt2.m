@@ -57,7 +57,7 @@ the fields with edge values set by interpolation.
 \end{itemize}
 
 
-\begin{funDescription}
+\begin{devMan}
 
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
@@ -309,5 +309,5 @@ end% function patchEdgeInt2
 \end{matlab}
 Fin, returning the 4/5D array of field values with
 interpolated edges. 
-\end{funDescription} 
+\end{devMan} 
 %}

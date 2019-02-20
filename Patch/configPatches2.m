@@ -91,7 +91,7 @@ patch.
 \end{itemize}
 
 
-\begin{funDescription}
+\begin{devMan}
 
 \subsubsection{If no arguments, then execute an example}
 \label{sec:configPatches2eg}
@@ -336,5 +336,5 @@ end% function
 %{
 \end{matlab}
 Fin.
-\end{funDescription}
+\end{devMan}
 %}

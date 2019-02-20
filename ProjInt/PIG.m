@@ -196,7 +196,7 @@ end%if no arguments
 
 
 
-\begin{funDescription}
+\begin{devMan}
 
 Find the number of time steps at which output is expected,
 and the number if variables.
@@ -363,5 +363,5 @@ This concludes \verb|PIG()|.
 end
 %{
 \end{matlab}
-\end{funDescription}
+\end{devMan}
 %}

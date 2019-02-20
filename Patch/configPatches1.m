@@ -71,7 +71,7 @@ microscale grid points in every patch.
 values set by interpolation at the edge regions of each
 patch.
 \end{itemize}
-\begin{funDescription}
+\begin{devMan}
 \subsubsection{If no arguments, then execute an example}
 \label{sec:configPatches1eg}
 \begin{matlab}
@@ -236,5 +236,5 @@ end% function
 %{
 \end{matlab}
 Fin.
-\end{funDescription}
+\end{devMan}
 %}

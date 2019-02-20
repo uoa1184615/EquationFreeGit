@@ -21,7 +21,7 @@ function bb = bbgen(solver,f,dt)
 \paragraph{Output}
 \verb|bb = bb|\((t_{in},x_{in},T)\) a `black box' microsolver that initialises at \( (t_{in},x_{in}) \) and simulates forward a duration \(T\). 
 
-\begin{funDescription}
+\begin{devMan}
 \begin{matlab}
 %}
 bb = @(t_in,x_in,T) feval(solver,f,...
@@ -29,5 +29,5 @@ linspace(t_in,t_in+T,1+ceil(T/dt)),x_in);
 end
 %{
 \end{matlab}
-\end{funDescription}
+\end{devMan}
 %}

@@ -58,7 +58,7 @@ edge values set to zero.
 \end{itemize}
 
 
-\begin{funDescription}
+\begin{devMan}
 Reshape the fields~\verb|u| as a 2/3D-array, and sets the
 edge values from macroscale interpolation of centre-patch
 values. \cref{sec:patchEdgeInt1} describes
@@ -81,6 +81,6 @@ dudt=reshape(dudt,[],1);
 %{
 \end{matlab}
 Fin.
-\end{funDescription}
+\end{devMan}
 %}
  

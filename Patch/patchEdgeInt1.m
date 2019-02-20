@@ -49,7 +49,7 @@ equi-spaced lattice on both macro- and micro-scales.
 \verb|nVars|\) 2/3D array of the fields with edge values set by
 interpolation of patch core averages.
 \end{itemize}
-\begin{funDescription}
+\begin{devMan}
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
@@ -260,5 +260,5 @@ end% if spectral
 %{
 \end{matlab}
 Fin, returning the 2/3D array of field values.  
-\end{funDescription}
+\end{devMan}
 %}

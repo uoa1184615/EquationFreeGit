@@ -6,9 +6,9 @@
 
 This section provides some good projective integration functions \cite[e.g.]{Gear02b, Gear03c, Givon06, Sieber2018}.
 The goal is to enable computationally expensive dynamic simulations to be run over long time scales.
-\begin{userExample} 
+\begin{userMan} 
 Perhaps start by looking at \cref{sec:egPIMM} which codes the introductory example of a long time simulation of the Michaelis--Menton multiscale system of differential equations.
-\end{userExample}
+\end{userMan}
 
 \paragraph{Scenario}
 When you are interested in a complex system with many interacting parts or agents, you usually are primarily interested in the self-organised emergent macroscale characteristics.
@@ -53,7 +53,7 @@ Descriptions for the minor functions follow, and an example of the use of \verb|
 \input{../ProjInt/PIG.m}
 \input{../ProjInt/PIRK4.m}
 \input{../ProjInt/cdmc.m}
-\begin{body}
+\begin{devMan}
 
 %\subsection{Examples functions}
 %\label{sec:extras}
@@ -72,6 +72,6 @@ Then output at each user-requested coarse time is the end point of an applicatio
 \item Can maybe implement microsolvers that terminate a burst when the fast dynamics have settled using, for example, the 'Events' function handle in ode23. 
 \end{itemize}
 
-\end{body}
+\end{devMan}
 
 

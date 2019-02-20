@@ -13,7 +13,7 @@ The inter-patch coupling is realised by spectral interpolation to the patch edge
 This approach, based upon the differential equations coded in \cref{sec:simpleWavePDE}, may be adapted by a user to a wide variety of 1D wave and near-wave systems.
 For example, the differential equations of \cref{sec:waterWavePDE} describes the nonlinear microscale simulator of the nonlinear shallow water wave \pde\ derived from the Smagorinski model of turbulent flow \cite[]{Cao2012, Cao2014b}.
 
-\begin{body}
+\begin{devMan}
 \begin{figure}
 \centering \caption{\label{fig:ps1WaveCtsUH}water depth~\(h(x,t)\) (above) and velocity field~\(u(x,t)\) (below) of the gap-tooth scheme applied to the simple wave \pde~\cref{eq:genwaveqn}, linearised.
 The micro-scale random component to the initial condition has long lasting effects on the simulation---but the macroscale wave still propagates.}
@@ -263,5 +263,5 @@ end
 %{
 \end{matlab}
 Fin.
-\end{body}
+\end{devMan}
 %}

@@ -34,7 +34,7 @@ cSol = @(t,x) cdmc(sol,t,x)|
 and thereafter use \verb|csol()| in place of \verb|sol()| as the microBurst for any Projective Integration scheme.
 The original microBurst \verb|sol()| could create large errors if used in a Projective Integration scheme, but the output of \verb|cdmc()| should not.
 
-\begin{funDescription}
+\begin{devMan}
 Begin with a standard application of the micro-burst.
 \begin{matlab}
 %}
@@ -53,5 +53,5 @@ t0 = ts(1)-bT;
 [ts,xs] = feval(microBurst,t0,x0.');
 %{
 \end{matlab}
-\end{funDescription}
+\end{devMan}
 %}

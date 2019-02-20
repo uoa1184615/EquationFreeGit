@@ -213,7 +213,7 @@ end
 
 
 
-\begin{funDescription}
+\begin{devMan}
 
 
 
@@ -460,7 +460,7 @@ This concludes \verb|PIRK2()|.
 end
 %{
 \end{matlab}
-\end{funDescription}
+\end{devMan}
 %}
 
 

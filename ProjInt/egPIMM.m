@@ -3,7 +3,7 @@
 %usage of the PIRK2() function. AJR, 29 Sep 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\begin{userExample}
+\begin{userMan}
 \subsection{\texttt{egPIMM}: Example projective integration
 of Michaelis--Menton kinetics}
 \label{sec:egPIMM}
@@ -146,5 +146,5 @@ function [ts, xs] = MMburst(ti, xi, bT)
 end
 %{
 \end{matlab}
-\end{userExample}
+\end{userMan}
 %}

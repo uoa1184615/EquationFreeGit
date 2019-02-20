@@ -10,7 +10,7 @@ simulation is not accurate. In parallel, we run the same
 scheme but with \verb|cdmc()| used as a wrapper for the
 microsolver. This second implementation successfully
 replicates the true dynamics.
-\begin{body}
+\begin{devMan}
 \begin{matlab}
 %}
 clear all, close all
@@ -100,5 +100,5 @@ error, but by design \verb|PIG()| works with any
 user-defined macrosolver and cannot reduce this error. The
 function \verb|cdmc()| reduces this error term by attempting
 to mimic the microsolver without advancing time. 
-\end{body}
+\end{devMan}
 %}

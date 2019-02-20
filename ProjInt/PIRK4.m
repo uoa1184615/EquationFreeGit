@@ -81,7 +81,7 @@ end
 \end{matlab}
 
 
-\begin{funDescription}
+\begin{devMan}
 
 
 \paragraph{Input}
@@ -425,6 +425,6 @@ This concludes \verb|PIRK4()|.
 end
 %{
 \end{matlab}
-\end{funDescription}
+\end{devMan}
 %}
 

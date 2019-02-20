@@ -1,12 +1,12 @@
 %Initially by AJR, Apr 2017 -- Nov 2018
 %!TEX root = eqnFreeDevMan.tex
 \section{Introduction}
-\begin{funDescription}
-This document is intended to be used in conjunction with the user manual. It contains line-by-line descriptions of the code in each function in the toolbox. For brief descriptions of each function, quick start guides, and many examples, see the user manual.
-\end{funDescription}
 
-\begin{userExample}
 \localtableofcontents
+
+\begin{devMan}
+This Developers Manual contains line-by-line descriptions of the code in each function in the toolbox, and each example.  For basic descriptions of each function, quick start guides, and some basic examples, see the User Manual.
+\end{devMan}
 
 \paragraph{Users}
 Place this toolbox's folder in a path searched by \script.
@@ -40,62 +40,67 @@ Let's develop functions that work for both \script.
 This section may be used in conjunction with the many examples in later sections to help apply the toolbox functions to a particular problem, or to assist in distinguishing between the various functions.
 
 \subsection{Cheat sheet: Projective Integration}
-This section pertains to the Projective Integration (PI) methods of Section~\ref{sec:ProjInt}. The PI approach is to greatly accelerate computations of a system exhibiting multiple time scales.
+This section pertains to the Projective Integration (PI) methods of \cref{sec:ProjInt}. The PI approach is to greatly accelerate computations of a system exhibiting multiple time scales.
 
-The PI toolbox presents several `main' functions that could separately be called to perform PI, as well as several optional wrapper functions that may be called. This section helps to distinguish between the top-level PI functions, and helps to tell which of the optional functions may be needed at a glance. For full details on each function refer to Section~\ref{sec:ProjInt}.
+The PI toolbox presents several `main' functions that could separately be called to perform PI, as well as several optional wrapper functions that may be called. This section helps to distinguish between the top-level PI functions, and helps to tell which of the optional functions may be needed at a glance. \cref{sec:ProjInt} fully details each function.
 
-The cheat sheet consists of two flow charts. For an overview of constructing a PI simulation, see Figure~\ref{fig:constructPI}. For a rough guide as to which of the top-level PI functions should be used, refer to Figure~\ref{fig:PIchoosemacro}.
+The cheat sheet consists of two flow charts. \cref{fig:constructPI} overviews constructing a PI simulation. \cref{fig:PIchoosemacro} roughly guides which of the top-level PI functions should be used.
 
-
-\begin{figure}[h!]
+\newlength{\WD}%%%%%%%%%
+\begin{figure}
+\caption{these figures appear confusing to a newbie????  and we must \emph{not} resize fixed width constructs.  Use linewidth for large-scale layout scaling, em for small-widths, and ex for small-heights.}
+\label{fig:constructPI}
 \centering
-\resizebox{\textwidth}{!}{ %resize tikz picture to correct width
+\setlength{\WD}{0.05\linewidth}%%%%%%%%%%%%%%%%
 \begin{tikzpicture}[node distance = 3ex, auto]
-\tikzstyle{bigblock} = [rectangle, draw, thick,   text width=20.5cm, text badly centered,
+\tikzstyle{bigblock} = [rectangle, draw, thick,   text width=20.5\WD, text badly centered,
     rounded corners, minimum height=4ex]
 \tikzstyle{block} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
-    text width=9.8cm, text ragged, rounded corners, minimum height=8ex]
+    text width=9.6\WD, text ragged, rounded corners, minimum height=8ex]
  \tikzstyle{smallblock} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
-    text width=6cm, text ragged, rounded corners, minimum height=8ex]   
+    text width=6\WD, text ragged, rounded corners, minimum height=8ex]   
  \tikzstyle{tinyblock} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
-    text width=4.5cm, text ragged, rounded corners, minimum height=8ex]    
+    text width=4.3\WD, text ragged, rounded corners, minimum height=8ex]    
      \tikzstyle{smallenclose} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
-    text width=6.2cm, text ragged, rounded corners, minimum height=8ex]   
+    text width=6.2\WD, text ragged, rounded corners, minimum height=8ex]   
      \tikzstyle{refblock} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=blue!5,
-    text width=1cm, rounded corners, minimum height=1.05em] 
+    text width=1\WD, rounded corners, minimum height=1.05em] 
 \tikzstyle{line} = [draw, -latex']
 \tikzstyle{lined} = [draw, latex'-latex']
-\node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Schematic for Projective Integration scheme}\\
+\node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Schematic for Projective Integration scheme}
+
     \begin{tikzpicture}[node distance = 3ex, auto]
-    \node [block] (setmicro) {\textbf{Set microsolver}\\ 
-    Define or construct the function \texttt{solver()} that calls a black box microsolver. Set \texttt{bT}, the time to run microsolver for. Possible aids:\\
-    Use the 
-    \hyperref[fig:constructpatch]{\begin{tikzpicture}[node distance = 0.5cm, auto]   
-    \node [refblock] (ref) {Patch};
-    \end{tikzpicture}}
-    toolbox to discretise a pde.\\
-    Use \texttt{bbgen()} if the microsolver is a standard solver, \texttt{ode45} e.g., and needs to be converted into a black box.\\
-    Use \texttt{cmdc()} as a wrapper for the microsolver if the slow variables would otherwise change significantly over the microsolver.};
-    \node[block, right=0.2cm of setmicro] (setmacro){\textbf{Set macrosolver, define problem}\\ 
-    \vspace{1pt}
+    \node [block] (setmicro) {\textbf{Set microsolver}
+     
+    Define or construct the function \texttt{solver()} that calls a black box microsolver. Set \texttt{bT}, the time to run microsolver for. Possible aids:
+\begin{itemize}
+\item     Use the Patch functions (\cref{fig:constructpatch}) to simulate a large-scale a \pde, lattice, etc.
+%\item    Use \texttt{bbgen()} if the microsolver is a standard solver, \texttt{ode45} e.g., and needs to be converted into a black box.
+\item    Use \texttt{cmdc()} as a wrapper for the microsolver if the slow variables would otherwise change significantly over the microsolver.
+\end{itemize}};
+
+    \node[block, right=2ex of setmicro] (setmacro){\textbf{Set macrosolver, define problem}\\[1ex]
         \begin{tikzpicture}
     \node [tinyblock]%, below=0.6cm of pig]
-     (pirk) {\textbf{If using \texttt{PIRK()}:}\\ 
-    Set the vector of output times \texttt{tspan}. Intervals between times are the time steps in the numerical scheme. Set initial conditions \texttt{IC}.};
-   \node [tinyblock, right=0.2cm of pirk]%, below right=0.2cm and -1cm of lift]
-    (pig) {\textbf{If using \texttt{PIG()}:}\\ 
-    Set the solver \texttt{macro.solver} to be used on the macro scale. Set any needed time inputs or time step data in \texttt{macro.tspan}. Set initial conditions \texttt{IC}.};
+     (pirk) {\textbf{If using \texttt{PIRK()}:}
+      
+    Set the vector of output times \texttt{tspan}. Intervals between times are the time steps in the numerical scheme. Set initial values \texttt{x0}.};
+   \node [tinyblock, right=1ex of pirk]%, below right=0.2cm and -1cm of lift]
+    (pig) {\textbf{If using \texttt{PIG()}:}
+     
+    Set the solver \texttt{macro.solver} to be used on the macro scale. Set any needed time inputs or time step data in \texttt{macro.tspan}. Set initial values \texttt{x0}.};
     \end{tikzpicture}
     };
    
-       \node [tinyblock, below=0.3cm of setmacro] (lift) {\textbf{Set lifting/restriction}\\ 
+       \node [smallblock, below=2ex of setmacro] (lift) 
+       {\textbf{Set lifting\slash restriction}\quad
     If needed, set functions \texttt{restrict()} and \texttt{lift()} to convert between macro and micro problems/variables. These are optional arguments to the \texttt{PI} functions.};
     
- \node [block, below right=0.8cm and -8cm of setmicro] (dopi) {\textbf{Do PI}\\ 
-    Call the appropriate PI function as e.g. \\
-    \texttt{[t,x] = PIRK2(solver,bT,tspan,IC)}, or\\
-    \texttt{[t,x] = PIG(solver,bT,macro,IC)}. \\
-    Additional outputs may be requested to obtain details on the micro states and estimates of the slow vector field over the simulation.};
+ \node [block, below right=5ex and -9\WD of setmicro] (dopi) {\textbf{Do PI}\quad 
+    Invoke the appropriate PI function as, e.g., 
+    \verb|[t,x]=PIRK2(solver,bT,tspan,x0)|, or
+    \verb|[t,x]=PIG(solver,macro,x0)|. 
+    Additional optional outputs inform you of the microscale.};
              \path [line, thick] (setmicro) to[out=-90,in=120] (dopi);
          \path [line, thick] (lift) to[out=180,in=3] (dopi);
          \path [line, thick] (setmacro) to[out=-150,in=30] (dopi);
@@ -105,36 +110,42 @@ The cheat sheet consists of two flow charts. For an overview of constructing a P
     \end{tikzpicture}
     };   
 \end{tikzpicture}
-}
-\caption{}
-\label{fig:constructPI}
 \end{figure}
 
-\begin{figure}[h!]
+
+
+
+
+
+
+
+
+
+\begin{figure}
 \centering
-\resizebox{0.6\textwidth}{!}{ %resize tikz picture to correct width
+\caption{}\label{fig:PIchoosemacro}
+\setlength{\WD}{0.081\linewidth}%%%%%%%%%%%%%%%%
 \begin{tikzpicture}[node distance = 0.5cm, auto]
 \tikzstyle{bigblock} = [rectangle, draw, thick,   text badly centered, 
-    text width=12cm, rounded corners, minimum height=2em]
+    text width=12\WD, rounded corners, minimum height=2em]
 \tikzstyle{block} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
-    text width=5cm, rounded corners, minimum height=4em]
+    text width=5\WD, rounded corners, minimum height=4em, text ragged]
  \tikzstyle{smallblock} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
-    text width=3.4cm, rounded corners, minimum height=4em]  
+    text width=3.4\WD, rounded corners, minimum height=4em, text ragged]  
  \tikzstyle{yesblock} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
-    text width=1.2cm, rounded corners, minimum height=1.2em]   
+    text width=1.2\WD, rounded corners, minimum height=1.2em]   
 \tikzstyle{line} = [draw, -latex']
 \tikzstyle{lined} = [draw, latex'-latex']
-\node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Choosing the macro solver in PI:}\\
-\vspace{2pt}
-    \begin{tikzpicture}[node distance = 1cm, auto]
-    \node [block,right=5cm] (timestep) {\textbf{Is an appropriate time step known for the slow dynamics?}};
-    \node [yesblock, below =0.5cm of timestep] (timeyes) {Yes};
-    \node [yesblock, right=0.4cm of timestep] (timeno) {No};
-    \node [block, below=0.5cm of timeyes] (slowsol) {\textbf{Is a particular solver desired to simulate the slow dynamics?}};
-     \node [smallblock, below right=0.5cm and 0.5cm of timeno] (pig) {Choose \texttt{PIG()} to do simulation};
-         \node [yesblock, below =0.4cm of slowsol] (slowno) {No};
-    \node [yesblock,  right=0.4cm of slowsol] (slowyes) {Yes};
-         \node [smallblock, below =0.5cm of slowno] (pirk) {Choose \texttt{PIRK2()} or \texttt{PIRK4()} to do simulation};
+\node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Choosing the macro solver in PI}\\[2ex]
+    \begin{tikzpicture}[node distance = 4ex, auto]
+    \node [block,right=5\WD] (timestep) {{Is an appropriate time step known for the slow dynamics?}};
+    \node [yesblock, below =2ex of timestep] (timeyes) {Yes};
+    \node [yesblock, right=2ex of timestep] (timeno) {No};
+    \node [block, below=2ex of timeyes] (slowsol) {{Is a specific solver desired to simulate the slow dynamics?}};
+     \node [smallblock, below right=2ex and 2ex of timeno] (pig) {Choose \texttt{PIG()} to do simulation};
+         \node [yesblock, below =2ex of slowsol] (slowno) {No};
+    \node [yesblock,  right=2ex of slowsol] (slowyes) {Yes};
+         \node [smallblock, below =2ex of slowno] (pirk) {Choose \texttt{PIRK2()} or \texttt{PIRK4()} to do simulation};
          \path [line, thick] (timestep) to[out=-90,in=90] (timeyes);
          \path [line, thick] (timestep) to[out=0,in=180] (timeno);
           \path [line, thick] (timeno) to[out=0,in=90] (pig);
@@ -146,45 +157,58 @@ The cheat sheet consists of two flow charts. For an overview of constructing a P
     \end{tikzpicture}
     };   
 \end{tikzpicture}
-}
-\caption{}
-\label{fig:PIchoosemacro}
 \end{figure}
 
 
 
+
+
+
+
+
+
+
+
+
 \subsection{Cheat sheet: constructing patches}
-This section pertains to the Patch approach to discretising \textsc{pde}s of Section~\ref{sec:ProjInt}. 
+This section pertains to the Patch approach, \cref{sec:patch}, to solving \textsc{pde}s, lattice systems, or agent\slash particle microscale simulators. 
 
-The Patch toolbox requires that one configure patches, couple the patches and interface the coupled patches with a time integrator. For an overview of the chief functions involved and their interactions, see Figure~\ref{fig:constructpatch}.
+The Patch toolbox requires that one configure patches, couple the patches and interface the coupled patches with a time integrator. \cref{fig:constructpatch} overviews the chief functions involved and their interactions.
 
-\begin{figure}[h!]
+\begin{figure}
+\begin{maxipage}
+\setlength{\WD}{0.048\linewidth}%%%%%%%%%%%%%%%%
 \centering
-\resizebox{\textwidth}{!}{ %resize tikz picture to correct width
+\caption{}\label{fig:constructpatch}
 \begin{tikzpicture}[node distance = 3ex, auto]
-\tikzstyle{bigblock} = [rectangle, draw, thick,   text width=20.5cm, text badly centered,
-    rounded corners, minimum height=4ex]
+\tikzstyle{bigblock} = [rectangle, draw, thick, text width=20.5\WD, text badly centered, rounded corners, minimum height=4ex]
 \tikzstyle{block} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
-    text width=10cm, text ragged, rounded corners, minimum height=8ex]
+    text width=10\WD, text ragged, rounded corners, minimum height=8ex]
  \tikzstyle{smallblock} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
-    text width=6cm, text ragged, rounded corners, minimum height=8ex]   
+    text width=6\WD, text ragged, rounded corners, minimum height=8ex]   
  \tikzstyle{tinyblock} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
-    text width=4.5cm, text ragged, rounded corners, minimum height=8ex]      
+    text width=4.5\WD, text ragged, rounded corners, minimum height=8ex]      
 \tikzstyle{line} = [draw, -latex']
 \tikzstyle{lined} = [draw, latex'-latex']
-\node [bigblock,draw=blue!80!black,fill=blue!10] (gaptooth) {\textbf{Patch scheme for \textsc{pde}s}\\
-\vspace{1pt}
+\node [bigblock,draw=blue!80!black,fill=blue!10] (gaptooth) {\textbf{Patch scheme for \textsc{pde}s}\\[1ex]
     \begin{tikzpicture}[node distance = 3ex, auto]
-    \node [block] (configPatches) {\textbf{Define problem and construct patches}\\ Call \texttt{configpatches1} (for 1D) or \texttt{configpatches2} (for 2D) with inputs which define the microscale problem (\textsc{pde}, domain, boundary conditions etc) and the desired patch structure (number of patches, patch size, coupling order etc).\\
-    Output of \texttt{configpatches1} or \texttt{configpatches2}  is the global struct \texttt{patches}. The components of this struct should contain all information required to solve the microscale problem within each patch (function, microscale lattice points in each patch etc). If necessary, the user should define additional components for struct \texttt{patches} (e.g., as in \texttt{HomogenisationExample}).};
+    \node [block] (configPatches) {\textbf{Define problem and construct patches}
+    
+    Call \texttt{configpatches1} (for 1D) or \texttt{configpatches2} (for 2D) with inputs which define the microscale problem (\textsc{pde}, domain, boundary conditions etc) and the desired patch structure (number of patches, patch size, coupling order etc).
+    
+    Output of \texttt{configpatches1} or \texttt{configpatches2}  is the global struct \texttt{patches}. The components of this struct should contain all information required to solve the microscale problem within each patch (function, microscale lattice points in each patch etc). If necessary, define additional components for struct \texttt{patches} (e.g.,  \texttt{HomogenisationExample}).};
     \node [block, below=of configPatches] (microPDE) {\textbf{Solve microscale problem within each patch}\\
-    Call the \textsc{pde} solver which is to evaluate the microscale problem within each patch. This solver may be a Matlab defined function (such as \texttt{ode15s} or \texttt{ode45}) or a user defined function (such as Runge--Kutta).\\
+    Call the \textsc{pde} solver which is to evaluate the microscale problem within each patch. This solver may be a Matlab defined function (such as \texttt{ode15s} or \texttt{ode45}) or a user defined function (such as Runge--Kutta).
+    
     Input of the \textsc{pde} solver is the function \texttt{patchSmooth1} (for 1D) or \texttt{patchSmooth2} (for 2D) which  interfaces with the \textsc{pde} solver and the microscale \textsc{pde}. Other inputs are the time span and initial conditions. Output of the \textsc{pde} solver is the solution of the patch \textsc{pde} over the given time span, but only evaluated within the defined patches.};
-    \node [smallblock, above right=-2.2cm and 2cm of microPDE] (patchSmooth1) {\textbf{Interface to time integrators}\\
+    \node [smallblock, above right=-2.2\WD and 2\WD of microPDE] (patchSmooth1) {\textbf{Interface to time integrators}
+    
     The \textsc{pde} function (\texttt{patchSmooth1} or \texttt{patchSmooth2}) interfaces with the \textsc{pde} solve, the microscale \textsc{pde} and the patch coupling conditions. Input is the \textsc{pde} field at one time step and output is the field at the next time step.};
-    \node [tinyblock, below left=0.5cm and -3cm of patchSmooth1] (coupling) {\textbf{Coupling conditions}\\
+    \node [tinyblock, below left=3ex and -3\WD of patchSmooth1] (coupling) {\textbf{Coupling conditions}
+    
     Coupling conditions are evaluated in \texttt{patchEdge1} (for 1D) or \texttt{patchEdge2} (for 2D) with the coupling order defined by global struct component \texttt{patches.ordCC}.};
-    \node [tinyblock, below right=0.5cm and -3cm of patchSmooth1] (micropde) {\textbf{Microscale \textsc{pde}}\\ 
+    \node [tinyblock, below right=3ex and -3\WD of patchSmooth1] (micropde) {\textbf{Microscale \textsc{pde}}
+    
     This \textsc{pde} is defined by the global struct \texttt{patches}, for example component \texttt{patches.fun} defines the function (e.g.,  \texttt{BurgersPDE} or \texttt{heteroDiff}) and \texttt{patches.x} defines the domain of the patches};
     \node [block,draw=red!80!black,fill=red!10, below=of microPDE] (pi) {\hyperref[fig:constructPI]{\textbf{\textbf{Projective integration scheme (if needed)}}}\\
     };    
@@ -198,12 +222,9 @@ The Patch toolbox requires that one configure patches, couple the patches and in
 \node [bigblock,draw=black,below=of gaptooth] (process) {\textbf{Process results and plot}};
  \path [lined,very thick,-latex] (gaptooth) -- (process);
 \end{tikzpicture}
-}
-\caption{}
-\label{fig:constructpatch}
+\end{maxipage}
 \end{figure}
 
-\end{userExample}
 
 
 
@@ -219,9 +240,9 @@ The Patch toolbox requires that one configure patches, couple the patches and in
 %    \let\subsubsection\paragraph%
 %    \let\paragraph\subparagraph%
 %    \fancyvrbStartStop%
-%    \excludeversion{body}
+%    \excludeversion{devMan}
 %    \input{../ProjInt/projInt}
 %    \input{../Patch/patch}
-%    \includeversion{body}
+%    \includeversion{devMan}
 %}%end-exclusion
 

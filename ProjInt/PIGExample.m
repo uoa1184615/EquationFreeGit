@@ -10,7 +10,7 @@ integrator, such as \verb|ode45()|, on the slow, long-time
 macroscale.  For this stiff system, \verb|PIG()| is an order
 of magnitude faster than ordinary use of~\verb|ode45|.
 
-\begin{body}
+\begin{devMan}
 \begin{matlab}
 %}
 clear all, close all
@@ -107,5 +107,5 @@ problems, that cannot be efficiently solved by most standard
 methods.
 \end{itemize}
 
-\end{body}
+\end{devMan}
 %}

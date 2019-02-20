@@ -21,7 +21,7 @@ recursion).
 \end{enumerate}
 
 
-\begin{body}
+\begin{devMan}
 Establish global patch data struct to interface with a
 function coding the wave \pde: to be solved
 on \(2\pi\)-periodic domain, with \(9\times9\) patches,
@@ -182,5 +182,5 @@ function uvt = wavePDE(t,uv,x,y)
 end
 %{
 \end{matlab}
-\end{body}
+\end{devMan}
 %}

@@ -7,7 +7,7 @@ This script is a demonstration of the \verb|PIRK()| schemes,
 that use a Runge--Kutta macrosolver, applied to a simple
 linear system with some slow and fast directions. 
 
-\begin{body}
+\begin{devMan}
 Clear workspace and set a seed.
 \begin{matlab}
 %}
@@ -145,5 +145,5 @@ set(gcf,'PaperPosition',[0 0 14 10])
 print('-depsc2','PIRK')
 %{
 \end{matlab}
-\end{body}
+\end{devMan}
 %}

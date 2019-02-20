@@ -3,7 +3,7 @@
 % AJR, Nov 2017 -- Oct 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\begin{userExample}
+\begin{userMan}
 \subsection[\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]{\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
 \label{sec:HomogenisationExample}
 \localtableofcontents
@@ -332,5 +332,5 @@ end
 %{
 \end{matlab}
 Fin.
-\end{userExample}
+\end{userMan}
 %}
