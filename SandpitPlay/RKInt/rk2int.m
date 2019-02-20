@@ -3,7 +3,7 @@
 %AJR, 29 Mar 2017
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{rk2int()}}
+\section{\texttt{rk2int()}}
 \label{sec:rk2int}
 \localtableofcontents
 

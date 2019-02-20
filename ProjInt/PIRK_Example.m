@@ -1,7 +1,7 @@
 %Linear example of PIRK. JM, Sept 18.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{Example: PI using Runge--Kutta macrosolvers }
+\section{Example: PI using Runge--Kutta macrosolvers }
 \label{sec:ExPIRK}
 This script is a demonstration of the \verb|PIRK()| schemes,
 that use a Runge--Kutta macrosolver, applied to a simple

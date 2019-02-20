@@ -3,7 +3,7 @@
 % AJR, 29 Mar 2017
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{rk2intTest2}: A 2D test of RK2 integration}
+\section{\texttt{rk2intTest2}: A 2D test of RK2 integration}
 \label{sec:2tpi}
 \localtableofcontents
 

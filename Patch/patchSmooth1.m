@@ -4,7 +4,7 @@
 %AJR, Nov 2017 -- Sep 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{patchSmooth1()}: interface to time integrators}
+\section{\texttt{patchSmooth1()}: interface to time integrators}
 \label{sec:patchSmooth1}
 \localtableofcontents
 
@@ -45,7 +45,7 @@ but herein the patch edge values are overwritten by zeros.
 \item \verb|.x| is \(\verb|nSubP|\times \verb|nPatch|\)
 array of the spatial locations~\(x_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
-equi-spaced lattice on both macro- and micro-scales.
+equi-spaced lattice on both macro- and microscales.
 \end{itemize}
 \end{itemize}
 

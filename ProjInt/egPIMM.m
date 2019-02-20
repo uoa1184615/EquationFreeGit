@@ -4,7 +4,7 @@
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \begin{userMan}
-\subsection{\texttt{egPIMM}: Example projective integration
+\section{\texttt{egPIMM}: Example projective integration
 of Michaelis--Menton kinetics}
 \label{sec:egPIMM}
 \localtableofcontents
@@ -21,7 +21,7 @@ variable~\(x(t)\) evolves on a time scale of one, whereas
 the fast variable~\(y(t)\) evolves on a time scale of the
 small parameter~\(\epsilon\).
 
-\subsubsection{Invoke projective integration}
+\subsection{Invoke projective integration}
 
 Clear, and set the scale separation parameter~\(\epsilon\)
 to something small like~\(0.01\). Here use \(\epsilon=0.1\)
@@ -126,7 +126,7 @@ forward simulations used to project backwards in time at
 
 
 
-\subsubsection{Code a burst of Michaelis--Menten enzyme kinetics}
+\subsection{Code a burst of Michaelis--Menten enzyme kinetics}
 \label{sec:egPIMMburst}
 Say use \verb|ode23()| to integrate a burst of the
 differential equations for the Michaelis--Menten enzyme

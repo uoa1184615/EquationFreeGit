@@ -6,7 +6,7 @@
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
-\subsection{\texttt{PIRK2()}: projective integration of second order accuracy}
+\section{\texttt{PIRK2()}: projective integration of second order accuracy}
 \label{sec:PIRK2}
 
 This Projective Integration scheme implements a macroscale
@@ -151,7 +151,7 @@ the estimated slow vector field.
 
 
 
-\subsubsection{If no arguments, then execute an example}
+\subsection{If no arguments, then execute an example}
 \label{sec:pirk2eg}
 \begin{matlab}
 %}
@@ -217,7 +217,7 @@ end
 
 
 
-\subsubsection{The projective integration code}
+\subsection{The projective integration code}
 
 Determine the number of time steps and preallocate storage
 for macroscale estimates.
@@ -444,7 +444,7 @@ end
 \end{matlab}
 
 
-\subsubsection{If no output specified, then plot simulation}
+\subsection{If no output specified, then plot simulation}
 \begin{matlab}
 %}
 if nArgs==0

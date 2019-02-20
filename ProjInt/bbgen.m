@@ -4,7 +4,7 @@
 %JM,Sept 2018.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsubsection{\texttt{bbgen()}}
+\subsection{\texttt{bbgen()}}
 \label{sec:bbgen}
 \verb|bbgen()| is a simple function that takes a standard numerical method and produces a black box solver of the type required by the PI schemes. 
 \begin{matlab}

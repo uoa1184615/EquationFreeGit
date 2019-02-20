@@ -3,7 +3,7 @@
 %AJR, Nov 2017 -- Oct 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{waterWaveExample}: simulate a water wave PDE on patches}
+\section{\texttt{waterWaveExample}: simulate a water wave PDE on patches}
 \label{sec:waterWaveExample}
 \localtableofcontents
 
@@ -16,7 +16,7 @@ For example, the differential equations of \cref{sec:waterWavePDE} describes the
 \begin{devMan}
 \begin{figure}
 \centering \caption{\label{fig:ps1WaveCtsUH}water depth~\(h(x,t)\) (above) and velocity field~\(u(x,t)\) (below) of the gap-tooth scheme applied to the simple wave \pde~\cref{eq:genwaveqn}, linearised.
-The micro-scale random component to the initial condition has long lasting effects on the simulation---but the macroscale wave still propagates.}
+The microscale random component to the initial condition has long lasting effects on the simulation---but the macroscale wave still propagates.}
 \includegraphics[scale=0.85]{Patch/ps1WaveCtsUH}
 \end{figure}%
 Often, wave-like systems are written in terms of two conjugate variables, for example, position and momentum density, electric and magnetic fields, and water depth~\(h(x,t)\) and mean lateral velocity~\(u(x,t)\) as herein.
@@ -43,7 +43,7 @@ The momentum \pde~\cref{patch:Nu} represents  the effects of turbulent bed drag~
 
 \begin{figure}
 \centering \caption{\label{fig:ps1WaterWaveCtsUH}water depth~\(h(x,t)\) (above) and velocity field~\(u(x,t)\) (below) of the gap-tooth scheme applied to the Smagorinski shallow water wave \pde{}s~\cref{eqs:patch:N}.
-The micro-scale random initial component decays where the water speed is non-zero due to `turbulent' dissipation.}
+The microscale random initial component decays where the water speed is non-zero due to `turbulent' dissipation.}
 \includegraphics[scale=0.85]{Patch/ps1WaterWaveCtsUH}
 \end{figure}%
 
@@ -53,7 +53,7 @@ For such wave systems, let's implement a staggered microscale grid and staggered
 
 
 
-\subsubsection{Script code to simulate wave systems}
+\subsection{Script code to simulate wave systems}
 \label{sec:sc2waves}
 
 This script implements the following gap-tooth scheme
@@ -91,7 +91,7 @@ patches.hPts = hPts; patches.uPts = uPts;
 \end{matlab}
 
 Set an initial condition of a progressive wave, and check evaluation of the time derivative.
-The capital letter~\verb|U| denotes an array of values merged from both~\(u\) and~\(h\) fields on the staggered grids (possibly with some optional micro-scale wave noise).
+The capital letter~\verb|U| denotes an array of values merged from both~\(u\) and~\(h\) fields on the staggered grids (possibly with some optional microscale wave noise).
 \begin{matlab}
 %}
 U0 = zeros(nSubP,nPatch);
@@ -156,7 +156,7 @@ normNonSpan=norm( S*(S\V)-V )
 
 
 
-\subsubsection{\texttt{simpleWavePDE()}: simple wave PDE}
+\subsection{\texttt{simpleWavePDE()}: simple wave PDE}
 \label{sec:simpleWavePDE}
 This function codes the staggered lattice equation inside the patches for the simple wave \pde\ system \(h_t=-u_x\) and \(u_t=-h_x\).
 Here code for a staggered microscale grid of staggered macroscale patches: the array
@@ -204,7 +204,7 @@ end
 
 
 
-\subsubsection{\texttt{waterWavePDE()}: water wave PDE}
+\subsection{\texttt{waterWavePDE()}: water wave PDE}
 \label{sec:waterWavePDE}
 This function codes the staggered lattice equation inside the patches for the nonlinear wave-like \pde\ system~\cref{eqs:patch:N}.
 Also, regularise the absolute value appearing the the \pde{}s via the one-line function~\verb|rabs()|.

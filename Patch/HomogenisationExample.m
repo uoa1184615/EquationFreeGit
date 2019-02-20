@@ -4,7 +4,7 @@
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \begin{userMan}
-\subsection[\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]{\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
+\section[\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]{\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
 \label{sec:HomogenisationExample}
 \localtableofcontents
 \Cref{fig:ps1HomogenisationCtsU,fig:ps1HomogenisationCtsUEnsAve}  show example simulations
@@ -51,7 +51,7 @@ spacing~\(dx\), and governed by the heterogeneous diffusion
 In this 1D space, the macroscale, homogenised, effective
 diffusion should be the harmonic mean of these coefficients.
 
-\subsubsection{Script to simulate via stiff or projective integration}
+\subsection{Script to simulate via stiff or projective integration}
 Set the desired microscale periodicity, and microscale
 diffusion coefficients (with subscripts shifted by a half).
 \begin{matlab}
@@ -209,7 +209,7 @@ projective extrapolation by setting initial values to \nan.
 u0([1 end],:) = nan;
 %{
 \end{matlab}
-Set the desired macro- and micro-scale time-steps over the
+Set the desired macro- and microscale time-steps over the
 time domain: the macroscale step is in proportion to the
 effective mean diffusion time on the macroscale; the burst
 time is proportional to the intra-patch effective diffusion
@@ -282,7 +282,7 @@ end
 %{
 \end{matlab}
 End of the script.
-\subsubsection{\texttt{heteroDiff()}: heterogeneous diffusion}
+\subsection{\texttt{heteroDiff()}: heterogeneous diffusion}
 \label{sec:heteroDiff}
 This function codes the lattice heterogeneous diffusion
 inside the patches.  For 2D input arrays~\verb|u|
@@ -304,7 +304,7 @@ function ut = heteroDiff(t,u,x)
 end% function
 %{
 \end{matlab}
-\subsubsection{\texttt{heteroBurst()}: a burst of heterogeneous diffusion}
+\subsection{\texttt{heteroBurst()}: a burst of heterogeneous diffusion}
 \label{sec:heteroBurst}
 This code integrates in time the derivatives computed by
 \verb|heteroDiff| from within the patch coupling of

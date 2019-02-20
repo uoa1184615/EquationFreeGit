@@ -3,7 +3,7 @@
 %AJR, Nov 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{configPatches2()}: configures spatial patches in 2D}
+\section{\texttt{configPatches2()}: configures spatial patches in 2D}
 \label{sec:configPatches2}
 \localtableofcontents
 
@@ -93,7 +93,7 @@ patch.
 
 \begin{devMan}
 
-\subsubsection{If no arguments, then execute an example}
+\subsection{If no arguments, then execute an example}
 \label{sec:configPatches2eg}
 \begin{matlab}
 %}
@@ -202,7 +202,7 @@ code \(\dot u_{ijkl} =\frac1{\delta x^2}
 \begin{matlab}
 %}
 function ut=nonDiffPDE(t,u,x,y)
-  dx=diff(x(1:2));  dy=diff(y(1:2));  % micro-scale spacing
+  dx=diff(x(1:2));  dy=diff(y(1:2));  % microscale spacing
   i=2:size(u,1)-1;  j=2:size(u,2)-1;  % interior points in patches
   ut=nan(size(u));  % preallocate storage
   ut(i,j,:,:)=diff(u(:,j,:,:).^3,2,1)/dx^2 ...
@@ -216,7 +216,7 @@ end
 
 
 
-\subsubsection{The code to make patches}
+\subsection{The code to make patches}
 
 Initially duplicate parameters as needed.
 \begin{matlab}

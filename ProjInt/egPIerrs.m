@@ -3,7 +3,7 @@
 % usage of the PIRK2() function. AJR, 29 Sep 2018
 %%%%%%%%%%%%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{egPIerrs}: Errors in projective integration
+\section{\texttt{egPIerrs}: Errors in projective integration
 of Michaelis--Menton kinetics}
 \label{sec:egPIerrs}
 \localtableofcontents
@@ -21,7 +21,7 @@ the fast variable~\(y(t)\) evolves on a time scale of the
 small parameter~\(\epsilon\).
 
 
-\subsubsection{Invoke projective integration}
+\subsection{Invoke projective integration}
 
 Clear, and set the scale separation parameter~\(\epsilon\)
 to something small.  Need something like \(\epsilon=0.001\)
@@ -95,7 +95,7 @@ print -depsc2 egPIerrs.eps
 \end{matlab}
 
 
-\subsubsection{Code an accurate burst of Michaelis--Menten enzyme kinetics}
+\subsection{Code an accurate burst of Michaelis--Menten enzyme kinetics}
 \label{sec:egPIMMacc}
 Say use \verb|ode45()| to accurately integrate a burst of the
 differential equations for the Michaelis--Menten enzyme

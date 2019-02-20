@@ -124,6 +124,59 @@
                    slow components of the original system.},
 }
 
+@article{Sieber2018,
+  author =        {Sieber, J. and Marschler, C. and Starke, J.},
+  journal =       {SIAM Journal on Applied Dynamical Systems},
+  month =         jan,
+  number =        {4},
+  pages =         {2574--2614},
+  title =         {Convergence of {Equation}-{Free} {Methods} in the
+                   {Case} of {Finite} {Time} {Scale} {Separation} with
+                   {Application} to {Deterministic} and {Stochastic}
+                   {Systems}},
+  volume =        {17},
+  year =          {2018},
+  abstract =      {A common approach to studying high-dimensional
+                   systems with emergent low-dimensional behavior is
+                   based on lift-evolve-restrict maps (called
+                   equation-free methods): first, a user-defined lifting
+                   operator maps a set of low-dimensional coordinates
+                   into the high-dimensional phase space, then the
+                   high-dimensional (microscopic) evolution is applied
+                   for some time, and finally a user-defined restriction
+                   operator maps down into a low-dimensional space
+                   again. We prove convergence of equation-free methods
+                   for finite time scale separation with respect to a
+                   method parameter, the so-called healing time. Our
+                   convergence result justifies equation-free methods as
+                   a tool for performing high-level tasks such as
+                   bifurcation analysis on high-dimensional systems.
+                   More precisely, if the high-dimensional system has an
+                   attracting invariant manifold with smaller expansion
+                   and attraction rates in the tangential direction than
+                   in the transversal direction (normal hyperbolicity),
+                   and restriction and lifting satisfy some generic
+                   transversality conditions, then an implicit
+                   formulation of the lift-evolve-restrict procedure
+                   generates an approximate map that converges to the
+                   flow on the invariant manifold for healing time going
+                   to infinity. In contrast to all previous results, our
+                   result does not require the time scale separation to
+                   be large. A demonstration with Michaelis--Menten
+                   kinetics shows that the error estimates of our
+                   theorem are sharp. The ability to achieve convergence
+                   even for finite time scale separation is especially
+                   important for applications involving stochastic
+                   systems, where the evolution occurs at the level of
+                   distributions, governed by the Fokker--Planck
+                   equation. In these applications the spectral gap is
+                   typically finite. We investigate a low-dimensional
+                   stochastic differential equation where the ratio
+                   between the decay rates of fast and slow variables is
+                   2.},
+  doi =           {10.1137/17M1126084},
+}
+
 @article{Hyman2005,
   author =        {Hyman, James M.},
   journal =       {Computing in Science \& Engineering},
@@ -300,6 +353,97 @@
   doi =           {http://dx.doi.org/10.1016/j.apnum.2014.12.007},
   url =           {http://www.sciencedirect.com/science/article/pii/
                    S0168927414002086},
+}
+
+@article{Bunder2013b,
+  author =        {Bunder, J.~E. and Roberts, A.~J. and
+                   Kevrekidis, I.~G.},
+  journal =       {J.~Computational Physics},
+  month =         {may},
+  pages =         {154-174},
+  title =         {Good coupling for the multiscale patch scheme on
+                   systems with microscale heterogeneity},
+  volume =        {337},
+  year =          {2017},
+  abstract =      {Computational simulation of microscale detailed
+                   systems is frequently only feasible over spatial
+                   domains much smaller than the macroscale of interest.
+                   The `equation-free' methodology couples many small
+                   patches of microscale computations across space to
+                   empower efficient computational simulation over
+                   macroscale domains of interest. Motivated by
+                   molecular or agent simulations, we analyse the
+                   performance of various coupling schemes for patches
+                   when the microscale is inherently `rough'. As a
+                   canonical problem in this universality class, we
+                   systematically analyse the case of heterogeneous
+                   diffusion on a lattice. Computer algebra explores how
+                   the dynamics of coupled patches predict the large
+                   scale emergent macroscale dynamics of the
+                   computational scheme. We determine good design for
+                   the coupling of patches by comparing the macroscale
+                   predictions from patch dynamics with the emergent
+                   macroscale on the entire domain, thus minimising the
+                   computational error of the multiscale modelling. The
+                   minimal error on the macroscale is obtained when the
+                   coupling utilises averaging regions which are between
+                   a third and a half of the patch. Moreover, when the
+                   symmetry of the inter-patch coupling matches that of
+                   the underlying microscale structure, patch dynamics
+                   predicts the desired macroscale dynamics to any
+                   specified order of error. The results confirm that
+                   the patch scheme is useful for macroscale
+                   computational simulation of a range of systems with
+                   microscale heterogeneity.},
+  doi =           {10.1016/j.jcp.2017.02.004},
+}
+
+@inproceedings{Cao2012,
+  author =        {Cao, Meng and Roberts, A. J.},
+  booktitle =     {18th Australasian Fluid Mechanics Conference},
+  editor =        {Brandner, P.~A. and Pearce, B.~W.},
+  month =         {Dec},
+  title =         {Modelling 3D turbulent floods based upon the
+                   Smagorinski large eddy closure},
+  year =          {2012},
+  url =           {http://people.eng.unimelb.edu.au/imarusic/proceedings/18/
+                  70%20-%20Cao.pdf},
+}
+
+@article{Cao2014b,
+  author =        {Cao, Meng and Roberts, A. J.},
+  institution =   {[\url{http://arxiv.org/abs/1407.1579}]},
+  journal =       {J.~Engrg.\ Maths},
+  number =        {1},
+  pages =         {187--204},
+  title =         {Modelling suspended sediment in environmental
+                   turbulent fluids},
+  volume =        {98},
+  year =          {2016},
+  abstract =      {Modelling sediment transport in environmental
+                   turbulent fluids is a challenge. This article
+                   develops a model of the longitudinal transport of
+                   suspended sediment in environmental fluid flows such
+                   as floods and tsunamis. The model is systematically
+                   derived from a three-dimensional turbulence model
+                   based on the Smagorinski large eddy closure.
+                   Embedding the physical dynamics into a family of
+                   problems and analysing the linear dynamics of the
+                   system, the centre manifold theory indicates the
+                   existence of a slow manifold parameterised by
+                   macroscale variables. Computer algebra then
+                   constructs the slow manifold in terms of fluid depth,
+                   depth-averaged longitudinal velocities, and suspended
+                   sediment concentration. The model includes the
+                   effects of sediment erosion, advection and dispersion
+                   and the interactions between the sediment and
+                   turbulent fluid flow. Vertical distributions of the
+                   velocity and concentration in steady flow agree with
+                   established experimental data. For a pilot study,
+                   numerical simulations of the suspended sediment under
+                   long waves show that the developed model predicts
+                   physically reasonable sediment flow interaction.},
+  doi =           {10.1007/s10665-015-9817-7},
 }
 
 @article{Bunder2015a,

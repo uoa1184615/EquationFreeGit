@@ -1,7 +1,7 @@
 % Basic example of PIG. JM, Sept 18.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{Example: Projective Integration using General macrosolvers }
+\section{Example: Projective Integration using General macrosolvers }
 \label{sec:ExPIG}
 In this example the Projective Integration-General scheme is
 applied to a singularly perturbed ordinary differential

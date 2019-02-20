@@ -3,7 +3,7 @@
 % AJR, Oct 2017
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{projIntDMDExample1}: A first test of basic projective integration}
+\section{\texttt{projIntDMDExample1}: A first test of basic projective integration}
 \label{sec:ftbpi}
 \localtableofcontents
 

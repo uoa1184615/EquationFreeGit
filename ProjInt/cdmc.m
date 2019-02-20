@@ -4,7 +4,7 @@
 %JM, July 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsubsection{\texttt{cdmc()}}
+\subsection{\texttt{cdmc()}}
 \label{sec:cdmc}
 \verb|cdmc()| iteratively applies the micro-burst and then projects backwards in time to the initial conditions. The cumulative effect is to relax the variables to the attracting slow manifold, while keeping the final time for the output the same as the input time.
 

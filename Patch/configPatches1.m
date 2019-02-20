@@ -3,7 +3,7 @@
 %AJR, Nov 2017
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{configPatches1()}: configures spatial patches in 1D}
+\section{\texttt{configPatches1()}: configures spatial patches in 1D}
 \label{sec:configPatches1}
 \localtableofcontents
 Makes the struct~\verb|patches| for use by the patch\slash
@@ -72,7 +72,7 @@ values set by interpolation at the edge regions of each
 patch.
 \end{itemize}
 \begin{devMan}
-\subsubsection{If no arguments, then execute an example}
+\subsection{If no arguments, then execute an example}
 \label{sec:configPatches1eg}
 \begin{matlab}
 %}
@@ -139,7 +139,7 @@ code \(\dot u_{ij} =\frac1{\delta x^2}
 \begin{matlab}
 %}
 function ut=BurgersPDE(t,u,x)
-  dx=diff(x(1:2));  % micro-scale spacing
+  dx=diff(x(1:2));  % microscale spacing
   i=2:size(u,1)-1;  % interior points in patches
   ut=nan(size(u));  % preallocate storage
   ut(i,:)=diff(u,2)/dx^2 ...
@@ -147,7 +147,7 @@ function ut=BurgersPDE(t,u,x)
 end
 %{
 \end{matlab}
-\subsubsection{The code to make patches}
+\subsection{The code to make patches}
 Set one edge-value to compute by interpolation if not 
 specified by the user. Store in the struct.
 \begin{matlab}

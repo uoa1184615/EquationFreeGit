@@ -3,7 +3,7 @@
 
 
 
-\subsubsection{Water wave PDE}
+\subsection{Water wave PDE}
 This function codes the staggered lattice equation inside the patches for the nonlinear wave-like PDE system~\eqref{eqs:patch:N}.
 As before, set the micro-grid spacing, reserve space for time derivatives, and index the internal points of the micro-grid.
 \begin{matlab}

@@ -4,7 +4,7 @@
 % AJR, Nov 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{patchSmooth2()}: interface to time integrators}
+\section{\texttt{patchSmooth2()}: interface to time integrators}
 \label{sec:patchSmooth2}
 \localtableofcontents
 
@@ -49,12 +49,12 @@ overwritten by zeros.
 \verb|nPatch(1)|\) array of the spatial locations~\(x_{ij}\)
 of the microscale grid points in every patch. Currently it
 \emph{must} be an equi-spaced lattice on both macro- and
-micro-scales.
+microscales.
 \item \verb|.y| is similarly \(\verb|nSubP(2)| \times
 \verb|nPatch(2)|\) array of the spatial locations~\(y_{ij}\)
 of the microscale grid points in every patch. Currently it
 \emph{must} be an equi-spaced lattice on both macro- and
-micro-scales.
+microscales.
 \end{itemize}
 \end{itemize}
 

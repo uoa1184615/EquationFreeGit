@@ -5,7 +5,7 @@
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
-\subsection{\texttt{PIG()}: Projective Integration via a General macroscale integrator}
+\section{\texttt{PIG()}: Projective Integration via a General macroscale integrator}
 \label{sec:PIG}
 
 This is an approximate Projective Integration scheme when
@@ -42,7 +42,7 @@ The inputs and outputs are a little different to the two
 \paragraph{Inputs:}
 \begin{itemize}
 \item \verb|microBurst()| is a function that produces output
-from the user-specified code for a burst of micro-scale
+from the user-specified code for a burst of microscale
 simulation. The function must know how long a burst it is to
 use.  Usage
 \begin{equation*}
@@ -125,7 +125,7 @@ the estimated slow vector field.
 
 
 
-\subsubsection{If no arguments, then execute an example}
+\subsection{If no arguments, then execute an example}
 \label{sec:pigeg}
 \begin{matlab}
 %}
@@ -354,7 +354,7 @@ end
 \end{matlab}
 
 
-\subsubsection{If no output specified, then plot simulation}
+\subsection{If no output specified, then plot simulation}
 \begin{matlab}
 %}
 if nArgs==0

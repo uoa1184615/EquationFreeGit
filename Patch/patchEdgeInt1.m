@@ -4,7 +4,7 @@
 %AJR, Sep 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{patchEdgeInt1()}: sets edge values from interpolation over the macroscale}
+\section{\texttt{patchEdgeInt1()}: sets edge values from interpolation over the macroscale}
 \label{sec:patchEdgeInt1}
 \localtableofcontents
 Couples 1D patches across 1D space by computing their edge
@@ -36,7 +36,7 @@ which includes the following.
 \item \verb|.x| is \(\verb|nSubP|\times \verb|nPatch|\)
 array of the spatial locations~\(x_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
-equi-spaced lattice on both macro- and micro-scales.
+equi-spaced lattice on both macro- and microscales.
 \item \verb|.ordCC| is order of interpolation integer \(\geq -1\).
 \item \verb|.alt| in \(\{0,1\}\) is one for staggered grid
 (alternating) interpolation.

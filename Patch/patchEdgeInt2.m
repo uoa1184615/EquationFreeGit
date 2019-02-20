@@ -3,7 +3,7 @@
 % discretisations.  AJR, Nov 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection[\texttt{patchEdgeInt2()}: 2D patch edge values from 2D interpolation]{\texttt{patchEdgeInt2()}: sets 2D patch edge values from 2D macroscale interpolation}
+\section[\texttt{patchEdgeInt2()}: 2D patch edge values from 2D interpolation]{\texttt{patchEdgeInt2()}: sets 2D patch edge values from 2D macroscale interpolation}
 \label{sec:patchEdgeInt2}
 \localtableofcontents
 
@@ -36,11 +36,11 @@ which includes the following information.
 \item \verb|.x| is \(\verb|nx|\times \verb|Nx|\)
 array of the spatial locations~\(x_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
-equi-spaced lattice on both macro- and micro-scales.
+equi-spaced lattice on both macro- and microscales.
 \item \verb|.y| is similarly \(\verb|ny|\times \verb|Ny|\)
 array of the spatial locations~\(y_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
-equi-spaced lattice on both macro- and micro-scales.
+equi-spaced lattice on both macro- and microscales.
 \item \verb|.ordCC| is order of interpolation, currently only
 \(\{0\}\).
 %\item \verb|.alt| in \(\{0,1\}\) is one for staggered grid

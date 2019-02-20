@@ -4,7 +4,7 @@
 % AJR, Feb 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{projIntDMDExplore2}: explore effect of varying parameters}
+\section{\texttt{projIntDMDExplore2}: explore effect of varying parameters}
 \label{sec:pi1eevp}
 \localtableofcontents
 

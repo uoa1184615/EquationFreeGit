@@ -1,6 +1,6 @@
 %Initially by AJR, Apr 2017 -- Nov 2018
 %!TEX root = eqnFreeDevMan.tex
-\section{Introduction}
+\chapter{Introduction}
 
 \localtableofcontents
 
@@ -10,7 +10,7 @@ This Developers Manual contains line-by-line descriptions of the code in each fu
 
 \paragraph{Users}
 Place this toolbox's folder in a path searched by \script.
-Then read the subsection that documents the function of interest.
+Then read the section that documents the function of interest.
 
 
 \paragraph{Blackbox scenario}
@@ -35,11 +35,11 @@ Let's develop functions that work for both \script.
 \cref{sec:contribute} outlines some details for contributors.
 
 
-\section{Quick start}
+\chapter{Quick start}
 \localtableofcontents
 This section may be used in conjunction with the many examples in later sections to help apply the toolbox functions to a particular problem, or to assist in distinguishing between the various functions.
 
-\subsection{Cheat sheet: Projective Integration}
+\section{Cheat sheet: Projective Integration}
 This section pertains to the Projective Integration (PI) methods of \cref{sec:ProjInt}. The PI approach is to greatly accelerate computations of a system exhibiting multiple time scales.
 
 The PI toolbox presents several `main' functions that could separately be called to perform PI, as well as several optional wrapper functions that may be called. This section helps to distinguish between the top-level PI functions, and helps to tell which of the optional functions may be needed at a glance. \cref{sec:ProjInt} fully details each function.
@@ -170,7 +170,7 @@ The cheat sheet consists of two flow charts. \cref{fig:constructPI} overviews co
 
 
 
-\subsection{Cheat sheet: constructing patches}
+\section{Cheat sheet: constructing patches}
 This section pertains to the Patch approach, \cref{sec:patch}, to solving \textsc{pde}s, lattice systems, or agent\slash particle microscale simulators. 
 
 The Patch toolbox requires that one configure patches, couple the patches and interface the coupled patches with a time integrator. \cref{fig:constructpatch} overviews the chief functions involved and their interactions.
@@ -229,15 +229,15 @@ The Patch toolbox requires that one configure patches, couple the patches and in
 
 
 
-%\section{Overview of major functions and example scripts}
+%\chapter{Overview of major functions and example scripts}
 %\label{sec:smf}
 %\localtableofcontents
 %
 %{% excluding the body gives overview of each function/script
 %    \renewcommand{\label}[1]{}%
+%    \let\section\section%
 %    \let\section\subsection%
-%    \let\subsection\subsubsection%
-%    \let\subsubsection\paragraph%
+%    \let\subsection\paragraph%
 %    \let\paragraph\subparagraph%
 %    \fancyvrbStartStop%
 %    \excludeversion{devMan}

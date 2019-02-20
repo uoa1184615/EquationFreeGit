@@ -3,7 +3,7 @@
 % AJR, Nov 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{wave2D}: example of a wave on patches in 2D}
+\section{\texttt{wave2D}: example of a wave on patches in 2D}
 \label{sec:wave2D}
 \localtableofcontents
 
@@ -40,7 +40,7 @@ configPatches2(@wavePDE,[-pi pi], nan, nPatch, 0, 0.1, nSubP);
 
 
 
-\subsubsection{Check on the linear stability of the wave PDE}
+\subsection{Check on the linear stability of the wave PDE}
 Set a zero equilibrium as basis.
 Then find the patch-interior points as the only ones to vary in order to construct the Jacobian.
 \begin{matlab}
@@ -93,7 +93,7 @@ freqerr=[freq; min(abs(imag(evals)-freq))]
 
 
 
-\subsubsection{Execute a simulation}
+\subsection{Execute a simulation}
 Set a Gaussian initial condition using auto-replication of
 the spatial grid: here \verb|u0| and~\verb|v0| are in the form required for computation: \(n_x\times n_y\times N_x\times N_y\).
 \begin{matlab}
@@ -164,7 +164,7 @@ time \(t=6\) of the patch scheme applied to the simple wave~\pde\ with initial c
 
 
 
-\subsubsection{Example of simple wave PDE inside patches}
+\subsection{Example of simple wave PDE inside patches}
 As a microscale discretisation of \(u_{tt}=\delsq(u)\),
 so code \(\dot u_{ijkl}=v_{ijkl}\) and \(\dot v_{ijkl} =\frac1{\delta x^2}
 (u_{i+1,j,k,l} -2u_{i,j,k,l} +u_{i-1,j,k,l}) + \frac1{\delta y^2}
@@ -173,7 +173,7 @@ so code \(\dot u_{ijkl}=v_{ijkl}\) and \(\dot v_{ijkl} =\frac1{\delta x^2}
 %}
 function uvt = wavePDE(t,uv,x,y)
   if ceil(t+1e-7)-t<2e-2, simTime=t, end %track progress
-  dx=diff(x(1:2));  dy=diff(y(1:2));   % micro-scale spacing
+  dx=diff(x(1:2));  dy=diff(y(1:2));   % microscale spacing
   i=2:size(uv,1)-1;  j=2:size(uv,2)-1; % interior patch-points
   uvt = nan(size(uv));  % preallocate storage
   uvt(i,j,:,:,1) = uv(i,j,:,:,2);

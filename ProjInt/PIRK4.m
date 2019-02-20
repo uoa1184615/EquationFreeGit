@@ -5,7 +5,7 @@
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
-\subsection{\texttt{PIRK4()}: projective integration of fourth order accuracy}
+\section{\texttt{PIRK4()}: projective integration of fourth order accuracy}
 \label{sec:PIRK4}
 
 This Projective Integration scheme implements a macrosolver
@@ -167,7 +167,7 @@ the estimated slow vector field.
 \end{itemize}
 
 
-\subsubsection{The projective integration code}
+\subsection{The projective integration code}
 
 Determine the number of time steps and preallocate storage
 for macroscale estimates.
@@ -409,7 +409,7 @@ end
 \end{matlab}
 
 
-\subsubsection{If no output specified, then plot simulation}
+\subsection{If no output specified, then plot simulation}
 \begin{matlab}
 %}
 if nArgs==0

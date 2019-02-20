@@ -1,7 +1,7 @@
 %Exploration of cdmc. JM, Sept 18.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{Explore: Projective Integration using constraint-defined manifold computing}
+\section{Explore: Projective Integration using constraint-defined manifold computing}
 \label{sec:Excdmc}
 In this example the Projective Integration-General scheme is applied to a
 singularly perturbed ordinary differential equation in which

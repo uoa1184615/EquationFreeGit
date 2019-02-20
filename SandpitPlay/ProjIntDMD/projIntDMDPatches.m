@@ -3,7 +3,7 @@
 % AJR, Oct 2017
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{projIntDMDPatches}: Projective integration of patch scheme}
+\section{\texttt{projIntDMDPatches}: Projective integration of patch scheme}
 \label{sec:pips}
 \localtableofcontents
 

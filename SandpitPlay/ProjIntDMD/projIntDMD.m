@@ -2,7 +2,7 @@
 % given system of stiff deterministic ODEs.  AJR, Oct 2017
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{projIntDMD()}}
+\section{\texttt{projIntDMD()}}
 \label{sec:projIntDMD}
 \localtableofcontents
 \def\dmd{\textsc{dmd}}
