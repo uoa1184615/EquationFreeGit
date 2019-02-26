@@ -3,7 +3,7 @@
 %AJR, 29 Mar 2017
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{rk2int()}}
+\section{\texttt{rk2int()}}
 \label{sec:rk2int}
 \localtableofcontents
 
@@ -38,7 +38,7 @@ approximate solution row vector at the specified times.
 estimate for  the step from \(t_{k-1}\) to~\(t_k\).
 \end{itemize}
 
-Compute the time steps and create storage for outputs.
+Compute the time-steps and create storage for outputs.
 \begin{matlab}
 %}
 dt = diff(ts);
@@ -64,7 +64,7 @@ for k = 1:numel(dt)
   f0 = f1;
 %{
 \end{matlab}
-Simple second order accurate time step.
+Simple second-order accurate time-step.
 \begin{matlab}
 %}
   xh = xs(:,k)+f0*dt(k)/2;

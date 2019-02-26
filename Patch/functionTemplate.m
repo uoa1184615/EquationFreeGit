@@ -2,7 +2,7 @@
 %Author, date
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{...}: ...}
+\section{\texttt{...}: ...}
 \label{sec:...}
 \localtableofcontents
 Summary LaTeX explanation.

@@ -1,12 +1,13 @@
-% input *.m files for ... AJR, Nov 2017
+% input *.m files for the Patch scheme in 1D and 2D. AJR,
+% Nov 2017 -- Feb 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
-\section{Patch scheme for given microscale discrete space system}
+\chapter{Patch scheme for given microscale discrete space system}
 \label{sec:patch}
 \localtableofcontents
 
 The patch scheme applies to spatio-temporal systems where
 the spatial domain is larger than what can be computed in
-reasonable time. Then one may simulate only on small patches
+reasonable time.  In the scheme we compute only on small patches
 of the space-time domain, and produce correct macroscale
 predictions by craftily coupling the patches across
 unsimulated space \cite[e.g.]{Hyman2005, Samaey03b,
@@ -17,43 +18,42 @@ from finite difference approximation of a \pde. Usually
 continuous in time.
 
 \paragraph{Quick start}
-For an example, see \cref{sec:configPatches1eg,sec:configPatches2eg}  for basic code that uses the provided functions to simulate Burgers'~\pde\ and a nonlinear `diffusion' \pde.
+See \cref{sec:configPatches1eg,sec:configPatches2eg} which
+list example basic code that uses the provided functions to
+simulate 1D Burgers'~\pde\ and a 2D nonlinear
+`diffusion'~\pde.
 
 \input{../Patch/configPatches1.m}
 \input{../Patch/patchSmooth1.m}
 \input{../Patch/patchEdgeInt1.m}
-\begin{userExample}
+\begin{devMan}
 \input{../Patch/BurgersExample.m}
 \input{../Patch/HomogenisationExample.m}
-%\input{../Patch/configPatches1.m}
-%\input{../Patch/patchCoreSmooth1.m}
-%\input{../Patch/patchCoreEdgeInt1.m}
-%\input{../Patch/BurgersExample.m}
-%\input{../Patch/HomogenisationCoreExample.m}
 \input{../Patch/waterWaveExample.m}
-\end{userExample}
+\end{devMan}
+
 % 2D stuff
 \input{../Patch/configPatches2.m}
 \input{../Patch/patchSmooth2.m}
 \input{../Patch/patchEdgeInt2.m}
-\begin{userExample}
+\begin{devMan}
 \input{../Patch/wave2D.m}
 
 
 
-\subsection{To do}
+\section{To do}
 \begin{itemize}
-\item Testing is so far only qualitative.  Need to be quantitative.
-\item Multiple space dimensions.
-\item Heterogeneous microscale via averaging regions.
+\item Testing needs to be quantitative.
+\item more than two space dimensions??
+\item Heterogeneous microscale via averaging regions---but I suspect should be separated from simple homogenisation
 \item Parallel processing versions.
 \item ??
 \item Adapt to maps in micro-time?  Surely easy, just an example.
 \end{itemize}
 
 
-\subsection{Miscellaneous tests}
+\section{Miscellaneous tests}
 \input{../Patch/patchEdgeInt1test.m}
 \input{../Patch/patchEdgeInt2test.m}
 
-\end{userExample}
+\end{devMan}

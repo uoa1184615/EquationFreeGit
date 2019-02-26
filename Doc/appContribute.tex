@@ -1,6 +1,6 @@
 %Initially by AJR, Apr 2017 -- Oct 2018
 %!TEX root = eqnFreeDevMan.tex
-\section{Create, document and test algorithms}
+\chapter{Create, document and test algorithms}
 \label{sec:contribute}
 \secttoc
 \def\LaTeX{LaTeX}% for some unknown reason we need this!! 2018-12-22
@@ -21,17 +21,17 @@ For developers to create and document the various functions, we use an idea due 
 \end{itemize}
 
 
-\item Each toolbox function is documented as a separate subsection, with tests and examples as separate subsections.
+\item Each toolbox function is documented as a separate section, with tests and examples as separate sections.
 
-\item Each function-subsection and test-subsection is to be created as a \script\ \verb|Dir/*.m| file, say \verb|Dir/fun1.m|, so that users simply invoke the function in \script\ as usual by \verb|fun1(...)|.
+\item Each function-section and test-section is to be created as a \script\ \verb|Dir/*.m| file, say \verb|Dir/fun1.m|, so that users simply invoke the function in \script\ as usual by \verb|fun1(...)|.
 
 Some editors may need to be told that \verb|fun1.m| is a \LaTeX\ file.  For example, TexShop on the Mac requires one to execute in a Terminal
 \begin{verbatim}
 defaults write TeXShop OtherTeXExtensions -array-add "m"
 \end{verbatim}
 
-\item \autoref{tbl:format} gives the template for the \verb|Dir/*.m| function-subsections.
-The format for a example\slash test-subsection is similar.
+\item \autoref{tbl:format} gives the template for the \verb|Dir/*.m| function-sections.
+The format for a example\slash test-section is similar.
 
 %\item Currently I use the beautiful \verb|minted| package to list code, but it does require a little more effort when installing.
 
@@ -46,11 +46,11 @@ Include with \quad \verb|\includegraphics[scale=0.85]{filename}|
 
 
 \begin{table}
-\caption{\label{tbl:funtex}example \texttt{Dir/*.tex} file to typeset in the master document a function-subsection, say \texttt{fun.m}, and maybe the test\slash example-subsections.}
-\VerbatimInput[numbers=left]{../sectionTemplate.tex}
+\caption{\label{tbl:funtex}example \texttt{Dir/*.tex} file to typeset in the master document a function-section, say \texttt{fun.m}, and maybe the test\slash example-sections.}
+\VerbatimInput[numbers=left]{../chapterTemplate.tex}
 \end{table}
 \begin{table}
-\caption{\label{tbl:format}template for a function-subsection \texttt{Dir/*.m} file.}
+\caption{\label{tbl:format}template for a function-section \texttt{Dir/*.m} file.}
 \VerbatimInput[numbers=left]{../functionTemplate.m}
 \end{table}
 

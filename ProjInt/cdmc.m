@@ -4,7 +4,7 @@
 %JM, July 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsubsection{\texttt{cdmc()}}
+\subsection{\texttt{cdmc()}}
 \label{sec:cdmc}
 \verb|cdmc()| iteratively applies the micro-burst and then projects backwards in time to the initial conditions. The cumulative effect is to relax the variables to the attracting slow manifold, while keeping the final time for the output the same as the input time.
 
@@ -16,7 +16,7 @@ function [ts, xs] = cdmc(microBurst,t0,x0)
 
 \paragraph{Input}
 \begin{itemize}
-\item \verb|microBurst()|, a black box micro-burst function suitable for Projective Integration. See any of \verb|PIRK2()|, \verb|PIRK4()|, or \verb|PIG()| for a description of \verb|microBurst()|.
+\item \verb|microBurst()|, a black-box micro-burst function suitable for Projective Integration. See any of \verb|PIRK2()|, \verb|PIRK4()|, or \verb|PIG()| for a description of \verb|microBurst()|.
 \item \verb|t0|, an initial time
 \item \verb|x0|, an initial state
 \end{itemize}
@@ -34,7 +34,7 @@ cSol = @(t,x) cdmc(sol,t,x)|
 and thereafter use \verb|csol()| in place of \verb|sol()| as the microBurst for any Projective Integration scheme.
 The original microBurst \verb|sol()| could create large errors if used in a Projective Integration scheme, but the output of \verb|cdmc()| should not.
 
-\begin{funDescription}
+\begin{devMan}
 Begin with a standard application of the micro-burst.
 \begin{matlab}
 %}
@@ -60,5 +60,5 @@ ts = [t1; t2];
 xs = [x1; x2];
 %{
 \end{matlab}
-\end{funDescription}
+\end{devMan}
 %}

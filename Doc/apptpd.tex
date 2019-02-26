@@ -1,12 +1,12 @@
 %Initiated by AJR, Apr 2017
 %!TEX root = eqnFreeDevMan.tex
-\section{Aspects of developing a `toolbox' for patch dynamics}
+\chapter{Aspects of developing a `toolbox' for patch dynamics}
 \secttoc
 
 This appendix documents sketchy further thoughts on aspects of the development.
 
 
-\subsection{Macroscale grid}
+\section{Macroscale grid}
 
 The patches are to be distributed on a macroscale grid: the \(j\)th~patch `centred' at position~\(\Xv_j\in\XX\).
 In principle the patches could move, but let's keep them fixed in the first version.
@@ -16,7 +16,7 @@ And plan to later allow for more general interconnect networks for more topologi
 
 
 
-\subsection{Macroscale field variables}
+\section{Macroscale field variables}
 
 The researcher\slash practitioner has to know an appropriate set of macroscale field variables~\(\Uv(t)\in\RR^{d_{\Uv}}\) for each patch.  
 For example, first they might be a simple average over a core of a patch of all of the micro-field variables; second, they might be a subset of the average micro-field variables; and third in general the macro-variables might be a nonlinear function of the micro-field variables (such as temperature is the average speed squared).
@@ -29,7 +29,7 @@ In practice, users may not choose an appropriate set of macro-variables, so will
 
 
 
-\subsection{Boundary and coupling conditions}
+\section{Boundary and coupling conditions}
 
 The physical domain boundary conditions are distinct from the conditions coupling the patches together.
 Start with physical boundary conditions of periodicity in the macroscale.
@@ -52,7 +52,7 @@ To cater for this we should also allow a control at perhaps the quartiles of a m
 
 
 
-\subsection{Mesotime communication}
+\section{Mesotime communication}
 
 Since communication limits large scale parallelism, a first step in reducing communication will be to implement only updating the coupling conditions when necessary.
 Error analysis indicates that updating on times longer the microscale times and shorter than the macroscale times can be effective
@@ -60,14 +60,14 @@ Error analysis indicates that updating on times longer the microscale times and 
 Implementations can communicate one or more derivatives in time, as well as macroscale variables.
 
 At this stage we can effectively parallelise over patches: first by simply using Matlab's \texttt{parfor}.   
-Probably not using a \textsc{gpu} as we probably want to leave \textsc{gpu}s for the black box to utilise within each patch.
+Probably not using a \textsc{gpu} as we probably want to leave \textsc{gpu}s for the black-box to utilise within each patch.
 
 
 
 
-\subsection{Projective integration}
+\section{Projective integration}
 
-To take macroscale time steps, invoke several possible projective integration schemes: simple Euler projection, Heun-like method, etc
+To take macroscale time-steps, invoke several possible projective integration schemes: simple Euler projection, Heun-like method, etc
 \citep{Samaey08}.
 Need to decide how long a microscale burst needs to be.
 
@@ -81,7 +81,7 @@ A further stage is to implement a projective integration scheme for stochastic m
 
 
 
-\subsection{Lift to many internal modes}
+\section{Lift to many internal modes}
 
 In most problems the number of macroscale variables at any given position in space,~\(d_{\Uv}\), is less than the number of microscale variables at a position,~\(d_{\uv}\); often much less \citep[e.g.]{Kevrekidis09a}.
 In this case, every time we start a patch simulation we need to provide  \(d_{\uv}-d_{\Uv}\) data at each position in the patch: this is lifting.
@@ -96,7 +96,7 @@ A second step is to cater for cases where the slow manifold is stochastic or is 
 
 
 
-\subsection{Macroscale closure}
+\section{Macroscale closure}
 
 In some circumstances a researcher\slash practitioner will not code the appropriately set of macroscale variables for a complete closure of the macroscale.
 For example, in thin film fluid dynamics at low Reynolds number the only macroscale variable is the fluid depth; however, at higher Reynolds number, circa ten, the inertia of the fluid becomes important and the macroscale variables must additionally include a measure of the mean lateral velocity\slash momentum \citep[e.g.]{Roberts99b}.
@@ -108,7 +108,7 @@ A good resolution of the issue will account for both faces.
 
 
 
-\subsection{Exascale fault tolerance}
+\section{Exascale fault tolerance}
 
 Matlab is probably not an appropriate vehicle to deal with real exascale faults.  
 However, we should cater by coding procedures for fault tolerance and testing them at least synthetically.
@@ -121,7 +121,7 @@ Should also explore proceeding with a lower order interpolation that misses the 
 
 
 
-\subsection{Link to established packages}
+\section{Link to established packages}
 
 Several molecular\slash particle\slash agent based codes are well developed and used by a wide community of researchers.  
 Plan to develop hooks to use some such codes as the microscale simulators on patches.

@@ -1,10 +1,10 @@
 % Explore the time integration function projIntDMD() 
 % on discretisation of a nonlinear diffusion PDE.  
-% Test dependence of errors on macro-time step.
+% Test dependence of errors on macro-time-step.
 % AJR, Feb 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{projIntDMDExplore2}: explore effect of varying parameters}
+\section{\texttt{projIntDMDExplore2}: explore effect of varying parameters}
 \label{sec:pi1eevp}
 \localtableofcontents
 
@@ -14,7 +14,7 @@ Seek to simulate the nonlinear diffusion \pde\
 \end{equation*}
 with random positive initial condition.
 
-Set the number of interior points in the domain~\([-1,1]\), and the macroscale time step. 
+Set the number of interior points in the domain~\([-1,1]\), and the macroscale time-step. 
 \begin{matlab}
 %}
 function projIntDMDExplore2

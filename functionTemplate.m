@@ -2,7 +2,7 @@
 % Author, date
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{...}: ...}
+\section{\texttt{...}: ...}
 \label{sec:...}
 \localtableofcontents
 Overview LaTeX explanation.
@@ -13,7 +13,7 @@ function ...
 \end{matlab}
 \paragraph{Input} ...
 \paragraph{Output} ...
-\begin{body}
+\begin{devMan}
 Repeated as desired:
 LaTeX between end-matlab and begin-matlab
 \begin{matlab}
@@ -22,5 +22,5 @@ Matlab code between %} and %{
 %{
 \end{matlab}
 Concluding LaTeX before following final lines.
-\end{body}
+\end{devMan}
 %}

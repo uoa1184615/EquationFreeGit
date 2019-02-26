@@ -1,9 +1,9 @@
 % Michaelis--Menton example of projective integrating
 % fast-slow system.  This example simply introduces basic
 % usage of the PIRK2() function. AJR, 29 Sep 2018
-%%%%%%%%%%%%!TEX root = ../Doc/eqnFreeDevMan.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{egPIerrs}: Errors in projective integration
+\section{\texttt{egPIerrs}: Errors in projective integration
 of Michaelis--Menton kinetics}
 \label{sec:egPIerrs}
 \localtableofcontents
@@ -21,7 +21,7 @@ the fast variable~\(y(t)\) evolves on a time scale of the
 small parameter~\(\epsilon\).
 
 
-\subsubsection{Invoke projective integration}
+\subsection{Invoke projective integration}
 
 Clear, and set the scale separation parameter~\(\epsilon\)
 to something small.  Need something like \(\epsilon=0.001\)
@@ -75,7 +75,7 @@ for j=1:nlogdt
   ts = linspace(0,Tend,nSteps(j)+1);
   dts(j)=diff(ts(1:2));
   for i=1:nburst
-    xs = PIRK2(@MMburst, meps(i)*epsilon, ts, x0);
+    xs = PIRK2(@MMburst, ts, x0, meps(i)*epsilon);
     xerrs(i,j)=norm(xs(end,:)-xend);
 end, end
 dts=dts
@@ -95,7 +95,7 @@ print -depsc2 egPIerrs.eps
 \end{matlab}
 
 
-\subsubsection{Code an accurate burst of Michaelis--Menten enzyme kinetics}
+\subsection{Code an accurate burst of Michaelis--Menten enzyme kinetics}
 \label{sec:egPIMMacc}
 Say use \verb|ode45()| to accurately integrate a burst of the
 differential equations for the Michaelis--Menten enzyme

@@ -1,7 +1,7 @@
 % Basic example of PIG. JM, Sept 18.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{Example: Projective Integration using General macrosolvers }
+\section{Example: Projective Integration using General macrosolvers }
 \label{sec:ExPIG}
 In this example the Projective Integration-General scheme is
 applied to a singularly perturbed ordinary differential
@@ -10,7 +10,7 @@ integrator, such as \verb|ode45()|, on the slow, long-time
 macroscale.  For this stiff system, \verb|PIG()| is an order
 of magnitude faster than ordinary use of~\verb|ode45|.
 
-\begin{body}
+\begin{devMan}
 \begin{matlab}
 %}
 clear all, close all
@@ -26,7 +26,7 @@ dxdt=@(t,x) [ cos(x(1))*sin(x(2))*cos(t)
 %{
 \end{matlab}
 
-Set the `black box' microsolver to be an integration using a
+Set the `black-box' microsolver to be an integration using a
 standard solver, and set the standard time of simulation for
 the microsolver.
 \begin{matlab}
@@ -107,5 +107,5 @@ problems, that cannot be efficiently solved by most standard
 methods.
 \end{itemize}
 
-\end{body}
+\end{devMan}
 %}

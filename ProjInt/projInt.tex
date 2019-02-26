@@ -1,14 +1,14 @@
 % input *.m files for Projective Integration  AJR, Oct 2017
 %!TEX root = ../Doc/eqnFreeDevMan.tex
-\section{Projective integration of deterministic ODEs}
+\chapter{Projective integration of deterministic ODEs}
 \label{sec:ProjInt}
 \localtableofcontents
 
 This section provides some good projective integration functions \cite[e.g.]{Gear02b, Gear03c, Givon06, Sieber2018}.
 The goal is to enable computationally expensive dynamic simulations to be run over long time scales.
-\begin{userExample} 
+\begin{userMan} 
 Perhaps start by looking at \cref{sec:egPIMM} which codes the introductory example of a long time simulation of the Michaelis--Menton multiscale system of differential equations.
-\end{userExample}
+\end{userMan}
 
 \paragraph{Scenario}
 When you are interested in a complex system with many interacting parts or agents, you usually are primarily interested in the self-organised emergent macroscale characteristics.
@@ -22,10 +22,10 @@ Each function has standardised inputs and outputs.
 
 \paragraph{Main functions}
 \begin{itemize}
-\item Projective Integration by second or fourth order Runge--Kutta, \verb|PIRK2()| and \verb|PIRK4()| respectively.
+\item Projective Integration by second or fourth-order Runge--Kutta, \verb|PIRK2()| and \verb|PIRK4()| respectively.
 These schemes are suitable for precise simulation of the slow dynamics, provided the time period spanned by an application of the microsolver is not too large.
 \item Projective Integration with a General solver, \verb|PIG()|.
-This function enables a Projective Integration implementation of any solver with macroscale time steps.
+This function enables a Projective Integration implementation of any solver with macroscale time-steps.
 It does not matter whether the solver is a standard Matlab or Octave algorithm, or one supplied by the user.
 As explored in later examples, \verb|PIG()| should only be used in very stiff systems. 
 %\end{itemize}
@@ -38,7 +38,7 @@ The result is to constrain the fast variables close to the slow manifold, withou
 This function can be used to reduce errors related to the simulation length of the microsolver in either the \verb|PIRK| or \verb|PIG| functions.
 In particular, it enables \verb|PIG()| to be used on problems that are not particularly stiff.
 %\item Black box microsolver generator, \verb|bbgen()|.
-%This simple function takes as input a standard solver with a recommended time step for microscale simulation, and returns a `black box' microsolver for the Projective Integration functions.
+%This simple function takes as input a standard solver with a recommended time-step for microscale simulation, and returns a `black-box' microsolver for the Projective Integration functions.
 \end{itemize}
 
 The above functions share dependence on a user-specified `microsolver', that accurately simulates some problem of interest. 
@@ -53,9 +53,9 @@ Descriptions for the minor functions follow, and an example of the use of \verb|
 \input{../ProjInt/PIG.m}
 \input{../ProjInt/PIRK4.m}
 \input{../ProjInt/cdmc.m}
-\begin{body}
+\begin{devMan}
 
-%\subsection{Examples functions}
+%\section{Examples functions}
 %\label{sec:extras}
 %\input{../ProjInt/bbgen.m}
 \input{../ProjInt/PIRK_Example.m}
@@ -64,7 +64,7 @@ Descriptions for the minor functions follow, and an example of the use of \verb|
 
 
 
-\subsection{To do/discuss}
+\section{To do/discuss}
 \begin{itemize}
 \item could implement Projective Integration by `arbitrary' Runge--Kutta scheme; that is, by having the user input a particular Butcher table---surely only specialists would be interested
 \item can `reverse' the order of projection and microsolver applications with a little fiddling.
@@ -72,6 +72,6 @@ Then output at each user-requested coarse time is the end point of an applicatio
 \item Can maybe implement microsolvers that terminate a burst when the fast dynamics have settled using, for example, the 'Events' function handle in ode23. 
 \end{itemize}
 
-\end{body}
+\end{devMan}
 
 

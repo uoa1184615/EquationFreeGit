@@ -1,6 +1,13 @@
 \begin{thebibliography}{xx}
 
 \harvarditem[Bunder et~al.]{Bunder, Roberts \harvardand\
+  Kevrekidis}{2017}{Bunder2013b}
+Bunder, J.~E., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
+  2017\harvardyearright , `Good coupling for the multiscale patch scheme on
+  systems with microscale heterogeneity', {\em J.~Computational Physics} {\bf
+  337},~154--174.
+
+\harvarditem[Bunder et~al.]{Bunder, Roberts \harvardand\
   Kevrekidis}{2016}{Bunder2015a}
 Bunder, J., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
   2016\harvardyearright , `Accuracy of patch dynamics with mesoscale temporal
@@ -18,6 +25,31 @@ Gear, C.~W., Kaper, T.~J., Kevrekidis, I.~G. \harvardand\ Zagaris, A.
   \harvardyearleft 2005\harvardyearright , `Projecting to a slow manifold:
   Singularly perturbed systems and legacy codes', {\em SIAM Journal on Applied
   Dynamical Systems} {\bf 4}(3),~711--732.
+
+\harvarditem{Cao \harvardand\ Roberts}{2012}{Cao2012}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2012\harvardyearright ,
+  Modelling 3d turbulent floods based upon the smagorinski large eddy closure,
+  {\em in} P.~A. Brandner \harvardand\ B.~W. Pearce, eds, `18th Australasian
+  Fluid Mechanics Conference'.
+\newline\harvardurl{http://people.eng.unimelb.edu.au/imarusic/proceedings/18/
+  70%20-%20Cao.pdf}
+
+\harvarditem{Cao \harvardand\ Roberts}{2013}{Cao2013}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2013\harvardyearright ,
+  Multiscale modelling couples patches of wave-like simulations, {\em in}
+  S.~McCue, T.~Moroney, D.~Mallet \harvardand\ J.~Bunder, eds, `Proceedings of
+  the 16th Biennial Computational Techniques and Applications Conference,
+  CTAC-2012', Vol.~54 of {\em ANZIAM J.}, pp.~C153--C170.
+
+\harvarditem{Cao \harvardand\ Roberts}{2016{\em a}}{Cao2014b}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016{\em
+  a}\harvardyearright , `Modelling suspended sediment in environmental
+  turbulent fluids', {\em J.~Engrg.\ Maths} {\bf 98}(1),~187--204.
+
+\harvarditem{Cao \harvardand\ Roberts}{2016{\em b}}{Cao2014a}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016{\em
+  b}\harvardyearright , `Multiscale modelling couples patches of nonlinear
+  wave-like simulations', {\em IMA J.~Applied Maths.} {\bf 81}(2),~228--254.
 
 \harvarditem{Gear \harvardand\ Kevrekidis}{2003{\em a}}{Gear02b}
 Gear, C.~W. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft 2003{\em
@@ -115,6 +147,14 @@ Samaey, G., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
 Samaey, G., Roose, D. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
   2006\harvardyearright , `Patch dynamics with buffers for homogenization
   problems', {\em J.~Comput Phys.} {\bf 213},~264--287.
+
+\harvarditem[Sieber et~al.]{Sieber, Marschler \harvardand\
+  Starke}{2018}{Sieber2018}
+Sieber, J., Marschler, C. \harvardand\ Starke, J.  \harvardyearleft
+  2018\harvardyearright , `Convergence of {Equation}-{Free} {Methods} in the
+  {Case} of {Finite} {Time} {Scale} {Separation} with {Application} to
+  {Deterministic} and {Stochastic} {Systems}', {\em SIAM Journal on Applied
+  Dynamical Systems} {\bf 17}(4),~2574--2614.
 
 \harvarditem{Svard \harvardand\ Nordstrom}{2006}{Svard2006}
 Svard, M. \harvardand\ Nordstrom, J.  \harvardyearleft 2006\harvardyearright ,

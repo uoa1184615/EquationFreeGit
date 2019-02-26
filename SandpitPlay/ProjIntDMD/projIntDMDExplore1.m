@@ -3,7 +3,7 @@
 % AJR, Jan 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{projIntDMDExplore1}: explore effect of varying parameters}
+\section{\texttt{projIntDMDExplore1}: explore effect of varying parameters}
 \label{sec:pi1eevp}
 \localtableofcontents
 
@@ -13,7 +13,7 @@ Seek to simulate the nonlinear diffusion \pde\
 \end{equation*}
 with random positive initial condition.
 
-Set the number of interior points in the domain~\([-1,1]\), and the macroscale time step. 
+Set the number of interior points in the domain~\([-1,1]\), and the macroscale time-step. 
 \begin{matlab}
 %}
 function projIntDMDExplore1
@@ -31,7 +31,7 @@ Very strangely, the results from Matlab and Octave are different for the zero no
 \includegraphics[width=\linewidth]{ProjInt/explore1icn0}
 \end{figure}%
 \autoref{fig:explor1icn0} shows the parameter variations when the system is already on the slow manifold.
-The picture after two time steps, bottom row, appears clearer than for one time step.
+The picture after two time-steps, bottom row, appears clearer than for one time-step.
 The errors do not vary with rank provided that it is\({}\geq2\).
 There is only a very weak dependence upon the length of the burst being analysed---and that could be due to reduction in the gap.
 There is a weak dependence upon the transient-time, but only by a factor of two across the domain considered.
@@ -107,7 +107,7 @@ end
 %{
 \end{matlab}
 
-Stereo view of isosurfaces of errors after both one and two time steps.
+Stereo view of isosurfaces of errors after both one and two time-steps.
 The three surfaces are the quartiles of the errors, coloured accordingly, but with a little extra colour from position for clarity.
 \begin{matlab}
 %}

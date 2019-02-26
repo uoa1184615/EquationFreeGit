@@ -1,14 +1,14 @@
 %Exploration of cdmc. JM, Feb 19.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{Explore: Projective Integration using constraint-defined manifold computing}
+\section{Explore: Projective Integration using constraint-defined manifold computing}
 \label{sec:Excdmc}
 In this example the Projective Integration-General scheme is applied to a
 singularly perturbed ordinary differential equation in which
 the time scale separation is not large. The results demonstrate the value of
  the default \verb|cdmc()| wrapper for the
 microsolver. 
-\begin{body}
+\begin{devMan}
 \begin{matlab}
 %}
 clear all, close all
@@ -91,5 +91,5 @@ error, but by design \verb|PIG()| works with any
 user-defined macrosolver and cannot reduce this error. The
 function \verb|cdmc()| reduces this error term by attempting
 to mimic the microsolver without advancing time. 
-\end{body}
+\end{devMan}
 %}

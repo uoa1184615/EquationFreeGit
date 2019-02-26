@@ -3,28 +3,33 @@
 %!TEX root = eqnFreeDevMan.tex
 
 
-\author{A. J. Roberts\thanks{%
+\author{A.~J.~Roberts\thanks{%
 School of Mathematical Sciences, University of Adelaide, South Australia.
 \url{http://www.maths.adelaide.edu.au/anthony.roberts},
 \url{http://orcid.org/0000-0001-8930-1552}}
-\and John Maclean\thanks{%
+\and John~Maclean\thanks{%
 School of Mathematical Sciences, University of Adelaide, South Australia.
 \url{http://www.adelaide.edu.au/directory/john.maclean}}
-\and J.~E. Bunder\thanks{%
+\and J.~E.~Bunder\thanks{%
 School of Mathematical Sciences, University of Adelaide, South Australia.
 \protect\url{mailto:judith.bunder@adelaide.edu.au},
 \protect\url{http://orcid.org/0000-0001-5355-2288}}
-\and et al.\thanks{Appear here for your contribution.}
+\and et~al.\thanks{Appear here for your contribution.}
 }
 
 \date{\today}
 
-% I guess we should abandon these alternatives
-\IfFileExists{ajr.sty}{\usepackage{ajr}}{
-  \IfFileExists{jm.sty}{\usepackage{jm}}{
-    \usepackage[a5paper,margin=11mm]{geometry}
-}}  
+% For some reason, refart needs this??
+\renewcommand{\and}{\hspace{2em plus 1em minus 1em}}
 
+
+%% I guess we should abandon these alternatives
+%\IfFileExists{ajr.sty}{\usepackage{ajr}}{
+%  \IfFileExists{jm.sty}{\usepackage{jm}}{
+%    \usepackage[a5paper,margin=11mm]{geometry}
+%}}  
+
+\usepackage[dvipsnames]{xcolor}
 
 
 \usepackage{pgfplots} 
@@ -60,17 +65,26 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 
 \usepackage{natbib}
 \bibliographystyle{agsm}
-\let\harvardurl\url
+\AtBeginDocument{\let\harvardurl\url}
 
 % used to in/exclude
 \usepackage{versions}
-\newenvironment{body}{}{}
-\newenvironment{userExample}{}{}
-\newenvironment{funDescription}{}{}
+\newenvironment{devMan}{}{} % material for only the developers manual
+\newenvironment{userMan}{}{} %
 
 
 \usepackage[onedeep]{etocx}% for mini-local-tableofconents
-\usepackage{microtype,amsmath,amssymb,defns,graphicx,hyperref}
+\usepackage{url,microtype,amsmath,amssymb,defns,graphicx,hyperref,doi}
+\hypersetup{colorlinks,linkcolor=RoyalBlue,citecolor=RoyalBlue,pagecolor=RoyalBlue,%
+            urlcolor=magenta,filecolor=magenta,breaklinks,%
+            dvips,bookmarks,bookmarksopen}
+\makeatletter
+\AtBeginDocument{{\def\and{, }\def\thanks#1{}%
+  \hypersetup{
+    pdfauthor={\@author},
+    pdftitle={\@title}}}
+    }
+\makeatother
 % Invoke cleverref
 \usepackage[capitalise,nameinlink,noabbrev]{cleveref}
 \crefname{equation}{}{}
@@ -84,7 +98,6 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 \def\into{\(\leftrightarrow\)\ }
 \Vec f\Vec x\Vec u \Vec X \Vec U
 \Bb R  \Bb X
-\def\into{\(\leftrightarrow\)\ }
 
 
 
@@ -103,8 +116,8 @@ This suite of functions should empower users to start implementing such methods-
 
 \tableofcontents
 
-\ifUserNotDev \excludeversion{funDescription}
-\else \excludeversion{userExample}
+\ifUserNotDev \excludeversion{devMan}
+\else         \excludeversion{userMan}
 \fi
 
 \include{introduction}
@@ -118,13 +131,15 @@ This suite of functions should empower users to start implementing such methods-
 
 
 % only include appendices in the devManual
-\ifUserNotDev\else
+\begin{devMan}
+%
 \appendix
 \let\FancyVerbStartString\relax 
 \let\FancyVerbStopString\relax
 \include{appContribute}
 \include{apptpd}
-\fi
+%
+\end{devMan}
 
 
 % get bib data from shared and local files; 

@@ -3,7 +3,7 @@
 %AJR, 26 Sep 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsubsection{\texttt{patchEdgeInt1test}: test the spectral interpolation}
+\subsection{\texttt{patchEdgeInt1test}: test the spectral interpolation}
 \label{sec:patchEdgeInt1test}
 \localtableofcontents
 A script to test the spectral interpolation of function \verb|patchEdgeInt1()|

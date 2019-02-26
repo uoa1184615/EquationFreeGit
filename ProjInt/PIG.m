@@ -5,7 +5,7 @@
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
-\subsection{\texttt{PIG()}: Projective Integration via a General macroscale integrator}
+\section{\texttt{PIG()}: Projective Integration via a General macroscale integrator}
 \label{sec:PIG}
 
 This is an approximate Projective Integration scheme when
@@ -14,7 +14,9 @@ is that one may use \script's inbuilt integration functions,
 with all their sophisticated error control and adaptive
 time-stepping, to do the macroscale simulation.
 
-By default, \verb|PIG()| uses `constraint-defined manifold computing' for the microscale simulations. This algorithm, developed in \cite{Gear05}, uses a backwards projection so that the simulation time is unchanged after running the microscale simulator. The implementation is \verb|cdmc()|, described in \cref{sec:cdmc}. 
+By default, \verb|PIG()| uses `constraint-defined manifold computing' for the microscale simulations.
+ This algorithm, developed in \cite{Gear05}, uses a backwards projection so that the simulation time
+ is unchanged after running the microscale simulator. The implementation is \verb|cdmc()|, described in \cref{sec:cdmc}. 
 
 \begin{matlab}
 %}
@@ -70,7 +72,8 @@ an initial and final time only.
 time~\verb|tSpan(1)|.
 \end{itemize}
 \paragraph{Optional Inputs:}
-The input \verb|varargin| allows for 0, 2 or 3 additional inputs after \verb|x0|. If there are distinct microscale and macroscale states and the aim is to do Projective Integration on the macroscale only, then functions must be provided to convert between them. Usage
+The input \verb|varargin| allows for 0, 2 or 3 additional inputs after \verb|x0|.
+ If there are distinct microscale and macroscale states and the aim is to do Projective Integration on the macroscale only, then functions must be provided to convert between them. Usage
 \verb|PIG(...,restrict,lift)|
 \begin{itemize}
 \item \verb|restrict()|, a function that takes an input \(n\)-dimensional 
@@ -129,7 +132,8 @@ the estimated slow vector field.
 If \verb|macroInt()| is e.g. the forward Euler method (or the Runge-Kutta method), then \(\hat L = L\) (or \(\hat L = 4L \)). 
 
 
-\subsubsection{If no inputs, then execute an example}
+\subsection{If no arguments, then execute an example}
+
 \label{sec:pigeg}
 \begin{matlab}
 %}
@@ -159,7 +163,7 @@ Second, we code microscale bursts, here using the standard
 \verb|ode23()|. We choose a burst length
 \(2\epsilon\log(1/\epsilon)\) as the rate of decay is \(\beta\approx
 1/\epsilon\) and we do not know the
-macroscale time step invoked by \verb|macroInt()|, so
+macroscale time-step invoked by \verb|macroInt()|, so
 blithely assume \(\Delta\le1\) and then double the usual formula
 for safety.
 \begin{matlab}
@@ -209,8 +213,8 @@ end%if no arguments
 
 
 
-\begin{funDescription}
-\subsubsection{The projective integration code}
+\begin{devMan}
+\subsection{The projective integration code}
 Interpret any optional inputs.
 \begin{matlab}
 %}
@@ -244,7 +248,7 @@ saveSvf = (nArgs>4);
 %{
 \end{matlab}
 
-Find the number of time steps at which output is expected,
+Find the number of time-steps at which output is expected,
 and the number of variables.
 \begin{matlab}
 %}
@@ -401,6 +405,7 @@ end
 
 
 If no output specified, then plot simulation. Otherwise, return the requested outputs.
+
 \begin{matlab}
 %}
 if nArgs==0
@@ -419,5 +424,5 @@ This concludes \verb|PIG()|.
 end
 %{
 \end{matlab}
-\end{funDescription}
+\end{devMan}
 %}

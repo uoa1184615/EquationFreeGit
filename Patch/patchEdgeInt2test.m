@@ -2,7 +2,7 @@
 % AJR, Nov 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{patchEdgeInt2test}: tests 2D spectral interpolation}
+\section{\texttt{patchEdgeInt2test}: tests 2D spectral interpolation}
 \label{sec:...}
 \localtableofcontents
 Try 99 realisations of random tests.
