@@ -169,7 +169,7 @@ for safety.
 \begin{matlab}
 %}
 bT = 2*epsilon*log(1/epsilon)
-micro = @(tb0,xb0) ode23(dxdt,[tb0 tb0+bT],xb0);
+microBurst = @(tb0,xb0) ode23(dxdt,[tb0 tb0+bT],xb0);
 %{
 \end{matlab}
 Third, code functions to convert between macroscale and microscale states.
@@ -188,7 +188,7 @@ with forward bursts.)
 \begin{matlab}
 %}
 tSpan = [0 6]; 
-[ts,xs,tms,xms] = PIG('ode45',micro,tSpan,1, restrict, lift);
+[ts,xs,tms,xms] = PIG('ode45',microBurst,tSpan,1,restrict,lift);
 %{
 \end{matlab}
 Plot output of this projective integration.
