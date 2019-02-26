@@ -1,15 +1,13 @@
-%Exploration of cdmc. JM, Sept 18.
+%Exploration of cdmc. JM, Feb 19.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{Explore: Projective Integration using constraint-defined manifold computing}
 \label{sec:Excdmc}
 In this example the Projective Integration-General scheme is applied to a
 singularly perturbed ordinary differential equation in which
-the time scale separation is not large. The resulting
-simulation is not accurate. In parallel, we run the same
-scheme but with \verb|cdmc()| used as a wrapper for the
-microsolver. This second implementation successfully
-replicates the true dynamics.
+the time scale separation is not large. The results demonstrate the value of
+ the default \verb|cdmc()| wrapper for the
+microsolver. 
 \begin{body}
 \begin{matlab}
 %}
@@ -17,7 +15,7 @@ clear all, close all
 %{
 \end{matlab}
 
-Set a weak time scale separation and model.
+Set a weak time scale separation, and model.
 \begin{matlab}
 %}
 epsilon = 0.01;
@@ -26,20 +24,13 @@ dxdt=@(t,x) [ cos(x(1))*sin(x(2))*cos(t)
 %{
 \end{matlab}
 
-Set the `naive' microsolver to be an integration using a
+Set the microsolver to be an integration using a
 standard solver, and set the standard time of simulation for
 the microsolver.
 \begin{matlab}
 %}
 bT = epsilon*log(1/epsilon);
-naiveBurst = @(tb0,xb0) ode45(dxdt,[tb0 tb0+bT],xb0);
-%{
-\end{matlab}
-Create a second struct in which the solver is the output of
-\verb|cdmc()|.
-\begin{matlab}
-%}
-cBurst = @(t,x) cdmc(naiveBurst,t,x);
+microBurst = @(tb0,xb0) ode45(dxdt,[tb0 tb0+bT],xb0);
 %{
 \end{matlab}
 
@@ -53,13 +44,13 @@ tSpan=0:0.5:15;
 \end{matlab}
 
 
-Simulate using \verb|PIG()| with each of the above
-microsolvers. Generate a trusted solution using standard
+Simulate using \verb|PIG()|, first without the default treatment of \verb|cdmc|
+for the microsolver and second with. Generate a trusted solution using standard
 numerical methods.
 \begin{matlab}
 %}
-[nt,nx] = PIG('ode45',naiveBurst,tSpan,x0);
-[ct,cx] = PIG('ode45',cBurst,tSpan,x0);
+[nt,nx] = PIG('ode45',microBurst,tSpan,x0,[],[],'no cdmc');
+[ct,cx] = PIG('ode45',microBurst,tSpan,x0);
 [t45,x45] = ode45(dxdt,tSpan([1 end]),x0);
 %{
 \end{matlab}
@@ -77,8 +68,8 @@ using a naive application of~\texttt{PIG()}.}\label{fig:PIGE}
 \begin{matlab}
 %}
 figure
-h = plot(nt,nx,'o', ct,cx,'+', t45,x45,'-');
-legend(h(1:2:5),'Naive PIG','PIG + cdmc','Accurate')
+h = plot(nt,nx,'rx', ct,cx,'bo', t45,x45,'-');
+legend(h(1:2:5),'Naive PIG','default: PIG + cdmc','Accurate')
 xlabel('Time'), ylabel('State')
 set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','PIGExplore')
 %{

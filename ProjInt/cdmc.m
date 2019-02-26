@@ -38,8 +38,8 @@ The original microBurst \verb|sol()| could create large errors if used in a Proj
 Begin with a standard application of the micro-burst.
 \begin{matlab}
 %}
-[ts,xs] = feval(microBurst,t0,x0);
-bT = ts(end)-ts(1);
+[t1,x1] = feval(microBurst,t0,x0);
+bT = t1(end)-t1(1);
 %{
 \end{matlab}
 
@@ -47,10 +47,17 @@ Project backwards to before the initial time, then
 simulate just one burst forward to obtain a simulation burst that ends at the original~\verb|t0|.
 \begin{matlab}
 %}
-dxdt = (xs(end,:) - xs(end-1,:))/(ts(end,:) - ts(end-1,:));
-x0 = xs(end,:)-2*bT*dxdt;
-t0 = ts(1)-bT;
-[ts,xs] = feval(microBurst,t0,x0.');
+dxdt = (x1(end,:) - x1(end-1,:))/(t1(end,:) - t1(end-1,:));
+x0 = x1(end,:)-2*bT*dxdt;
+t0 = t1(1)-bT;
+[t2,x2] = feval(microBurst,t0,x0.');
+%{
+\end{matlab}
+Return both sets of output, though only (t2,x2) will be used in PI.
+\begin{matlab}
+%}
+ts = [t1; t2];
+xs = [x1; x2];
 %{
 \end{matlab}
 \end{funDescription}

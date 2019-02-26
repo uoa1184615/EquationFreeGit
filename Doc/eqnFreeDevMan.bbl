@@ -12,6 +12,13 @@ Calderon, C.~P.  \harvardyearleft 2007\harvardyearright , `Local diffusion
   models for stochastic reacting systems: estimation issues in equation-free
   numerics', {\em Molecular Simulation} {\bf 33}(9---10),~713---731.
 
+\harvarditem[Gear et~al.]{Gear, Kaper, Kevrekidis \harvardand\
+  Zagaris}{2005}{Gear05}
+Gear, C.~W., Kaper, T.~J., Kevrekidis, I.~G. \harvardand\ Zagaris, A.
+  \harvardyearleft 2005\harvardyearright , `Projecting to a slow manifold:
+  Singularly perturbed systems and legacy codes', {\em SIAM Journal on Applied
+  Dynamical Systems} {\bf 4}(3),~711--732.
+
 \harvarditem{Gear \harvardand\ Kevrekidis}{2003{\em a}}{Gear02b}
 Gear, C.~W. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft 2003{\em
   a}\harvardyearright , `Projective methods for stiff differential equations:
@@ -113,5 +120,12 @@ Samaey, G., Roose, D. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
 Svard, M. \harvardand\ Nordstrom, J.  \harvardyearleft 2006\harvardyearright ,
   `On the order of accuracy for difference approximations of initial-boundary
   value problems', {\em Journal of Computational Physics} {\bf 218},~333--352.
+
+\harvarditem[Zagaris et~al.]{Zagaris, Vandekerckhove, Gear, Kaper \harvardand\
+  Kevrekidis}{2012}{Zagaris12}
+Zagaris, A., Vandekerckhove, C., Gear, C.~W., Kaper, T.~J. \harvardand\
+  Kevrekidis, I.~G.  \harvardyearleft 2012\harvardyearright , `Stability and
+  stabilization of the constrained runs schemes for equation-free projection to
+  a slow manifold', {\em DCDS-A} {\bf 32},~2759--2803.
 
 \end{thebibliography}
