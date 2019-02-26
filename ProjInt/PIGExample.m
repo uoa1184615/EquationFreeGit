@@ -26,7 +26,7 @@ dxdt=@(t,x) [ cos(x(1))*sin(x(2))*cos(t)
 %{
 \end{matlab}
 
-Set the `black box' microsolver to be an integration using a
+Set the `black-box' microsolver to be an integration using a
 standard solver, and set the standard time of simulation for
 the microsolver.
 \begin{matlab}

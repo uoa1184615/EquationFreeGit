@@ -17,34 +17,40 @@ the patch-centre values.  Communicate patch-design variables
 via the global struct~\verb|patches|.
 \begin{matlab}
 %}
-function u=patchEdgeInt2(u)
+function u = patchEdgeInt2(u)
 global patches
 %{
 \end{matlab}
 
 \paragraph{Input}
 \begin{itemize}
+
 \item \verb|u| is a vector of length \(\verb|nx| \cdot
 \verb|ny| \cdot \verb|Nx| \cdot \verb|Ny| \cdot
 \verb|nVars|\) where there are \verb|nVars| field values at
 each of the points in the \(\verb|nx| \times \verb|ny|\times
 \verb|Nx| \times \verb|Ny|\) grid on the \(\verb|Nx| \times
 \verb|Ny|\) array of patches.
+
 \item \verb|patches| a struct set by \verb|configPatches2()|
 which includes the following information.
 \begin{itemize}
+
 \item \verb|.x| is \(\verb|nx|\times \verb|Nx|\)
 array of the spatial locations~\(x_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and microscales.
+
 \item \verb|.y| is similarly \(\verb|ny|\times \verb|Ny|\)
 array of the spatial locations~\(y_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and microscales.
+
 \item \verb|.ordCC| is order of interpolation, currently only
 \(\{0\}\).
 %\item \verb|.alt| in \(\{0,1\}\) is one for staggered grid
 %(alternating) interpolation.
+
 \item \verb|.Cwtsr| and \verb|.Cwtsl|---not yet used
 \end{itemize}
 \end{itemize}
@@ -55,6 +61,9 @@ equi-spaced lattice on both macro- and microscales.
 \verb|Nx| \times \verb|Ny| \times \verb|nVars|\) array of
 the fields with edge values set by interpolation.
 \end{itemize}
+
+
+
 
 
 \begin{devMan}
@@ -91,7 +100,7 @@ ry = dy*(ny-1)/2/DY;
 For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
 eventually cater for periodic, odd-mid-gap, even-mid-gap,
-even-mid-patch, dirichlet, neumann, ?? These index vectors
+even-mid-patch, Dirichlet, Neumann, Robin?? These index vectors
 point to patches and their two immediate neighbours.
 \begin{matlab}
 %}
@@ -139,7 +148,7 @@ in parallel).
 \end{matlab}
 Interpolate macro-values to be Dirichlet edge values for
 each patch \cite[]{Roberts06d}, using weights computed in
-\verb|configPatches2()| . Here interpolate to specified order.
+\verb|configPatches2()|. Here interpolate to specified order.
 \begin{matlab}
 %}
   u(nSubP,j,:)=u(i0,j,:)*(1-patches.alt) ...
@@ -148,6 +157,7 @@ each patch \cite[]{Roberts06d}, using weights computed in
     +sum(bsxfun(@times,patches.Cwtsl,dmu));
 %{
 \end{matlab}
+
 
 \paragraph{Case of spectral interpolation}
 Assumes the domain is macro-periodic. We interpolate in
@@ -208,7 +218,7 @@ accordingly.
 \begin{matlab}
 %}
   if imag(u(i0,j0,:,:,:))==0, uclean = @(u) real(u);
-     else uclean = @(u) u; end
+                         else uclean = @(u) u; end
 %{
 \end{matlab}
 Compute the Fourier transform of the patch centre-values for

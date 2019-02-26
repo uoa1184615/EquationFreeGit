@@ -155,7 +155,7 @@ Second, we code microscale bursts, here using the standard
 \verb|ode45()|. Since the rate of decay is \(\beta\approx
 1/\epsilon\) we choose a burst length
 \(2\epsilon\log(1/\epsilon)\) as here we do not know the
-macroscale time step invoked by \verb|marcoInt()|, so
+macroscale time-step invoked by \verb|marcoInt()|, so
 blithely use \(\Delta=1\), and then double the usual formula
 for safety.
 \begin{matlab}
@@ -200,7 +200,7 @@ end%if no arguments
 
 \begin{devMan}
 
-Find the number of time steps at which output is expected,
+Find the number of time-steps at which output is expected,
 and the number of variables.
 \begin{matlab}
 %}

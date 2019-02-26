@@ -1,19 +1,18 @@
 % PIRK4 implements fourth-order Projective Integration with
 % a user-specified microsolver.  The macrosolver adapts the
 % explicit fourth-order Runge--Kutta scheme. JM, Oct 2018. 
-% See the LaTeX generated pdf document for details.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
-\section{\texttt{PIRK4()}: projective integration of fourth order accuracy}
+\section{\texttt{PIRK4()}: projective integration of fourth-order accuracy}
 \label{sec:PIRK4}
 
 This Projective Integration scheme implements a macrosolver
-analogous to the fourth order Runge--Kutta method.
+analogous to the fourth-order Runge--Kutta method.
 
 \begin{matlab}
 %}
-function [x, tms, xms, rm, svf] = PIRK4(solver, bT, tSpan, x0)
+function [x, tms, xms, rm, svf] = PIRK4(microBurst, tSpan, x0, bT)
 %{
 \end{matlab}
 
@@ -42,13 +41,13 @@ solution over time \(-5\leq t\leq0\) for parameter
 \(\epsilon=0.1\)\,. Since the rate of decay is
 \(\beta\approx 1/\epsilon\) we choose a burst length
 \(\epsilon\log(|\Delta|/\epsilon)\) as here the macroscale
-time step \(\Delta=-1\).
+time-step \(\Delta=-1\).
 \begin{matlab}
 %}
 epsilon = 0.1
 ts = 0:-1:-5
 bT = epsilon*log(abs(ts(2)-ts(1))/epsilon)
-[x,tms,xms,rm,svf] = PIRK4(@MMburst, bT, ts, 0.2*[1;1]);
+[x,tms,xms,rm,svf] = PIRK4(@MMburst, ts, 0.2*[1;1], bT);
 figure, plot(ts,x,'o:',tms,xms)
 xlabel('time t'), legend('x(t)','y(t)')
 title('Backwards-time projective integration of Michaelis--Menten')
@@ -86,37 +85,51 @@ end
 
 \paragraph{Input}
 \begin{itemize}
-\item \verb|solver()|, a function that produces output from
+\item \verb|microBurst()|, a function that produces output from
 the user-specified code for microscale simulation. 
 \begin{verbatim}
-[tOut, xOut] = solver(tStart, xStart, tSim)
+[tOut, xOut] = microBurst(tStart, xStart, bT)
 \end{verbatim}
 \begin{itemize}
 \item Inputs:
   \verb|tStart|,~the start time of a burst of simulation;
   \(\verb|xStart|\),~the row \(n\)-vector of the starting
-  state; \verb|tSim|,~the total time to simulate in the burst. 
+  state; \verb|bT|, optional, the total time to simulate in
+  the burst---if \verb|microBurst()| determines~\verb|bT|,
+  then replace~\verb|bT| in the argument list
+  by~\verb|varargin|. 
 \item Outputs:
   \verb|tOut|,~the column vector of solution times; and 
-  \verb|xOut|, an array in which each \emph{row} contains
+  \verb|xOut|,~an array in which each \emph{row} contains
   the system state at corresponding times.
 \end{itemize}
-
-\item \verb|bT|, a scalar, the minimum amount of time needed
-for simulation of the microsolver to relax the fast
-variables to the slow manifold. 
 
 \item \verb|tSpan| is an \(\ell\)-vector of times at which
 the user requests output, of which the first element is
 always the initial time. \verb|PIRK4()| does not use
-adaptive time stepping; the macroscale time steps are
+adaptive time-stepping; the macroscale time-steps are
 (nearly) the steps between elements of \verb|tSpan|.
 
 \item \verb|x0| is an \(n\)-vector of initial values at the
 initial time \verb|tSpan(1)|. Elements of~\verb|x0| may be
 \verb|NaN|: they are included in the simulation and output,
 and often represent boundaries in space fields.
+
+\item \verb|bT|, optional, either missing, or
+empty~(\verb|[]|), or a scalar: if a given scalar, then it
+is the length of the micro-burst simulations---the minimum
+amount of time needed for the microscale simulation to relax
+to the slow manifold; else if missing or~\verb|[]|, then
+\verb|microBurst()| must itself determine the length of a
+computed burst.
+\begin{matlab}
+%}
+if nargin<4, bT=[]; end
+%{
+\end{matlab}
+
 \end{itemize}
+
 
 \paragraph{Output}
 If there are no output arguments specified, then a plot is 
@@ -125,7 +138,7 @@ drawn of the computed solution~\verb|x| versus \verb|tSpan|.
 \item  \verb|x|, an \(\ell \times n\) array of the
 approximate solution vector. Each row is an estimated state
 at the corresponding time in \verb|tSpan|.  The simplest
-usage is then \verb|x = PIRK4(solver,bT,tSpan,x0)|.
+usage is then \verb|x = PIRK4(microBurst,tSpan,x0,bT)|.
 
 However, microscale details of the underlying Projective
 Integration computations may be helpful. \verb|PIRK4()|
@@ -134,14 +147,16 @@ bursts.
 
 \item \verb|tms|, optional, is an \(L\) dimensional column
 vector containing microscale times of burst simulations,
-each burst separated by~\verb|NaN|; \item \verb|xms|,
+each burst separated by~\verb|NaN|; 
+
+\item \verb|xms|,
 optional, is an \(L\times n\) array of the corresponding
 microscale states---this data is an accurate simulation of
 the state and may help visualise more details of the
 solution. 
 
 \item \verb|rm|, optional, a struct containing the
-`remaining' applications of the microsolver required by the
+`remaining' applications of the micro-burst required by the
 Projective Integration method during the calculation of the
 macrostep: \begin{itemize}
 \item \verb|rm.t|~is a column vector of microscale times; and 
@@ -158,7 +173,7 @@ Projective Integration estimates of the slow vector field.
 \begin{itemize}
 \item \verb|svf.t| is a \(4\ell\) dimensional column vector
 containing all times at which the Projective Integration
-scheme is extrapolated along microsolver data to form a
+scheme is extrapolated along micro-burst data to form a
 macrostep. 
 \item \verb|svf.dx| is a \(4\ell\times n\) array containing
 the estimated slow vector field.
@@ -169,7 +184,7 @@ the estimated slow vector field.
 
 \subsection{The projective integration code}
 
-Determine the number of time steps and preallocate storage
+Determine the number of time-steps and preallocate storage
 for macroscale estimates.
 \begin{matlab}
 %}
@@ -190,30 +205,30 @@ saveSvf = (nArgs>4);
 \end{matlab}
 
 
-Run a preliminary application of the microsolver on the
+Run a preliminary application of the micro-burst on the
 initial conditions to help relax to the slow manifold. This
-is done in addition to the microsolver in the main loop,
+is done in addition to the micro-burst in the main loop,
 because the initial conditions are often far from the
 attracting slow manifold. Require the user to input and
 output rows of the system state.
 \begin{matlab}
 %}
 x0 = reshape(x0,1,[]); 
-[relax_t,relax_x0] = solver(tSpan(1),x0,bT);
+[relax_t,relax_x0] = microBurst(tSpan(1),x0,bT);
 %{
 \end{matlab}
 
-Use the end point of the microsolver as the initial
+Use the end point of the micro-burst as the initial
 conditions.
 \begin{matlab}
 %}
-tSpan(1) = tSpan(1)+bT; 
+tSpan(1) = relax_t(end); 
 x(1,:)=relax_x0(end,:); 
 %{
 \end{matlab}
 
 If saving information, then record the first application of
-the microsolver. Allocate cell arrays for times and states
+the micro-burst. Allocate cell arrays for times and states
 for outputs requested by the user, as concatenating cells is
 much faster than iteratively extending arrays. 
 \begin{matlab}
@@ -236,21 +251,21 @@ end
 \end{matlab}
 
 
-\paragraph{Loop over the macroscale time steps}
+\paragraph{Loop over the macroscale time-steps}
 \begin{matlab}
 %}
 for jT = 2:nT
     T = tSpan(jT-1);
 %{
 \end{matlab}
-If four applications of the microsolver would cover the
+If four applications of the micro-burst would cover the
 entire macroscale time-step, then do so (setting some
 internal states to \verb|NaN|); else proceed to projective
 step.
 \begin{matlab}
 %}
-    if 4*abs(bT)>=abs(tSpan(jT)-T) & bT*(tSpan(jT)-T)>0
-        [t1,xm1] = solver(T, x(jT-1,:), tSpan(jT)-T);
+    if ~isempty(bT) & 4*abs(bT)>=abs(tSpan(jT)-T) & bT*(tSpan(jT)-T)>0
+        [t1,xm1] = microBurst(T, x(jT-1,:), tSpan(jT)-T);
         x(jT,:) = xm1(end,:);
         t2=nan; xm2=nan(1,size(xm1,2));
         t3=nan; t4=nan; xm3=xm2; xm4 = xm2; dx1=xm2; dx2=xm2;
@@ -258,14 +273,14 @@ step.
 %{
 \end{matlab}
 
-Run the first application of the microsolver; since this
+Run the first application of the micro-burst; since this
 application directly follows from the initial conditions, or
 from the latest macrostep, this microscale information is
 physically meaningful as a simulation of the system. Extract
-the size of the final time step. 
+the size of the final time-step. 
    \begin{matlab}
 %}
-    [t1,xm1] = solver(T, x(jT-1,:), bT);
+    [t1,xm1] = microBurst(T, x(jT-1,:), bT);
     del = t1(end)-t1(end-1);
 %{
 \end{matlab}
@@ -280,34 +295,43 @@ Check for round-off error.
 %{
 \end{matlab}
 
-Find the needed time step to reach time \verb|tSpan(n+1)|
+Find the needed time-step to reach time \verb|tSpan(n+1)|
 and form a first estimate \verb|dx1| of the slow vector
 field.
 \begin{matlab}
 %}
-    Dt = tSpan(jT)-T-bT;  
+    Dt = tSpan(jT)-t1(end);  
     dx1 = (xm1(end,:)-xm1(end-1,:))/del; 
 %{
 \end{matlab}
+Assume burst times are the same length for this macro-step,
+or effectively so (recall that \verb|bT| may be empty as it
+may be only coded and known in \verb|microBurst()|).
+\begin{matlab}
+%}
+abT = t1(end)-t1(1);
+%{
+\end{matlab}
+
 
 Project along \verb|dx1| to form an intermediate
 approximation of \verb|x|; run another application of the
-microsolver and form a second estimate of the slow vector
+micro-burst and form a second estimate of the slow vector
 field.  
 \begin{matlab}
 %}
-    xint = xm1(end,:) + (Dt/2-bT)*dx1;
-    [t2,xm2] = solver(T+Dt/2, xint, bT);
+    xint = xm1(end,:) + (Dt/2-abT)*dx1;
+    [t2,xm2] = microBurst(T+Dt/2, xint, bT);
     del = t2(end)-t2(end-1);
     dx2 = (xm2(end,:)-xm2(end-1,:))/del; 
     
-    xint = xm1(end,:) + (Dt/2-bT)*dx2;
-    [t3,xm3] = solver(T+Dt/2, xint, bT);
+    xint = xm1(end,:) + (Dt/2-abT)*dx2;
+    [t3,xm3] = microBurst(T+Dt/2, xint, bT);
     del = t3(end)-t3(end-1);
     dx3 = (xm3(end,:)-xm3(end-1,:))/del; 
     
-    xint = xm1(end,:) + (Dt-bT)*dx3;
-    [t4,xm4] = solver(T+Dt, xint, bT);
+    xint = xm1(end,:) + (Dt-abT)*dx3;
+    [t4,xm4] = microBurst(T+Dt, xint, bT);
     del = t4(end)-t4(end-1);
     dx4 = (xm4(end,:)-xm4(end-1,:))/del; 
 %{
@@ -339,8 +363,8 @@ step saves simulation time.
 \end{matlab}
 
 If saving trusted microscale data, then populate the cell
-arrays for the current loop iterate with the time steps and
-output of the first application of the microsolver. Separate
+arrays for the current loop iterate with the time-steps and
+output of the first application of the micro-burst. Separate
 bursts by~\verb|NaN|s.
 \begin{matlab}
 %}
@@ -351,7 +375,7 @@ bursts by~\verb|NaN|s.
 \end{matlab}
 
 If saving all microscale data, then repeat for the remaining
-applications of the microsolver.         
+applications of the micro-burst.         
 \begin{matlab}
 %}
         if saveFullMicro 

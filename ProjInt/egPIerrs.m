@@ -1,7 +1,7 @@
 % Michaelis--Menton example of projective integrating
 % fast-slow system.  This example simply introduces basic
 % usage of the PIRK2() function. AJR, 29 Sep 2018
-%%%%%%%%%%%%!TEX root = ../Doc/eqnFreeDevMan.tex
+%!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{egPIerrs}: Errors in projective integration
 of Michaelis--Menton kinetics}
@@ -75,7 +75,7 @@ for j=1:nlogdt
   ts = linspace(0,Tend,nSteps(j)+1);
   dts(j)=diff(ts(1:2));
   for i=1:nburst
-    xs = PIRK2(@MMburst, meps(i)*epsilon, ts, x0);
+    xs = PIRK2(@MMburst, ts, x0, meps(i)*epsilon);
     xerrs(i,j)=norm(xs(end,:)-xend);
 end, end
 dts=dts

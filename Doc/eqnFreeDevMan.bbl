@@ -19,6 +19,31 @@ Calderon, C.~P.  \harvardyearleft 2007\harvardyearright , `Local diffusion
   models for stochastic reacting systems: estimation issues in equation-free
   numerics', {\em Molecular Simulation} {\bf 33}(9---10),~713---731.
 
+\harvarditem{Cao \harvardand\ Roberts}{2012}{Cao2012}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2012\harvardyearright ,
+  Modelling 3d turbulent floods based upon the smagorinski large eddy closure,
+  {\em in} P.~A. Brandner \harvardand\ B.~W. Pearce, eds, `18th Australasian
+  Fluid Mechanics Conference'.
+\newline\harvardurl{http://people.eng.unimelb.edu.au/imarusic/proceedings/18/
+  70%20-%20Cao.pdf}
+
+\harvarditem{Cao \harvardand\ Roberts}{2013}{Cao2013}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2013\harvardyearright ,
+  Multiscale modelling couples patches of wave-like simulations, {\em in}
+  S.~McCue, T.~Moroney, D.~Mallet \harvardand\ J.~Bunder, eds, `Proceedings of
+  the 16th Biennial Computational Techniques and Applications Conference,
+  CTAC-2012', Vol.~54 of {\em ANZIAM J.}, pp.~C153--C170.
+
+\harvarditem{Cao \harvardand\ Roberts}{2016{\em a}}{Cao2014b}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016{\em
+  a}\harvardyearright , `Modelling suspended sediment in environmental
+  turbulent fluids', {\em J.~Engrg.\ Maths} {\bf 98}(1),~187--204.
+
+\harvarditem{Cao \harvardand\ Roberts}{2016{\em b}}{Cao2014a}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016{\em
+  b}\harvardyearright , `Multiscale modelling couples patches of nonlinear
+  wave-like simulations', {\em IMA J.~Applied Maths.} {\bf 81}(2),~228--254.
+
 \harvarditem{Gear \harvardand\ Kevrekidis}{2003{\em a}}{Gear02b}
 Gear, C.~W. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft 2003{\em
   a}\harvardyearright , `Projective methods for stiff differential equations:

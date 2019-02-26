@@ -60,14 +60,14 @@ Error analysis indicates that updating on times longer the microscale times and 
 Implementations can communicate one or more derivatives in time, as well as macroscale variables.
 
 At this stage we can effectively parallelise over patches: first by simply using Matlab's \texttt{parfor}.   
-Probably not using a \textsc{gpu} as we probably want to leave \textsc{gpu}s for the black box to utilise within each patch.
+Probably not using a \textsc{gpu} as we probably want to leave \textsc{gpu}s for the black-box to utilise within each patch.
 
 
 
 
 \section{Projective integration}
 
-To take macroscale time steps, invoke several possible projective integration schemes: simple Euler projection, Heun-like method, etc
+To take macroscale time-steps, invoke several possible projective integration schemes: simple Euler projection, Heun-like method, etc
 \citep{Samaey08}.
 Need to decide how long a microscale burst needs to be.
 

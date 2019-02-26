@@ -1,6 +1,6 @@
-%Michaelis--Menton example of projective integrating
-%fast-slow system.  This example simply introduces basic
-%usage of the PIRK2() function. AJR, 29 Sep 2018
+% Michaelis--Menton example of projective integrating
+% fast-slow system.  This example simply introduces basic
+% usage of the PIRK2() function. AJR, 29 Sep 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \begin{userMan}
@@ -46,7 +46,7 @@ condition for the Michaelis--Menten system of
 \begin{matlab}
 %}
 ts = 0:6
-xs = PIRK2(@MMburst, 2*epsilon, ts, [1;0])
+xs = PIRK2(@MMburst, ts, [1;0], 2*epsilon)
 plot(ts,xs,'o:')
 xlabel('time t'), legend('x(t)','y(t)')
 pause(1)
@@ -75,7 +75,7 @@ in \cref{fig:egPIMM2}. Two further output variables provide
 this microscale burst information.
 \begin{matlab}
 %}
-[xs,tMicro,xMicro] = PIRK2(@MMburst, 2*epsilon, ts, [1;0]);
+[xs,tMicro,xMicro] = PIRK2(@MMburst, ts, [1;0], 2*epsilon);
 figure, plot(ts,xs,'o:',tMicro,xMicro)
 xlabel('time t'), legend('x(t)','y(t)')
 pause(1)
@@ -103,13 +103,13 @@ alignment along the slow manifold.}
 simulates backwards in time along the slow manifold using
 short forward bursts. Such backwards macroscale simulations
 succeed despite the fast variable~\(y(t)\), when backwards
-in time, being viciously unstable. However, backwards
+in time, being viciously unstable.  However, backwards
 integration appears to need longer bursts,
 here~\(3\epsilon\).
 \begin{matlab}
 %}
 ts = 0:-1:-5
-[xs,tMicro,xMicro] = PIRK2(@MMburst, 3*epsilon, ts, 0.2*[1;1]);
+[xs,tMicro,xMicro] = PIRK2(@MMburst, ts, 0.2*[1;1], 3*epsilon);
 figure, plot(ts,xs,'o:',tMicro,xMicro)
 xlabel('time t'), legend('x(t)','y(t)')
 %{

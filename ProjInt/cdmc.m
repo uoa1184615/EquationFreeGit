@@ -16,7 +16,7 @@ function [ts, xs] = cdmc(microBurst,t0,x0)
 
 \paragraph{Input}
 \begin{itemize}
-\item \verb|microBurst()|, a black box micro-burst function suitable for Projective Integration. See any of \verb|PIRK2()|, \verb|PIRK4()|, or \verb|PIG()| for a description of \verb|microBurst()|.
+\item \verb|microBurst()|, a black-box micro-burst function suitable for Projective Integration. See any of \verb|PIRK2()|, \verb|PIRK4()|, or \verb|PIG()| for a description of \verb|microBurst()|.
 \item \verb|t0|, an initial time
 \item \verb|x0|, an initial state
 \end{itemize}

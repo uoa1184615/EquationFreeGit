@@ -46,7 +46,7 @@
     Call the \textsc{pde} solver which is to evaluate the microscale problem within each patch. This solver may be a Matlab defined function (such as \texttt{ode15s} or \texttt{ode45}) or a user defined function (such as Runge--Kutta).\\
     Input of the \textsc{pde} solver is the function \texttt{patchSmooth1} (for 1D) or \texttt{patchSmooth2} (for 2D) which  interfaces with the \textsc{pde} solver and the microscale \textsc{pde}. Other inputs are the time span and initial conditions. Output of the \textsc{pde} solver is the solution of the patch \textsc{pde} over the given time span, but only evaluated within the defined patches.};
     \node [smallblock, above right=-2.2cm and 2cm of microPDE] (patchSmooth1) {\textbf{Interface to time integrators}\\
-    The \textsc{pde} function (\texttt{patchSmooth1} or \texttt{patchSmooth2}) interfaces with the \textsc{pde} solve, the microscale \textsc{pde} and the patch coupling conditions. Input is the \textsc{pde} field at one time step and output is the field at the next time step.};
+    The \textsc{pde} function (\texttt{patchSmooth1} or \texttt{patchSmooth2}) interfaces with the \textsc{pde} solve, the microscale \textsc{pde} and the patch coupling conditions. Input is the \textsc{pde} field at one time-step and output is the field at the next time-step.};
     \node [tinyblock, below left=0.5cm and -3cm of patchSmooth1] (coupling) {\textbf{Coupling conditions}\\
     Coupling conditions are evaluated in \texttt{patchEdge1} (for 1D) or \texttt{patchEdge2} (for 2D) with the coupling order defined by global struct component \texttt{patches.ordCC}.};
     \node [tinyblock, below right=0.5cm and -3cm of patchSmooth1] (micropde) {\textbf{Microscale \textsc{pde}}\\ 
@@ -82,7 +82,7 @@
 \node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Choosing the macro solver in PI:}\\
 \vspace{2pt}
     \begin{tikzpicture}[node distance = 1cm, auto]
-    \node [block,right=5cm] (timestep) {\textbf{Is an appropriate time step known for the slow dynamics?}};
+    \node [block,right=5cm] (timestep) {\textbf{Is an appropriate time-step known for the slow dynamics?}};
     \node [yesblock, below =0.5cm of timestep] (timeyes) {Yes};
     \node [yesblock, right=0.4cm of timestep] (timeno) {No};
     \node [block, below=0.5cm of timeyes] (slowsol) {\textbf{Is a particular solver desired to simulate the slow dynamics?}};
@@ -124,13 +124,13 @@
 \node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Projective Integration scheme}\\
     \begin{tikzpicture}[node distance = 3ex, auto]
     \node [block] (setmicro) {\textbf{Set microsolver}\\ 
-    Define or construct the function \texttt{solver()} that calls a black box microsolver. Possible aids:\\
+    Define or construct the function \texttt{solver()} that calls a black-box microsolver. Possible aids:\\
     Use the toolbox
     \begin{tikzpicture}[node distance = 0.5cm, auto]   
     \node [refblock] (gapref) {Gap-tooth scheme};
     \end{tikzpicture}
     to discretise a pde.\\
-    Use \texttt{bbgen()} if the microsolver is a standard solver, \texttt{ode45} e.g., and needs to be converted into a black box.\\
+    Use \texttt{bbgen()} if the microsolver is a standard solver, \texttt{ode45} e.g., and needs to be converted into a black-box.\\
     Use \texttt{cmdc()} as a wrapper for the microsolver if the slow variables would otherwise change significantly over the microsolver.};
     \node [tinyblock, right=0.3cm of setmicro] (lift) {\textbf{Set lifting/restriction}\\ 
     If needed, set functions \texttt{restrict()} and \texttt{lift()} to convert between macro and micro problems/variables. These are optional arguments to the \texttt{PI} functions.};
@@ -139,7 +139,7 @@
         \begin{tikzpicture}
     \node [smallblock]%, below=0.6cm of pig]
      (pirk) {\textbf{If using \texttt{PIRK()}:}\\ 
-    Set the vector of times \texttt{tspan} at which solutions are desired, noting that the intervals between times will be used as time steps in the numerical scheme. Set initial conditions \texttt{IC}.};
+    Set the vector of times \texttt{tspan} at which solutions are desired, noting that the intervals between times will be used as time-steps in the numerical scheme. Set initial conditions \texttt{IC}.};
     \end{tikzpicture}
     
     \vspace{2pt}
@@ -147,7 +147,7 @@
         \begin{tikzpicture}
    \node [smallblock]%, below right=0.2cm and -1cm of lift]
     (pig) {\textbf{If using \texttt{PIG()}:}\\ 
-    Set the solver to be used on the macro scale. Set any needed time inputs or time step data in \texttt{tspan}. Set initial conditions \texttt{IC}.};
+    Set the solver to be used on the macro scale. Set any needed time inputs or time-step data in \texttt{tspan}. Set initial conditions \texttt{IC}.};
     \end{tikzpicture}
 
     };

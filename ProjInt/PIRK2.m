@@ -2,11 +2,11 @@
 % a user-specified microsolver.  The macrosolver adapts the
 % explicit second-order Runge--Kutta Improved Euler scheme.
 % JM and AJR, Oct 2018.  Execute with no arguments to see an
-% example.  See the LaTeX generated pdf document for details.
+% example.  
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
-\section{\texttt{PIRK2()}: projective integration of second order accuracy}
+\section{\texttt{PIRK2()}: projective integration of second-order accuracy}
 \label{sec:PIRK2}
 
 This Projective Integration scheme implements a macroscale
@@ -15,7 +15,7 @@ Improved Euler integration.
 
 \begin{matlab}
 %}
-function [x, tms, xms, rm, svf] = PIRK2(microBurst, bT, tSpan, x0)
+function [x, tms, xms, rm, svf] = PIRK2(microBurst, tSpan, x0, bT)
 %{
 \end{matlab}
 
@@ -33,27 +33,40 @@ a short-time burst of the microscale simulation.
 \item Inputs:
   \verb|tStart|,~the start time of a burst of simulation;
   \(\verb|xStart|\),~the row \(n\)-vector of the starting
-  state; \verb|bT|,~the total time to simulate in the burst. 
+  state; \verb|bT|, optional, the total time to simulate in
+  the burst---if \verb|microBurst()| determines the burst
+  time, then replace~\verb|bT| in the argument list
+  by~\verb|varargin|. 
 \item Outputs:
   \verb|tOut|,~the column vector of solution times; and 
-  \verb|xOut|, an array in which each \emph{row} contains
+  \verb|xOut|,~an array in which each \emph{row} contains
   the system state at corresponding times.
 \end{itemize}
-
-\item \verb|bT|, a scalar, the minimum amount of time needed
-for simulation of the microBurst to relax the fast
-variables to the slow manifold. 
 
 \item \verb|tSpan| is an \(\ell\)-vector of times at which
 the user requests output, of which the first element is
 always the initial time. \verb|PIRK2()| does not use
-adaptive time stepping; the macroscale time steps are
+adaptive time-stepping; the macroscale time-steps are
 (nearly) the steps between elements of \verb|tSpan|.
 
 \item \verb|x0| is an \(n\)-vector of initial values at the
 initial time \verb|tSpan(1)|. Elements of~\verb|x0| may be
 \verb|NaN|: they are included in the simulation and output,
 and often represent boundaries in space fields.
+
+\item \verb|bT|, optional, either missing, or
+empty~(\verb|[]|), or a scalar: if a given scalar, then it
+is the length of the micro-burst simulations---the minimum
+amount of time needed for the microscale simulation to relax
+to the slow manifold; else if missing or~\verb|[]|, then
+\verb|microBurst()| must itself determine the length of a
+computed burst.
+\begin{matlab}
+%}
+if nargin<4, bT=[]; end
+%{
+\end{matlab}
+
 \end{itemize}
 
 
@@ -86,7 +99,7 @@ rate~\(\beta\).}
 \end{figure}
 Then choose 
 \begin{enumerate}
-\item a macroscale time step, \(\Delta=\verb|diff(tSpan)|\),
+\item a macroscale time-step, \(\Delta=\verb|diff(tSpan)|\),
 such that \(\alpha\Delta\approx\sqrt{6\varepsilon}\), and
 \item a microscale burst length, \(\delta=\verb|bT| \gtrsim
 \frac1\beta\log(\beta\Delta)\) (see \cref{fig:bTlength}).
@@ -102,7 +115,7 @@ drawn of the computed solution~\verb|x| versus \verb|tSpan|.
 \item  \verb|x|, an \(\ell \times n\) array of the
 approximate solution vector. Each row is an estimated state
 at the corresponding time in \verb|tSpan|.  The simplest
-usage is then \verb|x = PIRK2(microBurst,bT,tSpan,x0)|.
+usage is then \verb|x = PIRK2(microBurst,tSpan,x0,bT)|.
 
 However, microscale details of the underlying Projective
 Integration computations may be helpful. \verb|PIRK2()|
@@ -172,13 +185,13 @@ following code computes and plots a solution over time
 \(0\leq t\leq6\) for parameter \(\epsilon=0.05\)\,. Since
 the rate of decay is \(\beta\approx 1/\epsilon\) we choose a
 burst length \(\epsilon\log(\Delta/\epsilon)\) as here the
-macroscale time step \(\Delta=1\).
+macroscale time-step \(\Delta=1\).
 \begin{matlab}
 %}
 epsilon = 0.05
 ts = 0:6
 bT = epsilon*log((ts(2)-ts(1))/epsilon)
-[x,tms,xms] = PIRK2(@MMburst, bT, ts, [1;0]);
+[x,tms,xms] = PIRK2(@MMburst, ts, [1;0], bT);
 figure, plot(ts,x,'o:',tms,xms)
 title('Projective integration of Michaelis--Menten enzyme kinetics')
 xlabel('time t'), legend('x(t)','y(t)')
@@ -219,7 +232,7 @@ end
 
 \subsection{The projective integration code}
 
-Determine the number of time steps and preallocate storage
+Determine the number of time-steps and preallocate storage
 for macroscale estimates.
 \begin{matlab}
 %}
@@ -257,7 +270,7 @@ Use the end point of the microBurst as the initial
 conditions.
 \begin{matlab}
 %}
-tSpan(1) = tSpan(1)+bT; 
+tSpan(1) = relax_t(end); 
 x(1,:)=relax_x0(end,:); 
 %{
 \end{matlab}
@@ -286,7 +299,7 @@ end
 \end{matlab}
 
 
-\paragraph{Loop over the macroscale time steps}
+\paragraph{Loop over the macroscale time-steps}
 \begin{matlab}
 %}
 for jT = 2:nT
@@ -298,7 +311,7 @@ time-step, then do so (setting some internal states to
 \verb|NaN|); else proceed to projective step.
 \begin{matlab}
 %}
-    if 2*abs(bT)>=abs(tSpan(jT)-T) & bT*(tSpan(jT)-T)>0
+    if ~isempty(bT) & 2*abs(bT)>=abs(tSpan(jT)-T) & bT*(tSpan(jT)-T)>0
         [t1,xm1] = microBurst(T, x(jT-1,:), tSpan(jT)-T);
         x(jT,:) = xm1(end,:);
         t2=nan; xm2=nan(1,size(xm1,2));
@@ -311,7 +324,7 @@ Run the first application of the microBurst; since this
 application directly follows from the initial conditions, or
 from the latest macrostep, this microscale information is
 physically meaningful as a simulation of the system. Extract
-the size of the final time step. 
+the size of the final time-step. 
    \begin{matlab}
 %}
     [t1,xm1] = microBurst(T, x(jT-1,:), bT);
@@ -329,23 +342,23 @@ Check for round-off error.
 %{
 \end{matlab}
 
-Find the needed time step to reach time \verb|tSpan(n+1)|
+Find the needed time-step to reach time \verb|tSpan(n+1)|
 and form a first estimate \verb|dx1| of the slow vector
 field.
 \begin{matlab}
 %}
-    Dt = tSpan(jT)-T-bT;  
+    Dt = tSpan(jT)-t1(end);  
     dx1 = (xm1(end,:)-xm1(end-1,:))/del; 
 %{
 \end{matlab}
 
 Project along \verb|dx1| to form an intermediate
-approximation of \verb|x|; run another application of the
+approximation of~\verb|x|; run another application of the
 microBurst and form a second estimate of the slow vector
-field.  
+field (assuming the burst length is the same, or nearly so).  
 \begin{matlab}
 %}
-    xint = xm1(end,:) + (Dt-bT)*dx1;
+    xint = xm1(end,:) + (Dt-(t1(end)-t1(1)))*dx1;
     [t2,xm2] = microBurst(T+Dt, xint, bT);
     del = t2(end)-t2(end-1);
     dx2 = (xm2(end,:)-xm2(end-1,:))/del; 
@@ -378,7 +391,7 @@ step saves simulation time.
 \end{matlab}
 
 If saving trusted microscale data, then populate the cell
-arrays for the current loop iterate with the time steps and
+arrays for the current loop iterate with the time-steps and
 output of the first application of the microBurst. Separate
 bursts by~\verb|NaN|s.
 \begin{matlab}

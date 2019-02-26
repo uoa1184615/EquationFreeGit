@@ -19,7 +19,7 @@ with random positive initial condition.
 \includegraphics[width=\linewidth]{ProjInt/pi1Example1u9}
 \end{figure}
 
-Set the number of interior points in the domain~\([-1,1]\), and the macroscale time step. 
+Set the number of interior points in the domain~\([-1,1]\), and the macroscale time-step. 
 \begin{matlab}
 %}
 function projIntDMDExample1

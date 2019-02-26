@@ -25,7 +25,7 @@ If any entries in~\verb|x0| are~\verb|NaN|, then \verb|fun()| must cope, and onl
 
 \item \verb|Ts| is a vector of times to compute the approximate solution, say in~\(\RR^\ell\) for \(\ell\geq2\)\,.
 
-\item \verb|rank| is the rank of the \dmd\ extrapolation over macroscale time steps.  
+\item \verb|rank| is the rank of the \dmd\ extrapolation over macroscale time-steps.  
 Suspect \verb|rank| should be at least one more than the effective number of slow variables.
 
 \item \verb|dt| is the size of the microscale time-step.  Must be small enough so that RK2 integration of the \ode{}s is stable.
@@ -46,7 +46,7 @@ Suspect \verb|rank| should be at least one more than the effective number of slo
 \item \verb|tss|, optional, \(1\times\text{big}\) vector of times corresponding to the columns of~\verb|xss|.
 \end{itemize}
 
-Compute the time steps and create storage for outputs.
+Compute the time-steps and create storage for outputs.
 \begin{matlab}
 %}
 DT=diff(Ts);
@@ -93,8 +93,8 @@ Projectively integrate each of the time-steps from~\(t_k\) to~\(t_{k+1}\).
 for k=1:length(DT)
 %{
 \end{matlab}
-Microscale integration is simple, second order, Runge--Kutta method.
-Reasons: the start-up time for implicit integrators, such as ode15s, is too onerous to be worthwhile for each short burst; the microscale time step needed for stability of explicit integrators is so small that a low order method is usually accurate enough.
+Microscale integration is simple, second-order, Runge--Kutta method.
+Reasons: the start-up time for implicit integrators, such as ode15s, is too onerous to be worthwhile for each short burst; the microscale time-step needed for stability of explicit integrators is so small that a low order method is usually accurate enough.
 \begin{matlab}
 %}
 x=[x0(:) nan(n,sum(timeSteps))];
@@ -164,7 +164,7 @@ x=[x;ones(1,iFin)]; j1=[j;n+1];
 %{
 \end{matlab}
 Then the basic \dmd\ algorithm: first the fit.
-However, need to test whether we need to worry about the microscale time step being too small and leading to an effect analogous to `numerical differentiation' errors: 
+However, need to test whether we need to worry about the microscale time-step being too small and leading to an effect analogous to `numerical differentiation' errors: 
 akin to the rule-of-thumb in fitting chaos with time-delay coordinates that a good time-step is approximately the time of the first zero of the autocorrelation.
 \begin{matlab}
 %}
@@ -177,7 +177,7 @@ Atilde = U(:,1:rank)'*AUr; % low-rank dynamics, rxr
 Phi = AUr*Wr; % DMD modes, nxr
 %{
 \end{matlab}
-Second, reconstruct a prediction for the time step.
+Second, reconstruct a prediction for the time-step.
 The current micro-simulation time is \verb|dt*iFin|, so step forward an amount to predict the systems state at \verb|Ts(k+1)|.
 Perhaps should test~\(\omega\) and abort if 'large' and/or positive??
 Answer: not necessarily as if the rank is large then the omega could contain large negative values.
@@ -251,7 +251,7 @@ xs(:,k+1)=x0;
 %{
 \end{matlab}
 
-End the macroscale time stepping.
+End the macroscale time-stepping.
 \begin{matlab}
 %}
 end
