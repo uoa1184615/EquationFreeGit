@@ -1,8 +1,8 @@
 % This etocx package aims to be a simple front-end for 
 % basic use of the etoc package.  AJR, 12 Jul 2018
 % http://orcid.org/0000-0001-8930-1552
-\def\fileversion{0.1c}
-\def\filedate{2018/08/23}
+\def\fileversion{0.1d}
+\def\filedate{2018/11/05}
 \typeout{-- Package `etocx' \fileversion\space <\filedate> --}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{etocx}[\filedate\space\fileversion]
@@ -36,13 +36,13 @@
    \else\def\etocXHead{% section class
       \section*{Contents}\ifcase\etocXdeep
       \or\etocsettocdepth{section}
-      \or\etocsettocdepth{section}
+      \or\etocsettocdepth{subsection}
       \else\fi}
    \fi
 
 
 \newcommand\EtocXheader{% from article.cls
-    \@startsection{subsection}{3}{\z@}%
+    \@startsection{subsubsection}{3}{\z@}%
     {-3.25ex\@plus -1ex \@minus -.2ex}%
     {1.5ex \@plus .2ex}%
     {\normalfont\normalsize\itshape}}
@@ -54,10 +54,10 @@
 \setcounter{tocdepth}{5}%need to store deep info
 \etocsettocstyle{% one deep
   \ifcase\Etoc@level\section*{Part contents}\etocsettocdepth{chapter}%
-  \or\section*{Chapter contents}\etocsettocdepth{section}%
-  \or\EtocXheader*{Section contents}\etocsettocdepth{section}%
-  \or\EtocXheader*{Subsection contents}\etocsettocdepth{subsection}%
-  \or\EtocXheader*{Subsection contents}\etocsettocdepth{paragraph}%
+  \or\subsection*{Chapter contents}\etocsettocdepth{section}%
+  \or\EtocXheader*{Section contents}\etocsettocdepth{subsection}%
+  \or\EtocXheader*{Subsection contents}\etocsettocdepth{subsubsection}%
+  \or\EtocXheader*{Subsubsection contents}\etocsettocdepth{paragraph}%
   \or\etocsettocdepth{paragraph}% a bit strange?? AJR Nov 2018
   \or%empty
   \or%empty
@@ -67,10 +67,10 @@
 \setcounter{tocdepth}{5}%need to store deep info
 \etocsettocstyle{% two deep
   \ifcase\Etoc@level\section*{Part contents}\etocsettocdepth{section}%
-  \or\section*{Chapter contents}\etocsettocdepth{section}%
-  \or\EtocXheader*{Section contents}\etocsettocdepth{subsection}%
+  \or\subsection*{Chapter contents}\etocsettocdepth{subsection}%
+  \or\EtocXheader*{Section contents}\etocsettocdepth{subsubsection}%
   \or\EtocXheader*{Subsection contents}\etocsettocdepth{paragraph}%
-  \or\EtocXheader*{Subsection contents}\etocsettocdepth{subparagraph}%
+  \or\EtocXheader*{Subsubsection contents}\etocsettocdepth{subparagraph}%
   \or%empty
   \or%empty
   \else\etocXHead%
@@ -78,10 +78,10 @@
 \else% 
 \etocsettocstyle{% default case
   \ifcase\Etoc@level\section*{Part contents}%
-  \or\section*{Chapter contents}%
+  \or\subsection*{Chapter contents}%
   \or\EtocXheader*{Section contents}%
   \or\EtocXheader*{Subsection contents}%
-  \or\EtocXheader*{Subsection contents}%
+  \or\EtocXheader*{Subsubsection contents}%
   \or%empty
   \or%empty
   \else\etocXHead%

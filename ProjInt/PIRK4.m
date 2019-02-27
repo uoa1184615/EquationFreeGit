@@ -6,6 +6,7 @@
 %{
 \section{\texttt{PIRK4()}: projective integration of fourth-order accuracy}
 \label{sec:PIRK4}
+\localtableofcontents
 
 This Projective Integration scheme implements a macrosolver
 analogous to the fourth-order Runge--Kutta method.

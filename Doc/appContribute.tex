@@ -17,7 +17,7 @@ For developers to create and document the various functions, we use an idea due 
 \begin{itemize}
 \item put \verb|\include{funs}| into \verb|Doc/eqnFreeDevMan.tex|;
 \item to include we have to use a soft link so at the command line in the directory~\verb|Doc| execute \verb|ln -s ../Dir/funs.tex|
-\footnote{Such soft links are necessary for at least my Mac \textsc{osx} and hopefully will work for other developers.  Further, it has the advantage that auxiliary files are also located in the \texttt{Doc} directory.}
+\footnote{Such soft links are necessary for at least my Mac \textsc{osx} and hopefully work for other developers.  Further, auxiliary files are advantageously also located in the \texttt{Doc} directory.}
 \end{itemize}
 
 
@@ -38,9 +38,12 @@ The format for a example\slash test-section is similar.
 \item Any figures from examples should be generated and then saved for later inclusion with the following (which finally works properly for \textsc{Matlab} 2017+)
 \begin{verbatim}
 set(gcf,'PaperPosition',[0 0 14 10])
-print('-depsc2',filename)
+print('-depsc2','Figs/filename')
 \end{verbatim}
-Include with \quad \verb|\includegraphics[scale=0.85]{filename}|
+Include with (do \emph{not} postfix with \verb|.eps| or \verb|.pdf|)
+\begin{verbatim}
+\includegraphics[scale=0.9]{../Dir/Figs/filename}
+\end{verbatim}
 
 \end{itemize}
 

@@ -32,7 +32,7 @@ recursion).
 simulation of the Burgers' map (\cref{sec:burgersMap}) on
 patches in space. It requires many very small time-steps
 only just visible in this mesh.}
-\includegraphics[scale=0.9]{../Patch/BurgersMapU}
+\includegraphics[scale=0.9]{BurgersMapU}
 \end{figure}%
 
 
@@ -92,7 +92,7 @@ print('-depsc2','BurgersMapU')
 space-time field \(u(x,t)\) in a basic projective
 integration of the patch scheme applied to the microscale
 Burgers' map.}
-\includegraphics[scale=0.9]{../Patch/BurgersU}
+\includegraphics[scale=0.9]{BurgersU}
 \end{figure}%
 Around the microscale burst \verb|burgerBurst()|, wrap the
 projective integration function \verb|PIRK2()| of
@@ -150,7 +150,7 @@ invisible.
 \centering \caption{\label{fig:BurgersMicro}the field
 \(u(x,t)\) during each of the microscale bursts used in the
 projective integration.  View this stereo pair cross-eyed.}
-\includegraphics[scale=0.85]{../Patch/BurgersMicro}
+\includegraphics[scale=0.85]{BurgersMicro}
 \end{figure}
 \begin{matlab}
 %}

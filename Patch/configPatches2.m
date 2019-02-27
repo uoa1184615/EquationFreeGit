@@ -187,7 +187,7 @@ field~\(u(x,y,t)\) at time \(t=0\) of the patch scheme
 applied to a nonlinear `diffusion'~\pde:
 \cref{fig:configPatches2t3} plots the computed field at time
 \(t=3\).}
-\includegraphics[scale=0.9]{../Patch/configPatches2ic}
+\includegraphics[scale=0.9]{configPatches2ic}
 \end{figure}
 Integrate in time using standard functions.
 \begin{matlab}
@@ -216,7 +216,7 @@ print('-depsc2','configPatches2t3')
 time \(t=3\) of the patch scheme applied to a nonlinear
 `diffusion'~\pde\ with initial condition in
 \cref{fig:configPatches2ic}.}
-\includegraphics[scale=0.9]{../Patch/configPatches2t3}
+\includegraphics[scale=0.9]{configPatches2t3}
 \end{figure}
 
 Upon finishing execution of the example, exit this function.

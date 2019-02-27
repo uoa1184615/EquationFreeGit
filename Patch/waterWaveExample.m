@@ -31,7 +31,7 @@ depth~\(h(x,t)\) (above) and velocity field~\(u(x,t)\)
 component to the initial condition has long lasting effects
 on the simulation---but the macroscale wave still
 propagates.}
-\includegraphics[scale=0.85]{../Patch/ps1WaveCtsUH}
+\includegraphics[scale=0.85]{ps1WaveCtsUH}
 \end{figure}%
 Often, wave-like systems are written in terms of two
 conjugate variables, for example, position and momentum
@@ -80,7 +80,7 @@ depth~\(h(x,t)\) (above) and velocity field~\(u(x,t)\)
 shallow water wave \pde{}s~\cref{eqs:patch:N}. The
 microscale random initial component decays where the water
 speed is non-zero due to `turbulent' dissipation.}
-\includegraphics[scale=0.85]{../Patch/ps1WaterWaveCtsUH}
+\includegraphics[scale=0.85]{ps1WaterWaveCtsUH}
 \end{figure}%
 
 
@@ -206,7 +206,7 @@ more exploration and thought.
 %\begin{figure}
 %\centering
 %\caption{\label{fig:ps1WaterWaveU}basic projective integration of the patch scheme function applied to a water Wave' \pde.}
-%%\includegraphics[scale=0.85]{../Patch/ps1WaterWaveU}
+%%\includegraphics[scale=0.85]{ps1WaterWaveU}
 %\end{figure}%
 %Now wrap around the patch time derivative function, \verb|patchSmooth1|, the projective integration function for patch simulations as illustrated by \cref{fig:ps1WaterWaveU}.
 %
@@ -254,7 +254,7 @@ more exploration and thought.
 %\begin{figure}
 %\centering
 %\caption{\label{fig:ps1WaterWaveMicro}stereo pair of the field \(u(x,t)\) during each of the microscale bursts used in the projective integration.}
-%%\includegraphics[scale=0.85]{../Patch/ps1WaterWaveMicro}
+%%\includegraphics[scale=0.85]{ps1WaterWaveMicro}
 %\end{figure}
 %\begin{matlab}
 %%}

@@ -137,7 +137,7 @@ print('-depsc','wave2Dic')
 field~\(u(x,y,t)\) at time \(t=0\) of the patch scheme
 applied to the simple wave~\pde: \cref{fig:wave2Dt6} plots
 the computed field at time \(t=2\).}
-\includegraphics[scale=0.9]{../Patch/wave2Dic}
+\includegraphics[scale=0.9]{wave2Dic}
 \end{figure}
 Integrate in time using standard functions.
 \begin{matlab}
@@ -167,7 +167,7 @@ print('-depsc',['wave2Dt' num2str(ts(end))])
 \caption{\label{fig:wave2Dt6}field~\(u(x,y,t)\) at time
 \(t=2\) of the patch scheme applied to the simple wave~\pde\
 with initial condition in \cref{fig:wave2Dic}.}
-\includegraphics[scale=0.9]{../Patch/wave2Dt2}
+\includegraphics[scale=0.9]{wave2Dt2}
 \end{figure}
 
 

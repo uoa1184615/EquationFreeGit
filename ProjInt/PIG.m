@@ -7,6 +7,7 @@
 %{
 \section{\texttt{PIG()}: Projective Integration via a General macroscale integrator}
 \label{sec:PIG}
+\localtableofcontents
 
 This is an approximate Projective Integration scheme when
 the macroscale integrator is any coded scheme. The advantage

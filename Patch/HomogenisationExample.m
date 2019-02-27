@@ -37,7 +37,7 @@ diffusing field~\(u(x,t)\) in the patch (gap-tooth) scheme
 applied to microscale heterogeneous diffusion with no
 ensemble average. The heterogeneous diffusion results in a
 smilarly heterogeneous  field solution.}
-\includegraphics[scale=0.9]{../Patch/HomogenisationCtsU}
+\includegraphics[scale=0.9]{HomogenisationCtsU}
 \end{figure}%
 \begin{figure}
 \centering \caption{\label{fig:HomogenisationCtsUEnsAve}the
@@ -45,7 +45,7 @@ diffusing field~\(u(x,t)\) in the patch (gap-tooth) scheme
 applied to microscale heterogeneous diffusion with an
 ensemble average. The ensemble average smooths out the
 heterogeneous diffusion.}
-\includegraphics[scale=0.9]{../Patch/HomogenisationCtsUEnsAve}
+\includegraphics[scale=0.9]{HomogenisationCtsUEnsAve}
 \end{figure}%
 
 Consider a lattice of values~\(u_i(t)\), with lattice
@@ -190,7 +190,7 @@ heterogeneous diffusion with no ensemble average: different
 colours correspond to the times in the legend. This field
 solution displays some fine scale heterogeneity due to the
 heterogeneous diffusion.}
-\includegraphics[scale=0.9]{../Patch/HomogenisationU}
+\includegraphics[scale=0.9]{HomogenisationU}
 \end{figure}%
 \begin{figure}
 \centering \caption{\label{fig:HomogenisationUEnsAve}field
@@ -199,7 +199,7 @@ heterogeneous diffusion with ensemble average: different
 colours correspond to the times in the legend. Once
 transients have decayed, this field solution is smooth due
 to the ensemble average.}
-\includegraphics[scale=0.9]{../Patch/HomogenisationUEnsAve}
+\includegraphics[scale=0.9]{HomogenisationUEnsAve}
 \end{figure}%
 
 Now take \verb|patchSmooth1|, the interface to the time
@@ -275,14 +275,14 @@ in \cref{fig:HomogenisationMicro} or
 pair of the field~\(u(x,t)\) during each of the microscale
 bursts used in the projective integration with no ensemble
 averaging.}
-\includegraphics[scale=0.9]{../Patch/HomogenisationMicro}
+\includegraphics[scale=0.9]{HomogenisationMicro}
 \end{figure}
 \begin{figure}
 \centering
 \caption{\label{fig:HomogenisationMicroEnsAve}stereo pair of
 the field~\(u(x,t)\) during each of the microscale bursts
 used in the projective integration with ensemble averaging.}
-\includegraphics[scale=0.9]{../Patch/HomogenisationMicro}
+\includegraphics[scale=0.9]{HomogenisationMicro}
 \end{figure}
 \begin{matlab}
 %}

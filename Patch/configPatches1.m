@@ -142,7 +142,7 @@ xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 \begin{figure}
 \centering \caption{\label{fig:config1Burgers}field
 \(u(x,t)\) of the patch scheme applied to Burgers'~\pde.}
-\includegraphics[scale=0.85]{../Patch/config1Burgers}
+\includegraphics[scale=0.85]{config1Burgers}
 \end{figure}
 Upon finishing execution of the example, exit this function.
 \begin{matlab}

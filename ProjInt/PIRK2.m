@@ -8,6 +8,7 @@
 %{
 \section{\texttt{PIRK2()}: projective integration of second-order accuracy}
 \label{sec:PIRK2}
+\localtableofcontents
 
 This Projective Integration scheme implements a macroscale
 scheme that is analogous to the second-order Runge--Kutta

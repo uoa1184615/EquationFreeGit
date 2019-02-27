@@ -3,6 +3,8 @@
 %{
 \section{Explore: Projective Integration using constraint-defined manifold computing}
 \label{sec:Excdmc}
+\localtableofcontents
+
 In this example the Projective Integration-General scheme is applied to a
 singularly perturbed ordinary differential equation in which
 the time scale separation is not large. The results demonstrate the value of
@@ -63,7 +65,7 @@ numerical methods.
 \caption{Accurate simulation of a weakly stiff non-autonomous
 system by \texttt{PIG()} using cdmc(), and an inaccurate solution
 using a naive application of~\texttt{PIG()}.}\label{fig:PIGE}
-\includegraphics[scale=0.9]{../ProjInt/PIGExplore}
+\includegraphics[scale=0.9]{PIGExplore}
 \end{figure}
 \begin{matlab}
 %}

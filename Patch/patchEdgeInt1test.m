@@ -5,7 +5,7 @@
 %{
 \subsection{\texttt{patchEdgeInt1test}: test the spectral interpolation}
 \label{sec:patchEdgeInt1test}
-\localtableofcontents
+
 A script to test the spectral interpolation of function \verb|patchEdgeInt1()|
 Establish global data struct for the range of various cases.
 \begin{matlab}

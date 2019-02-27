@@ -3,6 +3,8 @@
 %{
 \section{Example: Projective Integration using General macrosolvers }
 \label{sec:ExPIG}
+\localtableofcontents
+
 In this example the Projective Integration-General scheme is
 applied to a singularly perturbed ordinary differential
 equation. The aim is to use a standard non-stiff numerical
@@ -82,7 +84,7 @@ set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','PIGExample')
 \caption{Accurate simulation of a stiff nonautonomous system
 by PIG().  The microsolver is called on-the-fly by the
 macrosolver \texttt{ode45}.}\label{fig:PIGExample}
-\includegraphics[scale=0.8]{../ProjInt/PIGExample}
+\includegraphics[scale=0.8]{PIGExample}
 \end{figure}
 
 \begin{itemize}

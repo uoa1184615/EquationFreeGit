@@ -3,6 +3,8 @@
 %{
 \section{Example: PI using Runge--Kutta macrosolvers }
 \label{sec:ExPIRK}
+\localtableofcontents
+
 This script is a demonstration of the \verb|PIRK()| schemes,
 that use a Runge--Kutta macrosolver, applied to a simple
 linear system with some slow and fast directions. 
@@ -84,7 +86,7 @@ manifold. The \textsc{pi} solution accurately tracks the
 evolution of the variables over time while requiring only a
 fraction of the computations of the standard
 solver.}\label{fig:PIRK}
-\includegraphics[scale=0.9]{../ProjInt/PIRK}
+\includegraphics[scale=0.9]{PIRK}
 \end{figure}
 \cref{fig:PIRK} plots the output.
 \begin{matlab}
