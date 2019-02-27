@@ -20,7 +20,8 @@ By default, \verb|PIG()| uses `constraint-defined manifold computing' for the mi
 
 \begin{matlab}
 %}
-function varargout = PIG(macroInt,microBurst,tSpan,x0,varargin)
+function [t,x,tms,xms,svf] = PIG(macroInt,microBurst,tSpan,x0,...
+                                  restrict,lift,cdmcFlag)
 %{
 \end{matlab}
 
@@ -72,7 +73,7 @@ an initial and final time only.
 time~\verb|tSpan(1)|.
 \end{itemize}
 \paragraph{Optional Inputs:}
-The input \verb|varargin| allows for 0, 2 or 3 additional inputs after \verb|x0|.
+\verb|PIG()| allows for 0, 2 or 3 additional inputs after \verb|x0|.
  If there are distinct microscale and macroscale states and the aim is to do Projective Integration on the macroscale only, then functions must be provided to convert between them. Usage
 \verb|PIG(...,restrict,lift)|
 \begin{itemize}
@@ -210,24 +211,11 @@ end%if no arguments
 
 
 
-
-
-
 \begin{devMan}
 \subsection{The projective integration code}
-Interpret any optional inputs.
-\begin{matlab}
-%}
-if nargin > 4
-    restrict = varargin{1}; 
-    lift = varargin{2};
-    if nargin > 6
-        cdmcFlag = varargin{3};
-    end
-end
-%{
-\end{matlab}
-If no lifting/restriction operators were
+
+
+If no lifting/restriction functions were
 set, assign them.
 \begin{matlab}
 %}
@@ -404,15 +392,13 @@ end
 \end{matlab}
 
 
-If no output specified, then plot simulation. Otherwise, return the requested outputs.
+\subsection{If no output specified, then plot simulation.}
 
 \begin{matlab}
 %}
 if nArgs==0
     figure, plot(t,x,'o:')
     title('Projective Simulation via PIG')
-else
-    varargout = {t x tms xms svf};
 end
 %{
 \end{matlab}
