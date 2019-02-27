@@ -8,6 +8,8 @@
 \label{sec:patchSmooth2}
 \localtableofcontents
 
+\subsection{Introduction}
+
 To simulate in time with spatial patches we often need to
 interface a users time derivative function with time
 integration routines such as \verb|ode15s| or~\verb|PIRK2|.

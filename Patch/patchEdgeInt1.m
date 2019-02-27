@@ -8,6 +8,8 @@
 \label{sec:patchEdgeInt1}
 \localtableofcontents
 
+\subsection{Introduction}
+
 Couples 1D patches across 1D space by computing their edge
 values from macroscale interpolation of either the mid-patch
 value or the patch-core average. This function is primarily

@@ -73,7 +73,6 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 \newenvironment{userMan}{}{} %
 
 
-\usepackage[onedeep]{etocx}% for mini-local-tableofconents
 \usepackage{url,microtype,amsmath,amssymb,defns,graphicx,hyperref,doi}
 \hypersetup{colorlinks,linkcolor=RoyalBlue,citecolor=RoyalBlue,pagecolor=RoyalBlue,%
             urlcolor=magenta,filecolor=magenta,breaklinks,%
@@ -100,7 +99,13 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 \Bb R  \Bb X
 
 
+\usepackage[onedeep]{etocx}% for mini-local-tableofconents, best loaded last??
+
+
 \graphicspath{{../ProjInt/Figs/}{../Patch/Figs/}}
+
+
+
 \begin{document}
 \epstopdfsetup{suffix=} % must be after begin{document}
 

@@ -7,6 +7,8 @@
 \label{sec:configPatches2}
 \localtableofcontents
 
+\subsection{Introduction}
+
 Makes the struct~\verb|patches| for use by the patch\slash
 gap-tooth time derivative function~\verb|patchSmooth2()|.
 \cref{sec:configPatches2eg} lists an example of its use.

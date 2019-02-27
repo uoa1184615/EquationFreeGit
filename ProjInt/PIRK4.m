@@ -8,6 +8,8 @@
 \label{sec:PIRK4}
 \localtableofcontents
 
+\subsection{Introduction}
+
 This Projective Integration scheme implements a macrosolver
 analogous to the fourth-order Runge--Kutta method.
 

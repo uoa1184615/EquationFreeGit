@@ -10,6 +10,8 @@
 \label{sec:PIRK2}
 \localtableofcontents
 
+\subsection{Introduction}
+
 This Projective Integration scheme implements a macroscale
 scheme that is analogous to the second-order Runge--Kutta
 Improved Euler integration.

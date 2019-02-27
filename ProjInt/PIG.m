@@ -9,6 +9,8 @@
 \label{sec:PIG}
 \localtableofcontents
 
+\subsection{Introduction}
+
 This is an approximate Projective Integration scheme when
 the macroscale integrator is any coded scheme. The advantage
 is that one may use \script's inbuilt integration functions,

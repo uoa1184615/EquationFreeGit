@@ -6,12 +6,16 @@
 \section{\texttt{configPatches1()}: configures spatial patches in 1D}
 \label{sec:configPatches1}
 \localtableofcontents
+
+\subsection{Introduction}
+
 Makes the struct~\verb|patches| for use by the patch\slash
 gap-tooth time derivative function~\verb|patchSmooth1()|.
 \cref{sec:configPatches1eg} lists an example of its use.
 \begin{matlab}
 %}
-function configPatches1(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,nEdge)
+function configPatches1(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP ...
+                       ,nEdge)
 global patches
 %{
 \end{matlab}
@@ -50,7 +54,7 @@ discretisation.
 lattice points in each patch. Must be odd so that there is a
 central lattice point.
 
-\item \verb|nEdge| is, for each patch, the number of edge
+\item \verb|nEdge|, optional, for each patch, the number of edge
 values set by interpolation at the edge regions of each
 patch.  May be omitted.  The default is one (suitable for
 microscale lattices with only nearest neighbour
