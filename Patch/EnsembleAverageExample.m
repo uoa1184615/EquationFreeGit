@@ -47,7 +47,6 @@ recursion).
 \item process results
 \end{enumerate}
 \begin{figure}
-\begin{figure}
 \centering \caption{\label{fig:HomogenisationCtsUEnsAve}the
 diffusing field~\(u(x,t)\) in the patch (gap-tooth) scheme
 applied to microscale heterogeneous diffusion with an

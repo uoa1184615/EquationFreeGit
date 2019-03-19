@@ -1,5 +1,5 @@
 % Common input to both userManual and to devManual.  
-% AJR, Feb 2019
+% AJR, Feb--Mar 2019
 %!TEX root = eqnFreeDevMan.tex
 
 
@@ -29,6 +29,7 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 %    \usepackage[a5paper,margin=11mm]{geometry}
 %}}  
 
+\usepackage[T1]{fontenc}
 \usepackage[dvipsnames]{xcolor}
 
 
@@ -42,10 +43,10 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 \usetikzlibrary{shapes,arrows,fit}
 \usetikzlibrary{positioning}
 
-\usepackage{bold-extra}
-\usepackage[T1]{fontenc}
-\usepackage{caption}
-
+% What do we need these for??
+%\usepackage{bold-extra}
+%\usepackage{caption}
+\def\figurename{\em Figure}
 
 % fancyvrb does code listing, including line numbers
 \usepackage{fancyvrb}
@@ -53,7 +54,7 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
     {\Verbatim[numbers=left,firstnumber=\the\inputlineno]}%
     {\endVerbatim}
 % Also get fancyvrb to omit %{ and %} pairs, 
-% but this requires they always be used
+% although this requires they always be used
 \makeatletter
 \def\fancyvrbStartStop{%
   \edef\FancyVerbStartString{\@percentchar\@charrb} 

@@ -5,11 +5,11 @@
 \label{sec:Excdmc}
 \localtableofcontents
 
-In this example the Projective Integration-General scheme is applied to a
-singularly perturbed ordinary differential equation in which
-the time scale separation is not large. The results demonstrate the value of
- the default \verb|cdmc()| wrapper for the
-microsolver. 
+In this example the Projective Integration-General scheme is
+applied to a singularly perturbed ordinary differential
+equation in which the time scale separation is not large.
+The results demonstrate the value of the default
+\verb|cdmc()| wrapper for the microsolver. 
 \begin{devMan}
 \begin{matlab}
 %}
@@ -46,9 +46,10 @@ tSpan=0:0.5:15;
 \end{matlab}
 
 
-Simulate using \verb|PIG()|, first without the default treatment of \verb|cdmc|
-for the microsolver and second with. Generate a trusted solution using standard
-numerical methods.
+Simulate using \verb|PIG()|, first without the default
+treatment of \verb|cdmc| for the microsolver and second
+with. Generate a trusted solution using standard numerical
+methods.
 \begin{matlab}
 %}
 [nt,nx] = PIG('ode45',microBurst,tSpan,x0,[],[],'no cdmc');
@@ -73,25 +74,25 @@ figure
 h = plot(nt,nx,'rx', ct,cx,'bo', t45,x45,'-');
 legend(h(1:2:5),'Naive PIG','default: PIG + cdmc','Accurate')
 xlabel('Time'), ylabel('State')
-set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','PIGExplore')
+%set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','Figs/PIGExplore')
 %{
 \end{matlab}
-The source of the error in
-the standard \verb|PIG()| scheme is the burst length
-\verb|bT|, that is significant on the slow time scale. Set
-\verb|bT| to \verb|20*epsilon| or
-\verb|50*epsilon|\footnote{this example is quite extreme: at
-bT=50*epsilon, it would be computationally much cheaper to
-simulate the entire length of tSpan using the microsolver
-alone.} to worsen the error in both schemes. This example
-reflects a general principle, that most Projective Integration schemes will
-incur a global error term which is proportional to the
-simulation time of the microsolver and independent of the
-order of the microsolver. The \verb|PIRK()| schemes have
-been written to minimise, if not eliminate entirely, this
-error, but by design \verb|PIG()| works with any
-user-defined macrosolver and cannot reduce this error. The
-function \verb|cdmc()| reduces this error term by attempting
-to mimic the microsolver without advancing time. 
+The source of the error in the standard \verb|PIG()| scheme
+is the burst length~\verb|bT|, that is significant on the
+slow time scale. Set \verb|bT| to \verb|20*epsilon| or
+\verb|50*epsilon|\footnote{This example is quite extreme: at
+\texttt{bT=50*epsilon}, it would be computationally much
+cheaper to simulate the entire length of tSpan using the
+microsolver alone.} to worsen the error in both schemes.
+This example reflects a general principle, that most
+Projective Integration schemes will incur a global error
+term which is proportional to the simulation time of the
+microsolver and independent of the order of the microsolver.
+The \verb|PIRK()| schemes have been written to minimise, if
+not eliminate entirely, this error, but by design
+\verb|PIG()| works with any user-defined macrosolver and
+cannot reduce this error. The function \verb|cdmc()| reduces
+this error term by attempting to mimic the microsolver
+without advancing time. 
 \end{devMan}
 %}

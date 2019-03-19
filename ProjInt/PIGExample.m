@@ -49,15 +49,15 @@ tSpan=[0 15];
 Now time and integrate the above system over \verb|tspan|
 using \verb|PIG()| and, for comparison, a brute force
 implementation of \verb|ode45()|. Report the time taken by
-each method.
+each method (in seconds).
 \begin{matlab}
 %}
 tic
 [ts,xs,tms,xms] = PIG('ode45',microBurst,tSpan,x0);
-tPIGusingODE45asMacro = toc
+secsPIGusingODE45asMacro = toc
 tic
 [t45,x45] = ode45(dxdt,tSpan,x0);
-tODE45alone = toc
+secsODE45alone = toc
 %{
 \end{matlab}
 
@@ -76,7 +76,7 @@ figure
 h = plot(ts,xs,'o', t45,x45,'-');
 legend(h([1 3]),'PI Solution','ode45 Solution')
 xlabel('Time'), ylabel('State')
-set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','PIGExample')
+%set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','Figs/PIGExample')
 %{
 \end{matlab}
 \cref{fig:PIGExample} plots the output.
