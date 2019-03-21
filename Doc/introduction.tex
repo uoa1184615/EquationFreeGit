@@ -1,17 +1,23 @@
 %Initially by AJR, Apr 2017 -- Nov 2018
 %!TEX root = eqnFreeDevMan.tex
 \chapter{Introduction}
-
 %\localtableofcontents
 
 \begin{devMan}
-This Developers Manual contains line-by-line descriptions of the code in each function in the toolbox, and each example.  For basic descriptions of each function, quick start guides, and some basic examples, see the User Manual.
+This Developers Manual contains complete descriptions of the code in each function in the toolbox, and each example.  For basic descriptions of each function, quick start guides, and some basic examples, see the User Manual.
 \end{devMan}
 
 
 \paragraph{Users}
 Place this toolbox's folder in a path searched by \script.
-Then read the section that documents the function of interest.
+Then read the section(s) that documents the function of interest.
+
+
+\paragraph{Quick start}
+Adapt one of the examples included in the toolbox.
+\begin{itemize}
+\item ??
+\end{itemize}
 
 
 \paragraph{Blackbox scenario}
@@ -28,29 +34,22 @@ Thus we aim a toolbox to simulate only on macroscale distributed patches.
 
 \paragraph{Contributors}
 The aim of this project is to collectively develop a \script\ toolbox of equation-free algorithms.
-Initially the algorithms will be simple, and the plan is to subsequently develop more and more capability.
+Initially the algorithms are basic, and the plan is to subsequently develop more and more capability.
 
-\textsc{Matlab} appears the obvious choice for a first version since it is widespread, reasonably efficient, supports various parallel modes, and development costs are reasonably low.
-Further it is built on \textsc{blas} and \textsc{lapack} so potentially the cache and superscalar \cpu{} are well utilised.
-Let's develop functions that work for both \script.
+\textsc{Matlab} appears a good choice for a first version since it is widespread, efficient, supports various parallel modes, and development costs are reasonably low.
+Further it is built on \textsc{blas} and \textsc{lapack} so the cache and superscalar \cpu{} are potentially well utilised.
+We aim to develop functions that work for both \script.
 \cref{sec:contribute} outlines some details for contributors.
 
 
-\chapter{Quick start}
-\localtableofcontents
-This section may be used in conjunction with the many examples in later sections to help apply the toolbox functions to a particular problem, or to assist in distinguishing between the various functions.
-
-\section{Cheat sheet: Projective Integration}
-This section pertains to the Projective Integration (PI) methods of \cref{sec:ProjInt}. The PI approach is to greatly accelerate computations of a system exhibiting multiple time scales.
-
-The PI toolbox presents several `main' functions that could separately be called to perform PI, as well as several optional wrapper functions that may be called. This section helps to distinguish between the top-level PI functions, and helps to tell which of the optional functions may be needed at a glance. \cref{sec:ProjInt} fully details each function.
-
-The cheat sheet consists of two flow charts. \cref{fig:constructPI} overviews constructing a PI simulation. \cref{fig:PIchoosemacro} roughly guides which of the top-level PI functions should be used.
-
-\newlength{\WD}%%%%%%%%%
+\marginpar{\footnotesize\raggedright
+The following charts confuse me??  and we must \emph{not} resize\slash scale fixed width constructs.  Use linewidth for large-scale layout scaling, em for small-widths, and ex for small-heights. }
+\newlength{\WD}%% to set overall size for each chart, propto linewidth
 \begin{figure}
-\caption{these figures appear confusing to a newbie????  and we must \emph{not} resize fixed width constructs.  Use linewidth for large-scale layout scaling, em for small-widths, and ex for small-heights.}
-\label{fig:constructPI}
+\caption{\label{fig:constructPI}The Projective Integration (PI) method greatly accelerates simulation\slash integration of a system exhibiting multiple time scales.
+The PI \cref{sec:ProjInt} presents several `main' functions that could separately be invoked to perform PI, as well as several optional wrapper functions that may be invoked. 
+This chart overviews constructing a PI simulation, whereas \cref{fig:PIchoosemacro} roughly guides which top-level PI functions should be used.
+\cref{sec:ProjInt} fully details each function.}
 \centering
 \setlength{\WD}{0.05\linewidth}%%%%%%%%%%%%%%%%
 \begin{tikzpicture}[node distance = 3ex, auto]
@@ -83,7 +82,7 @@ The cheat sheet consists of two flow charts. \cref{fig:constructPI} overviews co
     \node[block, right=2ex of setmicro] (setmacro){\textbf{Set macrosolver, define problem}\\[1ex]
         \begin{tikzpicture}
     \node [tinyblock]%, below=0.6cm of pig]
-     (pirk) {\textbf{If using \texttt{PIRK()}:}
+     (pirk) {\textbf{If using \texttt{PIRKn()}:}
       
     Set the vector of output times \texttt{tspan}. Intervals between times are the time-steps in the numerical scheme. Set initial values \texttt{x0}.};
    \node [tinyblock, right=1ex of pirk]%, below right=0.2cm and -1cm of lift]
@@ -124,7 +123,9 @@ The cheat sheet consists of two flow charts. \cref{fig:constructPI} overviews co
 
 \begin{figure}
 \centering
-\caption{}\label{fig:PIchoosemacro}
+\caption{\label{fig:PIchoosemacro}The Projective Integration (PI) method greatly accelerates simulation\slash integration of a system exhibiting multiple time scales.
+In conjunction with \cref{fig:constructPI}, this chart roughly guides which top-level PI functions should be used.
+\cref{sec:ProjInt} fully details each function.}
 \setlength{\WD}{0.081\linewidth}%%%%%%%%%%%%%%%%
 \begin{tikzpicture}[node distance = 0.5cm, auto]
 \tikzstyle{bigblock} = [rectangle, draw, thick,   text badly centered, 
@@ -143,10 +144,10 @@ The cheat sheet consists of two flow charts. \cref{fig:constructPI} overviews co
     \node [yesblock, below =2ex of timestep] (timeyes) {Yes};
     \node [yesblock, right=2ex of timestep] (timeno) {No};
     \node [block, below=2ex of timeyes] (slowsol) {{Is a specific solver desired to simulate the slow dynamics?}};
-     \node [smallblock, below right=2ex and 2ex of timeno] (pig) {Choose \texttt{PIG()} to do simulation};
+     \node [smallblock, below right=2ex and 2ex of timeno] (pig) {Choose \texttt{PIG()} to simulate\slash integrate};
          \node [yesblock, below =2ex of slowsol] (slowno) {No};
     \node [yesblock,  right=2ex of slowsol] (slowyes) {Yes};
-         \node [smallblock, below =2ex of slowno] (pirk) {Choose \texttt{PIRK2()} or \texttt{PIRK4()} to do simulation};
+         \node [block, below =2ex of slowno] (pirk) {Choose \texttt{PIRK2()} or \texttt{PIRK4()} to  simulate\slash integrate};
          \path [line, thick] (timestep) to[out=-90,in=90] (timeyes);
          \path [line, thick] (timestep) to[out=0,in=180] (timeno);
           \path [line, thick] (timeno) to[out=0,in=90] (pig);
@@ -171,16 +172,16 @@ The cheat sheet consists of two flow charts. \cref{fig:constructPI} overviews co
 
 
 
-\section{Cheat sheet: constructing patches}
-This section pertains to the Patch approach, \cref{sec:patch}, to solving \textsc{pde}s, lattice systems, or agent\slash particle microscale simulators. 
 
-The Patch toolbox requires that one configure patches, couple the patches and interface the coupled patches with a time integrator. \cref{fig:constructpatch} overviews the chief functions involved and their interactions.
 
 \begin{figure}
 \begin{maxipage}
 \setlength{\WD}{0.048\linewidth}%%%%%%%%%%%%%%%%
 \centering
-\caption{}\label{fig:constructpatch}
+\caption{\label{fig:constructpatch}The Patch methods, \cref{sec:patch}, accelerate simulation\slash integration of multiuscale systems with interesting spatial (or network) structure\slash patterns. The patch methods use your given microsimulators whether coded from \textsc{pde}s, lattice systems, or agent\slash particle microscale simulators.
+The patch functions require that a user configure the patches, and interface the coupled patches with a time integrator\slash simulator. 
+This chart overviews the main functions involved and their interrelationships.
+}
 \begin{tikzpicture}[node distance = 3ex, auto]
 \tikzstyle{bigblock} = [rectangle, draw, thick, text width=20.5\WD, text badly centered, rounded corners, minimum height=4ex]
 \tikzstyle{block} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
