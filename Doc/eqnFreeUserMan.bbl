@@ -1,22 +1,47 @@
 \begin{thebibliography}{xx}
 
-\harvarditem[Gear et~al.]{Gear, Kaper, Kevrekidis \harvardand\
-  Zagaris}{2005}{gear2005projecting}
-Gear, C.~W., Kaper, T.~J., Kevrekidis, I.~G. \harvardand\ Zagaris, A.
-  \harvardyearleft 2005\harvardyearright , `Projecting to a slow manifold:
-  Singularly perturbed systems and legacy codes', {\em SIAM Journal on Applied
-  Dynamical Systems} {\bf 4}(3),~711--732.
+\harvarditem[Bunder et~al.]{Bunder, Roberts \harvardand\
+  Kevrekidis}{2017}{Bunder2013b}
+Bunder, J.~E., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
+  2017\harvardyearright , `Good coupling for the multiscale patch scheme on
+  systems with microscale heterogeneity', {\em J.~Computational Physics} {\bf
+  337},~154--174.
 
-\harvarditem{Gear \harvardand\ Kevrekidis}{2003{\em a}}{Gear02b}
+\harvarditem{Cao \harvardand\ Roberts}{2016}{Cao2014a}
+Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016\harvardyearright ,
+  `Multiscale modelling couples patches of nonlinear wave-like simulations',
+  {\em IMA J.~Applied Maths.} {\bf 81}(2),~228--254.
+
+\harvarditem[Gear et~al.]{Gear, Kaper, Kevrekidis \harvardand\
+  Zagaris}{2005{\em a}}{Gear04}
+Gear, C.~W., Kaper, T.~J., Kevrekidis, I.~G. \harvardand\ Zagaris, A.
+  \harvardyearleft 2005{\em a}\harvardyearright , `Projecting to a slow
+  manifold: singularly perturbed systems and legacy codes', {\em SIAM
+  J.~Applied Dynamical Systems} {\bf 4}(3),~711--732.
+\newline\harvardurl{http://www.siam.org/journals/siads/4-3/60829.html}
+
+\harvarditem[Gear et~al.]{Gear, Kaper, Kevrekidis \harvardand\
+  Zagaris}{2005{\em b}}{Gear05}
+Gear, C.~W., Kaper, T.~J., Kevrekidis, I.~G. \harvardand\ Zagaris, A.
+  \harvardyearleft 2005{\em b}\harvardyearright , `Projecting to a slow
+  manifold: Singularly perturbed systems and legacy codes', {\em SIAM Journal
+  on Applied Dynamical Systems} {\bf 4}(3),~711--732.
+
+\harvarditem{Gear \harvardand\ Kevrekidis}{2003{\em a}}{Gear03b}
 Gear, C.~W. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft 2003{\em
-  a}\harvardyearright , `Projective methods for stiff differential equations:
+  a}\harvardyearright , `Computing in the past with forward integration', {\em
+  Phys. Lett.~A} {\bf 321},~335--343.
+
+\harvarditem{Gear \harvardand\ Kevrekidis}{2003{\em b}}{Gear02b}
+Gear, C.~W. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft 2003{\em
+  b}\harvardyearright , `Projective methods for stiff differential equations:
   Problems with gaps in their eigenvalue spectrum', {\em SIAM Journal on
   Scientific Computing} {\bf 24}(4),~1091--1106.
 \newline\harvardurl{http://link.aip.org/link/?SCE/24/1091/1}
 
-\harvarditem{Gear \harvardand\ Kevrekidis}{2003{\em b}}{Gear03c}
+\harvarditem{Gear \harvardand\ Kevrekidis}{2003{\em c}}{Gear03c}
 Gear, C.~W. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft 2003{\em
-  b}\harvardyearright , `Telescopic projective methods for parabolic
+  c}\harvardyearright , `Telescopic projective methods for parabolic
   differential equations', {\em Journal of Computational Physics} {\bf
   187},~95--109.
 
@@ -63,10 +88,26 @@ Liu, P., Samaey, G., Gear, C.~W. \harvardand\ Kevrekidis, I.~G.
 \newline\harvardurl{http://www.sciencedirect.com/science/article/pii/
   S0168927414002086}
 
+\harvarditem{Maclean \harvardand\ Gottwald}{2015}{Maclean2015}
+Maclean, J. \harvardand\ Gottwald, G.~A.  \harvardyearleft
+  2015\harvardyearright , `On convergence of higher order schemes for the
+  projective integration method for stiff ordinary differential equations',
+  {\em Journal of Computational and Applied Mathematics} {\bf 288},~44--69.
+\newline\harvardurl{http://www.sciencedirect.com/science/article/pii/
+  S0377042715002149}
+
 \harvarditem{Roberts \harvardand\ Kevrekidis}{2007}{Roberts06d}
 Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
   2007\harvardyearright , `General tooth boundary conditions for equation free
   modelling', {\em SIAM J.~Scientific Computing} {\bf 29}(4),~1495--1510.
+
+\harvarditem[Roberts et~al.]{Roberts, MacKenzie \harvardand\
+  Bunder}{2014}{Roberts2011a}
+Roberts, A.~J., MacKenzie, T. \harvardand\ Bunder, J.  \harvardyearleft
+  2014\harvardyearright , `A dynamical systems approach to simulating
+  macroscale spatial dynamics in multiple dimensions', {\em J.~Engineering
+  Mathematics} {\bf 86}(1),~175--207.
+\newline\harvardurl{http://arxiv.org/abs/1103.1187}
 
 \harvarditem[Samaey et~al.]{Samaey, Kevrekidis \harvardand\
   Roose}{2005}{Samaey03b}
@@ -80,11 +121,12 @@ Samaey, G., Roose, D. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
   2006\harvardyearright , `Patch dynamics with buffers for homogenization
   problems', {\em J.~Comput Phys.} {\bf 213},~264--287.
 
-\harvarditem[Zagaris et~al.]{Zagaris, Vandekerckhove, Gear, Kaper \harvardand\
-  Kevrekidis}{2012}{zagaris2012stability}
-Zagaris, A., Vandekerckhove, C., Gear, C.~W., Kaper, T.~J. \harvardand\
-  Kevrekidis, I.~G.  \harvardyearleft 2012\harvardyearright , `Stability and
-  stabilization of the constrained runs schemes for equation-free projection to
-  a slow manifold', {\em DCDS-A} {\bf 32},~2759--2803.
+\harvarditem[Sieber et~al.]{Sieber, Marschler \harvardand\
+  Starke}{2018}{Sieber2018}
+Sieber, J., Marschler, C. \harvardand\ Starke, J.  \harvardyearleft
+  2018\harvardyearright , `Convergence of {Equation}-{Free} {Methods} in the
+  {Case} of {Finite} {Time} {Scale} {Separation} with {Application} to
+  {Deterministic} and {Stochastic} {Systems}', {\em SIAM Journal on Applied
+  Dynamical Systems} {\bf 17}(4),~2574--2614.
 
 \end{thebibliography}

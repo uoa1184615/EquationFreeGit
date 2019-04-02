@@ -70,10 +70,6 @@
 \def\arcproject#1{}
 \def\arcstatement#1{}
 
-% % stroked fractions
-% \newcommand{\strokefrac}[2]{\leavevmode\kern.1em
-% \raise.5ex\hbox{\the\scriptfont0 #1}\kern-.1em
-% /\kern-.15em\lower.25ex\hbox{\the\scriptfont0 #2}}
 \newcommand{\half}{\mbox{$\frac12$}}
 \newcommand{\third}{\mbox{$\frac13$}}
 \newcommand{\quarter}{\mbox{$\frac14$}}
@@ -87,7 +83,9 @@
 \newcommand{\pde}{\textsc{pde}}
 \newcommand{\Reduce}{{Reduce}}
 \newcommand{\Matlab}{\textsc{Matlab}}
-\def\script{\textsc{Matlab}\slash Octave}
+% Cannot(?) support Octave until the following is rescinded 
+% "handles to nested functions are not yet supported"
+\def\script{\Matlab}% \slash Octave}
 \newcommand{\cpu}{\textsc{cpu}}
 % units
 \newcommand{\m}{\operatorname{m}}

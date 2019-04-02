@@ -4,8 +4,8 @@
 % simulation easier. AJR, Nov 2017 -- Mar 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section[\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]
-{\texttt{HomogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
+\section[\texttt{homogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]
+{\texttt{homogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
 \label{sec:HomogenisationExample}
 \localtableofcontents
 
@@ -98,12 +98,7 @@ microscale differential equations.
 \begin{matlab}
 %}
 u0 = sin(patches.x)+0.4*randn(nSubP,nPatch);
-if exist('OCTAVE_VERSION', 'builtin') % Octave version
-   ts=linspace(0,2/cHomo,60);
-   ucts=lsode(@(u,t) patchSmooth1(t,u),u0(:),ts);
-else % Matlab version
-   [ts,ucts] = ode15s(@patchSmooth1, [0 2/cHomo], u0(:));
-end;
+[ts,ucts] = ode15s(@patchSmooth1, [0 2/cHomo], u0(:));
 ucts = reshape(ucts,length(ts),length(patches.x(:)),[]);
 %{
 \end{matlab}
@@ -116,7 +111,7 @@ xs = patches.x;  xs([1 end],:) = nan;
 mesh(ts,xs(:),ucts'),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 set(gcf,'PaperPosition',[0 0 14 10]);% cm
-print('-depsc2','Figs/HomogenisationCtsU')
+print('-depsc2','homogenisationCtsU')
 %{
 \end{matlab}
 
@@ -175,7 +170,7 @@ plot(xs(:),us','.')
 ylabel('u(x,t)'), xlabel('space x')
 legend(num2str(ts',3))
 set(gcf,'PaperPosition',[0 0 14 10]);% cm
-print('-depsc2','Figs/HomogenisationU')
+print('-depsc2','homogenisationU')
 %{
 \end{matlab}
 Also plot a surface detailing the microscale bursts as shown
@@ -195,7 +190,7 @@ for k = 1:2, subplot(1,2,k)
   axis tight, view(126-4*k,45)
 end
 set(gcf,'PaperPosition',[0 0 14 6]);% cm
-print('-depsc2','Figs/HomogenisationMicro')
+print('-depsc2','homogenisationMicro')
 %{
 \end{matlab}
 End of the script.

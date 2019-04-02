@@ -4,8 +4,8 @@
 % Mar 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section[\texttt{EnsembleAverageExample}: simulate an ensemble of solutions for heterogeneous diffusion in 1D \ldots]
-{\texttt{EnsembleAverageExample}: simulate an ensemble of solutions for heterogeneous diffusion in 1D on patches}
+\section[\texttt{ensembleAverageExample}: simulate an ensemble of solutions for heterogeneous diffusion in 1D \ldots]
+{\texttt{ensembleAverageExample}: simulate an ensemble of solutions for heterogeneous diffusion in 1D on patches}
 \label{sec:EnsembleAverageExample}
 \localtableofcontents
 
@@ -160,7 +160,7 @@ xs = patches.x;  xs([1 end],:) = nan;
 mesh(ts,xs(:),uctsAve'),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 set(gcf,'PaperPosition',[0 0 14 10]);% cm
-print('-depsc2','Figs/HomogenisationCtsUEnsAve')
+print('-depsc2','ensAveExCtsU')
 %{
 \end{matlab}
 
@@ -211,7 +211,7 @@ plot(xs(:),usAve','.')
 ylabel('u(x,t)'), xlabel('space x')
 legend(num2str(ts',3))
 set(gcf,'PaperPosition',[0 0 14 10]);% cm
-print('-depsc2','Figs/HomogenisationUEnsAve')
+print('-depsc2','ensAveExU')
 %{
 \end{matlab}
 Also plot a surface detailing the ensemble average
@@ -233,7 +233,7 @@ for k = 1:2, subplot(1,2,k)
   axis tight, view(126-4*k,45)
 end
 set(gcf,'PaperPosition',[0 0 14 6]);% cm
-print('-depsc2','Figs/HomogenisationMicroEnsAve')
+print('-depsc2','ensAveExMicro')
 %{
 \end{matlab}
 End of the script.

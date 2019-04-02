@@ -43,9 +43,6 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 \usetikzlibrary{shapes,arrows,fit}
 \usetikzlibrary{positioning}
 
-% What do we need these for??
-%\usepackage{bold-extra}
-%\usepackage{caption}
 \def\figurename{\em Figure}
 
 % fancyvrb does code listing, including line numbers
@@ -99,8 +96,8 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 \Vec f\Vec x\Vec u \Vec X \Vec U
 \Bb R  \Bb X
 
-
-\usepackage[onedeep]{etocx}% for mini-local-tableofconents, best loaded last??
+% for mini-local-tableofconents, best loaded last??
+\usepackage[twodeep]{etocx}
 
 
 \graphicspath{{../ProjInt/Figs/}{../Patch/Figs/}}
@@ -133,24 +130,26 @@ This suite of functions should empower users to start implementing such methods-
 
 \include{projInt}
 
+
 \include{patch}
+
 
 
 % only include appendices in the devManual
 \begin{devMan}
-%
 \appendix
 \let\FancyVerbStartString\relax 
 \let\FancyVerbStopString\relax
 \include{appContribute}
 \include{apptpd}
-%
 \end{devMan}
 
 
 % get bib data from shared and local files; 
-% add required local to shared with 'bibexport equationFreeDoc'
-\IfFileExists{ajr.sty}{\bibliography{bibexport,ajr,bib}}{}
-\IfFileExists{jm.sty}{\bibliography{bibexport,jm,bib}}{}
+% add required local to shared with 'bibexport eqnFreeDevMan'
+\IfFileExists{ajr.sty}{\bibliography{bibexport,ajr,bib}}{%
+\IfFileExists{jm.sty}{\bibliography{bibexport,jm,bib}}{%
+\IfFileExists{jeb.sty}{\bibliography{bibexport}}{%
+\bibliography{bibexport}}}}
 
 \end{document}

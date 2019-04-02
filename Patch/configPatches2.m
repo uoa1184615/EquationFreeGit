@@ -137,7 +137,9 @@ function coding a nonlinear `diffusion' \pde: to be solved
 on \(6\times4\)-periodic domain, with \(9\times7\) patches,
 spectral interpolation~(\(0\)) couples the patches, each
 patch of half-size ratio~\(0.25\), and with \(5\times5\)
-points within each patch.
+points within each patch. \cite{Roberts2011a} established
+that this scheme is consistent with the \pde\ (as the patch 
+spacing decreases).
 \begin{matlab}
 %}
 nSubP = 5;

@@ -74,7 +74,7 @@ figure
 h = plot(nt,nx,'rx', ct,cx,'bo', t45,x45,'-');
 legend(h(1:2:5),'Naive PIG','default: PIG + cdmc','Accurate')
 xlabel('Time'), ylabel('State')
-%set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','Figs/PIGExplore')
+%set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','PIGExplore')
 %{
 \end{matlab}
 The source of the error in the standard \verb|PIG()| scheme

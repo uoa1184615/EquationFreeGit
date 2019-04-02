@@ -1,7 +1,8 @@
 % Implementation of the 'legacy codes' approach to relaxing
-% a given set of coordinates near the slow manifold. This
-% scheme introduces non- trivial error if the fast dynamics
-% is insufficiently stiff. JM, July 2018
+% a given
+%set of coordinates near the slow manifold. This scheme
+%introduces non- trivial error if the fast dynamics is
+%insufficiently stiff. JM, July 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{cdmc()}}
@@ -58,9 +59,9 @@ bT = t1(end)-t1(1);
 %{
 \end{matlab}
 
-Project backwards to before the initial time, then
-simulate just one burst forward to obtain a simulation burst
-that ends at the original~\verb|t0|.
+Project backwards to before the initial time, then simulate
+just one burst forward to obtain a simulation burst that
+ends at the original~\verb|t0|.
 \begin{matlab}
 %}
 dxdt = (x1(end,:) - x1(end-1,:))/(t1(end,:) - t1(end-1,:));

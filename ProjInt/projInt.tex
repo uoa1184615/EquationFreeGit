@@ -7,11 +7,12 @@
 
 \section{Introduction}
 
-This section provides some good projective integration functions \cite[e.g.]{Gear02b, Gear03c, Givon06, Sieber2018}.
-The goal is to enable computationally expensive dynamic simulations to be run over long time scales.
-\begin{userMan} 
-Perhaps start by looking at \cref{sec:egPIMM} which codes the introductory example of a long time simulation of the Michaelis--Menton multiscale system of differential equations.
-\end{userMan}
+This section provides some good projective integration functions \cite[e.g.]{Gear02b, Gear03c, Givon06, Maclean2015, Sieber2018}.
+The goal is to enable computationally expensive multiscale dynamic simulations\slash integrations to efficiently compute over very long time~scales.
+
+\paragraph{Quick start} 
+\cref{sec:pirk2eg} shows the most basic use of a projective integration function.
+\cref{sec:egPIMM} shows how to code more variations of the introductory example of a long time simulation of the Michaelis--Menton multiscale system of differential equations.
 
 \paragraph{Scenario}
 When you are interested in a complex system with many interacting parts or agents, you usually are primarily interested in the self-organised emergent macroscale characteristics.
@@ -19,7 +20,7 @@ Projective integration empowers us to efficiently simulate such long-time emerge
 We suppose you have coded some accurate, fine scale simulation of the complex system, and call such code a microsolver.
 
 The Projective Integration section of this toolbox consists of several functions.
-Each function implements over the long-time scale a variant of a standard numerical method to simulate the emergent dynamics of the complex system.
+Each function implements over a long-time scale a variant of a standard numerical method to simulate\slash integrate the emergent dynamics of the complex system.
 Each function has standardised inputs and outputs.
 
 
@@ -27,16 +28,14 @@ Each function has standardised inputs and outputs.
 \begin{itemize}
 \item Projective Integration by second or fourth-order Runge--Kutta, \verb|PIRK2()| and \verb|PIRK4()| respectively.
 These schemes are suitable for precise simulation of the slow dynamics, provided the time period spanned by an application of the microsolver is not too large.
+
 \item Projective Integration with a General solver, \verb|PIG()|.
 This function enables a Projective Integration implementation of any solver with macroscale time-steps.
-It does not matter whether the solver is a standard Matlab or Octave algorithm, or one supplied by the user.
+It does not matter whether the solver is a standard Matlab algorithm, or one supplied by the user.
 As explored in later examples, \verb|PIG()| should only be used in very stiff systems. 
-%\end{itemize}
 
-%\paragraph{Minor functions}
-%\begin{itemize}
 \item `Constraint-defined manifold computing', \verb|cdmc()|.
-This helper function, based on the method introduced in \cite{GearKevrekidis05},  iteratively applies the microsolver and projects the output backwards in time.
+This helper function, based on the method introduced in \cite{Gear04},  iteratively applies the microsolver and projects the output backwards in time.
 The result is to constrain the fast variables close to the slow manifold, without advancing the current time by the duration of an application of the microsolver.
 This function can be used to reduce errors related to the simulation length of the microsolver in either the \verb|PIRK| or \verb|PIG| functions.
 In particular, it enables \verb|PIG()| to be used on problems that are not particularly stiff.
@@ -49,17 +48,15 @@ The above functions share dependence on a user-specified `microsolver', that acc
 
 The following sections describe the \verb|PIRK2()| and \verb|PIG()| functions in detail, providing an example for each.
 Then \verb|PIRK4()| is very similar to \verb|PIRK2()|.
-Descriptions for the minor functions follow, and an example of the use of \verb|cdmc()|.
+Descriptions for the minor functions follow, and an example of the use of~\verb|cdmc()|.
 
 \input{../ProjInt/PIRK2.m}
 \input{../ProjInt/egPIMM.m}
 \input{../ProjInt/PIG.m}
 \input{../ProjInt/PIRK4.m}
 \input{../ProjInt/cdmc.m}
-\begin{devMan}
 
-%\section{Examples functions}
-%\label{sec:extras}
+\begin{devMan}
 %\input{../ProjInt/bbgen.m}
 \input{../ProjInt/PIRK_Example.m}
 \input{../ProjInt/PIGExample.m}
@@ -69,12 +66,20 @@ Descriptions for the minor functions follow, and an example of the use of \verb|
 
 \section{To do/discuss}
 \begin{itemize}
-\item could implement Projective Integration by `arbitrary' Runge--Kutta scheme; that is, by having the user input a particular Butcher table---surely only specialists would be interested
-\item can `reverse' the order of projection and microsolver applications with a little fiddling.
-Then output at each user-requested coarse time is the end point of an application of the microsolver - better predictions for fast variables.
-\item Can maybe implement microsolvers that terminate a burst when the fast dynamics have settled using, for example, the 'Events' function handle in ode23. 
-\end{itemize}
+\item Can we implement for Octave?  We would like to use nested functions for some examples, because the function code then inherits parameter(s) from the main function.  However, in Octave we cannot then use handles to these nested functions due to the error ``handles to nested functions are not yet supported"---which apparently is not going to be fixed anytime soon (as at March 2019).
 
+\item could implement Projective Integration by `arbitrary' Runge--Kutta scheme; that is, by having the user input a particular Butcher table---surely only specialists would be interested.
+
+\item can `reverse' the order of projection and microsolver applications with a little fiddling.
+Then output at each user-requested coarse time is the end point of an application of the microsolver---better predictions for fast variables.
+
+\item Can maybe implement microsolvers that terminate a burst when the fast dynamics have settled using, for example, the 'Events' function handle in ode23. 
+
+\item Need projective integration of systems with fast oscillations, perhaps by DMD.
+
+\item Need projective integration for stochastic systems.
+
+\end{itemize}
 \end{devMan}
 
 

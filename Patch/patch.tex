@@ -10,29 +10,36 @@
 
 The patch scheme applies to spatio-temporal systems where
 the spatial domain is larger than what can be computed in
-reasonable time.  In the scheme we compute only on small patches
-of the space-time domain, and produce correct macroscale
-predictions by craftily coupling the patches across
-unsimulated space \cite[e.g.]{Hyman2005, Samaey03b,
-Samaey04, Roberts06d, Liu2015}.
+reasonable time in a given complicated microscale code.  In
+the scheme we compute the microscale details only on small
+patches of the space-time domain, and produce correct
+macroscale predictions by craftily coupling the patches
+across unsimulated space \cite[e.g.]{Hyman2005, Samaey03b,
+Samaey04, Roberts06d, Liu2015}.  The resulting macroscale
+predictions were generally proved to be consistent with the
+microscale dynamics, to some specified order of accuracy, in
+a series of papers: 1D-space dissipative systems
+\cite[]{Roberts06d, Bunder2013b}; 2D-space dissipative
+systems \cite[]{Roberts2011a}; and 1D-space wave-like
+systems \cite[]{Cao2014a}.
 
-The spatial structure is to be on a lattice such as obtained
-from finite difference approximation of a \pde. Usually
-continuous in time.
+The microscale spatial structure is to be on a lattice such
+as obtained from finite difference approximation of a \pde.
+Usually continuous in time.
 
 \paragraph{Quick start}
 See \cref{sec:configPatches1eg,sec:configPatches2eg} which
-list example basic code that uses the provided functions to
-simulate 1D Burgers'~\pde\ and a 2D nonlinear
-`diffusion'~\pde.
+respectively list example basic code that uses the provided 
+functions to simulate the 1D Burgers'~\pde, and a 2D 
+nonlinear `diffusion'~\pde.
 
 \input{../Patch/configPatches1.m}
 \input{../Patch/patchSmooth1.m}
 \input{../Patch/patchEdgeInt1.m}
+\input{../Patch/homogenisationExample.m}
 \begin{devMan}
 \input{../Patch/BurgersExample.m}
-\input{../Patch/HomogenisationExample.m}
-\input{../Patch/EnsembleAverageExample.m}
+\input{../Patch/ensembleAverageExample.m}
 \input{../Patch/waterWaveExample.m}
 \end{devMan}
 

@@ -1,22 +1,4 @@
-@article{Gear05,
-  title={Projecting to a slow manifold: Singularly perturbed systems and legacy codes},
-  author={Gear, C William and Kaper, Tasso J and Kevrekidis, Ioannis G and Zagaris, Antonios},
-  journal={SIAM Journal on Applied Dynamical Systems},
-  volume={4},
-  number={3},
-  pages={711--732},
-  year={2005},
-  publisher={SIAM}
-}
 
-@article{Zagaris12,
-  title={Stability and stabilization of the constrained runs schemes for equation-free projection to a slow manifold},
-  author={Zagaris, Antonios and Vandekerckhove, Christophe and Gear, C William and Kaper, Tasso J and Kevrekidis, Ioannis G},
-  journal={DCDS-A},
-  volume={32},
-  pages={2759--2803},
-  year={2012}
-}
 
 @article{Kevrekidis09a,
   author =        {Kevrekidis, Ioannis~G. and Samaey, Giovanni},
@@ -142,6 +124,34 @@
                    slow components of the original system.},
 }
 
+@article{Maclean2015,
+  author =        {Maclean, John and Gottwald, Georg A.},
+  journal =       {Journal of Computational and Applied Mathematics},
+  pages =         {44--69},
+  title =         {On convergence of higher order schemes for the
+                   projective integration method for stiff ordinary
+                   differential equations},
+  volume =        {288},
+  year =          {2015},
+  abstract =      {Abstract We present a convergence proof for higher
+                   order implementations of the projective integration
+                   method (PI) for a class of deterministic multi-scale
+                   systems in which fast variables quickly settle on a
+                   slow manifold. The error is shown to contain
+                   contributions associated with the length of the
+                   microsolver, the numerical accuracy of the
+                   macrosolver and the distance from the slow manifold
+                   caused by the combined effect of micro- and
+                   macrosolvers, respectively. We also provide stability
+                   conditions for the \{PI\} methods under which the
+                   fast variables will not diverge from the slow
+                   manifold. We corroborate our results by numerical
+                   simulations.},
+  doi =           {http://dx.doi.org/10.1016/j.cam.2015.04.004},
+  url =           {http://www.sciencedirect.com/science/article/pii/
+                  S0377042715002149},
+}
+
 @article{Sieber2018,
   author =        {Sieber, J. and Marschler, C. and Starke, J.},
   journal =       {SIAM Journal on Applied Dynamical Systems},
@@ -193,6 +203,87 @@
                    between the decay rates of fast and slow variables is
                    2.},
   doi =           {10.1137/17M1126084},
+}
+
+@article{Gear04,
+  author =        {Gear, C.~W. and Kaper, T.~J. and Kevrekidis, I.~G. and
+                   Zagaris, A.},
+  institution =   {[\url{http://arXiv.org/abs/physics/0405074}]},
+  journal =       {SIAM J.~Applied Dynamical Systems},
+  number =        {3},
+  pages =         {711--732},
+  title =         {Projecting to a slow manifold: singularly perturbed
+                   systems and legacy codes},
+  volume =        {4},
+  year =          {2005},
+  abstract =      {We consider dynamical systems possessing an
+                   attracting, invariant ``slow manifold '' that can be
+                   parameterized by a few observable variables. We
+                   present a procedure that, given a process for
+                   integrating the system step by step and a set of
+                   values of the observables, finds the values of the
+                   remaining system variables such that the state is
+                   close to the slow manifold to some desired accuracy.
+                   It should be noted that this is not equivalent to
+                   ``integrating down to the manifold '' since the
+                   latter process may significantly change the values of
+                   the observables. We consider problems whose solution
+                   has a singular perturbation expansion, although we do
+                   not know what it is nor have any way to compute it
+                   (because the system is not necessarily expressed in a
+                   singular perturbation form). We show in this paper
+                   that, under some conditions, computing the values of
+                   the remaining variables so that their (m + 1)st time
+                   derivatives are zero provides an estimate of the
+                   unknown variables that is an mth-order approximation
+                   to a point on the slow manifold in a sense to be
+                   defined. We then show how this criterion can be
+                   applied approximately when the system is defined by a
+                   legacy code rather than directly through closed form
+                   equations. This procedure can be valuable when one
+                   wishes to start a simulation of the detailed model on
+                   the slow manifold with particular values of
+                   observable variables characterizing the slow
+                   manifold.},
+  doi =           {10.1137/040608295},
+  url =           {http://www.siam.org/journals/siads/4-3/60829.html},
+}
+
+@article{Gear03b,
+  author =        {Gear, C.~W. and Kevrekidis, I.~G.},
+  journal =       {Phys. Lett.~A},
+  pages =         {335--343},
+  title =         {Computing in the past with forward integration},
+  volume =        {321},
+  year =          {2003},
+  abstract =      {Using existing, forward-in-time integration schemes,
+                   we demonstrate that under certain conditions it is
+                   possible to compute the solution at earlier times,
+                   even in the presence of stiffness (for which reverse
+                   integration is unstable). This technique can be used
+                   when a reverse integrator is not available---for
+                   example, when all one has is a forward-in-time legacy
+                   code. It can also be used for the ``reverse coarse''
+                   integration of the macroscopic closure of a system
+                   defined by a microscopic model which itself is
+                   naturally forward in time (e.g., a particle model of
+                   a gas). The method proposed has stability properties
+                   that enable it to converge to stationary points of
+                   unstable stiff systems.},
+  doi =           {10.1016/j.physleta.2003.12.041},
+}
+
+@article{Gear05,
+  author =        {Gear, C William and Kaper, Tasso J and
+                   Kevrekidis, Ioannis G and Zagaris, Antonios},
+  journal =       {SIAM Journal on Applied Dynamical Systems},
+  number =        {3},
+  pages =         {711--732},
+  publisher =     {SIAM},
+  title =         {Projecting to a slow manifold: Singularly perturbed
+                   systems and legacy codes},
+  volume =        {4},
+  year =          {2005},
 }
 
 @article{Hyman2005,
@@ -416,6 +507,90 @@
   doi =           {10.1016/j.jcp.2017.02.004},
 }
 
+@article{Roberts2011a,
+  author =        {Roberts, A.~J. and MacKenzie, Tony and
+                   Bunder, Judith},
+  journal =       {J.~Engineering Mathematics},
+  number =        {1},
+  pages =         {175--207},
+  title =         {A dynamical systems approach to simulating macroscale
+                   spatial dynamics in multiple dimensions},
+  volume =        {86},
+  year =          {2014},
+  abstract =      {Developments in dynamical systems theory provides new
+                   support for the macroscale modelling of \pde{}s and
+                   other microscale systems such as Lattice Boltzmann,
+                   Monte Carlo or Molecular Dynamics simulators. By
+                   systematically resolving subgrid microscale dynamics
+                   the dynamical systems approach constructs accurate
+                   closures of macroscale discretisations of the
+                   microscale system. Here we specifically explore
+                   reaction-diffusion problems in two spatial dimensions
+                   as a prototype of generic systems in multiple
+                   dimensions. Our approach unifies into one the
+                   modelling of systems by a type of finite elements,
+                   and the `equation free' macroscale modelling of
+                   microscale simulators efficiently executing only on
+                   small patches of the spatial domain. Centre manifold
+                   theory ensures that a closed model exist on the
+                   macroscale grid, is emergent, and is systematically
+                   approximated. Dividing space either into overlapping
+                   finite elements or into spatially separated small
+                   patches, the specially crafted inter-element/patch
+                   coupling also ensures that the constructed
+                   discretisations are consistent with the microscale
+                   system\slash\pde\ to as high an order as desired.
+                   Computer algebra handles the considerable algebraic
+                   details as seen in the specific application to the
+                   Ginzburg--Landau \pde. However, higher order models
+                   in multiple dimensions require a mixed numerical and
+                   algebraic approach that is also developed. The
+                   modelling here may be straightforwardly adapted to a
+                   wide class of reaction-diffusion \pde{}s and lattice
+                   equations in multiple space dimensions. When applied
+                   to patches of microscopic simulations our coupling
+                   conditions promise efficient macroscale simulation.},
+  doi =           {10.1007/s10665-013-9653-6},
+  url =           {http://arxiv.org/abs/1103.1187},
+}
+
+@article{Cao2014a,
+  author =        {Cao, Meng and Roberts, A. J.},
+  journal =       {IMA J.~Applied Maths.},
+  number =        {2},
+  pages =         {228--254},
+  title =         {Multiscale modelling couples patches of nonlinear
+                   wave-like simulations},
+  volume =        {81},
+  year =          {2016},
+  abstract =      {The multiscale gap-tooth scheme is built from given
+                   microscale simulations of complicated physical
+                   processes to empower macroscale simulations. By
+                   coupling small patches of simulations over
+                   unsimulated physical gaps, large savings in
+                   computational time are possible. So far the gap-tooth
+                   scheme has been developed for dissipative systems,
+                   but wave systems are also of great interest. This
+                   article develops the gap-tooth scheme to the case of
+                   nonlinear microscale simulations of wave-like
+                   systems. Classic macroscale interpolation provides a
+                   generic coupling between patches that achieves
+                   arbitrarily high order consistency between the
+                   multiscale scheme and the underlying microscale
+                   dynamics. Eigen-analysis indicates that the resultant
+                   gap-tooth scheme empowers feasible computation of
+                   large scale simulations of wave-like dynamics with
+                   complicated underlying physics. As an pilot study, we
+                   implement numerical simulations of dam-breaking waves
+                   by the gap-tooth scheme. Comparison between a
+                   gap-tooth simulation, a microscale simulation over
+                   the whole domain, and some published experimental
+                   data on dam breaking, demonstrates that the gap-tooth
+                   scheme feasibly computes large scale wave-like
+                   dynamics with computational savings.},
+  doi =           {10.1093/imamat/hxv034},
+}
+
 @inproceedings{Cao2013,
   author =        {Cao, Meng and Roberts, A. J.},
   booktitle =     {Proceedings of the 16th Biennial Computational
@@ -505,41 +680,12 @@
   doi =           {10.1007/s10665-015-9817-7},
 }
 
-@article{Cao2014a,
-  author =        {Cao, Meng and Roberts, A. J.},
-  journal =       {IMA J.~Applied Maths.},
-  number =        {2},
-  pages =         {228--254},
-  title =         {Multiscale modelling couples patches of nonlinear
-                   wave-like simulations},
-  volume =        {81},
-  year =          {2016},
-  abstract =      {The multiscale gap-tooth scheme is built from given
-                   microscale simulations of complicated physical
-                   processes to empower macroscale simulations. By
-                   coupling small patches of simulations over
-                   unsimulated physical gaps, large savings in
-                   computational time are possible. So far the gap-tooth
-                   scheme has been developed for dissipative systems,
-                   but wave systems are also of great interest. This
-                   article develops the gap-tooth scheme to the case of
-                   nonlinear microscale simulations of wave-like
-                   systems. Classic macroscale interpolation provides a
-                   generic coupling between patches that achieves
-                   arbitrarily high order consistency between the
-                   multiscale scheme and the underlying microscale
-                   dynamics. Eigen-analysis indicates that the resultant
-                   gap-tooth scheme empowers feasible computation of
-                   large scale simulations of wave-like dynamics with
-                   complicated underlying physics. As an pilot study, we
-                   implement numerical simulations of dam-breaking waves
-                   by the gap-tooth scheme. Comparison between a
-                   gap-tooth simulation, a microscale simulation over
-                   the whole domain, and some published experimental
-                   data on dam breaking, demonstrates that the gap-tooth
-                   scheme feasibly computes large scale wave-like
-                   dynamics with computational savings.},
-  doi =           {10.1093/imamat/hxv034},
+@book{Higham98,
+  author =        {N.~J.~Higham},
+  edition =       {2nd edition},
+  publisher =     {SIAM},
+  title =         {Handbook of writing for the mathematical sciences},
+  year =          {1998},
 }
 
 @article{Bunder2015a,

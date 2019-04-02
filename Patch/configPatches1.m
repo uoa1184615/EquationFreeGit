@@ -176,12 +176,12 @@ end
 \begin{devMan}
 
 
-This hack needs to be resolved: AJR, 2019-02-26
-\begin{matlab}
-%}
-patches.EnsAve = 0;
-%{
-\end{matlab}
+%This hack needs to be resolved: AJR, 2019-02-26
+%\begin{matlab}
+%%}
+%patches.EnsAve = 0;
+%%{
+%\end{matlab}
 
 
 \subsection{The code to make patches and interpolation}

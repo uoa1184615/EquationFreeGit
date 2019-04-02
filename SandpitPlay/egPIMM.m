@@ -28,12 +28,12 @@ for clearer graphs.
 \begin{matlab}
 %}
 clear all, close all
-global epsilon
-epsilon = 0.1
+global MMepsilon
+MMepsilon = 0.1
 %{
 \end{matlab}
 
-First, \cref{sec:egPIMMburst} encodes the computation of
+First, the end of this section encodes the computation of
 bursts of the Michaelis--Menten system in a
 function~\verb|MMburst()|. Second, here set macroscale times
 of computation and interest into vector~\verb|ts|. Then,
@@ -45,7 +45,7 @@ condition for the Michaelis--Menten system of
 \begin{matlab}
 %}
 ts = 0:6
-xs = PIRK2(@MMburst, ts, [1;0], 2*epsilon)
+xs = PIRK2(@MMburst, ts, [1;0], 2*MMepsilon)
 plot(ts,xs,'o:')
 xlabel('time t'), legend('x(t)','y(t)')
 pause(1)
@@ -74,7 +74,7 @@ in \cref{fig:egPIMM2}. Two further output variables provide
 this microscale burst information.
 \begin{matlab}
 %}
-[xs,tMicro,xMicro] = PIRK2(@MMburst, ts, [1;0], 2*epsilon);
+[xs,tMicro,xMicro] = PIRK2(@MMburst, ts, [1;0], 2*MMepsilon);
 figure, plot(ts,xs,'o:',tMicro,xMicro)
 xlabel('time t'), legend('x(t)','y(t)')
 pause(1)
@@ -108,7 +108,7 @@ longer bursts, here~\(3\epsilon\).
 \begin{matlab}
 %}
 ts = 0:-1:-5
-[xs,tMicro,xMicro] = PIRK2(@MMburst, ts, 0.2*[1;1], 3*epsilon);
+[xs,tMicro,xMicro] = PIRK2(@MMburst, ts, 0.2*[1;1], 3*MMepsilon);
 figure, plot(ts,xs,'o:',tMicro,xMicro)
 xlabel('time t'), legend('x(t)','y(t)')
 %{
@@ -124,25 +124,6 @@ forward simulations used to project backward in time at
 \end{figure}
 
 
+\input{../ProjInt/MMburst.m}
 
-\subsection{Code a burst of Michaelis--Menten enzyme kinetics}
-\label{sec:egPIMMburst}
-Say use \verb|ode23()| to integrate a burst of the
-differential equations for the Michaelis--Menten enzyme
-kinetics. Code differential equations in
-function~\verb|dMMdt| with variables \(x=\verb|x(1)|\) and
-\(y=\verb|x(2)|\). For the given start time~\verb|ti|, and
-start state~\verb|xi|, \verb|ode23()| integrates the
-differential equations for a burst time of~\verb|bT|, and
-return the simulation data.
-\begin{matlab}
-%}
-function [ts, xs] = MMburst(ti, xi, bT) 
-    global epsilon
-    dMMdt = @(t,x) [ -x(1)+(x(1)+0.5)*x(2)
-          1/epsilon*( x(1)-(x(1)+1)*x(2) ) ];
-    [ts, xs] = ode23(dMMdt, [ti ti+bT], xi);
-end
-%{
-\end{matlab}
 %}

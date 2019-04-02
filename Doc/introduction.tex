@@ -4,29 +4,40 @@
 %\localtableofcontents
 
 \begin{devMan}
-This Developers Manual contains complete descriptions of the code in each function in the toolbox, and each example.  For basic descriptions of each function, quick start guides, and some basic examples, see the User Manual.
+This Developers Manual contains complete descriptions of the code in each function in the toolbox, and each example.  For concise descriptions of each function, quick start guides, and some basic examples, see the User Manual.
 \end{devMan}
 
 
 \paragraph{Users}
-Place this toolbox's folder in a path searched by \script.
+Place the folder of this toolbox in a path searched by \script.
 Then read the section(s) that documents the function of interest.
 
 
 \paragraph{Quick start}
-Adapt one of the examples included in the toolbox.
+Maybe start by adapting one of the included examples. Many of the main functions include, at their start, example code of their use (code which is executed if the function is invoked without any arguments).
 \begin{itemize}
-\item ??
+\item To projectively integrate over time a multiscale, slow-fast, system of \ode{}s you could use \verb|PIRK2()|: adapt the Michaelis--Menten example at the start of \verb|PIRK2.m| (\cref{sec:pirk2eg}).
+\item You may use forward bursts of simulation in order to simulate the slow dynamics backward in time, as in \verb|egPIMM.m| (\cref{sec:egPIMM}).
+\item To only resolve the slow dynamics in the projective integration, use lifting and restriction functions by adapting the singular perturbation \ode\ example at the start of \verb|PIG.m| (\cref{sec:pigeg}).
+\item Consider an evolving system over a large spatial domains when all you have is a microscale code.  To efficiently simulate over the large domain, one can simulate in just small patches of the domain, appropriately coupled:
+\begin{itemize}
+\item in 1D adapt the code at the start of \verb|configPatches1.m| for Burgers' \pde\ (\cref{sec:configPatches1eg})%
+\ifcsname r@sec:wave2D\endcsname, or the staggered patches of 1D water wave equations in \verb|waterWaveExample.m| (\cref{sec:waterWaveExample})\fi;
+\item in 2D adapt the code at the start of \verb|configPatches2.m| for nonlinear diffusion (\cref{sec:configPatches2eg})%
+\ifcsname r@sec:wave2D\endcsname, or the regular patches of the 2D wave equation of \verb|wave2D.m| (\cref{sec:wave2D})\fi.
+\end{itemize}
+\item The above are for systems that have \emph{smooth} spatial structures on the microscale: when the microscale is `rough' with a known period (so far only in 1D), then adapt 
+the example of \verb|HomogenisationExample.m| (\cref{sec:HomogenisationExample}).
 \end{itemize}
 
 
 \paragraph{Blackbox scenario}
 Assume that a researcher\slash practitioner has a detailed and \emph{trustworthy} computational simulation of some problem of interest.
-The simulation may be written in terms of micro-positional coordinates~\(\xv_i(t)\) in `space' at which there are micro-field variable values~\(\uv_i(t)\) for indices~\(i\) in some (large) set of integers and for time~\(t\).
+Let's say the simulation is coded in terms of micro-field variable values~\(\uv_i(t)\) for indices~\(i\) in some (large) set of integers, and for time~\(t\).
+Perhaps the indices~\(i\) correspond to `spatial' coordinates~\(\xv_i(t)\).
 In lattice problems the positions~\(\xv_i\) would be fixed in time (unless employing a moving mesh on the microscale); in particle problems the positions would evolve.
 The positional coordinates are \(\xv_i\in\RR^{d}\) where for spatial problems integer \(d=1,2,3\), but it may be more when solving for a distribution of velocities, or pore sizes, or trader's beliefs, etc.
 The micro-field variables could be in~\(\RR^{p}\) for any \(p=1,2,\ldots,\infty\).
-
 Further, assume that the computational simulation is too expensive over all the desired spatial domain~\(\XX\subset\RR^{d}\).
 Thus we aim a toolbox to simulate only on macroscale distributed patches.
 
@@ -38,17 +49,15 @@ Initially the algorithms are basic, and the plan is to subsequently develop more
 
 \textsc{Matlab} appears a good choice for a first version since it is widespread, efficient, supports various parallel modes, and development costs are reasonably low.
 Further it is built on \textsc{blas} and \textsc{lapack} so the cache and superscalar \cpu{} are potentially well utilised.
-We aim to develop functions that work for both \script.
-\cref{sec:contribute} outlines some details for contributors.
+We aim to develop functions that work for~\script.
+\ifcsname r@sec:contribute\endcsname\cref{sec:contribute} outlines some details for contributors.\fi
 
 
-\marginpar{\footnotesize\raggedright
-The following charts confuse me??  and we must \emph{not} resize\slash scale fixed width constructs.  Use linewidth for large-scale layout scaling, em for small-widths, and ex for small-heights. }
-\newlength{\WD}%% to set overall size for each chart, propto linewidth
+\newlength{\WD}% set overall size for each chart, propto linewidth
 \begin{figure}
-\caption{\label{fig:constructPI}The Projective Integration (PI) method greatly accelerates simulation\slash integration of a system exhibiting multiple time scales.
-The PI \cref{sec:ProjInt} presents several `main' functions that could separately be invoked to perform PI, as well as several optional wrapper functions that may be invoked. 
-This chart overviews constructing a PI simulation, whereas \cref{fig:PIchoosemacro} roughly guides which top-level PI functions should be used.
+\caption{\label{fig:constructPI}The Projective Integration method greatly accelerates simulation\slash integration of a system exhibiting multiple time scales.
+The Projective Integration \cref{sec:ProjInt} presents several separate functions, as well as several optional wrapper functions that may be invoked. 
+This chart overviews constructing a Projective Integration simulation, whereas \cref{fig:PIchoosemacro} roughly guides which top-level Projective Integration functions should be used.
 \cref{sec:ProjInt} fully details each function.}
 \centering
 \setlength{\WD}{0.05\linewidth}%%%%%%%%%%%%%%%%
@@ -74,7 +83,7 @@ This chart overviews constructing a PI simulation, whereas \cref{fig:PIchoosemac
      
     Define or construct the function \texttt{solver()} that calls a black-box microsolver. Set \texttt{bT}, the time to run microsolver for. Possible aids:
 \begin{itemize}
-\item     Use the Patch functions (\cref{fig:constructpatch}) to simulate a large-scale a \pde, lattice, etc.
+\item     Use the Patch functions (\cref{fig:constructpatch}) to simulate a large-scale \pde, lattice, etc.
 %\item    Use \texttt{bbgen()} if the microsolver is a standard solver, \texttt{ode45} e.g., and needs to be converted into a black-box.
 \item    Use \texttt{cmdc()} as a wrapper for the microsolver if the slow variables would otherwise change significantly over the microsolver.
 \end{itemize}};
@@ -84,7 +93,7 @@ This chart overviews constructing a PI simulation, whereas \cref{fig:PIchoosemac
     \node [tinyblock]%, below=0.6cm of pig]
      (pirk) {\textbf{If using \texttt{PIRKn()}:}
       
-    Set the vector of output times \texttt{tspan}. Intervals between times are the time-steps in the numerical scheme. Set initial values \texttt{x0}.};
+    Set the vector of output times \texttt{tspan}. Intervals between times are the projective time-steps. Set initial values \texttt{x0}.};
    \node [tinyblock, right=1ex of pirk]%, below right=0.2cm and -1cm of lift]
     (pig) {\textbf{If using \texttt{PIG()}:}
      
@@ -94,11 +103,11 @@ This chart overviews constructing a PI simulation, whereas \cref{fig:PIchoosemac
    
        \node [smallblock, below=2ex of setmacro] (lift) 
        {\textbf{Set lifting\slash restriction}\quad
-    If needed, set functions \texttt{restrict()} and \texttt{lift()} to convert between macro and micro problems/variables. These are optional arguments to the \texttt{PI} functions.};
+    If needed, set functions \texttt{restrict()} and \texttt{lift()} to convert between macro and micro problems\slash variables. These are optional arguments to the Projective Integration functions.};
     
- \node [block, below right=5ex and -9\WD of setmicro] (dopi) {\textbf{Do PI}\quad 
-    Invoke the appropriate PI function as, e.g., 
-    \verb|[t,x]=PIRK2(solver,bT,tspan,x0)|, or
+ \node [block, below right=5ex and -9\WD of setmicro] (dopi) {\textbf{Do Projective Integration}\quad 
+    Invoke the appropriate Projective Integration function as, e.g., 
+    \verb|[t,x]=PIRK2(solver,tspan,x0,bT)|, or
     \verb|[t,x]=PIG(solver,macro,x0)|. 
     Additional optional outputs inform you of the microscale.};
              \path [line, thick] (setmicro) to[out=-90,in=120] (dopi);
@@ -123,8 +132,8 @@ This chart overviews constructing a PI simulation, whereas \cref{fig:PIchoosemac
 
 \begin{figure}
 \centering
-\caption{\label{fig:PIchoosemacro}The Projective Integration (PI) method greatly accelerates simulation\slash integration of a system exhibiting multiple time scales.
-In conjunction with \cref{fig:constructPI}, this chart roughly guides which top-level PI functions should be used.
+\caption{\label{fig:PIchoosemacro}The Projective Integration method greatly accelerates simulation\slash integration of a system exhibiting multiple time scales.
+In conjunction with \cref{fig:constructPI}, this chart roughly guides which top-level Projective Integration functions should be used.
 \cref{sec:ProjInt} fully details each function.}
 \setlength{\WD}{0.081\linewidth}%%%%%%%%%%%%%%%%
 \begin{tikzpicture}[node distance = 0.5cm, auto]
@@ -138,7 +147,7 @@ In conjunction with \cref{fig:constructPI}, this chart roughly guides which top-
     text width=1.2\WD, rounded corners, minimum height=1.2em]   
 \tikzstyle{line} = [draw, -latex']
 \tikzstyle{lined} = [draw, latex'-latex']
-\node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Choosing the macro solver in PI}\\[2ex]
+\node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Choosing the macro solver in Projective Integration}\\[2ex]
     \begin{tikzpicture}[node distance = 4ex, auto]
     \node [block,right=5\WD] (timestep) {{Is an appropriate time-step known for the slow dynamics?}};
     \node [yesblock, below =2ex of timestep] (timeyes) {Yes};
@@ -196,9 +205,10 @@ This chart overviews the main functions involved and their interrelationships.
     \begin{tikzpicture}[node distance = 3ex, auto]
     \node [block] (configPatches) {\textbf{Define problem and construct patches}
     
-    Call \texttt{configpatches1} (for 1D) or \texttt{configpatches2} (for 2D) with inputs which define the microscale problem (\textsc{pde}, domain, boundary conditions etc) and the desired patch structure (number of patches, patch size, coupling order etc).
-    
-    Output of \texttt{configpatches1} or \texttt{configpatches2}  is the global struct \texttt{patches}. The components of this struct should contain all information required to solve the microscale problem within each patch (function, microscale lattice points in each patch etc). If necessary, define additional components for struct \texttt{patches} (e.g.,  \texttt{HomogenisationExample}).};
+    Invoke \texttt{configpatches1} (for 1D) or \texttt{configpatches2} (for 2D) to define the microscale problem (\textsc{pde}, domain, boundary conditions, etc) and the desired patch structure (number of patches, patch size, coupling order, etc).
+These functions initialise the global struct \texttt{patches}. 
+The components of \texttt{patches} contain all information required to solve the microscale problem within each patch. 
+If necessary, define additional components for struct \texttt{patches} (e.g., see \texttt{EnsembleAverageExample.m}).};
     \node [block, below=of configPatches] (microPDE) {\textbf{Solve microscale problem within each patch}\\
     Call the \textsc{pde} solver which is to evaluate the microscale problem within each patch. This solver may be a Matlab defined function (such as \texttt{ode15s} or \texttt{ode45}) or a user defined function (such as Runge--Kutta).
     

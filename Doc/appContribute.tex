@@ -8,18 +8,18 @@
 For developers to create and document the various functions, we use an idea due to Neil~D. Lawrence of the University of Sheffield.
 
 \begin{itemize}
-\item Each class of toolbox functions is located in separate directories in the repository, say~\verb|Dir|.
+\item Each class of toolbox functions is located in separate folders in the repository, say~\verb|Dir|.
 
-\item Create a \LaTeX\ file~\verb|Dir/funs.tex|: establish as one \LaTeX\ section that \verb|\input{Dir/*.m}|s the  files of the functions in the class, example scripts of use, and possibly test scripts, \autoref{tbl:funtex}.
+\item Create a \LaTeX\ file~\verb|Dir/funs.tex|: establish as one \LaTeX\ chapter that \verb|\input{Dir/*.m}|s the  files of the functions in the class, example scripts of use, and possibly test scripts, \autoref{tbl:funtex}.
 
-\item Each such \verb|Dir/funs.tex| file is to be included from the main \LaTeX\ file \verb|Doc/eqnFreeDevMan.tex| so that people can most easily work on one section at a time: 
+\item Each such \verb|Dir/funs.tex| file is to be included from the main \LaTeX\ file \verb|Doc/docBody.tex| so that people can most easily work on one chapter at a time: 
 \begin{itemize}
-\item put \verb|\include{funs}| into \verb|Doc/eqnFreeDevMan.tex|;
-\item to include we have to use a soft link so at the command line in the directory~\verb|Doc| execute \verb|ln -s ../Dir/funs.tex|
-\footnote{Such soft links are necessary for at least my Mac \textsc{osx} and hopefully work for other developers.  Further, auxiliary files are advantageously also located in the \texttt{Doc} directory.}
+\item put \verb|\include{funs}| into \verb|Doc/docBody.tex|\,;
+\item to include, create a `link' file \verb|Doc/funs.tex| whose only active content is the command \verb|\input{../Dir/funs.tex}|\,;
+\item in \verb|Doc/docBody.tex| modify the \verb|\graphicspath| command to include \verb|{../Dir/Figs}|\,.
 \end{itemize}
 
-\item Each toolbox function is documented as a separate section, with tests and examples as separate sections.
+\item Each toolbox function is documented as a separate section, within its chapter, with tests and examples as separate sections.
 
 \item Each function-section and test-section is to be created as a \script\ \verb|Dir/*.m| file, say \verb|Dir/fun1.m|, so that users simply invoke the function in \script\ as usual by \verb|fun1(...)|.
 
@@ -34,24 +34,29 @@ The format for a example\slash test-section is similar.
 \item Any figures from examples should be generated and then saved for later inclusion with the following (which finally works properly for \textsc{Matlab} 2017+)
 \begin{verbatim}
 set(gcf,'PaperPosition',[0 0 14 10]);% cm
-print('-depsc2','Figs/filename')
+print('-depsc2','filename')
 \end{verbatim}
-Include with (do \emph{not} postfix with \verb|.eps| or \verb|.pdf|)
+If it is a suitable replacement for an existing graphic, then move it into the \verb|Dir/Figs| folder.
+Include such a graphic into the \LaTeX\ document with (do \emph{not} postfix with \verb|.eps| or \verb|.pdf|)
 \begin{verbatim}
-\includegraphics[scale=0.9]{../Dir/Figs/filename}
+\includegraphics[scale=0.9]{filename}
 \end{verbatim}
 
+\item   In figures and other graphics, do \emph{not} resize\slash scale fixed width constructs: instead use \verb|\linewidth| to configure large-scale layout, \verb|em| for small-widths, and \verb|ex| for small-heights. 
 
-\item For every function, generally include at the start of the function a simple example of its use.  The example is only to be executed when the function is invoked with no input arguments.
 
-When appropriate, if a function is invoked with no output arguments, then draw some reasonable graph of the results.
+\item For every function, generally include at the start of the function a simple example of its use.  The example is only to be executed when the function is invoked with no input arguments (\verb|if nargin==0|).
+
+When appropriate, if a function is invoked with no output arguments (\verb|if nargout==0|), then draw some reasonable graph of the results.
 
 
 \item In all \script\ code, prefer camal case for variable names (not underscores).
 
+\item When a function is `finalised', wrap (most) of the lines to be no more than 60~characters so that readers looking at the source can read the plain text reasonably.
 
-\item In documentation \cite[e.g.,][Ch.~4]{Higham98}: 
-write actively, not passive (e.g., avoid ``--tion'' words);
+
+\item In the documentation \cite[e.g.,][Ch.~4]{Higham98}: 
+write actively, not passively (e.g., avoid ``--tion'' words);
 avoid wishy-washy ``can'';
 use the present tense;
 cross-reference precisely;

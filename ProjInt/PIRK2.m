@@ -314,7 +314,7 @@ time-step, then do so (setting some internal states to
 \verb|NaN|); else proceed to projective step.
 \begin{matlab}
 %}
-    if ~isempty(bT) & 2*abs(bT)>=abs(tSpan(jT)-T) & bT*(tSpan(jT)-T)>0
+    if ~isempty(bT) && 2*abs(bT)>=abs(tSpan(jT)-T) && bT*(tSpan(jT)-T)>0
         [t1,xm1] = microBurst(T, x(jT-1,:), tSpan(jT)-T);
         x(jT,:) = xm1(end,:);
         t2=nan; xm2=nan(1,size(xm1,2));

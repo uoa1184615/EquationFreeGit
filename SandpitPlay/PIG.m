@@ -177,6 +177,9 @@ method (or the Runge--Kutta method), then \(\hat L = L\) (or
 \begin{matlab}
 %}
 if nargin==0
+   if exist('OCTAVE_VERSION','builtin')
+   error('This example is not yet adapted for Octave.')
+   end
 %{
 \end{matlab}
 \begin{figure}
