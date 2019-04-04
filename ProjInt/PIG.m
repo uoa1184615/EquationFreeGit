@@ -1,7 +1,7 @@
 % PIG implements Projective Integration scheme with any
-% system or user-specified integrator for the slow-time
-% macroscale, and any user-specified microsolver. JM & AJR,
-% Sept 2018 -- Mar 2019.
+% inbuilt integrator or user-specified integrator for the
+% slow-time macroscale, and with any inbuilt/user-specified
+% microsolver. JM & AJR, Sept 2018 -- Mar 2019.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
@@ -225,7 +225,9 @@ formula for safety.
 \begin{matlab}
 %}
 bT = 2*epsilon*log(1/epsilon)
-microBurst = @(tb0,xb0) ode45(dxdt,[tb0 tb0+bT],xb0);
+if ~exist('OCTAVE_VERSION','builtin')
+    micB='ode45'; else micB='rk2Int'; end
+microBurst = @(tb0, xb0) feval(micB,dxdt,[tb0 tb0+bT],xb0);
 %{
 \end{matlab}
 Third, code functions to convert between macroscale and
@@ -246,7 +248,9 @@ macroscale time with forward microscale bursts \cite[]{Gear03b}.
 %}
 Tspan = [0 6]; 
 x0 = [1;0];
-[Ts,Xs,tms,xms] = PIG('ode23',microBurst,Tspan,x0,restrict,lift);
+if ~exist('OCTAVE_VERSION','builtin')
+    macInt='ode23'; else macInt='odeOct'; end
+[Ts,Xs,tms,xms] = PIG(macInt,microBurst,Tspan,x0,restrict,lift);
 %{
 \end{matlab}
 Plot output of this projective integration.
@@ -290,7 +294,7 @@ Get the number of expected outputs and set logical indices
 to flag what data should be saved. 
 \begin{matlab}
 %}
-nArgs=nargout();
+nArgs = nargout();
 saveMicro = (nArgs>2);
 saveSvf = (nArgs>4);
 %{
@@ -300,7 +304,7 @@ Find the number of time-steps at which output is expected,
 and the number of variables.
 \begin{matlab}
 %}
-nT=length(Tspan)-1;
+nT = length(Tspan)-1;
 nx = length(x0);
 nX = length(restrict(x0));
 %{
@@ -309,6 +313,7 @@ nX = length(restrict(x0));
 Reformulate the microsolver to use \verb|cdmc()|, unless
 flagged otherwise. The result is that the solution from
 microBurst will terminate at the given initial time. 
+% Should be OK in Octave.
 \begin{matlab}
 %}
 if nargin<7
@@ -418,7 +423,8 @@ end% PIFun function
 Integrate \verb|PIF()| with the user-specified simulator
 \verb|macroInt()|. For some reason, in \script\ we need to
 use a one-line function, \verb|PIF|, that invokes the above
-macroscale function, \verb|PIFun|.
+macroscale function, \verb|PIFun|.  We also need to use
+\verb|feval| because \verb|macroInt()| has multiple outputs.
 \begin{matlab}
 %}
 PIF = @(t,x) PIFun(t,x);

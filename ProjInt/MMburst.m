@@ -19,8 +19,7 @@ function [ts, xs] = MMburst(ti, xi, bT)
     if ~exist('OCTAVE_VERSION','builtin')
     [ts, xs] = ode23(dMMdt, [ti ti+bT], xi);
     else % octave version
-    ts = linspace(ti,ti+bT,11);
-    xs = lsode(@(x,t) dMMdt(t,x),xi,ts);
+    [ts, xs] = odeOct(dMMdt, [ti ti+bT], xi);
     end
 end
 %{

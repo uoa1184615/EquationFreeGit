@@ -9,12 +9,11 @@ This script is a demonstration of the \verb|PIRK()| schemes,
 that use a Runge--Kutta macrosolver, applied to a simple
 linear system with some slow and fast directions. 
 
-\begin{devMan}
 Clear workspace and set a seed.
 \begin{matlab}
 %}
 clear
-rng(1)
+rand('seed',1) % albeit discouraged in Matlab
 global dxdt
 %{
 \end{matlab}
@@ -75,7 +74,12 @@ To verify, we also compute the trajectories using a
 standard integrator.
 \begin{matlab}
 %}
-[tt,ode45x] = ode45(dxdt,tSpan([1,end]),x0);
+if ~exist('OCTAVE_VERSION','builtin')
+    [tt,xode] = ode45(dxdt,tSpan([1,end]),x0);
+else % octave version
+    tt = linspace(tSpan(1),tSpan(end),101);
+    xode = lsode(@(x,t) dxdt(t,x),x0,tt);
+end
 %{
 \end{matlab}
 
@@ -94,7 +98,7 @@ solver.}\label{fig:PIRK}
 clf()
 hold on
 PI_sol=plot(tSpan,x,'bo');
-std_sol=plot(tt,ode45x,'r');
+std_sol=plot(tt,xode,'r');
 plot(tms,xms,'k.', rm.t,rm.x,'g.');
 legend([PI_sol(1),std_sol(1)],'PI Solution',...
     'Standard Solution','Location','NorthWest')
@@ -104,33 +108,14 @@ xlabel('Time'), ylabel('State')
 Save plot to a file.
 \begin{matlab}
 %}
-set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','PIRK')
+if ~exist('OCTAVE_VERSION','builtin')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+print('-depsc2','PIRK')
+end
 %{
 \end{matlab}
 
-Code the micro-burst function using simple Euler steps. As a
-rule of thumb, the time-steps \verb|dt| should satisfy
-$\verb|dt|  \le 1/|\verb|fastband|(1)|$ and the time to
-simulate with each application of the microsolver,
-\verb|bT|, should be larger than or equal to
-$1/|\verb|fastband|(2)|$. We set the integration scheme to
-be used in the microsolver. Since the time-steps are so
-small, we just use the forward Euler scheme
-\begin{matlab}
-%}
-function [ts, xs] = linearBurst(ti, xi, varargin) 
-global dxdt
-dt = 0.001;
-ts = ti+(0:dt:0.05)'; 
-nts = length(ts);
-xs = NaN(nts,length(xi));
-xs(1,:)=xi;
-for k=2:nts
-    xi = xi + dt*dxdt(ts(k),xi.').';
-    xs(k,:)=xi;
-end
-end
-%{
-\end{matlab}
-\end{devMan}
+
+\input{../ProjInt/linearBurst.m}
+
 %}

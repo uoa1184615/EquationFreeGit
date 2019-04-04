@@ -32,7 +32,9 @@ the microsolver.
 \begin{matlab}
 %}
 bT = epsilon*log(1/epsilon);
-microBurst = @(tb0,xb0) ode45(dxdt,[tb0 tb0+bT],xb0);
+if ~exist('OCTAVE_VERSION','builtin')
+    micB='ode45'; else micB='rk2Int'; end
+microBurst = @(tb0, xb0) feval(micB,dxdt,[tb0 tb0+bT],xb0);
 %{
 \end{matlab}
 
@@ -52,9 +54,11 @@ with. Generate a trusted solution using standard numerical
 methods.
 \begin{matlab}
 %}
-[nt,nx] = PIG('ode45',microBurst,tSpan,x0,[],[],'no cdmc');
-[ct,cx] = PIG('ode45',microBurst,tSpan,x0);
-[t45,x45] = ode45(dxdt,tSpan([1 end]),x0);
+if ~exist('OCTAVE_VERSION','builtin')
+    macInt='ode45'; else macInt='odeOct'; end
+[nt,nx] = PIG(macInt,microBurst,tSpan,x0,[],[],'no cdmc');
+[ct,cx] = PIG(macInt,microBurst,tSpan,x0);
+[tClassic,xClassic] = feval(macInt,dxdt,tSpan,x0);
 %{
 \end{matlab}
 
@@ -63,18 +67,22 @@ methods.
 \cref{fig:PIGE} plots the output. 
 \begin{figure}
 \centering
-\caption{Accurate simulation of a weakly stiff non-autonomous
-system by \texttt{PIG()} using cdmc(), and an inaccurate solution
-using a naive application of~\texttt{PIG()}.}\label{fig:PIGE}
+\caption{\label{fig:PIGE}Accurate simulation of a weakly
+stiff non-autonomous system by \texttt{PIG()} using
+\texttt{cdmc()}, and an inaccurate solution using a naive
+application of~\texttt{PIG()}.}
 \includegraphics[scale=0.9]{PIGExplore}
 \end{figure}
 \begin{matlab}
 %}
 figure
-h = plot(nt,nx,'rx', ct,cx,'bo', t45,x45,'-');
+h = plot(nt,nx,'rx', ct,cx,'bo', tClassic,xClassic,'-');
 legend(h(1:2:5),'Naive PIG','default: PIG + cdmc','Accurate')
 xlabel('Time'), ylabel('State')
-%set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','PIGExplore')
+if ~exist('OCTAVE_VERSION','builtin')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','PIGExplore')
+end
 %{
 \end{matlab}
 The source of the error in the standard \verb|PIG()| scheme

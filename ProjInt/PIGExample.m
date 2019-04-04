@@ -1,4 +1,4 @@
-% Basic example of PIG. JM, Sept 18.
+% Basic example of PIG. JM & AJR, Sept 2018 -- Apr 2019.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{Example: Projective Integration using General macrosolvers }
@@ -34,7 +34,9 @@ the microsolver.
 \begin{matlab}
 %}
 bT = epsilon*log(1/epsilon);
-microBurst = @(tb0, xb0) ode45(dxdt,[tb0 tb0+bT],xb0);
+if ~exist('OCTAVE_VERSION','builtin')
+    micB='ode45'; else micB='rk2Int'; end
+microBurst = @(tb0, xb0) feval(micB,dxdt,[tb0 tb0+bT],xb0);
 %{
 \end{matlab}
 
@@ -42,8 +44,8 @@ Set initial conditions, and the time to be covered by the
 macrosolver. 
 \begin{matlab}
 %}
-x0 = [1 1.4];
-tSpan=[0 15];
+x0 = [1 0.9];
+tSpan = [0 5]; 
 %{
 \end{matlab}
 Now time and integrate the above system over \verb|tspan|
@@ -52,12 +54,14 @@ implementation of \verb|ode45()|. Report the time taken by
 each method (in seconds).
 \begin{matlab}
 %}
+if ~exist('OCTAVE_VERSION','builtin')
+    macInt='ode45'; else macInt='odeOct'; end
 tic
-[ts,xs,tms,xms] = PIG('ode45',microBurst,tSpan,x0);
-secsPIGusingODE45asMacro = toc
+[ts,xs,tms,xms] = PIG(macInt,microBurst,tSpan,x0);
+secsPIGusingODEasMacro = toc
 tic
-[t45,x45] = ode45(dxdt,tSpan,x0);
-secsODE45alone = toc
+[tClassic,xClassic] = feval(macInt,dxdt,tSpan,x0);
+secsODEalone = toc
 %{
 \end{matlab}
 
@@ -68,22 +72,26 @@ on the first figure.
 \begin{matlab}
 %}
 figure
-h = plot(ts,xs,'o', t45,x45,'-', tms,xms,'.');
-legend(h(1:2:5),'PI Solution','ode45 Solution','PI microsolver')
+h = plot(ts,xs,'o', tClassic,xClassic,'-', tms,xms,'.');
+legend(h(1:2:5),'Pro Int method','classic method','PI microsolver')
 xlabel('Time'), ylabel('State')
 
 figure
-h = plot(ts,xs,'o', t45,x45,'-');
-legend(h([1 3]),'PI Solution','ode45 Solution')
+h = plot(ts,xs,'o', tClassic,xClassic,'-');
+legend(h([1 3]),'Pro Int method','classic method')
 xlabel('Time'), ylabel('State')
-%set(gcf,'PaperPosition',[0 0 14 10]), print('-depsc2','PIGExample')
+if ~exist('OCTAVE_VERSION','builtin')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','PIGExample')
+end
 %{
 \end{matlab}
 \cref{fig:PIGExample} plots the output.
 \begin{figure}\centering
-\caption{Accurate simulation of a stiff nonautonomous system
-by PIG().  The microsolver is called on-the-fly by the
-macrosolver \texttt{ode45}.}\label{fig:PIGExample}
+\caption{\label{fig:PIGExample}Accurate simulation of a
+stiff nonautonomous system by PIG().  The microsolver is
+called on-the-fly by the macrosolver \texttt{ode45\slash
+lsode}.}
 \includegraphics[scale=0.8]{PIGExample}
 \end{figure}
 

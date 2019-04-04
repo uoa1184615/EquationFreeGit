@@ -191,9 +191,10 @@ burst length \(\epsilon\log(\Delta/\epsilon)\) as here the
 macroscale time-step \(\Delta=1\).
 \begin{matlab}
 %}
-epsilon = 0.05
+global MMepsilon
+MMepsilon = 0.05
 ts = 0:6
-bT = epsilon*log((ts(2)-ts(1))/epsilon)
+bT = MMepsilon*log((ts(2)-ts(1))/MMepsilon)
 [x,tms,xms] = PIRK2(@MMburst, ts, [1;0], bT);
 figure, plot(ts,x,'o:',tms,xms)
 title('Projective integration of Michaelis--Menten enzyme kinetics')
@@ -208,24 +209,7 @@ end%if no arguments
 %{
 \end{matlab}
 
-\paragraph{Example function code for a burst of ODEs}
-Integrate a burst of length~\verb|bT| of the \ode{}s for the
-Michaelis--Menten enzyme kinetics at parameter~\(\epsilon\)
-inherited from above. Code \textsc{ode}s in
-function~\verb|dMMdt| with variables \(x=\verb|x(1)|\) and
-\(y=\verb|x(2)|\).  Starting at time~\verb|ti|, and
-state~\verb|xi| (row), we here simply use \verb|ode23| to 
-integrate in time.
-\begin{matlab}
-%}
-function [ts, xs] = MMburst(ti, xi, bT) 
-    dMMdt = @(t,x) [ -x(1)+(x(1)+0.5)*x(2)
-          1/epsilon*( x(1)-(x(1)+1)*x(2) ) ];
-    [ts, xs] = ode23(dMMdt, [ti ti+bT], xi);
-end
-%{
-\end{matlab}
-
+\input{../ProjInt/MMburst.m}
 
 
 

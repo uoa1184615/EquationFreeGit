@@ -1,7 +1,6 @@
-% Implementation of the 'legacy codes' approach to relaxing
-% a given set of coordinates near the slow manifold. This
-% scheme introduces non- trivial error if the fast dynamics
-% is insufficiently stiff. JM, July 2018
+% Relax a given initial condition to one onto the slow
+% manifold by two steps of the 'xmas-tree' algorithm.
+% JM & AJR, July 2018 -- Apr 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{cdmc()}}
@@ -29,8 +28,7 @@ description of \verb|microBurst()|.
 \end{itemize}
 \paragraph{Output}
 \begin{itemize}
-\item \verb|ts|, a vector of times. \verb|tout(end)| will
-equal \verb|t|.
+\item \verb|ts|, a vector of times.
 \item \verb|xs|, an array of state estimates produced by
 \verb|microBurst()|. 
 \end{itemize}
@@ -50,7 +48,8 @@ if used in a Projective Integration scheme, but the output
 of \verb|cdmc()| should not.
 
 \begin{devMan}
-Begin with a standard application of the micro-burst.
+Begin with a standard application of the micro-burst. Need
+\verb|feval| as \verb|microBurst| has multiple outputs.
 \begin{matlab}
 %}
 [t1,x1] = feval(microBurst,t0,x0);
@@ -58,21 +57,23 @@ bT = t1(end)-t1(1);
 %{
 \end{matlab}
 
-Project backwards to before the initial time, then
-simulate just one burst forward to obtain a simulation burst
-that ends at the original~\verb|t0|.
+Project backwards to before the initial time, then simulate
+just one burst forward to obtain a simulation burst that
+ends at the original~\verb|t0|.
 \begin{matlab}
 %}
-dxdt = (x1(end,:) - x1(end-1,:))/(t1(end,:) - t1(end-1,:));
+dxdt = (x1(end,:) - x1(end-1,:))/(t1(end) - t1(end-1));
 x0 = x1(end,:)-2*bT*dxdt;
 t0 = t1(1)-bT;
 [t2,x2] = feval(microBurst,t0,x0.');
 %{
 \end{matlab}
-Return both sets of output, though only (t2,x2) will be used in PI.
+Return both sets of output(?), although only (t2,x2) should
+be used in Projective Integration---maybe safer to return
+only (t2,x2)
 \begin{matlab}
 %}
-ts = [t1; t2];
+ts = [t1(:); t2(:)];
 xs = [x1; x2];
 %{
 \end{matlab}
