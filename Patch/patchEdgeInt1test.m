@@ -93,8 +93,9 @@ hPts=find(1-uPts);
 uPts=find(uPts);
 %{
 \end{matlab}
-Set a profile for various wavenumbers.
-The capital letter~\verb|U| denotes an array of values merged from both~\(u\) and~\(h\) fields on the staggered grids.
+Set a profile for various wavenumbers. The capital
+letter~\verb|U| denotes an array of values merged from
+both~\(u\) and~\(h\) fields on the staggered grids.
 \begin{matlab}
 %}
 fprintf('Single field-pair test.\n')
@@ -113,9 +114,11 @@ end
 \end{matlab}
 
 \subparagraph{Test multiple fields}
-Set a profile, and evaluate the interpolation.
-For the case of the highest wavenumber zig-zag, squash the error when the alternate centre-patch values are all zero.
-First shift the \(x\)-coordinates so that the zig-zag mode is centred on a patch.
+Set a profile, and evaluate the interpolation. For the case
+of the highest wavenumber zig-zag, squash the error when the
+alternate centre-patch values are all zero. First shift the
+\(x\)-coordinates so that the zig-zag mode is centred on a
+patch.
 \begin{matlab}
 %}
 fprintf('Two field-pairs test.\n')

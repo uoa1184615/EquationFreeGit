@@ -128,8 +128,8 @@ axis([-3 3 -3 3 -0.5 1]), view(60,40)
 xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
 legend('time = 0','Location','north')
 drawnow
-set(gcf,'paperposition',[0 0 14 10])
-print('-depsc','wave2Dic')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc','wave2Dic')
 %{
 \end{matlab}
 \begin{figure}
@@ -143,23 +143,27 @@ Integrate in time using standard functions.
 \begin{matlab}
 %}
 disp('Wait while we simulate u_t=v, v_t=u_xx+u_yy')
-[ts,uvs] = ode15s(@patchSmooth2,[0 2],[u0(:);v0(:)]);
+if ~exist('OCTAVE_VERSION','builtin')
+[ts,uvs] = ode15s( @patchSmooth2,[0 2],[u0(:);v0(:)]);
+else % octave version is slower
+[ts,uvs] = odeOcts(@patchSmooth2,[0 1],[u0(:);v0(:)]);
+end
 %{
 \end{matlab}
 Animate the computed simulation to end with
 \cref{fig:wave2Dt6}.  Because of the very small time-steps,
-subsample to plot at most 200 times.
+subsample to plot at most 100 times.
 \begin{matlab}
 %}
-di = ceil(length(ts)/200);
+di = ceil(length(ts)/100);
 for i = [1:di:length(ts)-1 length(ts)]
   uv = patchEdgeInt2(uvs(i,:)); 
   uv = reshape(permute(uv,[1 3 2 4 5]), [numel(x) numel(y) 2]);
-  usurf.ZData = uv(:,:,1)';
+  set(usurf,'ZData', uv(:,:,1)');
   legend(['time = ' num2str(ts(i),2)])
   pause(0.1)
 end
-print('-depsc',['wave2Dt' num2str(ts(end))])
+%print('-depsc',['wave2Dt' num2str(ts(end))])
 %{
 \end{matlab}
 \begin{figure}
@@ -170,26 +174,7 @@ with initial condition in \cref{fig:wave2Dic}.}
 \includegraphics[scale=0.9]{wave2Dt2}
 \end{figure}
 
+\input{../Patch/wavePDE.m}
 
-
-\subsection{Example of simple wave PDE inside patches}
-As a microscale discretisation of \(u_{tt}=\delsq(u)\), so
-code \(\dot u_{ijkl}=v_{ijkl}\) and \(\dot v_{ijkl}
-=\frac1{\delta x^2} (u_{i+1,j,k,l} -2u_{i,j,k,l}
-+u_{i-1,j,k,l}) + \frac1{\delta y^2} (u_{i,j+1,k,l}
--2u_{i,j,k,l} +u_{i,j-1,k,l})\).
-\begin{matlab}
-%}
-function uvt = wavePDE(t,uv,x,y)
-  if ceil(t+1e-7)-t<2e-2, simTime = t, end %track progress
-  dx = diff(x(1:2));  dy = diff(y(1:2));   % microscale spacing
-  i = 2:size(uv,1)-1;  j = 2:size(uv,2)-1; % interior patch-points
-  uvt = nan(size(uv));  % preallocate storage
-  uvt(i,j,:,:,1) = uv(i,j,:,:,2);
-  uvt(i,j,:,:,2) = diff(uv(:,j,:,:,1),2,1)/dx^2 ...
-                  +diff(uv(i,:,:,:,1),2,2)/dy^2;
-end
-%{
-\end{matlab}
 \end{devMan}
 %}

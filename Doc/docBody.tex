@@ -96,6 +96,10 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 \Vec f\Vec x\Vec u \Vec X \Vec U
 \Bb R  \Bb X
 
+% to set overall size for each chart, propto linewidth
+\newlength{\WD}
+
+
 % for mini-local-tableofconents, best loaded last??
 \usepackage[twodeep]{etocx}
 
@@ -112,9 +116,8 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 \begin{abstract}
 This `equation-free toolbox' empowers the computer-assisted analysis of complex, multiscale systems.
 Its aim is to enable you to use microscopic simulators to perform system level tasks and analysis.
-The methodology bypasses the derivation of macroscopic evolution equations by using only short bursts of microscale simulations which are often the best available description of a system
-\cite[e.g.]{Kevrekidis09a, Kevrekidis04a, Kevrekidis03b}.
-This suite of functions should empower users to start implementing such methods---but so far we have only just started.
+The methodology bypasses the derivation of macroscopic evolution equations by using only short bursts of microscale simulations which are often the best available description of a system \cite[e.g.]{Kevrekidis09a, Kevrekidis04a, Kevrekidis03b}, and often only computing on small patches of the spatial domain \cite[e.g.]{Roberts2011a}.
+This suite of functions empowers users to start implementing such methods.
 \end{abstract}
 
 \tableofcontents

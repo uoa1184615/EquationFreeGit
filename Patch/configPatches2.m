@@ -1,6 +1,6 @@
 % Creates a data struct of the design of 2D patches for
 % later use by the patch functions such as smoothPatch2() 
-% AJR, Nov 2018 -- Feb 2019
+% AJR, Nov 2018 -- Apr 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches2()}: configures spatial patches in 2D}
@@ -175,14 +175,13 @@ hsurf = surf(x(:),y(:),u');
 axis([-3 3 -3 3 -0.001 1]), view(60,40)
 legend('time = 0','Location','north')
 xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
-drawnow
 %{
 \end{matlab}
 Save the initial condition to file for \cref{fig:configPatches2ic}.
 \begin{matlab}
 %}
-set(gcf,'PaperPosition',[0 0 14 10])
-print('-depsc2','configPatches2ic')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','configPatches2ic')
 %{
 \end{matlab}
 \begin{figure}
@@ -197,7 +196,14 @@ Integrate in time using standard functions.
 \begin{matlab}
 %}
 disp('Wait while we simulate h_t=(h^3)_xx+(h^3)_yy')
-[ts,ucts] = ode15s(@patchSmooth2,[0 3],u0(:));
+drawnow
+if ~exist('OCTAVE_VERSION','builtin')
+	[ts,ucts] = ode15s( @patchSmooth2,[0 3],u0(:));
+else % octave version is quite slow
+	lsode_options('absolute tolerance',1e-4);
+	lsode_options('relative tolerance',1e-4);
+	[ts,ucts] = odeOcts(@patchSmooth2,[0 1],u0(:));
+end
 %{
 \end{matlab}
 Animate the computed simulation to end with
@@ -207,11 +213,11 @@ Animate the computed simulation to end with
 for i = 1:length(ts)
   u = patchEdgeInt2(ucts(i,:));
   u = reshape(permute(u,[1 3 2 4]), [numel(x) numel(y)]);
-  hsurf.ZData = u';
+  set(hsurf,'ZData', u');
   legend(['time = ' num2str(ts(i),2)])
   pause(0.1)
 end
-print('-depsc2','configPatches2t3')
+%print('-depsc2','configPatches2t3')
 %{
 \end{matlab}
 \begin{figure}
@@ -231,23 +237,8 @@ end%if no arguments
 %{
 \end{matlab}
 
-\paragraph{Example of nonlinear diffusion PDE inside patches}
-As a microscale discretisation of \(u_t=\delsq(u^3)\), code
-\(\dot u_{ijkl} =\frac1{\delta x^2} (u_{i+1,j,k,l}^3
--2u_{i,j,k,l}^3 +u_{i-1,j,k,l}^3) + \frac1{\delta y^2}
-(u_{i,j+1,k,l}^3 -2u_{i,j,k,l}^3 +u_{i,j-1,k,l}^3)\).
-\begin{matlab}
-%}
-function ut = nonDiffPDE(t,u,x,y)
-  dx = diff(x(1:2));  dy = diff(y(1:2));  % microscale spacing
-  i = 2:size(u,1)-1;  j = 2:size(u,2)-1;  % interior points in patches
-  ut = nan(size(u));  % preallocate storage
-  ut(i,j,:,:) = diff(u(:,j,:,:).^3,2,1)/dx^2 ...
-               +diff(u(i,:,:,:).^3,2,2)/dy^2;
-end
-%{
-\end{matlab}
 
+\input{../Patch/nonDiffPDE.m}
 
 
 

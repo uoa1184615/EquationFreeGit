@@ -13,6 +13,7 @@ The goal is to enable computationally expensive multiscale dynamic simulations\s
 \paragraph{Quick start} 
 \cref{sec:pirk2eg} shows the most basic use of a projective integration function.
 \cref{sec:egPIMM} shows how to code more variations of the introductory example of a long time simulation of the Michaelis--Menton multiscale system of differential equations.
+Then see \cref{fig:constructPI,fig:PIchoosemacro}
 
 \paragraph{Scenario}
 When you are interested in a complex system with many interacting parts or agents, you usually are primarily interested in the self-organised emergent macroscale characteristics.
@@ -22,6 +23,126 @@ We suppose you have coded some accurate, fine scale simulation of the complex sy
 The Projective Integration section of this toolbox consists of several functions.
 Each function implements over a long-time scale a variant of a standard numerical method to simulate\slash integrate the emergent dynamics of the complex system.
 Each function has standardised inputs and outputs.
+
+
+\begin{figure}
+\caption{\label{fig:constructPI}The Projective Integration method greatly accelerates simulation\slash integration of a system exhibiting multiple time scales.
+The Projective Integration \cref{sec:ProjInt} presents several separate functions, as well as several optional wrapper functions that may be invoked. 
+This chart overviews constructing a Projective Integration simulation, whereas \cref{fig:PIchoosemacro} roughly guides which top-level Projective Integration functions should be used.
+\cref{sec:ProjInt} fully details each function.}
+\centering
+\setlength{\WD}{0.05\linewidth}%%%%%%%%%%%%%%%%
+\begin{tikzpicture}[node distance = 3ex, auto]
+\tikzstyle{bigblock} = [rectangle, draw, thick,   text width=20.5\WD, text badly centered,
+    rounded corners, minimum height=4ex]
+\tikzstyle{block} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
+    text width=9.6\WD, text ragged, rounded corners, minimum height=8ex]
+ \tikzstyle{smallblock} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
+    text width=6\WD, text ragged, rounded corners, minimum height=8ex]   
+ \tikzstyle{tinyblock} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
+    text width=4.3\WD, text ragged, rounded corners, minimum height=8ex]    
+     \tikzstyle{smallenclose} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
+    text width=6.2\WD, text ragged, rounded corners, minimum height=8ex]   
+     \tikzstyle{refblock} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=blue!5,
+    text width=1\WD, rounded corners, minimum height=1.05em] 
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{lined} = [draw, latex'-latex']
+\node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Schematic for Projective Integration scheme}
+
+    \begin{tikzpicture}[node distance = 3ex, auto]
+    \node [block] (setmicro) {\textbf{Set microsolver}
+     
+    Define or construct the function \texttt{solver()} that calls a black-box microsolver. Set \texttt{bT}, the time to run microsolver for. Possible aids:
+\begin{itemize}
+\item     Use the Patch functions (\cref{fig:constructpatch}) to simulate a large-scale \pde, lattice, etc.
+%\item    Use \texttt{bbgen()} if the microsolver is a standard solver, \texttt{ode45} e.g., and needs to be converted into a black-box.
+\item    Use \texttt{cmdc()} as a wrapper for the microsolver if the slow variables would otherwise change significantly over the microsolver.
+\end{itemize}};
+
+    \node[block, right=2ex of setmicro] (setmacro){\textbf{Set macrosolver, define problem}\\[1ex]
+        \begin{tikzpicture}
+    \node [tinyblock]%, below=0.6cm of pig]
+     (pirk) {\textbf{If using \texttt{PIRKn()}:}
+      
+    Set the vector of output times \texttt{tspan}. Intervals between times are the projective time-steps. Set initial values \texttt{x0}.};
+   \node [tinyblock, right=1ex of pirk]%, below right=0.2cm and -1cm of lift]
+    (pig) {\textbf{If using \texttt{PIG()}:}
+     
+    Set the solver \texttt{macro.solver} to be used on the macro scale. Set any needed time inputs or time-step data in \texttt{macro.tspan}. Set initial values \texttt{x0}.};
+    \end{tikzpicture}
+    };
+   
+       \node [smallblock, below=2ex of setmacro] (lift) 
+       {\textbf{Set lifting\slash restriction}\quad
+    If needed, set functions \texttt{restrict()} and \texttt{lift()} to convert between macro and micro problems\slash variables. These are optional arguments to the Projective Integration functions.};
+    
+ \node [block, below right=5ex and -9\WD of setmicro] (dopi) {\textbf{Do Projective Integration}\quad 
+    Invoke the appropriate Projective Integration function as, e.g., 
+    \verb|[t,x]=PIRK2(solver,tspan,x0,bT)|, or
+    \verb|[t,x]=PIG(solver,macro,x0)|. 
+    Additional optional outputs inform you of the microscale.};
+             \path [line, thick] (setmicro) to[out=-90,in=120] (dopi);
+         \path [line, thick] (lift) to[out=180,in=3] (dopi);
+         \path [line, thick] (setmacro) to[out=-150,in=30] (dopi);
+%          \path [line, thick] (pig) to[out=180,in=0] (dopi);
+%          \path [line, thick] (pirk) to[out=180,in=0] (dopi);
+%          \draw [dashed, very thick] (pig) -- (pirk);
+    \end{tikzpicture}
+    };   
+\end{tikzpicture}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+\begin{figure}
+\centering
+\caption{\label{fig:PIchoosemacro}The Projective Integration method greatly accelerates simulation\slash integration of a system exhibiting multiple time scales.
+In conjunction with \cref{fig:constructPI}, this chart roughly guides which top-level Projective Integration functions should be used.
+\cref{sec:ProjInt} fully details each function.}
+\setlength{\WD}{0.081\linewidth}%%%%%%%%%%%%%%%%
+\begin{tikzpicture}[node distance = 0.5cm, auto]
+\tikzstyle{bigblock} = [rectangle, draw, thick,   text badly centered, 
+    text width=12\WD, rounded corners, minimum height=2em]
+\tikzstyle{block} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
+    text width=5\WD, rounded corners, minimum height=4em, text ragged]
+ \tikzstyle{smallblock} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
+    text width=3.4\WD, rounded corners, minimum height=4em, text ragged]  
+ \tikzstyle{yesblock} = [rectangle, draw=red!80!black, thick, anchor=west, fill=white,
+    text width=1.2\WD, rounded corners, minimum height=1.2em]   
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{lined} = [draw, latex'-latex']
+\node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Choosing the macro solver in Projective Integration}\\[2ex]
+    \begin{tikzpicture}[node distance = 4ex, auto]
+    \node [block,right=5\WD] (timestep) {{Is an appropriate time-step known for the slow dynamics?}};
+    \node [yesblock, below =2ex of timestep] (timeyes) {Yes};
+    \node [yesblock, right=2ex of timestep] (timeno) {No};
+    \node [block, below=2ex of timeyes] (slowsol) {{Is a specific solver desired to simulate the slow dynamics?}};
+     \node [smallblock, below right=2ex and 2ex of timeno] (pig) {Choose \texttt{PIG()} to simulate\slash integrate};
+         \node [yesblock, below =2ex of slowsol] (slowno) {No};
+    \node [yesblock,  right=2ex of slowsol] (slowyes) {Yes};
+         \node [block, below =2ex of slowno] (pirk) {Choose \texttt{PIRK2()} or \texttt{PIRK4()} to  simulate\slash integrate};
+         \path [line, thick] (timestep) to[out=-90,in=90] (timeyes);
+         \path [line, thick] (timestep) to[out=0,in=180] (timeno);
+          \path [line, thick] (timeno) to[out=0,in=90] (pig);
+          \path [line, thick] (timeyes) to[out=-90,in=90] (slowsol);
+          \path [line, thick] (slowsol) to[out=0,in=180] (slowyes);
+          \path [line, thick] (slowsol) to[out=-90,in=90] (slowno);
+          \path [line, thick] (slowno) to[out=-90,in=90] (pirk);
+          \path [line, thick] (slowyes) to[out=0,in=-90] (pig);
+    \end{tikzpicture}
+    };   
+\end{tikzpicture}
+\end{figure}
+
+
+
 
 
 \paragraph{Main functions}

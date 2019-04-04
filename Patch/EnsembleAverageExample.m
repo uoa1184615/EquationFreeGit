@@ -74,9 +74,9 @@ as defined here (which are the same as those given in
 %}
 clear all
 mPeriod = 4
-rng('default'); rng(1);
-cDiff = exp(4*rand(mPeriod,1))
-cHomo = 1/mean(1./cDiff)
+rand('seed',1);
+c = exp(4*rand(mPeriod,1))
+cHomo = 1/mean(1./c)
 %{
 \end{matlab}
 
@@ -108,23 +108,23 @@ of the ensemble (for the case of no ensemble averaging
 which in this example is \(\verb|nVars|=1\)) and we use the
 ensemble described by \cite{Bunder2013b} which includes all
 reflected and translated configurations of
-\verb|patches.cDiff|. We must increase the size of the
+\verb|patches.c|. We must increase the size of the
 diffusivity matrix to \((\verb|nSubP-1)|\times
 \verb|nPatch|\times \verb|nVars|\).
 \begin{matlab}
 %}
-patches.cDiff = cDiff((mod(round(patches.x(1:(end-1),:) ...
+patches.c = c((mod(round(patches.x(1:(end-1),:) ...
   /(patches.x(2)-patches.x(1))-0.5),mPeriod)+1));
 if patches.EnsAve    
   nVars = mPeriod+(mPeriod>2)*mPeriod;
-  patches.cDiff = repmat(patches.cDiff,[1,1,nVars]);    
+  patches.c = repmat(patches.c,[1,1,nVars]);    
   for sx = 2:mPeriod
-    patches.cDiff(:,:,sx) = circshift( ...
-      patches.cDiff(:,:,sx-1),[sx-1,0]);
+    patches.c(:,:,sx) = circshift( ...
+      patches.c(:,:,sx-1),[sx-1,0]);
    end;
    if nVars>2
-     patches.cDiff(:,:,(mPeriod+1):end) = flipud( ...
-       patches.cDiff(:,:,1:mPeriod)); 
+     patches.c(:,:,(mPeriod+1):end) = flipud( ...
+       patches.c(:,:,1:mPeriod)); 
    end;
 end
 %{
@@ -141,7 +141,11 @@ u0 = sin(patches.x)+0.2*randn(nSubP,nPatch);
 if patches.EnsAve
   u0 = repmat(u0,[1,1,nVars]);
 end
-[ts,ucts] = ode15s(@patchSmooth1, [0 2/cHomo], u0(:));
+if ~exist('OCTAVE_VERSION','builtin')
+	[ts,ucts] = ode15s( @patchSmooth1, [0 2/cHomo], u0(:));
+else % octave version is slower
+	[ts,ucts] = odeOcts(@patchSmooth1, [0 2/cHomo], u0(:));
+end
 ucts = reshape(ucts,length(ts),length(patches.x(:)),[]);
 %{
 \end{matlab}
@@ -159,8 +163,8 @@ figure(1),clf
 xs = patches.x;  xs([1 end],:) = nan;
 mesh(ts,xs(:),uctsAve'),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-set(gcf,'PaperPosition',[0 0 14 10]);% cm
-print('-depsc2','ensAveExCtsU')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','ensAveExCtsU')
 %{
 \end{matlab}
 
@@ -187,6 +191,7 @@ Mark that edge of patches are not to be used in the
 projective extrapolation by setting initial values to \nan.
 \begin{matlab}
 %}
+disp('Now start Projective Integration')
 u0([1 end],:) = nan;
 %{
 \end{matlab}
@@ -196,7 +201,7 @@ time domain.
 %}
 ts = linspace(0,2/cHomo,7)
 bT = 3*( ratio*Len/nPatch )^2/cHomo
-addpath('../ProjInt','../SandpitPlay/RKint')
+addpath('../ProjInt')
 [us,tss,uss] = PIRK2(@heteroBurst, ts, u0(:), bT);
 %{
 \end{matlab}
@@ -210,8 +215,8 @@ figure(2),clf
 plot(xs(:),usAve','.')
 ylabel('u(x,t)'), xlabel('space x')
 legend(num2str(ts',3))
-set(gcf,'PaperPosition',[0 0 14 10]);% cm
-print('-depsc2','ensAveExU')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','ensAveExU')
 %{
 \end{matlab}
 Also plot a surface detailing the ensemble average
@@ -232,65 +237,17 @@ for k = 1:2, subplot(1,2,k)
   ylabel('x'), xlabel('t'), zlabel('u(x,t)')
   axis tight, view(126-4*k,45)
 end
-set(gcf,'PaperPosition',[0 0 14 6]);% cm
-print('-depsc2','ensAveExMicro')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','ensAveExMicro')
 %{
 \end{matlab}
 End of the script.
 
 
-\subsection{\texttt{heteroDiff()}: heterogeneous diffusion}
-\label{sec:heteroDiff}
-This function codes the \pde\ of the heterogeneous diffusion
-inside the patches, coding it as \ode{}s on a microscale
-lattice.  For 2D input arrays~\verb|u| and~\verb|x| (via
-edge-value interpolation of \verb|patchSmooth1|,
-\cref{sec:patchSmooth1}), computes the time
-derivative~\cref{eq:HomogenisationExample} at each point in
-the interior of a patch, output in~\verb|ut|.  The column
-vector (or possibly array) of diffusion coefficients~\(c_i\)
-have previously been stored in struct~\verb|patches|.
-\begin{matlab}
-%}
-function ut = heteroDiff(t,u,x)
-  global patches
-  dx = diff(x(2:3)); % space step
-  i = 2:size(u,1)-1; % interior points in a patch
-  ut = nan(size(u)); % preallocate output array
-  ut(i,:,:) = diff(patches.cDiff.*diff(u))/dx^2; 
-end% function
-%{
-\end{matlab}
+\cref{sec:heteroDiff,sec:heteroBurst} list the functions used here.
+%\input{../Patch/heteroDiff.m}
+%\input{../Patch/heteroBurst.m}
 
 
-
-\subsection{\texttt{heteroBurst()}: a burst of heterogeneous diffusion}
-\label{sec:heteroBurst}
-This code integrates in time the derivatives computed by
-\verb|heteroDiff| from within the patch coupling of
-\verb|patchSmooth1|.  Try four possibilities:
-\begin{itemize}
-\item \verb|ode23| generates `noise' that is unsightly at
-best and may be ruinous;
-\item \verb|ode45| is similar to \verb|ode23|, but with
-reduced noise;
-\item \verb|ode15s| does not cater for the \nan{}s in some
-components of~\verb|u|;
-\item \verb|rk2int| simple specified step integrator, but
-may require inefficiently small time-steps.
-\end{itemize}
-\begin{matlab}
-%}
-function [ts, ucts] = heteroBurst(ti, ui, bT) 
-  switch '45'
-  case '23',  [ts,ucts] = ode23(@patchSmooth1,[ti ti+bT],ui(:));
-  case '45',  [ts,ucts] = ode45(@patchSmooth1,[ti ti+bT],ui(:));
-  case '15s', [ts,ucts] = ode15s(@patchSmooth1,[ti ti+bT],ui(:));
-  case 'rk2', ts = linspace(ti,ti+bT,200)';
-              ucts = rk2int(@patchSmooth1,ts,ui(:));
-  end
-end
-%{
-\end{matlab}
 Fin.
 %}

@@ -1,7 +1,7 @@
 % Simulate a microscale space-time map of Burgers' PDE
 % discretised.  Simulate on spatial patches, and via
 % projective integration.
-% AJR, Nov 2017 -- Feb 2019
+% AJR, Nov 2017 -- Apr 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{BurgersExample}: simulate Burgers' PDE on patches}
@@ -79,8 +79,8 @@ view(105,45)
 Save the plot to file to form \cref{fig:BurgersMapU}.
 \begin{matlab}
 %}
-set(gcf,'paperposition',[0 0 14 10])
-print('-depsc2','BurgersMapU')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','BurgersMapU')
 %{
 \end{matlab}
 
@@ -138,8 +138,8 @@ midP = (nSubP+1)/2;
 mesh(ts,xs(midP,:),us(:,midP:nSubP:end)')
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 view(120,50)
-set(gcf,'paperposition',[0 0 14 10])
-print('-depsc2','BurgersU')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','BurgersU')
 %{
 \end{matlab}
 Then plot and save the microscale mesh of the microscale
@@ -160,8 +160,8 @@ for k = 1:2, subplot(2,2,k)
   ylabel('x'),xlabel('t'),zlabel('u(x,t)')
   axis tight, view(126-4*k,50)
 end
-set(gcf,'paperposition',[0 0 17 12])
-print('-depsc2','BurgersMicro')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','BurgersMicro')
 %{
 \end{matlab}
 
@@ -170,66 +170,9 @@ print('-depsc2','BurgersMicro')
 
 
 
-\subsection{\texttt{burgersMap()}: discretise the PDE microscale}
-\label{sec:burgersMap}
-This function codes the microscale Euler integration map of
-the lattice differential equations inside the patches.  Only
-the patch-interior values mapped (\verb|patchSmooth1()|
-overrides the edge-values anyway).
-\begin{matlab}
-%}
-function u = burgersMap(t,u,x)
-  dx = diff(x(2:3));   
-  dt = dx^2/2;
-  i = 2:size(u,1)-1;
-  u(i,:) = u(i,:) +dt*( diff(u,2)/dx^2 ...
-     -20*u(i,:).*(u(i+1,:)-u(i-1,:))/(2*dx) );
-end
-%{
-\end{matlab}
+\input{../Patch/burgersMap.m}
 
+\input{../Patch/burgersBurst.m}
 
-
-\subsection{\texttt{burgerBurst()}: code a burst of the patch map}
-\label{sec:burgerBurst}
-\begin{matlab}
-%}
-function [ts, us] = burgerBurst(ti, ui, bT) 
-%{
-\end{matlab}
-First find and set the number of microscale time-steps.
-\begin{matlab}
-%}
-  global patches
-  dt = diff(patches.x(2:3))^2/2;
-  ndt = ceil(bT/dt -0.2);
-  ts = ti+(0:ndt)'*dt;
-%{
-\end{matlab}
-Use \verb|patchSmooth1()| (\cref{sec:patchSmooth1}) to apply
-the microscale map over all time-steps in the burst. The
-\verb|patchSmooth1()| interface provides the interpolated
-edge-values of each patch.  Store the results in rows to be
-consistent with \ode\ and projective integrators.
-\begin{matlab}
-%}
-  us = nan(ndt+1,numel(ui)); 
-  us(1,:) = reshape(ui,1,[]);
-  for j = 1:ndt
-    ui = patchSmooth1(ts(j),ui);
-    us(j+1,:) = reshape(ui,1,[]);
-  end
-%{
-\end{matlab}
-Linearly interpolate (extrapolate) to get the field values
-at the precise final time of the burst.  Then return.
-\begin{matlab}
-%}
-  ts(ndt+1) = ti+bT;
-  us(ndt+1,:) = us(ndt,:) ...
-    + diff(ts(ndt:ndt+1))/dt*diff(us(ndt:ndt+1,:));
-end
-%{
-\end{matlab}
 Fin.
 %}

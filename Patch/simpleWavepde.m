@@ -1,3 +1,5 @@
+% Used by patchEdgeInt1test.m
+% AJR, 2018
 function Ut=simpleWavepde(t,U,x)
 % global patches
 dx=x(2)-x(1);

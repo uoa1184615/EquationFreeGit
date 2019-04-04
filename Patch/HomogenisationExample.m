@@ -1,7 +1,7 @@
 % Simulate heterogeneous diffusion in 1D on patches as an
 % example application of patches in space. Here the
 % microscale is of known period which makes accurate
-% simulation easier. AJR, Nov 2017 -- Mar 2019
+% simulation easier. AJR, Nov 2017 -- Apr 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section[\texttt{homogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]
@@ -81,7 +81,9 @@ configPatches1(@heteroDiff,[0 Len],nan,nPatch ...
 %{
 \end{matlab}
 
-Add to the global data struct~\verb|patches| for use by the time derivative function (for example): here include the diffusivity coefficients, repeated to fill up a patch
+Add to the global data struct~\verb|patches| for use by the
+time derivative function (for example): here include the
+diffusivity coefficients, repeated to fill up a patch
 \begin{matlab}
 %}
 patches.c=repmat(cDiff,(nSubP-1)/mPeriod,1);
@@ -98,7 +100,11 @@ microscale differential equations.
 \begin{matlab}
 %}
 u0 = sin(patches.x)+0.4*randn(nSubP,nPatch);
+if ~exist('OCTAVE_VERSION','builtin')
 [ts,ucts] = ode15s(@patchSmooth1, [0 2/cHomo], u0(:));
+else % octave version
+[ts,ucts] = odeOcts(@patchSmooth1, [0 2/cHomo], u0(:));
+end
 ucts = reshape(ucts,length(ts),length(patches.x(:)),[]);
 %{
 \end{matlab}
@@ -110,8 +116,8 @@ figure(1),clf
 xs = patches.x;  xs([1 end],:) = nan;
 mesh(ts,xs(:),ucts'),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-set(gcf,'PaperPosition',[0 0 14 10]);% cm
-print('-depsc2','homogenisationCtsU')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','homogenisationCtsU')
 %{
 \end{matlab}
 
@@ -157,7 +163,7 @@ microscale lattice.
 %}
 ts = linspace(0,2/cHomo,7)
 bT = 3*( ratio*Len/nPatch )^2/cHomo
-addpath('../ProjInt','../SandpitPlay/RKint')
+addpath('../ProjInt')
 [us,tss,uss] = PIRK2(@heteroBurst, ts, u0(:), bT);
 %{
 \end{matlab}
@@ -169,8 +175,8 @@ figure(2),clf
 plot(xs(:),us','.')
 ylabel('u(x,t)'), xlabel('space x')
 legend(num2str(ts',3))
-set(gcf,'PaperPosition',[0 0 14 10]);% cm
-print('-depsc2','homogenisationU')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','homogenisationU')
 %{
 \end{matlab}
 Also plot a surface detailing the microscale bursts as shown
@@ -189,50 +195,16 @@ for k = 1:2, subplot(1,2,k)
   ylabel('x'), xlabel('t'), zlabel('u(x,t)')
   axis tight, view(126-4*k,45)
 end
-set(gcf,'PaperPosition',[0 0 14 6]);% cm
-print('-depsc2','homogenisationMicro')
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+%print('-depsc2','homogenisationMicro')
 %{
 \end{matlab}
 End of the script.
 
 
-\subsection{\texttt{heteroDiff()}: heterogeneous diffusion}
-\label{sec:heteroDiff}
-This function codes the lattice heterogeneous diffusion
-inside the patches.  For 2D input arrays~\verb|u|
-and~\verb|x| (via edge-value interpolation of
-\verb|patchSmooth1|, \cref{sec:patchSmooth1}), computes the
-time derivative~\cref{eq:HomogenisationExample} at each
-point in the interior of a patch, output in~\verb|ut|.  The
-column vector (or possibly array) of diffusion
-coefficients~\(c_i\) have previously been stored in
-struct~\verb|patches|.
-\begin{matlab}
-%}
-function ut = heteroDiff(t,u,x)
-  global patches
-  dx = diff(x(2:3)); % space step
-  i = 2:size(u,1)-1; % interior points in a patch
-  ut = nan(size(u)); % preallocate output array
-  ut(i,:,:) = diff(patches.c.*diff(u))/dx^2; 
-end% function
-%{
-\end{matlab}
+\input{../Patch/heteroDiff.m}
 
+\input{../Patch/heteroBurst.m}
 
-
-\subsection{\texttt{heteroBurst()}: a burst of heterogeneous diffusion}
-\label{sec:heteroBurst}
-This code integrates in time the derivatives computed by
-\verb|heteroDiff| from within the patch coupling of
-\verb|patchSmooth1|.  Try~\verb|ode23|, although
-\verb|ode45| may give smoother results.
-\begin{matlab}
-%}
-function [ts, ucts] = heteroBurst(ti, ui, bT) 
-  [ts,ucts] = ode23(@patchSmooth1,[ti ti+bT],ui(:));
-end
-%{
-\end{matlab}
 Fin.
 %}

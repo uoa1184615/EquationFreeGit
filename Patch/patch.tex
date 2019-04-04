@@ -31,7 +31,63 @@ Usually continuous in time.
 See \cref{sec:configPatches1eg,sec:configPatches2eg} which
 respectively list example basic code that uses the provided 
 functions to simulate the 1D Burgers'~\pde, and a 2D 
-nonlinear `diffusion'~\pde.
+nonlinear `diffusion'~\pde.  Then see \cref{fig:constructpatch}.
+
+\begin{figure}
+\begin{maxipage}
+\setlength{\WD}{0.048\linewidth}%%%%%%%%%%%%%%%%
+\centering
+\caption{\label{fig:constructpatch}The Patch methods, \cref{sec:patch}, accelerate simulation\slash integration of multiuscale systems with interesting spatial (or network) structure\slash patterns. The patch methods use your given microsimulators whether coded from \textsc{pde}s, lattice systems, or agent\slash particle microscale simulators.
+The patch functions require that a user configure the patches, and interface the coupled patches with a time integrator\slash simulator. 
+This chart overviews the main functions involved and their interrelationships.
+}
+\begin{tikzpicture}[node distance = 3ex, auto]
+\tikzstyle{bigblock} = [rectangle, draw, thick, text width=20.5\WD, text badly centered, rounded corners, minimum height=4ex]
+\tikzstyle{block} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
+    text width=10\WD, text ragged, rounded corners, minimum height=8ex]
+ \tikzstyle{smallblock} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
+    text width=6\WD, text ragged, rounded corners, minimum height=8ex]   
+ \tikzstyle{tinyblock} = [rectangle, draw=blue!80!black, thick, anchor=west, fill=white,
+    text width=4.5\WD, text ragged, rounded corners, minimum height=8ex]      
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{lined} = [draw, latex'-latex']
+\node [bigblock,draw=blue!80!black,fill=blue!10] (gaptooth) {\textbf{Patch scheme for \textsc{pde}s}\\[1ex]
+    \begin{tikzpicture}[node distance = 3ex, auto]
+    \node [block] (configPatches) {\textbf{Define problem and construct patches}
+    
+    Invoke \texttt{configpatches1} (for 1D) or \texttt{configpatches2} (for 2D) to define the microscale problem (\textsc{pde}, domain, boundary conditions, etc) and the desired patch structure (number of patches, patch size, coupling order, etc).
+These functions initialise the global struct \texttt{patches}. 
+The components of \texttt{patches} contain all information required to solve the microscale problem within each patch. 
+If necessary, define additional components for struct \texttt{patches} (e.g., see \texttt{EnsembleAverageExample.m}).};
+    \node [block, below=of configPatches] (microPDE) {\textbf{Solve microscale problem within each patch}\\
+    Call the \textsc{pde} solver which is to evaluate the microscale problem within each patch. This solver may be a Matlab defined function (such as \texttt{ode15s} or \texttt{ode45}) or a user defined function (such as Runge--Kutta).
+    
+    Input of the \textsc{pde} solver is the function \texttt{patchSmooth1} (for 1D) or \texttt{patchSmooth2} (for 2D) which  interfaces with the \textsc{pde} solver and the microscale \textsc{pde}. Other inputs are the time span and initial conditions. Output of the \textsc{pde} solver is the solution of the patch \textsc{pde} over the given time span, but only evaluated within the defined patches.};
+    \node [smallblock, above right=-2.2\WD and 2\WD of microPDE] (patchSmooth1) {\textbf{Interface to time integrators}
+    
+    The \textsc{pde} function (\texttt{patchSmooth1} or \texttt{patchSmooth2}) interfaces with the \textsc{pde} solve, the microscale \textsc{pde} and the patch coupling conditions. Input is the \textsc{pde} field at one time-step and output is the field at the next time-step.};
+    \node [tinyblock, below left=3ex and -3\WD of patchSmooth1] (coupling) {\textbf{Coupling conditions}
+    
+    Coupling conditions are evaluated in \texttt{patchEdge1} (for 1D) or \texttt{patchEdge2} (for 2D) with the coupling order defined by global struct component \texttt{patches.ordCC}.};
+    \node [tinyblock, below right=3ex and -3\WD of patchSmooth1] (micropde) {\textbf{Microscale \textsc{pde}}
+    
+    This \textsc{pde} is defined by the global struct \texttt{patches}, for example component \texttt{patches.fun} defines the function (e.g.,  \texttt{BurgersPDE} or \texttt{heteroDiff}) and \texttt{patches.x} defines the domain of the patches};
+    \node [block,draw=red!80!black,fill=red!10, below=of microPDE] (pi) {\hyperref[fig:constructPI]{\textbf{\textbf{Projective integration scheme (if needed)}}}\\
+    };    
+    \path [lined,very thick,-latex] (configPatches) -- (microPDE);
+    \path [lined,very thick] (microPDE) to[out=0,in=180] (patchSmooth1);
+    \path [lined,very thick] (patchSmooth1) to[out=270,in=90] (coupling);
+    \path [lined,very thick] (patchSmooth1) to[out=270,in=90] (micropde);
+    \path [lined,very thick,latex-latex] (microPDE) -- (pi);
+    \end{tikzpicture}
+    };   
+\node [bigblock,draw=black,below=of gaptooth] (process) {\textbf{Process results and plot}};
+ \path [lined,very thick,-latex] (gaptooth) -- (process);
+\end{tikzpicture}
+\end{maxipage}
+\end{figure}
+
+
 
 \input{../Patch/configPatches1.m}
 \input{../Patch/patchSmooth1.m}

@@ -3,7 +3,8 @@
 % discretisations.  AJR, Nov 2018
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section[\texttt{patchEdgeInt2()}: 2D patch edge values from 2D interpolation]{\texttt{patchEdgeInt2()}: sets 2D patch edge values from 2D macroscale interpolation}
+\section[\texttt{patchEdgeInt2()}: 2D patch edge values from 2D interpolation]
+{\texttt{patchEdgeInt2()}: sets 2D patch edge values from 2D macroscale interpolation}
 \label{sec:patchEdgeInt2}
 \localtableofcontents
 
@@ -297,10 +298,17 @@ treat a zig-zag mode as cosine. Enforce reality when
 appropriate via \verb|uclean()|. 
 \begin{matlab}
 %}
-u(end,:,:,:,iV) = uclean( mean(unj,6) );
-u( 1 ,:,:,:,iV) = uclean( mean(u1j,6) );
-u(:,end,:,:,iV) = uclean( mean(uin,6) );
-u(:, 1 ,:,:,iV) = uclean( mean(ui1,6) );
+if numel(size(unj))>5
+	u(end,:,:,:,iV) = uclean( mean(unj,6) );
+	u( 1 ,:,:,:,iV) = uclean( mean(u1j,6) );
+	u(:,end,:,:,iV) = uclean( mean(uin,6) );
+	u(:, 1 ,:,:,iV) = uclean( mean(ui1,6) );
+else
+	u(end,:,:,:,iV) = uclean( unj );
+	u( 1 ,:,:,:,iV) = uclean( u1j );
+	u(:,end,:,:,iV) = uclean( uin );
+	u(:, 1 ,:,:,iV) = uclean( ui1 );
+end
 %{
 \end{matlab}
 Restore staggered grid when appropriate. Is there a better
