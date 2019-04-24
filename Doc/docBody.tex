@@ -1,5 +1,5 @@
 % Common input to both userManual and to devManual.  
-% AJR, Feb--Mar 2019
+% AJR, Feb--Apr 2019
 %!TEX root = eqnFreeDevMan.tex
 
 
@@ -22,12 +22,6 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 % For some reason, refart needs this??
 \renewcommand{\and}{\hspace{2em plus 1em minus 1em}}
 
-
-%% I guess we should abandon these alternatives
-%\IfFileExists{ajr.sty}{\usepackage{ajr}}{
-%  \IfFileExists{jm.sty}{\usepackage{jm}}{
-%    \usepackage[a5paper,margin=11mm]{geometry}
-%}}  
 
 \usepackage[T1]{fontenc}
 \usepackage[dvipsnames]{xcolor}
@@ -115,9 +109,9 @@ School of Mathematical Sciences, University of Adelaide, South Australia.
 
 \begin{abstract}
 This `equation-free toolbox' empowers the computer-assisted analysis of complex, multiscale systems.
-Its aim is to enable you to use microscopic simulators to perform system level tasks and analysis.
-The methodology bypasses the derivation of macroscopic evolution equations by using only short bursts of microscale simulations which are often the best available description of a system \cite[e.g.]{Kevrekidis09a, Kevrekidis04a, Kevrekidis03b}, and often only computing on small patches of the spatial domain \cite[e.g.]{Roberts2011a}.
-This suite of functions empowers users to start implementing such methods.
+Its aim is to enable you to use microscopic simulators to perform system level tasks and analysis, because microscale simulations are often the best available description of a system.
+The methodology bypasses the derivation of macroscopic evolution equations by computing only short bursts of of the microscale simulator \cite[e.g.]{Kevrekidis09a, Kevrekidis04a, Kevrekidis03b}, and often only computing on small patches of the spatial domain \cite[e.g.]{Roberts2011a}.
+This suite of functions empowers users to start implementing such methods in their own applications.
 \end{abstract}
 
 \tableofcontents

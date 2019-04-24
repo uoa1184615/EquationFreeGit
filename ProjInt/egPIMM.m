@@ -6,21 +6,22 @@
 \section{\texttt{egPIMM}: Example projective integration
 of Michaelis--Menton kinetics}
 \label{sec:egPIMM}
-\localtableofcontents
+%\localtableofcontents
 
 The Michaelis--Menten enzyme kinetics is expressed as a
 singularly perturbed system of differential equations for
 \(x(t)\) and~\(y(t)\):
 \begin{equation*}
 \frac{dx}{dt}=-x+(x+\tfrac12)y \quad\text{and}\quad
-\frac{dy}{dt}=\frac1\epsilon\big[x-(x+1)y\big].
+\frac{dy}{dt}=\frac1\epsilon\big[x-(x+1)y\big]
 \end{equation*}
-As illustrated in \cref{fig:egPIMM2}, the slow
+(encoded in function \verb|MMburst()| below). 
+As illustrated by \cref{fig:egPIMM2}, the slow
 variable~\(x(t)\) evolves on a time scale of one, whereas
 the fast variable~\(y(t)\) evolves on a time scale of the
 small parameter~\(\epsilon\).
 
-\subsection{Invoke projective integration}
+\paragraph{Invoke projective integration}
 
 Clear, and set the scale separation parameter~\(\epsilon\)
 to something small like~\(0.01\). Here use \(\epsilon=0.1\)
@@ -40,8 +41,8 @@ of computation and interest into vector~\verb|ts|. Then,
 invoke Projective Integration with \verb|PIRK2()| applied to
 the burst function, say using bursts of simulations of
 length~\(2\epsilon\), and starting from the initial
-condition for the Michaelis--Menten system of
-\((x(0),y(0))=(1,0)\) (off the slow manifold).
+condition for the Michaelis--Menten system, at time \(t=0\), of
+\((x,y)=(1,0)\) (off the slow manifold).
 \begin{matlab}
 %}
 ts = 0:6
@@ -65,10 +66,10 @@ kinetics simulated with the projective integration of
 their analysis of the convergence of Projective Integration.
 
 
-\paragraph{Optional: request and plot the microscale bursts}
+\paragraph{Request and plot the microscale bursts}
 Because the initial conditions of the simulation are off the
 slow manifold, the initial macroscale step appears to `jump'
-(\cref{fig:egPIMM1}). To see the initial transient
+(\cref{fig:egPIMM1}).  In order to see the initial transient
 attraction to the slow manifold we plot some microscale data
 in \cref{fig:egPIMM2}. Two further output variables provide
 this microscale burst information.
@@ -83,8 +84,8 @@ pause(1)
 \cref{fig:egPIMM2} plots the macroscale and microscale
 results---also showing that the initial burst is by default
 twice as long. Observe the slow variable~\(x(t)\) is also
-affected by the initial transient which indicates that other
-schemes which `freeze' slow variables are less accurate.
+affected by the initial transient (hence other
+schemes which `freeze' slow variables are less accurate).
 \begin{figure}
 \centering
 \caption{\label{fig:egPIMM2}Michaelis--Menten enzyme
@@ -97,7 +98,7 @@ alignment along the slow manifold.}
 
 
 
-\paragraph{Optional: simulate backward in time}
+\paragraph{Simulate backward in time}
 \cref{fig:egPIMM3} shows that projective integration even
 simulates backward in time along the slow manifold using
 short forward bursts \cite[]{Gear03b}. Such backward
@@ -116,14 +117,14 @@ xlabel('time t'), legend('x(t)','y(t)')
 \begin{figure}
 \centering
 \caption{\label{fig:egPIMM3}Michaelis--Menten enzyme
-kinetics simulated backward with the projective integration
+kinetics at \(\epsilon=0.1\) simulated backward with the projective integration
 of \texttt{PIRK2()}: the microscale bursts show the short
-forward simulations used to project backward in time at
-\(\epsilon=0.1\).}
+forward simulations used to projectively integrate backward in time.}
 \includegraphics[scale=0.85]{egPIMM3}
 \end{figure}
 
 
 \input{../ProjInt/MMburst.m}
+\input{../ProjInt/odeOct.m}
 
 %}

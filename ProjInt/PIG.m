@@ -1,7 +1,7 @@
 % PIG implements Projective Integration scheme with any
 % inbuilt integrator or user-specified integrator for the
 % slow-time macroscale, and with any inbuilt/user-specified
-% microsolver. JM & AJR, Sept 2018 -- Mar 2019.
+% microsolver. JM & AJR, Sept 2018 -- Apr 2019.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
@@ -12,18 +12,17 @@
 \subsection{Introduction}
 
 This is a Projective Integration scheme when the macroscale
-integrator is any specified coded scheme. The advantage is
+integrator is any specified coded method. The advantage is
 that one may use \script's inbuilt integration functions,
 with all their sophisticated error control and adaptive
 time-stepping, to do the macroscale integration\slash
 simulation.
 
-By default, \verb|PIG()| uses `constraint-defined manifold
-computing' for the microscale simulations.  This algorithm,
-initiated by \cite{Gear05}, uses a backwards projection so
+By default, for the microscale simulations \verb|PIG()| uses `constraint-defined manifold
+computing', \verb|cdmc()| (\cref{sec:cdmc}).  This algorithm,
+initiated by \cite{Gear05}, uses a backward projection so
 that the simulation time is unchanged after running the
-microscale simulator.  The implementation is \verb|cdmc()|,
-described in \cref{sec:cdmc}. 
+microscale simulator. 
 
 \begin{matlab}
 %}
@@ -36,7 +35,7 @@ function [T,X,tms,xms,svf] = PIG(macroInt,microBurst,Tspan,x0 ...
 \begin{itemize}
 
 \item \verb|macroInt()|, the numerical method that the user
-wants to apply on a slow-time macroscale. Either input a
+wants to apply on a slow-time macroscale. Either specify a
 standard \script\ integration function (such as
 \verb|'ode23'| or~\verb|'ode45|'), or code your own
 integration function using standard arguments. That is, if
@@ -61,7 +60,7 @@ to be estimated by Projective Integration.
 
 \item \verb|microBurst()| is a function that produces output
 from the user-specified code for a burst of microscale
-simulation. The function must internally specify how long a
+simulation. The function must internally specify\slash decide how long a
 burst it is to use.  Usage
 \begin{equation*}
 \verb|[tbs,xbs] = microBurst(tb0,xb0)|
@@ -76,7 +75,7 @@ and \verb|xbs|, the corresponding microscale states.
 
 \item \verb|Tspan|, a vector of macroscale times at which
 the user requests output.  The first element is always the
-initial time.  If \verb|macroInt| adaptively selects time
+initial time.  If \verb|macroInt| reports adaptively selected time
 steps (e.g., \verb|ode45|), then \verb|Tspan| consists of an
 initial and final time only.
 
@@ -93,11 +92,11 @@ restriction functions must be provided to convert between
 them. Usage \verb|PIG(...,restrict,lift)|:
 \begin{itemize}
 \item \verb|restrict(x)|, a function that takes an input
-\(n\)-dimensional microscale state~\xv\ and computes the
-corresponding \(N\)-dimensional macroscale state~\Xv; 
+high-dimensional, \(n\)-D, microscale state~\xv\ and computes the
+corresponding low-dimensional, \(N\)-D, macroscale state~\Xv; 
 \item \verb|lift(X,xApprox)|, a function that converts an
-input \(N\)-dimensional macroscale state~\Xv\ to a
-corresponding \(n\)-dimensional microscale state~\xv, given
+input low-dimensional, \(N\)-D, macroscale state~\Xv\ to a
+corresponding high-dimensional, \(n\)-D, microscale state~\xv, given
 that \verb|xApprox| is a recently computed microscale state
 on the slow manifold.
 \end{itemize}
@@ -142,7 +141,7 @@ provides some optional outputs of the microscale bursts, via
 
 \begin{itemize}
 \item \verb|tms|, optional, is an \(\ell\)-dimensional column
-vector containing microscale times of burst simulations,
+vector containing microscale times with bursts,
 each burst separated by~\verb|NaN|; 
 
 \item \verb|xms|, optional, is an \(\ell\times n\) array of
@@ -182,8 +181,7 @@ if nargin==0
 \begin{figure}
 \centering
 \caption{\label{fig:PIGsing}Projective Integration by
-\texttt{PIG} of the example system~\eqref{eq:PIGsing} in
-\cref{sec:pigeg}.  The macroscale solution~\(X(t)\) is
+\texttt{PIG} of the example system~\eqref{eq:PIGsing} with \(\epsilon=10^{-3}\) (\cref{sec:pigeg}).  The macroscale solution~\(X(t)\) is
 represented by just the blue circles.  The microscale bursts
 are the microscale states \((x_1(t),x_2(t)) =
 (\text{red},\text{yellow})\) dots.}
@@ -239,7 +237,7 @@ lift = @(X,xApprox) [X; xApprox(2)];
 %{
 \end{matlab}
 
-Fourth, invoke \verb|PIG| to use \verb|ode23()|, say, on the
+Fourth, invoke \verb|PIG| to use \script's \verb|ode23|\slash\verb|lsode|, say, on the
 macroscale slow evolution. Integrate the micro-bursts over
 \(0\leq t\leq6\) from initial condition \(\xv(0)=(1,0)\).
 You could set \verb|Tspan=[0 -6]| to integrate backward in
@@ -294,9 +292,9 @@ Get the number of expected outputs and set logical indices
 to flag what data should be saved. 
 \begin{matlab}
 %}
-nArgs = nargout();
-saveMicro = (nArgs>2);
-saveSvf = (nArgs>4);
+nArgOut = nargout();
+saveMicro = (nArgOut>2);
+saveSvf = (nArgOut>4);
 %{
 \end{matlab}
 
@@ -327,9 +325,9 @@ end
 
 
 
-Execute a first application of the microBurst on the initial
-conditions. This is done in addition to the microBurst in
-the main loop, because the initial conditions are often far
+Execute a preliminary application of the microBurst on the initial
+state. This is done in addition to the microBurst in
+the main loop, because the initial state is often far
 from the attracting slow manifold.
 \begin{matlab}
 %}
@@ -347,7 +345,7 @@ Tspan(1) = relaxT(end);
 \end{matlab}
 Allocate cell arrays for times and states for any of the
 outputs requested by the user. If saving information, then
-record the first application of the microBurst. Note that it
+record the first application of the microBurst. It
 is unknown a priori how many applications of microBurst
 will be required; this code may be run more efficiently if
 the correct number is used in place of \verb|nT+1| as the
@@ -377,7 +375,8 @@ The idea of \verb|PIG()| is to use the output from the
 \verb|microBurst()| to approximate an unknown function
 \verb|F(t,X)| that computes \(d\Xv/dt\). This approximation
 is then used in the system\slash user-defined `coarse
-solver' \verb|macroInt()|. The approximation is computed in
+solver' \verb|macroInt()|. The approximation is computed in 
+the function
 \begin{matlab}
 %}
 function [dXdt]=PIFun(t,X)
@@ -432,8 +431,8 @@ PIF = @(t,x) PIFun(t,x);
 %{
 \end{matlab}
 
-Overwrite \verb|X(1,:)| and \verb|T(1)|, which the user
-expect to be \verb|X0| and \verb|Tspan(1)| respectively,
+Overwrite \verb|X(1,:)| and \verb|T(1)|, which a user
+expects to be \verb|X0| and \verb|Tspan(1)| respectively,
 with the given initial conditions.
 \begin{matlab}
 %}
@@ -457,10 +456,10 @@ end
 \end{matlab}
 
 
-\subsection{If no output specified, then plot simulation.}
+\subsection{If no output specified, then plot the simulation}
 \begin{matlab}
 %}
-if nArgs==0
+if nArgOut==0
     figure, plot(T,X,'o:')
     title('Projective Simulation via PIG')
 end

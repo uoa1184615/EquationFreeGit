@@ -1,6 +1,7 @@
 % PIRK4 implements fourth-order Projective Integration with
 % a user-specified microsolver.  The macrosolver adapts the
-% explicit fourth-order Runge--Kutta scheme. JM, Oct 2018. 
+% explicit fourth-order Runge--Kutta scheme. 
+% JM, Oct 2018--Apr 2019. 
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
@@ -23,7 +24,6 @@ See \cref{sec:PIRK2} as the inputs and outputs are the
 same as \verb|PIRK2()|.
 
 \paragraph{If no arguments, then execute an example}
-%\label{sec:pirk4eg}
 \begin{matlab}
 %}
 if nargin==0
@@ -66,6 +66,10 @@ end%if no arguments
 \end{matlab}
 
 \input{../ProjInt/MMburst.m}
+\input{../ProjInt/odeOct.m}
+
+
+
 
 
 
@@ -73,9 +77,12 @@ end%if no arguments
 
 
 \paragraph{Input}
+If there are no input arguments, then this function applies
+itself to the Michaelis--Menton example: see the code in
+\cref{sec:pirk2eg} as a basic template of how to use.
 \begin{itemize}
-\item \verb|microBurst()|, a function that produces output from
-the user-specified code for microscale simulation. 
+\item \verb|microBurst()|, a user-coded function that 
+computes a short-time burst of the microscale simulation. 
 \begin{verbatim}
 [tOut, xOut] = microBurst(tStart, xStart, bT)
 \end{verbatim}
@@ -83,10 +90,10 @@ the user-specified code for microscale simulation.
 \item Inputs:
   \verb|tStart|,~the start time of a burst of simulation;
   \(\verb|xStart|\),~the row \(n\)-vector of the starting
-  state; \verb|bT|, optional, the total time to simulate in
-  the burst---if \verb|microBurst()| determines~\verb|bT|,
-  then replace~\verb|bT| in the argument list
-  by~\verb|varargin|. 
+  state; \verb|bT|, \emph{optional}, the total time to
+  simulate in the burst---if your \verb|microBurst()|
+  determines the burst time, then replace~\verb|bT| in the
+  argument list by~\verb|varargin|. 
 \item Outputs:
   \verb|tOut|,~the column vector of solution times; and 
   \verb|xOut|,~an array in which each \emph{row} contains
@@ -95,22 +102,23 @@ the user-specified code for microscale simulation.
 
 \item \verb|tSpan| is an \(\ell\)-vector of times at which
 the user requests output, of which the first element is
-always the initial time. \verb|PIRK4()| does not use
+always the initial time. \verb|PIRK2()| does not use
 adaptive time-stepping; the macroscale time-steps are
 (nearly) the steps between elements of \verb|tSpan|.
 
 \item \verb|x0| is an \(n\)-vector of initial values at the
 initial time \verb|tSpan(1)|. Elements of~\verb|x0| may be
-\verb|NaN|: they are included in the simulation and output,
-and often represent boundaries in space fields.
+\verb|NaN|: such \verb|Nan|s are carried in the simulation
+through to the output, and often represent boundaries\slash
+edges in spatial fields.
 
-\item \verb|bT|, optional, either missing, or
+\item \verb|bT|, \emph{optional}, either missing, or
 empty~(\verb|[]|), or a scalar: if a given scalar, then it
 is the length of the micro-burst simulations---the minimum
 amount of time needed for the microscale simulation to relax
 to the slow manifold; else if missing or~\verb|[]|, then
 \verb|microBurst()| must itself determine the length of a
-computed burst.
+burst.
 \begin{matlab}
 %}
 if nargin<4, bT=[]; end
@@ -120,6 +128,8 @@ if nargin<4, bT=[]; end
 \end{itemize}
 
 
+
+
 \paragraph{Output}
 If there are no output arguments specified, then a plot is 
 drawn of the computed solution~\verb|x| versus \verb|tSpan|.
@@ -127,25 +137,24 @@ drawn of the computed solution~\verb|x| versus \verb|tSpan|.
 \item  \verb|x|, an \(\ell \times n\) array of the
 approximate solution vector. Each row is an estimated state
 at the corresponding time in \verb|tSpan|.  The simplest
-usage is then \verb|x = PIRK4(microBurst,tSpan,x0,bT)|.
+usage is then \verb|x = PIRK2(microBurst,tSpan,x0,bT)|.
 
 However, microscale details of the underlying Projective
-Integration computations may be helpful. \verb|PIRK4()|
-provides two to four optional outputs of the microscale
+Integration computations may be helpful. \verb|PIRK2()|
+provides up to four optional outputs of the microscale
 bursts. 
 
 \item \verb|tms|, optional, is an \(L\) dimensional column
-vector containing microscale times of burst simulations,
-each burst separated by~\verb|NaN|; 
+vector containing the microscale times within the burst
+simulations, each burst separated by~\verb|NaN|; 
 
-\item \verb|xms|,
-optional, is an \(L\times n\) array of the corresponding
-microscale states---this data is an accurate simulation of
-the state and may help visualise more details of the
-solution. 
+\item \verb|xms|, optional, is an \(L\times n\) array of the
+corresponding microscale states---each rows is an accurate
+estimate of the state at the corresponding time~\verb|tms|
+and helps visualise details of the solution. 
 
 \item \verb|rm|, optional, a struct containing the
-`remaining' applications of the micro-burst required by the
+`remaining' applications of the microBurst required by the
 Projective Integration method during the calculation of the
 macrostep: \begin{itemize}
 \item \verb|rm.t|~is a column vector of microscale times; and 
@@ -154,21 +163,26 @@ macrostep: \begin{itemize}
 The states \verb|rm.x| do not have the same physical
 interpretation as those in \verb|xms|; the \verb|rm.x| are
 required in order to estimate the slow vector field during
-the calculation of the Runge--Kutta increments, and do not
-in general resemble the true dynamics.
+the calculation of the Runge--Kutta increments, and do
+\emph{not} accurately approximate the macroscale dynamics.
 
 \item  \verb|svf|, optional, a struct containing the
 Projective Integration estimates of the slow vector field.
 \begin{itemize}
-\item \verb|svf.t| is a \(4\ell\) dimensional column vector
+\item \verb|svf.t| is a \(2\ell\) dimensional column vector
 containing all times at which the Projective Integration
-scheme is extrapolated along micro-burst data to form a
+scheme is extrapolated along microBurst data to form a
 macrostep. 
-\item \verb|svf.dx| is a \(4\ell\times n\) array containing
+\item \verb|svf.dx| is a \(2\ell\times n\) array containing
 the estimated slow vector field.
 \end{itemize}
 
 \end{itemize}
+
+
+
+
+
 
 
 \subsection{The projective integration code}
@@ -177,8 +191,8 @@ Determine the number of time-steps and preallocate storage
 for macroscale estimates.
 \begin{matlab}
 %}
-nT=length(tSpan); 
-x=nan(nT,length(x0)); 
+nT = length(tSpan); 
+x = nan(nT,length(x0)); 
 %{
 \end{matlab}
 
@@ -186,20 +200,20 @@ Get the number of expected outputs and set logical indices
 to flag what data should be saved.
 \begin{matlab}
 %}
-nArgs=nargout(); 
-saveMicro = (nArgs>1); 
-saveFullMicro = (nArgs>3); 
-saveSvf = (nArgs>4); 
+nArgOut = nargout(); 
+saveMicro = (nArgOut>1); 
+saveFullMicro = (nArgOut>3); 
+saveSvf = (nArgOut>4); 
 %{
 \end{matlab}
 
 
 Run a preliminary application of the micro-burst on the
-initial conditions to help relax to the slow manifold. This
-is done in addition to the micro-burst in the main loop,
-because the initial conditions are often far from the
-attracting slow manifold. Require the user to input and
-output rows of the system state.
+initial state to help relax to the slow manifold. This is
+done in addition to the micro-burst in the main loop,
+because the initial state is often far from the attracting
+slow manifold. Require the user to input and output rows of
+the system state.
 \begin{matlab}
 %}
 x0 = reshape(x0,1,[]); 
@@ -207,12 +221,12 @@ x0 = reshape(x0,1,[]);
 %{
 \end{matlab}
 
-Use the end point of the micro-burst as the initial
-conditions.
+Use the end point of the micro-burst as the initial state
+for the macroscale time-steps.
 \begin{matlab}
 %}
 tSpan(1) = relax_t(end); 
-x(1,:)=relax_x0(end,:); 
+x(1,:) = relax_x0(end,:); 
 %{
 \end{matlab}
 
@@ -276,8 +290,8 @@ the size of the final time-step.
 Check for round-off error.
 \begin{matlab}
 %}
-    xt=[reshape(t1(end-1:end),[],1) xm1(end-1:end,:)];
-    roundingTol=1e-8;
+    xt = [reshape(t1(end-1:end),[],1) xm1(end-1:end,:)];
+    roundingTol = 1e-8;
     if norm(diff(xt))/norm(xt,'fro') < roundingTol
     warning(['significant round-off error in 1st projection at T=' num2str(T)])
     end
@@ -293,9 +307,10 @@ field.
     dx1 = (xm1(end,:)-xm1(end-1,:))/del; 
 %{
 \end{matlab}
-Assume burst times are the same length for this macro-step,
-or effectively so (recall that \verb|bT| may be empty as it
-may be only coded and known in \verb|microBurst()|).
+\emph{Assume} burst times are the same length for this
+macro-step, or effectively so (recall that \verb|bT| may be
+empty as it may be only coded and known in
+\verb|microBurst()|).
 \begin{matlab}
 %}
 abT = t1(end)-t1(1);
@@ -328,7 +343,7 @@ field.
 Check for round-off error.
 \begin{matlab}
 %}
-    xt=[reshape(t2(end-1:end),[],1) xm2(end-1:end,:)];
+    xt = [reshape(t2(end-1:end),[],1) xm2(end-1:end,:)];
     if norm(diff(xt))/norm(xt,'fro') < roundingTol
     warning(['significant round-off error in 2nd projection at T=' num2str(T)])
     end
@@ -390,7 +405,7 @@ times and estimates.
     end
 %{
 \end{matlab}
-Terminate the main loop:
+End of the main loop of all macro-steps.
 \begin{matlab}
 %}
 end
@@ -398,7 +413,7 @@ end
 \end{matlab}
 
 
-Overwrite \verb|x(1,:)| with the specified initial condition
+Overwrite \verb|x(1,:)| with the specified initial state
 \verb|tSpan(1)|.
 \begin{matlab}
 %}
@@ -422,10 +437,10 @@ end
 \end{matlab}
 
 
-\subsection{If no output specified, then plot simulation}
+\subsection{If no output specified, then plot the simulation}
 \begin{matlab}
 %}
-if nArgs==0
+if nArgOut==0
     figure, plot(tSpan,x,'o:')
     title('Projective Simulation with PIRK4')
 end

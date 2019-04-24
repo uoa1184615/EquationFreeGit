@@ -27,8 +27,8 @@ If there are no input arguments, then this function applies
 itself to the Michaelis--Menton example: see the code in
 \cref{sec:pirk2eg} as a basic template of how to use.
 \begin{itemize}
-\item \verb|microBurst()|, a user-coded function that computes 
-a short-time burst of the microscale simulation. 
+\item \verb|microBurst()|, a user-coded function that
+computes a short-time burst of the microscale simulation. 
 \begin{verbatim}
 [tOut, xOut] = microBurst(tStart, xStart, bT)
 \end{verbatim}
@@ -36,10 +36,10 @@ a short-time burst of the microscale simulation.
 \item Inputs:
   \verb|tStart|,~the start time of a burst of simulation;
   \(\verb|xStart|\),~the row \(n\)-vector of the starting
-  state; \verb|bT|, optional, the total time to simulate in
-  the burst---if \verb|microBurst()| determines the burst
-  time, then replace~\verb|bT| in the argument list
-  by~\verb|varargin|. 
+  state; \verb|bT|, \emph{optional}, the total time to
+  simulate in the burst---if your \verb|microBurst()|
+  determines the burst time, then replace~\verb|bT| in the
+  argument list by~\verb|varargin|. 
 \item Outputs:
   \verb|tOut|,~the column vector of solution times; and 
   \verb|xOut|,~an array in which each \emph{row} contains
@@ -54,16 +54,17 @@ adaptive time-stepping; the macroscale time-steps are
 
 \item \verb|x0| is an \(n\)-vector of initial values at the
 initial time \verb|tSpan(1)|. Elements of~\verb|x0| may be
-\verb|NaN|: they are included in the simulation and output,
-and often represent boundaries in space fields.
+\verb|NaN|: such \verb|Nan|s are carried in the simulation
+through to the output, and often represent boundaries\slash
+edges in spatial fields.
 
-\item \verb|bT|, optional, either missing, or
+\item \verb|bT|, \emph{optional}, either missing, or
 empty~(\verb|[]|), or a scalar: if a given scalar, then it
 is the length of the micro-burst simulations---the minimum
 amount of time needed for the microscale simulation to relax
 to the slow manifold; else if missing or~\verb|[]|, then
 \verb|microBurst()| must itself determine the length of a
-computed burst.
+burst.
 \begin{matlab}
 %}
 if nargin<4, bT=[]; end
@@ -74,14 +75,15 @@ if nargin<4, bT=[]; end
 
 
 \paragraph{Choose a long enough burst length}
-Suppose: you have some desired relative
+Suppose: firstly, you have some desired relative
 accuracy~\(\varepsilon\) that you wish to achieve (e.g.,
-\(\varepsilon\approx0.01\) for two digit accuracy); the slow
-dynamics of your system occurs at rate\slash frequency of
-magnitude about~\(\alpha\); and the rate of \emph{decay} of
-your fast modes are faster than the lower bound~\(\beta\)
-(e.g., if the fast modes decay roughly like \(e^{-12t},
-e^{-34t}, e^{-56t}\) then \(\beta\approx 12\)).
+\(\varepsilon\approx0.01\) for two digit accuracy);
+secondly, the slow dynamics of your system occurs at
+rate\slash frequency of magnitude about~\(\alpha\); and
+thirdly, the rate of \emph{decay} of your fast modes are
+faster than the lower bound~\(\beta\) (e.g., if three fast
+modes decay roughly like \(e^{-12t}, e^{-34t}, e^{-56t}\)
+then \(\beta\approx 12\)).
 \begin{figure}
 \centering
 \def\aD{\alpha\Delta}\def\bD{\beta\Delta}\def\dD{\delta/\Delta}
@@ -89,7 +91,7 @@ e^{-34t}, e^{-56t}\) then \(\beta\approx 12\)).
 such that $|\aD|\lesssim\sqrt{6\varepsilon}$ for given
 relative error~\(\varepsilon\) and slow rate~\(\alpha\), and
 then $\dD\gtrsim\frac1{\bD}\log\bD$ determines the minimum
-required burst length~\(\delta\) for given fast
+required burst length~\(\delta\) for every given fast
 rate~\(\beta\).}
 \tikzsetnextfilename{ProjInt/bTlength}
 \begin{tikzpicture}
@@ -100,12 +102,12 @@ rate~\(\beta\).}
   \end{loglogaxis} 
 \end{tikzpicture}
 \end{figure}
-Then choose 
+Then set 
 \begin{enumerate}
 \item a macroscale time-step, \(\Delta=\verb|diff(tSpan)|\),
 such that \(\alpha\Delta\approx\sqrt{6\varepsilon}\), and
 \item a microscale burst length, \(\delta=\verb|bT| \gtrsim
-\frac1\beta\log(\beta\Delta)\) (see \cref{fig:bTlength}).
+\frac1\beta\log(\beta\Delta)\), see \cref{fig:bTlength}.
 \end{enumerate}
 
 
@@ -122,18 +124,17 @@ usage is then \verb|x = PIRK2(microBurst,tSpan,x0,bT)|.
 
 However, microscale details of the underlying Projective
 Integration computations may be helpful. \verb|PIRK2()|
-provides two to four optional outputs of the microscale
+provides up to four optional outputs of the microscale
 bursts. 
 
 \item \verb|tms|, optional, is an \(L\) dimensional column
-vector containing microscale times of burst simulations,
-each burst separated by~\verb|NaN|; 
+vector containing the microscale times within the burst
+simulations, each burst separated by~\verb|NaN|; 
 
-\item \verb|xms|,
-optional, is an \(L\times n\) array of the corresponding
-microscale states---this data is an accurate simulation of
-the state and may help visualise more details of the
-solution. 
+\item \verb|xms|, optional, is an \(L\times n\) array of the
+corresponding microscale states---each rows is an accurate
+estimate of the state at the corresponding time~\verb|tms|
+and helps visualise details of the solution. 
 
 \item \verb|rm|, optional, a struct containing the
 `remaining' applications of the microBurst required by the
@@ -145,8 +146,8 @@ macrostep: \begin{itemize}
 The states \verb|rm.x| do not have the same physical
 interpretation as those in \verb|xms|; the \verb|rm.x| are
 required in order to estimate the slow vector field during
-the calculation of the Runge--Kutta increments, and do not
-in general resemble the true dynamics.
+the calculation of the Runge--Kutta increments, and do
+\emph{not} accurately approximate the macroscale dynamics.
 
 \item  \verb|svf|, optional, a struct containing the
 Projective Integration estimates of the slow vector field.
@@ -177,18 +178,19 @@ if nargin==0
 \paragraph{Example code for Michaelis--Menton dynamics} The
 Michaelis--Menten enzyme kinetics is expressed as a
 singularly perturbed system of differential equations for
-\(x(t)\) and~\(y(t)\) (encoded in function \verb|MMburst| 
-in the next paragraph):
+\(x(t)\) and~\(y(t)\):
 \begin{equation*}
 \frac{dx}{dt}=-x+(x+\tfrac12)y \quad\text{and}\quad
-\frac{dy}{dt}=\frac1\epsilon\big[x-(x+1)y\big].
+\frac{dy}{dt}=\frac1\epsilon\big[x-(x+1)y\big]
 \end{equation*}
-With initial conditions \(x(0)=1\) and \(y(0)=0\), the
-following code computes and plots a solution over time
-\(0\leq t\leq6\) for parameter \(\epsilon=0.05\)\,. Since
-the rate of decay is \(\beta\approx 1/\epsilon\) we choose a
-burst length \(\epsilon\log(\Delta/\epsilon)\) as here the
-macroscale time-step \(\Delta=1\).
+(encoded in function \verb|MMburst()| in the next
+paragraph). With initial conditions \(x(0)=1\) and
+\(y(0)=0\), the following code computes and plots a solution
+over time \(0\leq t\leq6\) for parameter
+\(\epsilon=0.05\)\,.  Since the rate of decay is
+\(\beta\approx 1/\epsilon\) we choose a burst length
+\(\epsilon\log(\Delta/\epsilon)\) as here the macroscale
+time-step \(\Delta=1\).
 \begin{matlab}
 %}
 global MMepsilon
@@ -210,6 +212,7 @@ end%if no arguments
 \end{matlab}
 
 \input{../ProjInt/MMburst.m}
+\input{../ProjInt/odeOct.m}
 
 
 
@@ -232,20 +235,20 @@ Get the number of expected outputs and set logical indices
 to flag what data should be saved.
 \begin{matlab}
 %}
-nArgs=nargout(); 
-saveMicro = (nArgs>1); 
-saveFullMicro = (nArgs>3); 
-saveSvf = (nArgs>4); 
+nArgOut=nargout(); 
+saveMicro = (nArgOut>1); 
+saveFullMicro = (nArgOut>3); 
+saveSvf = (nArgOut>4); 
 %{
 \end{matlab}
 
 
-Run a preliminary application of the microBurst on the
-initial conditions to help relax to the slow manifold. This
-is done in addition to the microBurst in the main loop,
-because the initial conditions are often far from the
-attracting slow manifold. Require the user to input and
-output rows of the system state.
+Run a preliminary application of the microBurst on the given
+initial state to help relax to the slow manifold. This is
+done in addition to the microBurst in the main loop, because
+the initial state is often far from the attracting slow
+manifold. Require the user to input and output rows of the
+system state.
 \begin{matlab}
 %}
 x0 = reshape(x0,1,[]); 
@@ -253,8 +256,8 @@ x0 = reshape(x0,1,[]);
 %{
 \end{matlab}
 
-Use the end point of the microBurst as the initial
-conditions.
+Use the end point of this preliminary microBurst as the
+initial state for the loop of macro-steps.
 \begin{matlab}
 %}
 tSpan(1) = relax_t(end); 
@@ -293,9 +296,9 @@ for jT = 2:nT
     T = tSpan(jT-1);
 %{
 \end{matlab}
-If two applications of the microBurst would cover one entire macroscale
-time-step, then do so (setting some internal states to
-\verb|NaN|); else proceed to projective step.
+If two applications of the microBurst would cover one entire
+macroscale time-step, then do so (setting some internal
+states to \verb|NaN|); else proceed to projective step.
 \begin{matlab}
 %}
     if ~isempty(bT) && 2*abs(bT)>=abs(tSpan(jT)-T) && bT*(tSpan(jT)-T)>0
@@ -362,7 +365,7 @@ Check for round-off error.
 \end{matlab}
 
 Use the weighted average of the estimates of the slow vector
-field to take a macrostep.
+field to take a macro-step.
 \begin{matlab}
 %}
     x(jT,:) = xm1(end,:) + Dt*(dx1+dx2)/2; 
@@ -412,7 +415,7 @@ times and estimates.
     end
 %{
 \end{matlab}
-Terminate the main loop:
+End the main loop over all the macro-steps.
 \begin{matlab}
 %}
 end
@@ -444,10 +447,10 @@ end
 \end{matlab}
 
 
-\subsection{If no output specified, then plot simulation}
+\subsection{If no output specified, then plot the simulation}
 \begin{matlab}
 %}
-if nArgs==0
+if nArgOut==0
     figure, plot(tSpan,x,'o:')
     title('Projective Simulation with PIRK2')
 end

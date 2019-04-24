@@ -18,7 +18,7 @@ Then see \cref{fig:constructPI,fig:PIchoosemacro}
 \paragraph{Scenario}
 When you are interested in a complex system with many interacting parts or agents, you usually are primarily interested in the self-organised emergent macroscale characteristics.
 Projective integration empowers us to efficiently simulate such long-time emergent dynamics.
-We suppose you have coded some accurate, fine scale simulation of the complex system, and call such code a microsolver.
+We suppose you have coded some accurate, fine-scale, microscale simulation of the complex system, and call such code a microsolver.
 
 The Projective Integration section of this toolbox consists of several functions.
 Each function implements over a long-time scale a variant of a standard numerical method to simulate\slash integrate the emergent dynamics of the complex system.
@@ -52,34 +52,29 @@ This chart overviews constructing a Projective Integration simulation, whereas \
     \begin{tikzpicture}[node distance = 3ex, auto]
     \node [block] (setmicro) {\textbf{Set microsolver}
      
-    Define or construct the function \texttt{solver()} that calls a black-box microsolver. Set \texttt{bT}, the time to run microsolver for. Possible aids:
+    Code a function that interfaces to your `black-box' microsolver, including the burst time,~\texttt{bT}, of the microsolver. Possible aids:
 \begin{itemize}
 \item     Use the Patch functions (\cref{fig:constructpatch}) to simulate a large-scale \pde, lattice, etc.
 %\item    Use \texttt{bbgen()} if the microsolver is a standard solver, \texttt{ode45} e.g., and needs to be converted into a black-box.
-\item    Use \texttt{cmdc()} as a wrapper for the microsolver if the slow variables would otherwise change significantly over the microsolver.
+\item    Use \texttt{cmdc()} as a wrapper for the microsolver if the slow variables may change significantly over the microsolver burst.
 \end{itemize}};
 
-    \node[block, right=2ex of setmicro] (setmacro){\textbf{Set macrosolver, define problem}\\[1ex]
-        \begin{tikzpicture}
-    \node [tinyblock]%, below=0.6cm of pig]
-     (pirk) {\textbf{If using \texttt{PIRKn()}:}
-      
-    Set the vector of output times \texttt{tspan}. Intervals between times are the projective time-steps. Set initial values \texttt{x0}.};
-   \node [tinyblock, right=1ex of pirk]%, below right=0.2cm and -1cm of lift]
-    (pig) {\textbf{If using \texttt{PIG()}:}
-     
-    Set the solver \texttt{macro.solver} to be used on the macro scale. Set any needed time inputs or time-step data in \texttt{macro.tspan}. Set initial values \texttt{x0}.};
-    \end{tikzpicture}
-    };
+\node[block, right=2ex of setmicro] (setmacro){\textbf{Set macro simulator}
+    
+    Set the vector of output times \texttt{tSpan\slash Tspan}, and set initial values~\texttt{x0}.
+\begin{itemize}
+\item If using \texttt{PIRKn()}, then intervals between times are the projective time-steps.
+\item If using \texttt{PIG()}, then intervals between times are as needed by \verb|macroInt|.
+    \end{itemize}};
    
-       \node [smallblock, below=2ex of setmacro] (lift) 
+\node [smallblock, below=2ex of setmacro] (lift) 
        {\textbf{Set lifting\slash restriction}\quad
     If needed, set functions \texttt{restrict()} and \texttt{lift()} to convert between macro and micro problems\slash variables. These are optional arguments to the Projective Integration functions.};
     
  \node [block, below right=5ex and -9\WD of setmicro] (dopi) {\textbf{Do Projective Integration}\quad 
     Invoke the appropriate Projective Integration function as, e.g., 
-    \verb|[t,x]=PIRK2(solver,tspan,x0,bT)|, or
-    \verb|[t,x]=PIG(solver,macro,x0)|. 
+    \texttt{x = PIRK2(microBurst, tSpan, x0)}, or
+    \texttt{[t,x] = PIG(macroInt, microBurst, Tspan, x0)}. 
     Additional optional outputs inform you of the microscale.};
              \path [line, thick] (setmicro) to[out=-90,in=120] (dopi);
          \path [line, thick] (lift) to[out=180,in=3] (dopi);
@@ -120,14 +115,15 @@ In conjunction with \cref{fig:constructPI}, this chart roughly guides which top-
 \tikzstyle{lined} = [draw, latex'-latex']
 \node [bigblock,draw=red!80!black,fill=red!10] (gaptooth) {\textbf{Choosing the macro solver in Projective Integration}\\[2ex]
     \begin{tikzpicture}[node distance = 4ex, auto]
-    \node [block,right=5\WD] (timestep) {{Is an appropriate time-step known for the slow dynamics?}};
+    \node [block,right=5\WD] (timestep) {{Do you know an appropriate time-step for the slow, macroscale, system-level, dynamics?}};
     \node [yesblock, below =2ex of timestep] (timeyes) {Yes};
     \node [yesblock, right=2ex of timestep] (timeno) {No};
-    \node [block, below=2ex of timeyes] (slowsol) {{Is a specific solver desired to simulate the slow dynamics?}};
-     \node [smallblock, below right=2ex and 2ex of timeno] (pig) {Choose \texttt{PIG()} to simulate\slash integrate};
+    \node [block, below=2ex of timeyes] (slowsol) {{Do you desire a specific method to simulate the slow macroscale dynamics?}};
          \node [yesblock, below =2ex of slowsol] (slowno) {No};
     \node [yesblock,  right=2ex of slowsol] (slowyes) {Yes};
-         \node [block, below =2ex of slowno] (pirk) {Choose \texttt{PIRK2()} or \texttt{PIRK4()} to  simulate\slash integrate};
+         \node [block, below =2ex of slowno] (pirk) {Simulate\slash integrate with \texttt{PIRK2()}, and maybe confirm with \texttt{PIRK4()}.};
+     \node [smallblock, right=10ex of pirk] (pig) 
+     {Choose \texttt{PIG()} to simulate\slash integrate};
          \path [line, thick] (timestep) to[out=-90,in=90] (timeyes);
          \path [line, thick] (timestep) to[out=0,in=180] (timeno);
           \path [line, thick] (timeno) to[out=0,in=90] (pig);
@@ -135,7 +131,7 @@ In conjunction with \cref{fig:constructPI}, this chart roughly guides which top-
           \path [line, thick] (slowsol) to[out=0,in=180] (slowyes);
           \path [line, thick] (slowsol) to[out=-90,in=90] (slowno);
           \path [line, thick] (slowno) to[out=-90,in=90] (pirk);
-          \path [line, thick] (slowyes) to[out=0,in=-90] (pig);
+          \path [line, thick] (slowyes) to[out=0,in=90] (pig);
     \end{tikzpicture}
     };   
 \end{tikzpicture}
@@ -147,29 +143,28 @@ In conjunction with \cref{fig:constructPI}, this chart roughly guides which top-
 
 \paragraph{Main functions}
 \begin{itemize}
-\item Projective Integration by second or fourth-order Runge--Kutta, \verb|PIRK2()| and \verb|PIRK4()| respectively.
+\item Projective Integration by second or fourth-order Runge--Kutta is implemented by \verb|PIRK2()| or \verb|PIRK4()| respectively.
 These schemes are suitable for precise simulation of the slow dynamics, provided the time period spanned by an application of the microsolver is not too large.
 
-\item Projective Integration with a General solver, \verb|PIG()|.
-This function enables a Projective Integration implementation of any solver with macroscale time-steps.
-It does not matter whether the solver is a standard Matlab algorithm, or one supplied by the user.
-As explored in later examples, \verb|PIG()| should only be used in very stiff systems. 
+\item Projective Integration with a General method, \verb|PIG()|.
+This function enables a Projective Integration implementation of any integration method over macroscale time-steps.
+It does not matter whether the method is a standard \script\ algorithm, or one supplied by the user.
+\verb|PIG()| should only be used directly in very stiff systems, less stiff systems additionally require \verb|cdmc()|. 
 
-\item `Constraint-defined manifold computing', \verb|cdmc()|.
-This helper function, based on the method introduced in \cite{Gear04},  iteratively applies the microsolver and projects the output backwards in time.
-The result is to constrain the fast variables close to the slow manifold, without advancing the current time by the duration of an application of the microsolver.
-This function can be used to reduce errors related to the simulation length of the microsolver in either the \verb|PIRK| or \verb|PIG| functions.
+\item \emph{Constraint-defined manifold computing}, \verb|cdmc()|, is a helper function, based on the method introduced in \cite{Gear04},  that iteratively applies the microsolver and backward projection in time.
+The result is to project the fast variables close to the slow manifold, without advancing the current time by the burst time of the microsolver.
+This function reduces errors related to the simulation length of the microsolver in the \verb|PIG| function.
 In particular, it enables \verb|PIG()| to be used on problems that are not particularly stiff.
 %\item Black box microsolver generator, \verb|bbgen()|.
 %This simple function takes as input a standard solver with a recommended time-step for microscale simulation, and returns a `black-box' microsolver for the Projective Integration functions.
 \end{itemize}
 
-The above functions share dependence on a user-specified `microsolver', that accurately simulates some problem of interest. 
+The above functions share dependence on a user-specified \emph{microsolver} that accurately simulates some problem of interest. 
 
 
 The following sections describe the \verb|PIRK2()| and \verb|PIG()| functions in detail, providing an example for each.
-Then \verb|PIRK4()| is very similar to \verb|PIRK2()|.
-Descriptions for the minor functions follow, and an example of the use of~\verb|cdmc()|.
+The function \verb|PIRK4()| is very similar to \verb|PIRK2()|.
+Descriptions for the minor functions follow, and an example using~\verb|cdmc()|.
 
 \input{../ProjInt/PIRK2.m}
 \input{../ProjInt/egPIMM.m}
@@ -179,7 +174,7 @@ Descriptions for the minor functions follow, and an example of the use of~\verb|
 
 \begin{devMan}
 %\input{../ProjInt/bbgen.m}
-\input{../ProjInt/PIRK_Example.m}
+\input{../ProjInt/PIRKexample.m}
 \input{../ProjInt/PIGExample.m}
 \input{../ProjInt/PIGExplore.m}
 
@@ -187,12 +182,12 @@ Descriptions for the minor functions follow, and an example of the use of~\verb|
 
 \section{To do/discuss}
 \begin{itemize}
-\item Can we implement for Octave?  We would like to use nested functions for some examples, because the function code then inherits parameter(s) from the main function.  However, in Octave we cannot then use handles to these nested functions due to the error ``handles to nested functions are not yet supported"---which apparently is not going to be fixed anytime soon (as at March 2019).
+\item Implement lifting and restriction for \verb|PIRKn()| functions.
 
-\item could implement Projective Integration by `arbitrary' Runge--Kutta scheme; that is, by having the user input a particular Butcher table---surely only specialists would be interested.
+\item Could implement Projective Integration by `arbitrary' Runge--Kutta scheme; that is, by having the user input a particular Butcher table---surely only specialists would be interested.
 
-\item can `reverse' the order of projection and microsolver applications with a little fiddling.
-Then output at each user-requested coarse time is the end point of an application of the microsolver---better predictions for fast variables.
+%\item Can `reverse' the order of projection and microsolver applications with a little fiddling.
+%Then output at each user-requested coarse time is the end point of an application of the microsolver---better predictions for fast variables.
 
 \item Can maybe implement microsolvers that terminate a burst when the fast dynamics have settled using, for example, the 'Events' function handle in ode23. 
 

@@ -19,7 +19,12 @@ clear all, close all
 %{
 \end{matlab}
 
-Set time scale separation and model.
+Set time scale separation and the underlying \ode{}s:
+\begin{equation*}
+\de t{x_1}=\cos x_1\sin x_2\cos t\,,
+\quad
+\de t{x_2}=\frac1\epsilon(-x_2+\cos x_1).
+\end{equation*}
 \begin{matlab}
 %}
 epsilon = 1e-4;
@@ -48,10 +53,10 @@ x0 = [1 0.9];
 tSpan = [0 5]; 
 %{
 \end{matlab}
-Now time and integrate the above system over \verb|tspan|
+Now time and integrate the above system over \verb|tSpan|
 using \verb|PIG()| and, for comparison, a brute force
-implementation of \verb|ode45()|. Report the time taken by
-each method (in seconds).
+implementation of \verb|ode45|\slash\verb|lsode|. Report 
+the time taken by each method (in seconds).
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
@@ -96,25 +101,21 @@ lsode}.}
 \end{figure}
 
 \begin{itemize}
-\item The problem may be made more, or less, stiff by
+\item The problem may be made more stiff or less stiff by
 changing the time-scale separation parameter
 \(\epsilon=\verb|epsilon|\). The compute time of
 \verb|PIG()| is almost independent of~\(\epsilon\), whereas
 that of \verb|ode45()| is proportional to~\(1/\epsilon\).
 
-But if the problem is insufficiently stiff
-(larger~\(\epsilon\)), then \verb|PIG()| produces nonsense.
-This nonsense is overcome by \verb|cdmc()|
-(\cref{sec:Excdmc}).
+If the problem is `semi-stiff' (larger~\(\epsilon\)), then
+\verb|PIG()|'s default of using \verb|cdmc()| avoids
+nonsense (\cref{sec:Excdmc}).
 
-\item The mildly stiff problem in \cref{sec:ExPIRK} may be
-efficiently solved by a standard solver (e.g.,
-\verb|ode45()|). The stiff but low dimensional problem in
-this example can be solved efficiently by a standard stiff
-solver (e.g., \verb|ode15s()|). The real advantage of the
-Projective Integration schemes is in high dimensional stiff
-problems, that cannot be efficiently solved by most standard
-methods.
+\item  The stiff but low dimensional problem in this example
+may be solved efficiently by a standard stiff solver (e.g.,
+\verb|ode15s()|). The real advantage of the Projective
+Integration schemes is in high dimensional stiff problems,
+that are not efficiently solved by most standard methods.
 \end{itemize}
 
 \end{devMan}

@@ -1,13 +1,13 @@
-% Linear example of PIRK4(). JM & AJR, Sept 18 -- Feb 2019.
+% Linear example of PIRK4(). JM & AJR, Sept 18 -- Apr 2019.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{Example: PI using Runge--Kutta macrosolvers }
 \label{sec:ExPIRK}
-\localtableofcontents
+%\localtableofcontents
 
-This script is a demonstration of the \verb|PIRK()| schemes,
-that use a Runge--Kutta macrosolver, applied to a simple
-linear system with some slow and fast directions. 
+This script demonstrates the \verb|PIRK4()| scheme
+that uses a Runge--Kutta macrosolver, applied to simple
+linear systems with some slow and fast directions. 
 
 Clear workspace and set a seed.
 \begin{matlab}
@@ -23,7 +23,7 @@ the microsolver. We use a simple function
 \verb|gen_linear_system()| that outputs a function \({f(t,x)
 = {A}\vec x+\vec b}\), where matrix~\({A}\) has some
 eigenvalues with large negative real part, corresponding to
-fast variables and some eigenvalues with real part close to
+fast variables, and some eigenvalues with real part close to
 zero, corresponding to slow variables. The function
 \verb|gen_linear_system()| requires that we specify bounds
 on the real part of the strongly stable eigenvalues,
@@ -50,10 +50,10 @@ dxdt = gen_linear_system(7,3,fastband,slowband);
 
 
 Set the macroscale times at which we request output from the
-\textsc{pi} scheme and the initial conditions.
+\textsc{pi} scheme and the initial state.
 \begin{matlab}
 %}
-tSpan = 0: 1 : 20; 
+tSpan = 0:1:20; 
 x0 = linspace(-10,10,10)'; 
 %{
 \end{matlab}
@@ -61,7 +61,7 @@ x0 = linspace(-10,10,10)';
 
 
 We implement the \textsc{pi} scheme, saving the coarse
-states in \verb|x|, the `trusted' applications of the
+states in~\verb|x|, the `trusted' applications of the
 microsolver in \verb|tms| and~\verb|xms|, and the additional
 applications of the microsolver in~\verb|rm| (the second,
 third and fourth outputs are optional).
@@ -85,12 +85,12 @@ end
 
 \begin{figure}
 \caption{Demonstration of PIRK4(). From initial conditions,
-the system rapidly trannsitions to an attracting invariant
+the system rapidly transitions to an attracting invariant
 manifold. The \textsc{pi} solution accurately tracks the
 evolution of the variables over time while requiring only a
 fraction of the computations of the standard
 solver.}\label{fig:PIRK}
-\includegraphics[scale=0.9]{PIRK}
+\includegraphics[scale=0.9]{PIRKexample}
 \end{figure}
 \cref{fig:PIRK} plots the output.
 \begin{matlab}
@@ -110,7 +110,7 @@ Save plot to a file.
 %}
 if ~exist('OCTAVE_VERSION','builtin')
 set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-print('-depsc2','PIRK')
+print('-depsc2','PIRKexample')
 end
 %{
 \end{matlab}

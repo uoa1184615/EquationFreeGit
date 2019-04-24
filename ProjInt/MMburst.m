@@ -8,8 +8,8 @@ Michaelis--Menten enzyme kinetics at parameter~\(\epsilon\)
 inherited from above. Code \textsc{ode}s in
 function~\verb|dMMdt| with variables \(x=\verb|x(1)|\) and
 \(y=\verb|x(2)|\).  Starting at time~\verb|ti|, and
-state~\verb|xi| (row), we here simply use \verb|ode23| to 
-integrate in time.
+state~\verb|xi| (row), we here simply use \script's
+\verb|ode23|\slash\verb|lsode| to integrate a burst in time.
 \begin{matlab}
 %}
 function [ts, xs] = MMburst(ti, xi, bT) 

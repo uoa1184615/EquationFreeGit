@@ -3,17 +3,18 @@
 % JM & AJR, July 2018 -- Apr 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{cdmc()}}
+\section{\texttt{cdmc()}: constraint defined manifold computing}
 \label{sec:cdmc}
-\verb|cdmc()| iteratively applies the micro-burst and then
-projects backwards in time to the initial conditions. The
-cumulative effect is to relax the variables to the
-attracting slow manifold, while keeping the final time for
+
+The function \verb|cdmc()| iteratively applies the given
+micro-burst and then projects backward to the initial time.
+The cumulative effect is to relax the variables to the
+attracting slow manifold, while keeping the `final' time for
 the output the same as the input time.
 
 \begin{matlab}
 %}
-function [ts, xs] = cdmc(microBurst,t0,x0)
+function [ts, xs] = cdmc(microBurst, t0, x0)
 %{
 \end{matlab}
 
@@ -23,8 +24,8 @@ function [ts, xs] = cdmc(microBurst,t0,x0)
 suitable for Projective Integration. See any of
 \verb|PIRK2()|, \verb|PIRK4()|, or \verb|PIG()| for a
 description of \verb|microBurst()|.
-\item \verb|t0|, an initial time
-\item \verb|x0|, an initial state
+\item \verb|t0|, an initial time.
+\item \verb|x0|, an initial state vector.
 \end{itemize}
 \paragraph{Output}
 \begin{itemize}
@@ -36,16 +37,16 @@ description of \verb|microBurst()|.
 
 This function is a wrapper for the micro-burst. For instance
 if the problem of interest is a dynamical system that is not
-too stiff, and which can be simulated by the microBurst
-\verb|sol(t,x,T)|, one would define
+too stiff, and which is simulated by the micro-burst function
+\verb|sol(t,x)|, one would invoke \verb|cdmc()| by defining
 \begin{verbatim}
-cSol = @(t,x) cdmc(sol,t,x)|
+cdmcSol = @(t,x) cdmc(sol,t,x)|
 \end{verbatim}
-and thereafter use \verb|csol()| in place of \verb|sol()| as
-the microBurst for any Projective Integration scheme. The
+and thereafter use \verb|cdmcSol()| in place of \verb|sol()|
+as the microBurst in any Projective Integration scheme. The
 original microBurst \verb|sol()| could create large errors
-if used in a Projective Integration scheme, but the output
-of \verb|cdmc()| should not.
+if used in the \verb|PIG()| scheme, but the output via
+\verb|cdmc()| should not.
 
 \begin{devMan}
 Begin with a standard application of the micro-burst. Need
@@ -68,9 +69,9 @@ t0 = t1(1)-bT;
 [t2,x2] = feval(microBurst,t0,x0.');
 %{
 \end{matlab}
-Return both sets of output(?), although only (t2,x2) should
-be used in Projective Integration---maybe safer to return
-only (t2,x2)
+Return both sets of output(?), although only \verb|(t2,x2)|
+should be used in Projective Integration---maybe safer to
+return only \verb|(t2,x2)|.
 \begin{matlab}
 %}
 ts = [t1(:); t2(:)];

@@ -1,10 +1,10 @@
-%Initially by AJR, Apr 2017 -- Nov 2018
+%Initially by AJR, Apr 2017 -- Apr 2019
 %!TEX root = eqnFreeDevMan.tex
 \chapter{Introduction}
 %\localtableofcontents
 
 \begin{devMan}
-This Developers Manual contains complete descriptions of the code in each function in the toolbox, and each example.  For concise descriptions of each function, quick start guides, and some basic examples, see the User Manual.
+This Developers Manual contains complete descriptions of the code in each function in the toolbox, and of each example.  For concise descriptions of each function, quick start guides, and some basic examples, see the User Manual.
 \end{devMan}
 
 
@@ -14,35 +14,38 @@ Then read the section(s) that documents the function of interest.
 
 
 \paragraph{Quick start}
-Maybe start by adapting one of the included examples. Many of the main functions include, at their start, example code of their use (code which is executed if the function is invoked without any arguments).
+Maybe start by adapting one of the included examples. 
+Many of the main functions include, at their beginning, example code of their use---code which is executed when the function is invoked without any arguments.
 \begin{itemize}
-\item To projectively integrate over time a multiscale, slow-fast, system of \ode{}s you could use \verb|PIRK2()|: adapt the Michaelis--Menten example at the start of \verb|PIRK2.m| (\cref{sec:pirk2eg}).
+\item To projectively integrate over time a multiscale, slow-fast, system of \ode{}s you could use \verb|PIRK2()|, or \verb|PIRK4()| for higher-order accuracy: adapt the Michaelis--Menten example at the beginning of \verb|PIRK2.m| (\cref{sec:pirk2eg}).
 \item You may use forward bursts of simulation in order to simulate the slow dynamics backward in time, as in \verb|egPIMM.m| (\cref{sec:egPIMM}).
-\item To only resolve the slow dynamics in the projective integration, use lifting and restriction functions by adapting the singular perturbation \ode\ example at the start of \verb|PIG.m| (\cref{sec:pigeg}).
-\item Consider an evolving system over a large spatial domains when all you have is a microscale code.  To efficiently simulate over the large domain, one can simulate in just small patches of the domain, appropriately coupled:
-\begin{itemize}
-\item in 1D adapt the code at the start of \verb|configPatches1.m| for Burgers' \pde\ (\cref{sec:configPatches1eg})%
-\ifcsname r@sec:wave2D\endcsname, or the staggered patches of 1D water wave equations in \verb|waterWaveExample.m| (\cref{sec:waterWaveExample})\fi;
-\item in 2D adapt the code at the start of \verb|configPatches2.m| for nonlinear diffusion (\cref{sec:configPatches2eg})%
+\item To only resolve the slow dynamics in the projective integration, use lifting and restriction functions by adapting the singular perturbation \ode\ example at the beginning of \verb|PIG.m| (\cref{sec:pigeg}).
+
+\paragraph{Space-time systems}
+Consider an evolving system over a large spatial domains when all you have is a microscale code.  
+To efficiently simulate over the large domain, one can simulate in just small patches of the domain, appropriately coupled.
+\item In 1D adapt the code at the beginning of \verb|configPatches1.m| for Burgers' \pde\ (\cref{sec:configPatches1eg})%
+\ifcsname r@sec:wave2D\endcsname, or the staggered patches of 1D water wave equations in \verb|waterWaveExample.m| (\cref{sec:waterWaveExample})\fi.
+\item in 2D adapt the code at the beginning of \verb|configPatches2.m| for nonlinear diffusion (\cref{sec:configPatches2eg})%
 \ifcsname r@sec:wave2D\endcsname, or the regular patches of the 2D wave equation of \verb|wave2D.m| (\cref{sec:wave2D})\fi.
-\end{itemize}
-\item The above are for systems that have \emph{smooth} spatial structures on the microscale: when the microscale is `rough' with a known period (so far only in 1D), then adapt 
+
+\item The above two are for systems that have \emph{smooth} spatial structures on the microscale: when the microscale is `rough' with a known period (so far only in 1D), then adapt 
 the example of \verb|HomogenisationExample.m| (\cref{sec:HomogenisationExample}).
 \end{itemize}
 
 
 \paragraph{Blackbox scenarios} 
 Suppose that you have a \emph{detailed and trustworthy} computational simulation of some problem of interest.
-Let's say the simulation is coded in terms of detailed (microscale) variable values~\(\uv(t)\), in~\(\RR^{p}\) for any \(p=1,2,\ldots,\infty\), and evolving time~\(t\).
-The details~\uv\ could represent particles, agents, states of a system.
-When the computation is too time consuming to simulate all the times of interest, then Projective Integration may be able to predict long-time dynamics.  
+Let's say the simulation is coded in terms of detailed (microscale) variable values~\(\uv(t)\), in~\(\RR^{p}\) for some~\(p\), and evolving time~\(t\).
+The details~\uv\ could represent particles, agents, or states of a system.
+When the computation is too time consuming to simulate all the times of interest, then Projective Integration may be able to predict long-time dynamics, both forward and backward in time.  
 In this case, provide your detailed computational simulation as a `black box' to the Projective Integration functions of \cref{sec:ProjInt}.
 
 In many scenarios, the problem of interest involves space or a `spatial' lattice.
-Let's say that indices~\(i\) correspond to `spatial' coordinates~\(\xv_i(t)\), which are often fixed: in lattice problems the positions~\(\xv_i\) would be fixed in time (unless employing a moving mesh on the microscale); in particle problems the positions would evolve.
-And suppose your detailed and trustworthy simulation is coded in terms of micro-field variable values~\(\uv_i(t)\in\RR^p\) at time~\(t\).
+Let's say that indices~\(i\) correspond to `spatial' coordinates~\(\xv_i(t)\), which are often fixed: in lattice problems the positions~\(\xv_i\) would be fixed in time (unless employing a moving mesh on the microscale); however, in particle problems the positions would evolve.
+And suppose your detailed and trustworthy simulation is coded also in terms of micro-field variable values~\(\uv_i(t)\in\RR^p\) at time~\(t\).
 Often the detailed computational simulation is too expensive over all the desired spatial domain \(\xv\in\XX\subset\RR^{d}\).
-In this case, the toolbox functions of \cref{sec:patch} empower you to simulate on only small, well-separated, patches of space by appropriately coupling between patches your simulation code, as a `black box', executing on each patch. 
+In this case, the toolbox functions of \cref{sec:patch} empower you to simulate on only small, well-separated, patches of space by appropriately coupling between patches your simulation code, as a `black box', executing on each small patch. 
 The computational savings may be enormous, especially if combined with projective integration.
 
 
@@ -57,24 +60,4 @@ We aim to develop functions that work for~\script.
 \ifcsname r@sec:contribute\endcsname\cref{sec:contribute} outlines some details for contributors.\fi
 
 
-
-
-
-
-%\chapter{Overview of major functions and example scripts}
-%\label{sec:smf}
-%\localtableofcontents
-%
-%{% excluding the body gives overview of each function/script
-%    \renewcommand{\label}[1]{}%
-%    \let\section\section%
-%    \let\section\subsection%
-%    \let\subsection\paragraph%
-%    \let\paragraph\subparagraph%
-%    \fancyvrbStartStop%
-%    \excludeversion{devMan}
-%    \input{../ProjInt/projInt}
-%    \input{../Patch/patch}
-%    \includeversion{devMan}
-%}%end-exclusion
 

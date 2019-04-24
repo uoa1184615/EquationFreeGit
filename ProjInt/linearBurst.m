@@ -1,9 +1,9 @@
-% Used by PIRK_Example.m
+% Used by PIRKexample.m
 % AJR, Apr 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \paragraph{A micro-burst simulation}
-Used by \verb|PIRK_Example.m|. Code the micro-burst function
+Used by \verb|PIRKexample.m|. Code the micro-burst function
 using simple Euler steps. As a rule of thumb, the time-steps
 \verb|dt| should satisfy $\verb|dt|  \le
 1/|\verb|fastband|(1)|$ and the time to simulate with each
