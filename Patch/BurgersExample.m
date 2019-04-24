@@ -61,7 +61,7 @@ function \verb|burgerBurst()| (\cref{sec:burgerBurst}).
 \begin{matlab}
 %}
 u0 = 0.4*(1+sin(patches.x))+0.1*randn(size(patches.x));
-[ts,us] = burgerBurst(0,u0,0.2);
+[ts,us] = burgersBurst(0,u0,0.4);
 %{
 \end{matlab}
 Plot the simulation. Use only the microscale values interior
@@ -124,7 +124,7 @@ second-order accurate in the macroscale time-step.
 ts = linspace(0,0.5,11);
 bT = 3*(ratio*Len/nPatch/(nSubP/2-1))^2
 addpath('../ProjInt')
-[us,tss,uss] = PIRK2(@burgerBurst,ts,u0(:),bT);
+[us,tss,uss] = PIRK2(@burgersBurst,ts,u0(:),bT);
 %{
 \end{matlab}
 Plot and save the macroscale predictions of the mid-patch
