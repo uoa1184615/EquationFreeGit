@@ -6,9 +6,8 @@
 %{
 \section{\texttt{patchSmooth2()}: interface to time integrators}
 \label{sec:patchSmooth2}
-\localtableofcontents
+%\localtableofcontents
 
-\subsection{Introduction}
 
 To simulate in time with spatial patches we often need to
 interface a users time derivative function with time
@@ -16,7 +15,7 @@ integration routines such as \verb|ode15s| or~\verb|PIRK2|.
 This function provides an interface. It assumes that the
 sub-patch structure is \emph{smooth} so that the patch
 centre-values are sensible macroscale variables, and patch
-edge values are determined by macroscale interpolation of
+edge-values are determined by macroscale interpolation of
 the patch-centre values. Communicate patch-design variables
 to this function via the previously established global
 struct~\verb|patches|.
@@ -48,7 +47,7 @@ the patchy lattice.  The array~\verb|u| has size
 \(\verb|nSubP(1)| \times\verb|nSubP(2)| \times
 \verb|nPatch(1)| \times \verb|nPatch(2)| \times
 \verb|nVars|\).  Time derivatives must be computed into the
-same sized array, but herein the patch edge values are
+same sized array, but herein the patch edge-values are
 overwritten by zeros.
 
 \item \verb|.x| is \(\verb|nSubP(1)| \times
@@ -71,7 +70,7 @@ microscales.
 \begin{itemize}
 \item \verb|dudt| is \(\verb|prod(nSubP)| \cdot
 \verb|prod(nPatch)| \cdot \verb|nVars|\) vector of time
-derivatives, but with patch edge values set to zero.
+derivatives, but with patch edge-values set to zero.
 \end{itemize}
 
 \begin{devMan}

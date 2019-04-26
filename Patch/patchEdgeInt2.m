@@ -6,7 +6,7 @@
 \section[\texttt{patchEdgeInt2()}: 2D patch edge values from 2D interpolation]
 {\texttt{patchEdgeInt2()}: sets 2D patch edge values from 2D macroscale interpolation}
 \label{sec:patchEdgeInt2}
-\localtableofcontents
+%\localtableofcontents
 
 
 Couples 2D patches across 2D space by computing their edge
@@ -102,7 +102,8 @@ For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
 eventually cater for periodic, odd-mid-gap, even-mid-gap,
 even-mid-patch, Dirichlet, Neumann, Robin?? These index vectors
-point to patches and their two immediate neighbours.
+point to patches and their two immediate neighbours---currently 
+not needed.
 \begin{matlab}
 %}
 %i=1:Nx; ip=mod(i,Nx)+1; im=mod(j-2,Nx)+1;
@@ -118,7 +119,8 @@ j0 = round((ny+1)/2);
 %{
 \end{matlab}
 
-\paragraph{Lagrange interpolation gives patch-edge values}
+\paragraph{Lagrange interpolation gives patch-edge values
+---not yet implemented}
 So compute centred differences of the mid-patch values for
 the macro-interpolation, of all fields. Assumes the domain
 is macro-periodic.

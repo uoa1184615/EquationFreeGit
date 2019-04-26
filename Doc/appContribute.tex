@@ -1,21 +1,29 @@
-%Initially by AJR, Apr 2017 -- Mar 2019
+% Initially by AJR, Apr 2017 -- Apr 2019
 %!TEX root = eqnFreeDevMan.tex
 \chapter{Create, document and test algorithms}
 \label{sec:contribute}
 \secttoc
 \def\LaTeX{LaTeX}% for some unknown reason we need this!! 2018-12-22
 
-For developers to create and document the various functions, we use an idea due to Neil~D. Lawrence of the University of Sheffield.
 
 \begin{itemize}
+\item Upon `finalising' a version of the toolbox: \begin{enumerate}
+\item pdflatex and bibtex \verb|Doc/eqnFreeDevMan.tex| to ensure all is documented properly;  
+\item execute \verb|bibexport eqnFreeDevMan| to update the local bibliographic data-file;
+\item pdflatex \verb|Doc/eqnFreeUserMan.tex|, several times, to get a shorter and more user friendly version;
+\item replace the root file \verb|eqnFreeUserMan-newest.pdf| by a renamed copy of the new \verb|Doc/eqnFreeUserMan.pdf|
+\end{enumerate}
+
+\item To create and document the various functions, we adapt an idea due to Neil~D. Lawrence of the University of Sheffield in order to interleave \script\ code, and its documentation in \LaTeX\ (\cref{tbl:format}).
+
 \item Each class of toolbox functions is located in separate folders in the repository, say~\verb|Dir|.
 
-\item Create a \LaTeX\ file~\verb|Dir/funs.tex|: establish as one \LaTeX\ chapter that \verb|\input{Dir/*.m}|s the  files of the functions in the class, example scripts of use, and possibly test scripts, \autoref{tbl:funtex}.
+\item Create a \LaTeX\ file~\verb|Dir/funs.tex|: establish as one \LaTeX\ chapter that \verb|\input{../Dir/*.m}|s the  files of the functions in the class, example scripts of use, and possibly test scripts, \autoref{tbl:funtex}.
 
 \item Each such \verb|Dir/funs.tex| file is to be included from the main \LaTeX\ file \verb|Doc/docBody.tex| so that people can most easily work on one chapter at a time: 
 \begin{itemize}
+\item create a `link' file \verb|Doc/funs.tex| whose only active content is the command \verb|\input{../Dir/funs.tex}|\,;
 \item put \verb|\include{funs}| into \verb|Doc/docBody.tex|\,;
-\item to include, create a `link' file \verb|Doc/funs.tex| whose only active content is the command \verb|\input{../Dir/funs.tex}|\,;
 \item in \verb|Doc/docBody.tex| modify the \verb|\graphicspath| command to include \verb|{../Dir/Figs}|\,.
 \end{itemize}
 
@@ -23,7 +31,7 @@ For developers to create and document the various functions, we use an idea due 
 
 \item Each function-section and test-section is to be created as a \script\ \verb|Dir/*.m| file, say \verb|Dir/fun1.m|, so that users simply invoke the function in \script\ as usual by \verb|fun1(...)|.
 
-Some editors may need to be told that \verb|fun1.m| is a \LaTeX\ file.  For example, TexShop on the Mac requires one to execute in a Terminal
+Some editors may need to be told that \verb|fun1.m| is a \LaTeX\ file.  For example, TexShop on the Mac requires one to execute (once) in a Terminal
 \begin{verbatim}
 defaults write TeXShop OtherTeXExtensions -array-add "m"
 \end{verbatim}
@@ -33,7 +41,7 @@ The format for a example\slash test-section is similar.
 
 \item Any figures from examples should be generated and then saved for later inclusion with the following (which finally works properly for \textsc{Matlab} 2017+)
 \begin{verbatim}
-set(gcf,'PaperPosition',[0 0 14 10]);% cm
+set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10]);% cm
 print('-depsc2','filename')
 \end{verbatim}
 If it is a suitable replacement for an existing graphic, then move it into the \verb|Dir/Figs| folder.
@@ -44,19 +52,16 @@ Include such a graphic into the \LaTeX\ document with (do \emph{not} postfix wit
 
 \item   In figures and other graphics, do \emph{not} resize\slash scale fixed width constructs: instead use \verb|\linewidth| to configure large-scale layout, \verb|em| for small-widths, and \verb|ex| for small-heights. 
 
-
 \item For every function, generally include at the start of the function a simple example of its use.  The example is only to be executed when the function is invoked with no input arguments (\verb|if nargin==0|).
 
 When appropriate, if a function is invoked with no output arguments (\verb|if nargout==0|), then draw some reasonable graph of the results.
-
 
 \item In all \script\ code, prefer camal case for variable names (not underscores).
 
 \item When a function is `finalised', wrap (most) of the lines to be no more than 60~characters so that readers looking at the source can read the plain text reasonably.
 
-
 \item In the documentation \cite[e.g.,][Ch.~4]{Higham98}: 
-write actively, not passively (e.g., avoid ``--tion'' words, and ``is/are verbed'' phrases);
+write actively, not passively (e.g., avoid ``--tion'' words, and avoid ``is/are verbed'' phrases);
 avoid wishy-washy ``can'';
 use the present tense;
 cross-reference precisely;

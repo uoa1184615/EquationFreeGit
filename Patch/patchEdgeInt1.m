@@ -1,14 +1,13 @@
 % Provides the interpolation across space for 1D patches of
 % simulations of a smooth lattice system such as PDE
 % discretisations.
-% AJR & JB, Sep 2018 -- Feb 2019
+% AJR & JB, Sep 2018 -- Apr 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeInt1()}: sets edge values from interpolation over the macroscale}
 \label{sec:patchEdgeInt1}
-\localtableofcontents
+%\localtableofcontents
 
-\subsection{Introduction}
 
 Couples 1D patches across 1D space by computing their edge
 values from macroscale interpolation of either the mid-patch
@@ -34,6 +33,7 @@ global patches
 \verb|nPatch|\cdot \verb|nVars|\) where there are
 \verb|nVars| field values at each of the points in the
 \(\verb|nSubP|\times \verb|nPatch|\) grid.
+
 \item \verb|patches| a struct set by \verb|configPatches1()|
 which includes the following.
 \begin{itemize}
@@ -41,12 +41,17 @@ which includes the following.
 array of the spatial locations~\(x_{ij}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and microscales.
-\item \verb|.ordCC| is order of interpolation integer \(\geq -1\).
+
+\item \verb|.ordCC| is order of interpolation integer~\(\geq
+-1\).
+
 \item \verb|.alt| in \(\{0,1\}\) is one for staggered grid
 (alternating) interpolation.
+
 \item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling.
 \end{itemize}
 \end{itemize}
+
 \paragraph{Output}
 \begin{itemize}
 \item \verb|u| is \(\verb|nSubP|\times \verb|nPatch|\times
@@ -169,9 +174,14 @@ specified order.
 %{
 \end{matlab}
 \paragraph{Case of spectral interpolation}
-Assumes the domain is macro-periodic. As the macroscale
-fields are \(N\)-periodic, the macroscale Fourier transform
-writes the centre-patch values as \(U_j =
+Assumes the domain is macro-periodic. 
+\begin{matlab}
+%}
+else% spectral interpolation
+%{
+\end{matlab}
+As the macroscale fields are \(N\)-periodic, the macroscale
+Fourier transform writes the centre-patch values as \(U_j =
 \sum_{k}C_ke^{ik2\pi j/N}\). Then the edge-patch values
 \(U_{j\pm r} =\sum_{k}C_ke^{ik2\pi/N(j\pm r)}
 =\sum_{k}C'_ke^{ik2\pi j/N}\) where \(C'_k =
@@ -181,11 +191,7 @@ C_ke^{ikr2\pi/N}\). For \verb|nPatch|~patches we resolve
 \ldots, k_{\max}, -k_{\max}, \ldots, -1)\) for odd~\(N\),
 and \(k = (0,1, \ldots, k_{\max}, \pm(k_{\max}+1),
 -k_{\max}, \ldots, -1)\) for even~\(N\).
-\begin{matlab}
-%}
-else% spectral interpolation
-%{
-\end{matlab}
+
 Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches1()|
 tests that there are an even number of patches). Then the
@@ -258,8 +264,8 @@ For an even number of patches, add in the cosine mode.
   end
 %{
 \end{matlab}
-Restore staggered grid when appropriate. Is there a better
-way to do this??
+Restore staggered grid when appropriate. 
+%Is there a better way to do this??
 \begin{matlab}
 %}
 if patches.alt

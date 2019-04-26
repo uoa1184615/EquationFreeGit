@@ -7,7 +7,7 @@
 \label{sec:idealWavePDE}
 This function codes the staggered lattice equation inside
 the patches for the ideal wave \pde\ system \(h_t=-u_x\) and
-\(u_t=-h_x\). Here code for a staggered microscale grid,
+\(u_t=-h_x\). Here code for a staggered micro-grid,
 index~\(i\), of staggered macroscale patches, index~\(j\):
 the array
 \begin{equation*}
@@ -26,14 +26,15 @@ function Ut = idealWavePDE(t,U,x)
   Ut = nan(size(U));  ht = Ut;
 %{
 \end{matlab}
-Compute the \pde\ derivatives at interior points of the patches.
+Compute the \pde\ derivatives only at interior micro-grid
+points of the patches.
 \begin{matlab}
 %}
   i = 2:size(U,1)-1;
 %{
 \end{matlab}
 Here `wastefully' compute time derivatives for both \pde{}s
-at all grid points---for `simplicity'---and then merges the
+at all grid points---for simplicity---and then merge the
 staggered results. Since \(\dot h_{ij} \approx -(u_{i+1,j}
 -u_{i-1,j}) /(2\cdot dx) =-(U_{i+1,j} -U_{i-1,j}) /(2\cdot
 dx)\) as adding\slash subtracting one from the index of a

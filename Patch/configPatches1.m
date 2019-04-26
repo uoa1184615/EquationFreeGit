@@ -1,6 +1,6 @@
 % Creates a data struct of the design of patches for later
 % use by the patch functions such as smoothPatch1().  
-% AJR, Nov 2017 -- Feb 2019
+% AJR, Nov 2017 -- Apr 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches1()}: configures spatial patches in 1D}
@@ -10,8 +10,9 @@
 \subsection{Introduction}
 
 Makes the struct~\verb|patches| for use by the patch\slash
-gap-tooth time derivative function~\verb|patchSmooth1()|.
-\cref{sec:configPatches1eg} lists an example of its use.
+gap-tooth time derivative\slash step
+function~\verb|patchSmooth1()|. \cref{sec:configPatches1eg}
+lists an example of its use.
 \begin{matlab}
 %}
 function configPatches1(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP ...
@@ -28,37 +29,40 @@ for the example code.
 \verb|fun(t,u,x)|, that computes time derivatives (or
 time-steps) of quantities on the patches.
 
-\item \verb|Xlim| give the macro-space domain of the
+\item \verb|Xlim| give the macro-space spatial domain of the
 computation: patches are equi-spaced over the interior of
 the interval~\([\verb|Xlim(1)|,\verb|Xlim(2)|]\).
 
 \item \verb|BCs| somehow will define the macroscale boundary
 conditions. Currently, \verb|BCs| is ignored and the system
-is assumed macro-periodic in the domain.
+is assumed macro-periodic in the spatial domain.
 
 \item \verb|nPatch| is the number of equi-spaced spaced
 patches.
 
-\item \verb|ordCC| is the `order' of interpolation across
-empty space of the macroscale mid-patch values to the edge
-of the patches for inter-patch coupling: currently must 
-be~\(\geq -1\).
+\item \verb|ordCC|, must be~\(\geq -1\), is the `order' of
+interpolation across empty space of the macroscale mid-patch
+values to the edge of the patches for inter-patch coupling:
+where \verb|ordCC| of~\(0\) or~\(-1\) gives spectral
+interpolation; and \verb|ordCC| being odd is for staggered
+spatial grids.
 
 \item \verb|ratio| (real) is the ratio of the half-width of
 a patch to the spacing of the patch mid-points: so
-\(\verb|ratio|=\tfrac12\) means the patches abut; and
+\(\verb|ratio|=\tfrac12\) means the patches abut;
 \(\verb|ratio|=1\) is overlapping patches as in holistic
-discretisation.
+discretisation; and small~\verb|ratio| should greatly reduce
+computational time.
 
 \item \verb|nSubP| is the number of equi-spaced microscale
 lattice points in each patch. Must be odd so that there is a
 central lattice point.
 
-\item \verb|nEdge|, optional, for each patch, the number of edge
-values set by interpolation at the edge regions of each
-patch.  May be omitted.  The default is one (suitable for
-microscale lattices with only nearest neighbour
-interactions).
+\item \verb|nEdge|, \emph{optional}, for each patch, the
+number of edge values set by interpolation at the edge
+regions of each patch.  May be omitted.  The default is one
+(suitable for microscale lattices with only nearest
+neighbour interactions).
 \end{itemize}
 
 
@@ -66,7 +70,7 @@ interactions).
 is created and set with the following components.
 \begin{itemize}
 \item \verb|.fun| is the name of the user's function
-\verb|fun(u,t,x)| that computes the time derivatives (or
+\verb|fun(t,u,x)| that computes the time derivatives (or
 steps) on the patchy lattice. 
 
 \item \verb|.ordCC| is the specified order of inter-patch
@@ -83,7 +87,7 @@ with patch:macroscale ratio as specified.
 
 \item \verb|.x| is \(\verb|nSubP|\times \verb|nPatch|\)
 array of the regular spatial locations~\(x_{ij}\) of the
-microscale grid points in every patch.  
+\(i\)th~microscale grid point in the \(j\)th~patch.  
 
 \item \verb|.nEdge| is, for each patch, the number of edge
 values set by interpolation at the edge regions of each
@@ -105,11 +109,11 @@ may have the following three steps (left-right arrows denote
 function recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches1 
-\item ode15s integrator \into patchSmooth1 \into user's burgersPDE
+\item ode15s integrator \into patchSmooth1 \into user's PDE
 \item process results
 \end{enumerate}
-Establish global patch data struct to interface with a
-function coding Burgers' \pde: to be solved on
+Establish global patch data struct to point to and interface
+with a function coding Burgers' \pde: to be solved on
 \(2\pi\)-periodic domain, with eight patches, spectral
 interpolation couples the patches, each patch of half-size
 ratio~\(0.2\), and with seven microscale points forming each
@@ -119,13 +123,17 @@ patch.
 configPatches1(@BurgersPDE,[0 2*pi], nan, 8, 0, 0.2, 7);
 %{
 \end{matlab}
-Set an initial condition, with some randomness, and 
-simulate in time using a standard stiff integrator and the
+Set an initial condition, with some microscale randomness.
+\begin{matlab}
+%}
+u0=0.3*(1+sin(patches.x))+0.1*randn(size(patches.x));
+%{
+\end{matlab}
+Simulate in time using a standard stiff integrator and the
 interface function \verb|patchsmooth1()|
 (\cref{sec:patchSmooth1}).
 \begin{matlab}
 %}
-u0=0.3*(1+sin(patches.x))+0.1*randn(size(patches.x));
 if ~exist('OCTAVE_VERSION','builtin')
 [ts,ucts] = ode15s( @patchSmooth1,[0 0.5],u0(:));
 else % octave version
@@ -161,11 +169,12 @@ end%if no arguments
 \end{matlab}
 
 \input{../Patch/BurgersPDE.m}
+\input{../Patch/odeOcts.m}
 
 \begin{devMan}
 
 
-By default, do not ensemble average.
+For compatibility, by default, do not ensemble average.
 \begin{matlab}
 %}
 patches.EnsAve = 0;
@@ -174,8 +183,9 @@ patches.EnsAve = 0;
 
 
 \subsection{The code to make patches and interpolation}
-Set one edge-value to compute by interpolation if not
-specified by the user. Store in the struct.
+If not specified by a user, then set interpolation to
+compute one edge-value on each patch edge. Store in the
+struct~\verb|patches|.
 \begin{matlab}
 %}
 if nargin<8, nEdge=1; end
@@ -201,7 +211,7 @@ if (ordCC<-1) | ~(floor(ordCC)==ordCC)
 end
 %{
 \end{matlab}
-For odd~\verb|ordCC| do interpolation based upon odd
+For odd~\verb|ordCC|, interpolate based upon odd
 neighbouring patches as is useful for staggered grids.
 \begin{matlab}
 %}

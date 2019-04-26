@@ -1,5 +1,5 @@
 % Microscale discretisation of a nonlinear diffusion PDE in
-% 2D space (x,y).
+% 2D space (x,y) in 2D patches.
 % AJR, 5 Apr 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
@@ -11,8 +11,8 @@ As a microscale discretisation of \(u_t=\delsq(u^3)\), code
 \begin{matlab}
 %}
 function ut = nonDiffPDE(t,u,x,y)
-  dx = diff(x(1:2));  dy = diff(y(1:2));  % microscale spacing
-  i = 2:size(u,1)-1;  j = 2:size(u,2)-1;  % interior points in patches
+  dx = diff(x(1:2));  dy = diff(y(1:2));  % microgrid spacing
+  i = 2:size(u,1)-1;  j = 2:size(u,2)-1;  % interior patch points
   ut = nan(size(u));  % preallocate storage
   ut(i,j,:,:) = diff(u(:,j,:,:).^3,2,1)/dx^2 ...
                +diff(u(i,:,:,:).^3,2,2)/dy^2;

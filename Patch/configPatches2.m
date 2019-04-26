@@ -10,8 +10,9 @@
 \subsection{Introduction}
 
 Makes the struct~\verb|patches| for use by the patch\slash
-gap-tooth time derivative function~\verb|patchSmooth2()|.
-\cref{sec:configPatches2eg} lists an example of its use.
+gap-tooth time derivative\slash step
+function~\verb|patchSmooth2()|. \cref{sec:configPatches2eg}
+lists an example of its use.
 
 
 \begin{matlab}
@@ -29,49 +30,51 @@ lubrication flow of a thin layer of fluid---see
 \begin{itemize}
 
 \item \verb|fun| is the name of the user function,
-\verb|fun(t,u,x,y)|, that computes time derivatives (or
-time-steps) of quantities on the patches.
+\verb|fun(t,u,x,y)|, that computes time-derivatives (or
+time-steps) of quantities on the 2D micro-grid within all
+the 2D patches.
 
 \item \verb|Xlim| array/vector giving the macro-space domain
 of the computation: patches are distributed equi-spaced over
-the interior of the rectangle \([\verb|Xlim(1)|, 
-\verb|Xlim(2)|] \times [\verb|Xlim(3)|, \verb|Xlim(4)|]\): 
-if \verb|Xlim| is of length two, then use the same interval 
-in both directions.
+the interior of the rectangle \([\verb|Xlim(1)|,
+\verb|Xlim(2)|] \times [\verb|Xlim(3)|, \verb|Xlim(4)|]\):
+if \verb|Xlim| is of length two, then the domain is the
+square of the same interval in both directions.
 
-\item \verb|BCs| somehow will define the macroscale boundary
-conditions.  Currently, \verb|BCs| is ignored and the system
-is assumed macro-periodic in the domain.
+\item \verb|BCs| eventually will define the macroscale
+boundary conditions.  Currently, \verb|BCs| is ignored and
+the system is assumed macro-periodic in the domain.
 
 \item \verb|nPatch| determines the number of equi-spaced
 spaced patches: if scalar, then use the same number of
 patches in both directions, otherwise \verb|nPatch(1:2)|
-give the number in each direction.
+gives the number of patches in each direction.
 
-\item \verb|ordCC| is the `order' of interpolation across
-empty space of the macroscale mid-patch values to the edge
-of the patches for inter-patch coupling: currently must be
-in~\(\{0\}\).
+\item \verb|ordCC| is the `order' of interpolation for
+inter-patch coupling across empty space of the macroscale
+mid-patch values to the edge-values of the patches:
+currently must be ~\(0\); where \(0\)~gives spectral
+interpolation.
 
 \item \verb|ratio| (real) is the ratio of the half-width of
 a patch to the spacing of the patch mid-points: so
-\(\verb|ratio|=\tfrac12\) means the patches abut; and
+\(\verb|ratio|=\tfrac12\) means the patches abut;
 \(\verb|ratio|=1\) would be overlapping patches as in
-holistic discretisation: if scalar, then use the same ratio
-in both directions, otherwise \verb|ratio(1:2)| give the
-ratio in each direction.
+holistic discretisation; and small \verb|ratio| should
+greatly reduce computational time. If scalar, then use the
+same ratio in both directions, otherwise \verb|ratio(1:2)|
+gives the ratio in each direction.
 
 \item \verb|nSubP| is the number of equi-spaced microscale
 lattice points in each patch: if scalar, then use the same
 number in both directions, otherwise \verb|nSubP(1:2)| gives
 the number in each direction. Must be odd so that there is a
-central lattice point.
+central micro-grid point in each patch.
 
-\item \verb|nEdge| is, for each patch, the number of edge
+\item \verb|nEdge|, \emph{optional}, is the number of edge
 values set by interpolation at the edge regions of each
-patch.  May be omitted. The default is one (suitable for
-microscale lattices with only nearest neighbours.
-interactions).
+patch.  The default is one (suitable for microscale lattices
+with only nearest neighbours. interactions).
 
 \end{itemize}
 
@@ -82,7 +85,7 @@ is created and set with the following components.
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
-\verb|fun(u,t,x,y)| that computes the time derivatives (or
+\verb|fun(t,u,x,y)| that computes the time derivatives (or
 steps) on the patchy lattice. 
 
 \item \verb|.ordCC| is the specified order of inter-patch
@@ -90,20 +93,24 @@ coupling.
 
 \item \verb|.alt| is true for interpolation using only odd
 neighbouring patches as for staggered grids, and false for
-the usual case of all neighbour coupling---not yet implemented.
+the usual case of all neighbour coupling---not yet
+implemented.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| are the
 \(\verb|ordCC|\)-vector of weights for the inter-patch
 interpolation onto the right and left edges (respectively)
-with patch:macroscale ratio as specified.
+with patch:macroscale ratio as specified---not yet
+implemented.
 
-\item \verb|.x| is \(\verb|nSubP(1)|\times \verb|nPatch(1)|\)
-array of the regular spatial locations~\(x_{ij}\) of the
-microscale grid points in every patch.  
+\item \verb|.x| is \(\verb|nSubP(1)|\times
+\verb|nPatch(1)|\) array of the regular spatial
+locations~\(x_{ij}\) of the microscale grid points in every
+patch.  
 
-\item \verb|.y| is \(\verb|nSubP(2)|\times \verb|nPatch(2)|\)
-array of the regular spatial locations~\(y_{ij}\) of the
-microscale grid points in every patch.  
+\item \verb|.y| is \(\verb|nSubP(2)|\times
+\verb|nPatch(2)|\) array of the regular spatial
+locations~\(y_{ij}\) of the microscale grid points in every
+patch.  
 
 \item \verb|.nEdge| is, for each patch, the number of edge
 values set by interpolation at the edge regions of each
@@ -128,7 +135,7 @@ may have the following three steps (arrows indicate function
 recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches2 
-\item ode15s integrator \into patchSmooth2 \into user's nonDiffPDE
+\item ode15s integrator \into patchSmooth2 \into user's PDE
 \item process results
 \end{enumerate}
 
@@ -136,17 +143,18 @@ Establish global patch data struct to interface with a
 function coding a nonlinear `diffusion' \pde: to be solved
 on \(6\times4\)-periodic domain, with \(9\times7\) patches,
 spectral interpolation~(\(0\)) couples the patches, each
-patch of half-size ratio~\(0.25\), and with \(5\times5\)
-points within each patch. \cite{Roberts2011a} established
-that this scheme is consistent with the \pde\ (as the patch 
-spacing decreases).
+patch of half-size ratio~\(0.25\) (relatively large for
+visualisation), and with \(5\times5\) points within each
+patch. \cite{Roberts2011a} established that this scheme is
+consistent with the \pde\ (as the patch spacing decreases).
 \begin{matlab}
 %}
 nSubP = 5;
 configPatches2(@nonDiffPDE,[-3 3 -2 2], nan, [9 7], 0, 0.25, nSubP);
 %{
 \end{matlab}
-Set a Gaussian initial condition using auto-replication of
+Set a  perturbed-Gaussian initial condition using
+auto-replication of
 the spatial grid.
 \begin{matlab}
 %}
@@ -177,7 +185,8 @@ legend('time = 0','Location','north')
 xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
 %{
 \end{matlab}
-Save the initial condition to file for \cref{fig:configPatches2ic}.
+Save the initial condition to file for
+\cref{fig:configPatches2ic}.
 \begin{matlab}
 %}
 set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
@@ -198,11 +207,11 @@ Integrate in time using standard functions.
 disp('Wait while we simulate h_t=(h^3)_xx+(h^3)_yy')
 drawnow
 if ~exist('OCTAVE_VERSION','builtin')
-	[ts,ucts] = ode15s( @patchSmooth2,[0 3],u0(:));
+    [ts,ucts] = ode15s( @patchSmooth2,[0 3],u0(:));
 else % octave version is quite slow
-	lsode_options('absolute tolerance',1e-4);
-	lsode_options('relative tolerance',1e-4);
-	[ts,ucts] = odeOcts(@patchSmooth2,[0 1],u0(:));
+    lsode_options('absolute tolerance',1e-4);
+    lsode_options('relative tolerance',1e-4);
+    [ts,ucts] = odeOcts(@patchSmooth2,[0 1],u0(:));
 end
 %{
 \end{matlab}
@@ -248,7 +257,8 @@ end%if no arguments
 
 \subsection{The code to make patches}
 
-Initially duplicate parameters as needed.
+Initially duplicate parameters for both space dimensions as
+needed.
 \begin{matlab}
 %}
 if numel(Xlim)==2, Xlim = repmat(Xlim,1,2); end
@@ -258,7 +268,7 @@ if numel(nSubP)==1, nSubP = repmat(nSubP,1,2); end
 %{
 \end{matlab}
 
-Set one edge-value to compute by interpolation if not 
+Set one edge-value to compute by interpolation if not
 specified by the user. Store in the struct.
 \begin{matlab}
 %}
@@ -306,8 +316,9 @@ patches.ordCC = ordCC;
 %%{
 %\end{matlab}
 Might as well precompute the weightings for the
-interpolation of field values for coupling. (Could sometime
-extend to coupling via derivative values.)
+interpolation of field values for coupling---not yet used
+here. (Could sometime extend to coupling via derivative
+values.)
 \begin{matlab}
 %}
 ratio = ratio(:)'; % force to be row vector
@@ -331,7 +342,7 @@ else %
     (-36+49*ratio.^2-14*ratio.^4+ratio.^6).*ratio.^2/40320 ];
 end
 patches.Cwtsr = patches.Cwtsr(1:ordCC,:);
-% should avoid this next implicit auto-replication
+% maybe should avoid this next implicit auto-replication
 patches.Cwtsl = (-1).^((1:ordCC)'-patches.alt).*patches.Cwtsr;
 %{
 \end{matlab}

@@ -5,6 +5,7 @@
 %{
 \subsection{\texttt{waterWavePDE()}: water wave PDE}
 \label{sec:waterWavePDE}
+
 This function codes the staggered lattice equation inside
 the patches for the nonlinear wave-like \pde\
 system~\cref{eqs:patch:N}. Also, regularise the absolute

@@ -9,9 +9,11 @@
 \label{sec:EnsembleAverageExample}
 \localtableofcontents
 
+
+\subsection{Introduction}
 This example is an extension of the homogenisation example
 of \cref{sec:HomogenisationExample} for heterogeneous
-diffusion. In cases where the periodicity of the 
+diffusion. In cases where the periodicity of the
 heterogeneous diffusion is known, then
 \cref{sec:HomogenisationExample} provides a efficient patch
 dynamics simulation. However, if the diffusion is not
@@ -20,25 +22,25 @@ ideal patch and core sizes as described by
 \cite{Bunder2013b} and applied in
 \cref{sec:HomogenisationExample}. In this case,
 \cite{Bunder2013b} recommend constructing an ensemble of
-diffusivity configurations and then computing an ensemble
-of field solutions, finally averaging over the ensemble of
+diffusivity configurations and then computing an ensemble of
+field solutions, finally averaging over the ensemble of
 fields to obtain the ensemble averaged field solution.
 
 For a first comparison, we present a very similar example to
-that presented in \cref{sec:HomogenisationExample}, but
-whereas \cref{sec:HomogenisationExample} simulates using
-only one diffusivity configuration, here we simulate over an
-ensemble. For example, \cref{fig:HomogenisationCtsUEnsAve}
-is similar to \cref{fig:HomogenisationCtsU}, but the former
-is an ensemble average of an ensemble of eight different
-simulations with different diffusivity configurations and
-the latter is simulated from just one diffusivity
+that of \cref{sec:HomogenisationExample}, but whereas
+\cref{sec:HomogenisationExample} simulates using only one
+diffusivity configuration, here we simulate over an
+ensemble. For example, \cref{fig:HomogenisationCtsU} is
+similar to \cref{fig:HomogenisationCtsUEnsAve}, but the
+latter is an average of an ensemble of eight different
+simulations with different diffusivity configurations,
+whereas the former is simulated from just one diffusivity
 configuration. The main difference between these two is that
-the  average over the ensemble removes any heterogeneity in
-the solution.
+the average over the ensemble caters for the heterogeneity
+in the problem.
 
 Much of this script is similar to that of
-\cref{sec:HomogenisationExample}, but with some additions to
+\cref{sec:HomogenisationExample}, but with additions to
 manage the ensemble. The first part of the script implements
 the following gap-tooth scheme (left-right arrows denote
 function recursion).
@@ -51,8 +53,8 @@ function recursion).
 \centering \caption{\label{fig:HomogenisationCtsUEnsAve}the
 diffusing field~\(u(x,t)\) in the patch (gap-tooth) scheme
 applied to microscale heterogeneous diffusion with an
-ensemble average. The ensemble average smooths out the
-heterogeneous diffusion.}
+ensemble average. The ensemble average caters for the
+heterogeneity.}
 \includegraphics[scale=0.9]{HomogenisationCtsUEnsAve}
 \end{figure}%
 
@@ -60,16 +62,15 @@ Consider a lattice of values~\(u_i(t)\), with lattice
 spacing~\(dx\), and governed by the heterogeneous diffusion 
 \begin{equation}
 \dot u_i=[c_{i-1/2}(u_{i-1}-u_i)+c_{i+1/2}(u_{i+1}-u_i)]/dx^2.
-\label{eq:HomogenisationExample}
+\label{eq:HomogenisationExample2}
 \end{equation}
 In this 1D space, the macroscale, homogenised, effective
 diffusion should be the harmonic mean of these coefficients.
-But we do not have full knowledge of these coefficients.
+But suppose we do not know this.
 
 \subsection{Script to simulate via stiff or projective integration}
-Say we only know four diffusivities in our diffusion problem, 
-as defined here (which are the same as those given in 
-\cref{sec:HomogenisationExample}).
+Say there are four different diffusivities in our diffusive
+medium, as defined here.
 \begin{matlab}
 %}
 clear all
@@ -107,10 +108,9 @@ of the ensemble (for the case of no ensemble averaging
 \verb|nVars| is the number of different field variables,
 which in this example is \(\verb|nVars|=1\)) and we use the
 ensemble described by \cite{Bunder2013b} which includes all
-reflected and translated configurations of
-\verb|patches.c|. We must increase the size of the
-diffusivity matrix to \((\verb|nSubP-1)|\times
-\verb|nPatch|\times \verb|nVars|\).
+reflected and translated configurations of \verb|patches.c|.
+ Hence we increase the size of the diffusivity matrix to
+\((\verb|nSubP-1)|\times \verb|nPatch|\times \verb|nVars|\).
 \begin{matlab}
 %}
 patches.c = c((mod(round(patches.x(1:(end-1),:) ...
@@ -133,7 +133,7 @@ end
 \paragraph{Conventional integration in time}
 Set an initial condition, and here integrate forward in time
 using a standard method for stiff systems. Integrate the
-interface \verb|patchSmooth1| (\cref{sec:patchSmooth1}) to
+interface \verb|patchSmooth1()| (\cref{sec:patchSmooth1}) to
 the microscale differential equations.
 \begin{matlab}
 %}
@@ -142,9 +142,9 @@ if patches.EnsAve
   u0 = repmat(u0,[1,1,nVars]);
 end
 if ~exist('OCTAVE_VERSION','builtin')
-	[ts,ucts] = ode15s( @patchSmooth1, [0 2/cHomo], u0(:));
+    [ts,ucts] = ode15s( @patchSmooth1, [0 2/cHomo], u0(:));
 else % octave version is slower
-	[ts,ucts] = odeOcts(@patchSmooth1, [0 2/cHomo], u0(:));
+    [ts,ucts] = odeOcts(@patchSmooth1, [0 2/cHomo], u0(:));
 end
 ucts = reshape(ucts,length(ts),length(patches.x(:)),[]);
 %{
@@ -178,14 +178,15 @@ transients have decayed, this field solution is smooth due
 to the ensemble average.}
 \includegraphics[scale=0.9]{HomogenisationUEnsAve}
 \end{figure}%
-Now take \verb|patchSmooth1|, the interface to the time
-derivatives, and wrap around it the projective integration
-\verb|PIRK2| (\cref{sec:PIRK2}), of bursts of simulation
-from \verb|heteroBurst| (\cref{sec:heteroBurst}), as
-illustrated by \cref{fig:HomogenisationUEnsAve}. The rest of
-this code follows that of \cref{sec:HomogenisationExample},
-but as we now evaluate an ensemble of field solutions, our
-final step is always an ensemble average. 
+Now consider the interface, \verb|patchSmooth1()|, to the
+time derivatives, and wrap around it the projective
+integration \verb|PIRK2| (\cref{sec:PIRK2}), of bursts of
+simulation from \verb|heteroBurst| (\cref{sec:heteroBurst}),
+as illustrated by \cref{fig:HomogenisationUEnsAve}. The rest
+of this code follows that of
+\cref{sec:HomogenisationExample}, but as we now evaluate an
+ensemble of field solutions, our final step is always an
+ensemble average. 
  
 Mark that edge of patches are not to be used in the
 projective extrapolation by setting initial values to \nan.
@@ -205,8 +206,8 @@ addpath('../ProjInt')
 [us,tss,uss] = PIRK2(@heteroBurst, ts, u0(:), bT);
 %{
 \end{matlab}
-Plot an average of the ensemble of macroscale predictions 
-to draw \cref{fig:HomogenisationUEnsAve}.
+\cref{fig:HomogenisationUEnsAve} shows an average of the
+ensemble of macroscale predictions.
 \begin{matlab}
 %}
 usAve = mean(reshape(us,size(us,1),length(xs(:)),nVars),3); 
@@ -220,7 +221,7 @@ set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
 %{
 \end{matlab}
 Also plot a surface detailing the ensemble average
-microscale bursts as shown
+microscale bursts,
 \cref{fig:HomogenisationMicroEnsAve}.
 \begin{figure}
 \centering
@@ -244,10 +245,6 @@ set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
 End of the script.
 
 
-\cref{sec:heteroDiff,sec:heteroBurst} list the functions used here.
-%\input{../Patch/heteroDiff.m}
-%\input{../Patch/heteroBurst.m}
-
-
-Fin.
+\cref{sec:heteroDiff,sec:heteroBurst} list the addtional
+functions used by this script.  Fin.
 %}

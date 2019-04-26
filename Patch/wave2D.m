@@ -23,12 +23,12 @@ function recursion).
 
 
 \begin{devMan}
-Establish global patch data struct to interface with a
+Establish the global data struct \verb|patches| to interface with a
 function coding the wave \pde: to be solved on
 \(2\pi\)-periodic domain, with \(9\times9\) patches,
 spectral interpolation~(\(0\)) couples the patches, each
-patch of half-size ratio~\(0.25\), and with \(5\times5\)
-points within each patch.
+patch of half-size ratio~\(0.25\) (big enough for visualisation), and with a \(5\times5\)
+micro-grid within each patch.
 \begin{matlab}
 %}
 clear all, close all
@@ -42,6 +42,7 @@ configPatches2(@wavePDE,[-pi pi], nan, nPatch, 0, 0.25, nSubP);
 
 
 \subsection{Check on the linear stability of the wave PDE}
+Construct the systems Jacobian via numerical differentiation.
 Set a zero equilibrium as basis. Then find the indices of
 patch-interior points as the only ones to vary in order to
 construct the Jacobian.
@@ -54,8 +55,7 @@ uv0(:,[1 end],:,:,:) = nan;
 i = find(~isnan(uv0));
 %{
 \end{matlab}
-Now construct the Jacobian. Since linear wave \pde, use
-large perturbations.
+Now construct the Jacobian. Since this is a \emph{linear} wave \pde, use large perturbations.
 \begin{matlab}
 %}
 small = 1;
@@ -70,7 +70,7 @@ end
 %{
 \end{matlab}
 Now explore the eigenvalues a little: find the ten with the
-biggest real-part; if small enough, then the method may be
+biggest real-part; if these are small enough, then the method may be
 good.
 \begin{matlab}
 %}
@@ -83,8 +83,7 @@ if abs(real(evals(k(1))))>1e-4
     return, end
 %{
 \end{matlab}
-Check eigenvalues close to true waves of the \pde\ (not yet
-the micro-discretised equations).
+Check that the eigenvalues are close to true waves of the \pde\ (not yet the micro-discretised equations).
 \begin{matlab}
 %}
 kwave = 0:(nPatch-1)/2;
@@ -175,6 +174,7 @@ with initial condition in \cref{fig:wave2Dic}.}
 \end{figure}
 
 \input{../Patch/wavePDE.m}
+\input{../Patch/odeOcts.m}
 
 \end{devMan}
 %}
