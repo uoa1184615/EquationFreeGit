@@ -17,7 +17,8 @@ lists an example of its use.
 
 \begin{matlab}
 %}
-function configPatches2(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,nEdge)
+function configPatches2(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP...
+    ,nEdge)
 global patches
 %{
 \end{matlab}
@@ -71,10 +72,11 @@ number in both directions, otherwise \verb|nSubP(1:2)| gives
 the number in each direction. Must be odd so that there is a
 central micro-grid point in each patch.
 
-\item \verb|nEdge|, \emph{optional}, is the number of edge
-values set by interpolation at the edge regions of each
-patch.  The default is one (suitable for microscale lattices
-with only nearest neighbours. interactions).
+\item \verb|nEdge|, (not yet implemented) \emph{optional},
+is the number of edge values set by interpolation at the
+edge regions of each patch.  The default is one (suitable
+for microscale lattices with only nearest neighbours.
+interactions).
 
 \end{itemize}
 
@@ -166,12 +168,12 @@ u0 = u0.*(0.9+0.1*rand(size(u0)));
 \end{matlab}
 Initiate a plot of the simulation using only the microscale
 values interior to the patches: set \(x\)~and \(y\)-edges to
-\verb|nan| to leave the gaps. 
+\verb|nan| to leave the gaps between patches. 
 \begin{matlab}
 %}
 figure(1), clf
 x = patches.x; y = patches.y;
-x([1 end],:) = nan; y([1 end],:) = nan;
+if 1, x([1 end],:) = nan; y([1 end],:) = nan; end
 %{
 \end{matlab}
 Start by showing the initial conditions of
@@ -180,7 +182,7 @@ Start by showing the initial conditions of
 %}
 u = reshape(permute(u0,[1 3 2 4]), [numel(x) numel(y)]);
 hsurf = surf(x(:),y(:),u');
-axis([-3 3 -3 3 -0.001 1]), view(60,40)
+axis([-3 3 -3 3 -0.03 1]), view(60,40)
 legend('time = 0','Location','north')
 xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
 %{
@@ -207,20 +209,21 @@ Integrate in time using standard functions.
 disp('Wait while we simulate h_t=(h^3)_xx+(h^3)_yy')
 drawnow
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,ucts] = ode15s( @patchSmooth2,[0 3],u0(:));
-else % octave version is quite slow
+    [ts,us] = ode15s( @patchSmooth2,[0 4],u0(:));
+else % octave version is quite slow for me
     lsode_options('absolute tolerance',1e-4);
     lsode_options('relative tolerance',1e-4);
-    [ts,ucts] = odeOcts(@patchSmooth2,[0 1],u0(:));
+    [ts,us] = odeOcts(@patchSmooth2,[0 1],u0(:));
 end
 %{
 \end{matlab}
 Animate the computed simulation to end with
-\cref{fig:configPatches2t3}.
+\cref{fig:configPatches2t3}.  Use \verb|patchEdgeInt2| 
+to interpolate patch-edge values (even if not drawn).
 \begin{matlab}
 %}
 for i = 1:length(ts)
-  u = patchEdgeInt2(ucts(i,:));
+  u = patchEdgeInt2(us(i,:));
   u = reshape(permute(u,[1 3 2 4]), [numel(x) numel(y)]);
   set(hsurf,'ZData', u');
   legend(['time = ' num2str(ts(i),2)])

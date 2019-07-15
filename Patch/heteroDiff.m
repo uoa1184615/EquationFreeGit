@@ -22,7 +22,7 @@ function ut = heteroDiff(t,u,x)
   dx = diff(x(2:3)); % space step
   i = 2:size(u,1)-1; % interior points in a patch
   ut = nan(size(u)); % preallocate output array
-  ut(i,:,:) = diff(patches.c.*diff(u))/dx^2; 
+  ut(i,:) = diff(patches.c.*diff(u))/dx^2; 
 end% function
 %{
 \end{matlab}

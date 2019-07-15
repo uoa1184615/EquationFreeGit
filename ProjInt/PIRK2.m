@@ -90,7 +90,7 @@ then \(\beta\approx 12\)).
 \caption{\label{fig:bTlength}Need macroscale step~\(\Delta\)
 such that $|\aD|\lesssim\sqrt{6\varepsilon}$ for given
 relative error~\(\varepsilon\) and slow rate~\(\alpha\), and
-then $\dD\gtrsim\frac1{\bD}\log\bD$ determines the minimum
+then $\dD\gtrsim\frac1{\bD}\log|\bD|$ determines the minimum
 required burst length~\(\delta\) for every given fast
 rate~\(\beta\).}
 \tikzsetnextfilename{ProjInt/bTlength}
@@ -107,7 +107,7 @@ Then set
 \item a macroscale time-step, \(\Delta=\verb|diff(tSpan)|\),
 such that \(\alpha\Delta\approx\sqrt{6\varepsilon}\), and
 \item a microscale burst length, \(\delta=\verb|bT| \gtrsim
-\frac1\beta\log(\beta\Delta)\), see \cref{fig:bTlength}.
+\frac1\beta\log|\beta\Delta|\), see \cref{fig:bTlength}.
 \end{enumerate}
 
 

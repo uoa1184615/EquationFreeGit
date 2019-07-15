@@ -18,11 +18,12 @@ with all their sophisticated error control and adaptive
 time-stepping, to do the macroscale integration\slash
 simulation.
 
-By default, for the microscale simulations \verb|PIG()| uses `constraint-defined manifold
-computing', \verb|cdmc()| (\cref{sec:cdmc}).  This algorithm,
-initiated by \cite{Gear05}, uses a backward projection so
-that the simulation time is unchanged after running the
-microscale simulator. 
+By default, for the microscale simulations \verb|PIG()| uses
+`constraint-defined manifold computing', \verb|cdmc()|
+(\cref{sec:cdmc}).  This algorithm, initiated by
+\cite{Gear05}, uses a backward projection so that the
+simulation time is unchanged after running the microscale
+simulator. 
 
 \begin{matlab}
 %}
@@ -60,8 +61,8 @@ to be estimated by Projective Integration.
 
 \item \verb|microBurst()| is a function that produces output
 from the user-specified code for a burst of microscale
-simulation. The function must internally specify\slash decide how long a
-burst it is to use.  Usage
+simulation. The function must internally specify\slash
+decide how long a burst it is to use.  Usage
 \begin{equation*}
 \verb|[tbs,xbs] = microBurst(tb0,xb0)|
 \end{equation*}
@@ -75,9 +76,9 @@ and \verb|xbs|, the corresponding microscale states.
 
 \item \verb|Tspan|, a vector of macroscale times at which
 the user requests output.  The first element is always the
-initial time.  If \verb|macroInt| reports adaptively selected time
-steps (e.g., \verb|ode45|), then \verb|Tspan| consists of an
-initial and final time only.
+initial time.  If \verb|macroInt| reports adaptively
+selected time steps (e.g., \verb|ode45|), then \verb|Tspan|
+consists of an initial and final time only.
 
 \item \verb|x0|, the \(n\)-vector of initial microscale
 values at the initial time~\verb|Tspan(1)|.
@@ -92,13 +93,14 @@ restriction functions must be provided to convert between
 them. Usage \verb|PIG(...,restrict,lift)|:
 \begin{itemize}
 \item \verb|restrict(x)|, a function that takes an input
-high-dimensional, \(n\)-D, microscale state~\xv\ and computes the
-corresponding low-dimensional, \(N\)-D, macroscale state~\Xv; 
+high-dimensional, \(n\)-D, microscale state~\xv\ and
+computes the corresponding low-dimensional, \(N\)-D,
+macroscale state~\Xv; 
 \item \verb|lift(X,xApprox)|, a function that converts an
 input low-dimensional, \(N\)-D, macroscale state~\Xv\ to a
-corresponding high-dimensional, \(n\)-D, microscale state~\xv, given
-that \verb|xApprox| is a recently computed microscale state
-on the slow manifold.
+corresponding high-dimensional, \(n\)-D, microscale
+state~\xv, given that \verb|xApprox| is a recently computed
+microscale state on the slow manifold.
 \end{itemize}
 Either both \verb|restrict()| and \verb|lift()| are to be
 defined, or neither. If neither are defined, then they are
@@ -181,10 +183,11 @@ if nargin==0
 \begin{figure}
 \centering
 \caption{\label{fig:PIGsing}Projective Integration by
-\texttt{PIG} of the example system~\eqref{eq:PIGsing} with \(\epsilon=10^{-3}\) (\cref{sec:pigeg}).  The macroscale solution~\(X(t)\) is
-represented by just the blue circles.  The microscale bursts
-are the microscale states \((x_1(t),x_2(t)) =
-(\text{red},\text{yellow})\) dots.}
+\texttt{PIG} of the example system~\eqref{eq:PIGsing} with
+\(\epsilon=10^{-3}\) (\cref{sec:pigeg}).  The macroscale
+solution~\(X(t)\) is represented by just the blue circles. 
+The microscale bursts are the microscale states
+\((x_1(t),x_2(t)) = (\text{red},\text{yellow})\) dots.}
 \includegraphics[scale=0.9]{PIGsing}
 \end{figure}%
 As a basic example, consider a microscale system of the
@@ -214,12 +217,11 @@ dxdt=@(t,x) [ cos(x(1))*sin(x(2))*cos(t)
 %{
 \end{matlab}
 Second, we code microscale bursts, here using the standard
-\verb|ode45()|. We choose a burst length
-\(2\epsilon\log(1/\epsilon)\) as the rate of decay is
-\(\beta\approx 1/\epsilon\) and we do not know the
-macroscale time-step invoked by \verb|macroInt()|, so
-blithely assume \(\Delta\le1\) and then double the usual
-formula for safety.
+\verb|ode45()|. We choose a burst length \(2 \epsilon
+\log(1/\epsilon)\) as the rate of decay is \(\beta\approx
+1/\epsilon\) but we do not know the macroscale time-step
+invoked by \verb|macroInt()|, so blithely assume
+\(\Delta\le1\) and then double the usual formula for safety.
 \begin{matlab}
 %}
 bT = 2*epsilon*log(1/epsilon)
@@ -237,11 +239,12 @@ lift = @(X,xApprox) [X; xApprox(2)];
 %{
 \end{matlab}
 
-Fourth, invoke \verb|PIG| to use \script's \verb|ode23|\slash\verb|lsode|, say, on the
-macroscale slow evolution. Integrate the micro-bursts over
-\(0\leq t\leq6\) from initial condition \(\xv(0)=(1,0)\).
-You could set \verb|Tspan=[0 -6]| to integrate backward in
-macroscale time with forward microscale bursts \cite[]{Gear03b}.
+Fourth, invoke \verb|PIG| to use \script's
+\verb|ode23|\slash\verb|lsode|, say, on the macroscale slow
+evolution. Integrate the micro-bursts over \(0\leq t\leq6\)
+from initial condition \(\xv(0)=(1,0)\). You could set
+\verb|Tspan=[0 -6]| to integrate backward in macroscale time
+with forward microscale bursts \cite[]{Gear03b}.
 \begin{matlab}
 %}
 Tspan = [0 6]; 
@@ -325,10 +328,10 @@ end
 
 
 
-Execute a preliminary application of the microBurst on the initial
-state. This is done in addition to the microBurst in
-the main loop, because the initial state is often far
-from the attracting slow manifold.
+Execute a preliminary application of the microBurst on the
+initial state. This is done in addition to the microBurst in
+the main loop, because the initial state is often far from
+the attracting slow manifold.
 \begin{matlab}
 %}
 [relaxT,x0MicroRelax] = microBurst(Tspan(1),x0);
@@ -345,10 +348,10 @@ Tspan(1) = relaxT(end);
 \end{matlab}
 Allocate cell arrays for times and states for any of the
 outputs requested by the user. If saving information, then
-record the first application of the microBurst. It
-is unknown a priori how many applications of microBurst
-will be required; this code may be run more efficiently if
-the correct number is used in place of \verb|nT+1| as the
+record the first application of the microBurst. It is
+unknown a priori how many applications of microBurst will be
+required; this code may be run more efficiently if the
+correct number is used in place of \verb|nT+1| as the
 dimension of the cell arrays.
 \begin{matlab}
 %}
