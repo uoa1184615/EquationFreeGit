@@ -102,7 +102,7 @@ computes a short-time burst of the microscale simulation.
 
 \item \verb|tSpan| is an \(\ell\)-vector of times at which
 the user requests output, of which the first element is
-always the initial time. \verb|PIRK2()| does not use
+always the initial time. \verb|PIRK4()| does not use
 adaptive time-stepping; the macroscale time-steps are
 (nearly) the steps between elements of \verb|tSpan|.
 
@@ -137,10 +137,10 @@ drawn of the computed solution~\verb|x| versus \verb|tSpan|.
 \item  \verb|x|, an \(\ell \times n\) array of the
 approximate solution vector. Each row is an estimated state
 at the corresponding time in \verb|tSpan|.  The simplest
-usage is then \verb|x = PIRK2(microBurst,tSpan,x0,bT)|.
+usage is then \verb|x = PIRK4(microBurst,tSpan,x0,bT)|.
 
 However, microscale details of the underlying Projective
-Integration computations may be helpful. \verb|PIRK2()|
+Integration computations may be helpful. \verb|PIRK4()|
 provides up to four optional outputs of the microscale
 bursts. 
 
