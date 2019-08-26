@@ -169,11 +169,11 @@ the calculation of the Runge--Kutta increments, and do
 \item  \verb|svf|, optional, a struct containing the
 Projective Integration estimates of the slow vector field.
 \begin{itemize}
-\item \verb|svf.t| is a \(2\ell\) dimensional column vector
+\item \verb|svf.t| is a \(4\ell\) dimensional column vector
 containing all times at which the Projective Integration
 scheme is extrapolated along microBurst data to form a
 macrostep. 
-\item \verb|svf.dx| is a \(2\ell\times n\) array containing
+\item \verb|svf.dx| is a \(4\ell\times n\) array containing
 the estimated slow vector field.
 \end{itemize}
 
