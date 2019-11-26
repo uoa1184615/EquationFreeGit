@@ -25,6 +25,7 @@ for nPatch=5:10
 nPatch=nPatch
 Len=10*rand
 ratio=0.5*rand
+patches.EdgyInt=1 % optional test
 configPatches1(@sin,[0,Len],nan,nPatch,0,ratio,nSubP);
 kMax=floor((nPatch-1)/2);
 %{

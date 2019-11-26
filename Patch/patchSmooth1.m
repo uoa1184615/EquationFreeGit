@@ -6,20 +6,23 @@
 %{
 \section{\texttt{patchSmooth1()}: interface to time integrators}
 \label{sec:patchSmooth1}
-\localtableofcontents
+%\localtableofcontents
 
-\subsection{Introduction}
+%\subsection{Introduction}
 
 To simulate in time with spatial patches we often need to
 interface a user's time derivative function with time
 integration routines such as \verb|ode15s| or~\verb|PIRK2|.
-This function provides an interface. It assumes that the
-sub-patch structure is \emph{smooth} so that the patch
+This function provides an interface. It mostly assumes that
+the sub-patch structure is \emph{smooth} so that the patch
 centre-values are sensible macroscale variables, and patch
 edge values are determined by macroscale interpolation of
-the patch-centre values. Communicate patch-design variables
-to this function using the previously established global
-struct~\verb|patches| (\cref{sec:configPatches1}).
+the patch-centre values.  However, we have found that
+microscale heterogeneous systems may be accurately simulated
+with this function via appropriate interpolation.
+Communicate patch-design variables to this function using
+the previously established global struct~\verb|patches|
+(\cref{sec:configPatches1}).
 \begin{matlab}
 %}
 function dudt=patchSmooth1(t,u)

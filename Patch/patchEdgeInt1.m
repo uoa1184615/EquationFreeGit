@@ -1,7 +1,7 @@
 % Provides the interpolation across space for 1D patches of
 % simulations of a smooth lattice system such as PDE
 % discretisations.
-% AJR & JB, Sep 2018 -- Apr 2019
+% AJR & JB, Sep 2018 -- 26 Nov 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeInt1()}: sets edge values from interpolation over the macroscale}
@@ -11,15 +11,17 @@
 
 Couples 1D patches across 1D space by computing their edge
 values from macroscale interpolation of either the mid-patch
-value or the patch-core average. This function is primarily
-used by \verb|patchSmooth1()| but is also useful for user
-graphics.  A spatially discrete system could be integrated
-in time via the patch or gap-tooth scheme
-\cite[]{Roberts06d}. Assumes that the core averages are in
-some sense \emph{smooth} so that these averages are sensible
-macroscale variables. Then patch edge values are determined
-by macroscale interpolation of the core averages
-\citep{Bunder2013b}. Communicate patch-design variables via
+value, or the patch-core average, or the opposite
+next-to-edge values (this last choice often maintains
+symmetry). This function is primarily used by
+\verb|patchSmooth1()| but is also useful for user graphics. 
+A spatially discrete system could be integrated in time via
+the patch or gap-tooth scheme \cite[]{Roberts06d}. When
+using core averages, assumes they are in some sense
+\emph{smooth} so that these averages are sensible macroscale
+variables: then patch edge values are determined by
+macroscale interpolation of the core averages
+\citep{Bunder2013b}. Communicates patch-design variables via
 the global struct~\verb|patches|.
 \begin{matlab}
 %}
@@ -34,8 +36,8 @@ global patches
 \verb|nVars| field values at each of the points in the
 \(\verb|nSubP|\times \verb|nPatch|\) grid.
 
-\item \verb|patches| a struct set by \verb|configPatches1()|
-which includes the following.
+\item \verb|patches| a struct largely set by
+\verb|configPatches1()|, and which includes the following.
 \begin{itemize}
 \item \verb|.x| is \(\verb|nSubP|\times \verb|nPatch|\)
 array of the spatial locations~\(x_{ij}\) of the microscale
@@ -49,6 +51,10 @@ equi-spaced lattice on both macro- and microscales.
 (alternating) interpolation.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling.
+
+\item \verb|.EdgyInt| in \(\{0,1\}\) is one for
+interpolating patch-edge values from opposite next-to-edge
+values (often preserves symmetry).
 \end{itemize}
 \end{itemize}
 
@@ -58,6 +64,9 @@ equi-spaced lattice on both macro- and microscales.
 \verb|nVars|\) 2/3D array of the fields with edge values set
 by interpolation of patch core averages.
 \end{itemize}
+
+
+
 
 
 
@@ -85,7 +94,8 @@ DX = patches.x(2,2)-patches.x(2,1);
 %{
 \end{matlab}
 If the user has not defined the patch core, then we assume
-it to be a single point in the middle of the patch. For
+it to be a single point in the middle of the patch, unlees
+we are interpolating from next-to-edge values. For
 \(\verb|patches.nCore|\neq 1\) the half width ratio is
 reduced, as described by \cite{Bunder2013b}.
 \begin{matlab}
@@ -93,7 +103,10 @@ reduced, as described by \cite{Bunder2013b}.
 if ~isfield(patches,'nCore')
     patches.nCore = 1;
 end
-r = dx*(nSubP-1)/2/DX*(nSubP - patches.nCore)/(nSubP - 1);
+if patches.EdgyInt==0
+     r = dx*(nSubP-1)/2/DX*(nSubP - patches.nCore)/(nSubP - 1);
+else r = dx*(nSubP-2)/DX;
+end
 %{
 \end{matlab}
 
@@ -123,6 +136,8 @@ the domain is macro-periodic.
 \begin{matlab}
 %}
 if patches.ordCC>0 % then non-spectral interpolation
+  assert(patches.EdgyInt==0, ...
+  'Finite width not yet implemented for Edgy Interpolation')
   if patches.EnsAve
     uCore = sum(mean(u((i0-c):(i0+c),j,:),3),1)';
     dmu = zeros(patches.ordCC,nPatch);
@@ -189,14 +204,15 @@ C_ke^{ikr2\pi/N}\). For \verb|nPatch|~patches we resolve
 `wavenumbers' \(|k|<\verb|nPatch|/2\), so set row vector
 \(\verb|ks| = k2\pi/N\) for `wavenumbers' \(k = (0,1,
 \ldots, k_{\max}, -k_{\max}, \ldots, -1)\) for odd~\(N\),
-and \(k = (0,1, \ldots, k_{\max}, \pm(k_{\max}+1),
--k_{\max}, \ldots, -1)\) for even~\(N\).
+and \(k = (0,1, \ldots, k_{\max}, (k_{\max}+1), -k_{\max},
+\ldots, -1)\) for even~\(N\).
 
 Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches1()|
 tests that there are an even number of patches). Then the
 patch-ratio is effectively halved. The patch edges are near
 the middle of the gaps and swapped.
+Have not yet tested whether works for Edgy Interpolation??
 \begin{matlab}
 %}
   if patches.alt % transform by doubling the number of fields
@@ -213,7 +229,8 @@ the middle of the gaps and swapped.
   end
 %{
 \end{matlab}
-Now set wavenumbers.
+Now set wavenumbers (when \verb|nPatch| is even then highest
+wavenumber is~$\pi$).
 \begin{matlab}
 %}
   kMax = floor((nPatch-1)/2); 
@@ -224,22 +241,23 @@ Test for reality of the field values, and define a function
 accordingly.
 \begin{matlab}
 %}
-  if imag(u(i0,:,:))==0, uclean=@(u) real(u);
-    else                 uclean=@(u) u; 
-    end
+  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
+       uclean=@(u) real(u);
+  else uclean=@(u) u; 
+  end
 %{
 \end{matlab}
 Compute the Fourier transform of the patch centre-values for
 all the fields. If there are an even number of points, then
-zero the zig-zag mode in the \textsc{ft} and add it in later
+if complex, treat as positive wavenumber, but if real, treat
 as cosine.
 \begin{matlab}
 %}
-  Ck = fft(u(i0,:,:));
-  if mod(nPatch,2)==0
-    Czz = Ck(1,nPatch/2+1,:)/nPatch; 
-    Ck(1,nPatch/2+1,:) = 0; 
-  end 
+if patches.EdgyInt==0
+     Cleft = fft(u(  i0   ,:,:)); Cright = Cleft;
+else Cleft = fft(u(   2   ,:,:));
+     Cright= fft(u(nSubP-1,:,:));
+end
 %{
 \end{matlab}
 The inverse Fourier transform gives the edge values via a
@@ -247,21 +265,10 @@ shift a fraction~\(r\) to the next macroscale grid point.
 Enforce reality when appropriate. 
 \begin{matlab}
 %}
-  u(nSubP,:,iV) = uclean(ifft(bsxfun(@times,Ck ...
+  u(nSubP,:,iV) = uclean(ifft(bsxfun(@times,Cleft ...
       ,exp(1i*bsxfun(@times,ks,altShift+r)))));
-  u( 1,:,iV) = uclean(ifft(bsxfun(@times,Ck ...
+  u(  1  ,:,iV) = uclean(ifft(bsxfun(@times,Cright ...
       ,exp(1i*bsxfun(@times,ks,altShift-r)))));
-%{
-\end{matlab}
-For an even number of patches, add in the cosine mode.
-\begin{matlab}
-%}
-  if mod(nPatch,2)==0
-    cosr = cos(pi*(altShift+r+(0:nPatch-1)));
-    u(nSubP,:,iV) = u(nSubP,:,iV)+uclean(bsxfun(@times,Czz,cosr));
-    cosr = cos(pi*(altShift-r+(0:nPatch-1)));
-    u( 1,:,iV) = u( 1,:,iV)+uclean(bsxfun(@times,Czz,cosr));
-  end
 %{
 \end{matlab}
 Restore staggered grid when appropriate. 
