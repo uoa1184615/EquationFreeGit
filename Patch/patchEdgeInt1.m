@@ -1,7 +1,7 @@
 % Provides the interpolation across space for 1D patches of
 % simulations of a smooth lattice system such as PDE
 % discretisations.
-% AJR & JB, Sep 2018 -- 26 Nov 2019
+% AJR & JB, Sep 2018 -- 27 Nov 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeInt1()}: sets edge values from interpolation over the macroscale}
@@ -14,7 +14,7 @@ values from macroscale interpolation of either the mid-patch
 value, or the patch-core average, or the opposite
 next-to-edge values (this last choice often maintains
 symmetry). This function is primarily used by
-\verb|patchSmooth1()| but is also useful for user graphics. 
+\verb|patchSmooth1()| but is also useful for user graphics.
 A spatially discrete system could be integrated in time via
 the patch or gap-tooth scheme \cite[]{Roberts06d}. When
 using core averages, assumes they are in some sense
@@ -94,7 +94,7 @@ DX = patches.x(2,2)-patches.x(2,1);
 %{
 \end{matlab}
 If the user has not defined the patch core, then we assume
-it to be a single point in the middle of the patch, unlees
+it to be a single point in the middle of the patch, unless
 we are interpolating from next-to-edge values. For
 \(\verb|patches.nCore|\neq 1\) the half width ratio is
 reduced, as described by \cite{Bunder2013b}.
@@ -136,11 +136,12 @@ the domain is macro-periodic.
 \begin{matlab}
 %}
 if patches.ordCC>0 % then non-spectral interpolation
-  assert(patches.EdgyInt==0, ...
-  'Finite width not yet implemented for Edgy Interpolation')
   if patches.EnsAve
     uCore = sum(mean(u((i0-c):(i0+c),j,:),3),1)';
     dmu = zeros(patches.ordCC,nPatch);
+  elseif patches.EdgyInt % next-to-edge values as double nVars, left first
+    uCore = reshape(shiftdim(u([2 end-1],j,:),1),nPatch,[]);
+    dmu = zeros(patches.ordCC,nPatch,2*nVars);
   else
     uCore = reshape(sum(u((i0-c):(i0+c),j,:),1),nPatch,nVars);
     dmu = zeros(patches.ordCC,nPatch,nVars);
@@ -151,7 +152,7 @@ if patches.ordCC>0 % then non-spectral interpolation
     jp = jp(jp); jm = jm(jm); % increase shifts to \pm2
   else % standard
     dmu(1,j,:) = (uCore(jp,:)-uCore(jm,:))/2; % \mu\delta
-    dmu(2,j,:) = (uCore(jp,:)-2*uCore(j,:)+uCore(jm,:))/2; % \delta^2
+    dmu(2,j,:) = (uCore(jp,:)-2*uCore(j,:)+uCore(jm,:)); % \delta^2
   end% if odd/even
 %{
 \end{matlab}
@@ -169,6 +170,9 @@ Interpolate macro-values to be Dirichlet edge values for
 each patch \cite[]{Roberts06d, Bunder2013b}, using weights
 computed in \verb|configPatches1()|. Here interpolate to
 specified order.
+
+In this first case of ensemble averaging, interpolate each
+in the ensemble.
 \begin{matlab}
 %}
   if patches.EnsAve      
@@ -178,6 +182,26 @@ specified order.
     u(1,j,:) = repmat(uCore(j)'*(1-patches.alt) ...      
       +sum(bsxfun(@times,patches.Cwtsl,dmu)),[1,1,nVars]) ...
       -sum(u(2:patches.nCore,:,:),1);
+%{
+\end{matlab}
+The second case is where next-to-edge values interpolate to
+the opposite edge-values.
+\begin{matlab}
+%}
+  elseif patches.EdgyInt
+    lVars=1:nVars; rVars=nVars+lVars;
+    u(nSubP,j,:) = shiftdim(uCore(j,lVars),-1)*(1-patches.alt) ...
+      +sum(bsxfun(@times,patches.Cwtsr,dmu(:,:,lVars)));
+    u(  1  ,j,:) = shiftdim(uCore(j,rVars),-1)*(1-patches.alt) ...      
+      +sum(bsxfun(@times,patches.Cwtsl,dmu(:,:,rVars)));
+%{
+\end{matlab}
+Thirdly, the original, the core (one or more) of each patch
+interpolates to the edge action regions. When more than one
+in the core, the edge is set depending upon near edge values
+so the average near the edge is correct.
+\begin{matlab}
+%}
   else
     u(nSubP,j,:) = uCore(j,:)*(1-patches.alt) ...
       + reshape(-sum(u((nSubP-patches.nCore+1):(nSubP-1),j,:),1) ...
@@ -188,6 +212,9 @@ specified order.
   end;
 %{
 \end{matlab}
+
+
+
 \paragraph{Case of spectral interpolation}
 Assumes the domain is macro-periodic. 
 \begin{matlab}
