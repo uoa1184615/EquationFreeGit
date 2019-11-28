@@ -57,7 +57,6 @@ sub-patch fast quasi-equilibration.}
 
 
 
-\begin{devMan}
 
 
 
@@ -275,6 +274,5 @@ End of the main script.
 
 
 Fin.
-\end{devMan}
 %}
 
