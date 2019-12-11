@@ -35,6 +35,17 @@ the example of \verb|HomogenisationExample.m| (\cref{sec:HomogenisationExample})
 \end{itemize}
 
 
+\paragraph{Verification}
+Most of these schemes have proven `accuracy' when compared to the underlying specified microscale system.
+In the spatial patch schemes, we measure `accuracy' by the order of consistency between macroscale dynamics and the specified microscale.  
+\begin{itemize}
+\item \cite{Roberts06d} and \cite{Roberts2011a} proved reasonably general high-order consistency for the 1D and 2D patch schemes, respectively.
+\item In wave-like systems, \cite{Cao2014a} established high-order consistency for the 1D staggered patch scheme.
+\item A heterogeneous microscale is more difficult, but \cite{Bunder2013b} showed good accuracy in a variety of circumstances, for appropriately chosen parameters. 
+\end{itemize}
+
+
+
 \paragraph{Blackbox scenarios} 
 Suppose that you have a \emph{detailed and trustworthy} computational simulation of some problem of interest.
 Let's say the simulation is coded in terms of detailed (microscale) variable values~\(\uv(t)\), in~\(\RR^{p}\) for some~\(p\), and evolving time~\(t\).

@@ -1,0 +1,38 @@
+The following failed when I tried to upload it to DSWeb on 10 Dec 2019
+
+Title:
+Equation-Free function toolbox for Matlab/Octave
+
+Subtitle:
+This 'equation-free toolbox' enables you to use microscale simulators to perform macroscale system level tasks and analysis as microscale simulations are often the best available description of a system.
+
+Categories:
+Functionality: toolbox of generic functions
+
+Model:
+Software type: 
+
+Language:  Matlab and Octave 
+
+Availability: https://github.com/uoa1184615/EquationFreeGit
+
+Contact person: Prof Tony Roberts, http://orcid.org/0000-0001-8930-1552
+
+References to papers:  https://doi.org/10.1146/annurev.physchem.59.032607.093610
+; https://doi.org/10.1007/s10665-013-9653-6
+
+Summary:
+This 'equation-free toolbox' empowers the computer-assisted analysis of complex, multiscale systems. Its aim is to enable you to use microscopic simulators to perform system level tasks and analysis, because microscale simulations are often the best available description of a system. The methodology bypasses the derivation of macroscopic evolution equations by computing only short bursts of of the microscale simulator, and often only computing on small patches of the spatial domain. This suite of functions empowers users to start implementing such methods in their own applications. Download via https://github.com/uoa1184615/EquationFreeGit
+
+Description:
+For a quick start, adapt one of the included examples. Many of the main functions include, at their beginning, example code of their use---code which is executed when the function is invoked without any arguments.
+* To projectively integrate over time a multiscale, slow-fast, system of odes you could use PIRK2(), or PIRK4() for higher-order accuracy: adapt the Michaelis--Menten example at the beginning of PIRK2.m
+* You may use forward bursts of simulation in order to simulate the slow
+dynamics backward in time, as in egPIMM.m
+* To only resolve the slow dynamics in the projective integration, use lifting and restriction functions by adapting the singular perturbation ode example at the beginning of PIG.m
+
+In space-time systems, consider an evolving system over a large spatial domains when all you have is a microscale code. To efficiently simulate over the large domain, one can simulate in just small patches of the domain, appropriately coupled.
+* In 1D adapt the code at the beginning of configPatches1.m for Burgers' pde, or the staggered patches of 1D water wave equations in waterWaveExample.m
+* in 2D adapt the code at the beginning of configPatches2.m for nonlinear diffusion, or the regular patches of the 2D wave equation of wave2D.m
+* The above two are for systems that have smooth spatial structures on the microscale: when the microscale is 'rough' with a known period (so far only in 1D), then adapt the example of HomogenisationExample.m
+

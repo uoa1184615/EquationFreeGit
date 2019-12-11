@@ -96,6 +96,17 @@ Maclean, J. \harvardand\ Gottwald, G.~A.  \harvardyearleft
 \newline\harvardurl{http://www.sciencedirect.com/science/article/pii/
   S0377042715002149}
 
+\harvarditem[Marschler et~al.]{Marschler, Sieber, Berkemer, Kawamoto
+  \harvardand\ Starke}{2014}{Marschler2014b}
+Marschler, C., Sieber, J., Berkemer, R., Kawamoto, A. \harvardand\ Starke, J.
+  \harvardyearleft 2014\harvardyearright , `Implicit methods for equation-free
+  analysis: Convergence results and analysis of emergent waves in microscopic
+  traffic models', {\em SIAM J.~Appl. Dyn. Syst.} {\bf 13}(2),~1202--1238.
+
+\harvarditem{Petersik}{2019--}{Petersik2019}
+Petersik, P.  \harvardyearleft 2019--\harvardyearright , Equation-free
+  modeling, Technical report, [\url{https://github.com/pjpetersik/eqnfree}].
+
 \harvarditem{Roberts \harvardand\ Kevrekidis}{2007}{Roberts06d}
 Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
   2007\harvardyearright , `General tooth boundary conditions for equation free

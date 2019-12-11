@@ -106,6 +106,132 @@
   url =           {http://arxiv.org/abs/1103.1187},
 }
 
+@article{Roberts06d,
+  author =        {Roberts, A.~J. and Kevrekidis, I.~G.},
+  journal =       {SIAM J.~Scientific Computing},
+  number =        {4},
+  pages =         {1495--1510},
+  title =         {General tooth boundary conditions for equation free
+                   modelling},
+  volume =        {29},
+  year =          {2007},
+  abstract =      {We are developing a framework for multiscale
+                   computation which enables models at a ``microscopic''
+                   level of description, for example, lattice Boltzmann,
+                   Monte Carlo, or molecular dynamics simulators, to
+                   perform modeling tasks at ``macroscopic'' length
+                   scales of interest. The plan is to use the
+                   microscopic rules restricted to small ``patches'' of
+                   the domain, the ``teeth,'' using interpolation to
+                   bridge the ``gaps.'' Here we explore general boundary
+                   conditions coupling the widely separated ``teeth'' of
+                   the microscopic simulation that achieve high order
+                   accuracy over the macroscale. We present the simplest
+                   case when the microscopic simulator is the
+                   quintessential example of a PDE. We argue that
+                   classic high order interpolation of the macroscopic
+                   field provides the correct forcing in whatever
+                   boundary condition is required by the microsimulator.
+                   Such interpolation leads to tooth boundary
+                   conditions, which achieve arbitrarily high order
+                   consistency. The high order consistency is
+                   demonstrated on a class of linear PDEs in two ways:
+                   first through the eigenvalues of the scheme for
+                   selected numerical problems, and second using the
+                   dynamical systems approach of holistic discretization
+                   on a general class of linear PDEs. Analytic modeling
+                   shows that, for a wide class of microscopic systems,
+                   the subgrid fields and the effective macroscopic
+                   model are largely independent of the tooth size and
+                   the particular tooth boundary conditions. When
+                   applied to patches of microscopic simulations these
+                   tooth boundary conditions promise efficient
+                   macroscale simulation. We expect the same approach
+                   will also accurately couple patch simulations in
+                   higher spatial dimensions.},
+  doi =           {10.1137/060654554},
+}
+
+@article{Cao2014a,
+  author =        {Cao, Meng and Roberts, A. J.},
+  journal =       {IMA J.~Applied Maths.},
+  number =        {2},
+  pages =         {228--254},
+  title =         {Multiscale modelling couples patches of nonlinear
+                   wave-like simulations},
+  volume =        {81},
+  year =          {2016},
+  abstract =      {The multiscale gap-tooth scheme is built from given
+                   microscale simulations of complicated physical
+                   processes to empower macroscale simulations. By
+                   coupling small patches of simulations over
+                   unsimulated physical gaps, large savings in
+                   computational time are possible. So far the gap-tooth
+                   scheme has been developed for dissipative systems,
+                   but wave systems are also of great interest. This
+                   article develops the gap-tooth scheme to the case of
+                   nonlinear microscale simulations of wave-like
+                   systems. Classic macroscale interpolation provides a
+                   generic coupling between patches that achieves
+                   arbitrarily high order consistency between the
+                   multiscale scheme and the underlying microscale
+                   dynamics. Eigen-analysis indicates that the resultant
+                   gap-tooth scheme empowers feasible computation of
+                   large scale simulations of wave-like dynamics with
+                   complicated underlying physics. As an pilot study, we
+                   implement numerical simulations of dam-breaking waves
+                   by the gap-tooth scheme. Comparison between a
+                   gap-tooth simulation, a microscale simulation over
+                   the whole domain, and some published experimental
+                   data on dam breaking, demonstrates that the gap-tooth
+                   scheme feasibly computes large scale wave-like
+                   dynamics with computational savings.},
+  doi =           {10.1093/imamat/hxv034},
+}
+
+@article{Bunder2013b,
+  author =        {Bunder, J.~E. and Roberts, A.~J. and
+                   Kevrekidis, I.~G.},
+  journal =       {J.~Computational Physics},
+  month =         {may},
+  pages =         {154-174},
+  title =         {Good coupling for the multiscale patch scheme on
+                   systems with microscale heterogeneity},
+  volume =        {337},
+  year =          {2017},
+  abstract =      {Computational simulation of microscale detailed
+                   systems is frequently only feasible over spatial
+                   domains much smaller than the macroscale of interest.
+                   The `equation-free' methodology couples many small
+                   patches of microscale computations across space to
+                   empower efficient computational simulation over
+                   macroscale domains of interest. Motivated by
+                   molecular or agent simulations, we analyse the
+                   performance of various coupling schemes for patches
+                   when the microscale is inherently `rough'. As a
+                   canonical problem in this universality class, we
+                   systematically analyse the case of heterogeneous
+                   diffusion on a lattice. Computer algebra explores how
+                   the dynamics of coupled patches predict the large
+                   scale emergent macroscale dynamics of the
+                   computational scheme. We determine good design for
+                   the coupling of patches by comparing the macroscale
+                   predictions from patch dynamics with the emergent
+                   macroscale on the entire domain, thus minimising the
+                   computational error of the multiscale modelling. The
+                   minimal error on the macroscale is obtained when the
+                   coupling utilises averaging regions which are between
+                   a third and a half of the patch. Moreover, when the
+                   symmetry of the inter-patch coupling matches that of
+                   the underlying microscale structure, patch dynamics
+                   predicts the desired macroscale dynamics to any
+                   specified order of error. The results confirm that
+                   the patch scheme is useful for macroscale
+                   computational simulation of a range of systems with
+                   microscale heterogeneity.},
+  doi =           {10.1016/j.jcp.2017.02.004},
+}
+
 @article{Gear02b,
   author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
   journal =       {SIAM Journal on Scientific Computing},
@@ -169,6 +295,45 @@
                    explicit bounds for the discrepancy between the
                    results of the projective integration method and the
                    slow components of the original system.},
+}
+
+@article{Marschler2014b,
+  author =        {Marschler, Christian and Sieber, Jan and
+                   Berkemer, Rainer and Kawamoto, Atsushi and
+                   Starke, Jens},
+  journal =       {SIAM J.~Appl. Dyn. Syst.},
+  number =        {2},
+  pages =         {1202--1238},
+  title =         {Implicit Methods for Equation-Free Analysis:
+                   Convergence Results and Analysis of Emergent Waves in
+                   Microscopic Traffic Models},
+  volume =        {13},
+  year =          {2014},
+  abstract =      {We introduce a general formulation for an implicit
+                   equation-free method in the setting of slow-fast
+                   systems. First, we give a rigorous convergence result
+                   for equation-free analysis showing that the
+                   implicitly defined coarse-level time stepper
+                   converges to the true dynamics on the slow manifold
+                   within an error that is exponentially small with
+                   respect to the small parameter measuring time scale
+                   separation. Second, we apply this result to the
+                   idealized traffic modeling problem of phantom jams
+                   generated by cars with uniform behavior on a circular
+                   road. The traffic jams are waves that travel slowly
+                   against the direction of traffic. Equation-free
+                   analysis enables us to investigate the behavior of
+                   the microscopic traffic model on a macroscopic level.
+                   The standard deviation of cars' headways is chosen as
+                   the macroscopic measure of the underlying dynamics
+                   such that traveling wave solutions correspond to
+                   equilibria on the macroscopic level in the
+                   equation-free setup. The collapse of the traffic jam
+                   to the free flow then corresponds to a saddle-node
+                   bifurcation of this macroscopic equilibrium. We
+                   continue this bifurcation in two parameters using
+                   equation-free analysis.},
+  doi =           {10.1137/130913961},
 }
 
 @article{Maclean2015,
@@ -250,6 +415,22 @@
                    between the decay rates of fast and slow variables is
                    2.},
   doi =           {10.1137/17M1126084},
+}
+
+@techreport{Petersik2019,
+  author =        {Paul Petersik},
+  institution =   {[\url{https://github.com/pjpetersik/eqnfree}]},
+  title =         {Equation-free modeling},
+  year =          {2019--},
+  abstract =      {In this repository, I am working on a module that
+                   contains code from the equation-free modeling
+                   developed by Kevrekidis et al. (2004). Later, this
+                   method was refined by Marschler et al. (2014). Up
+                   until now, my focus was on wirting a the code for a
+                   coarse bifurcation analysis. The theory for this is
+                   described in Marschler et al. (2014). In the example
+                   directory, I show some codes for the coarse
+                   bifuraction analysis of traffic models.},
 }
 
 @article{Gear04,
@@ -417,52 +598,6 @@
   doi =           {10.1016/j.jcp.2005.08.010},
 }
 
-@article{Roberts06d,
-  author =        {Roberts, A.~J. and Kevrekidis, I.~G.},
-  journal =       {SIAM J.~Scientific Computing},
-  number =        {4},
-  pages =         {1495--1510},
-  title =         {General tooth boundary conditions for equation free
-                   modelling},
-  volume =        {29},
-  year =          {2007},
-  abstract =      {We are developing a framework for multiscale
-                   computation which enables models at a ``microscopic''
-                   level of description, for example, lattice Boltzmann,
-                   Monte Carlo, or molecular dynamics simulators, to
-                   perform modeling tasks at ``macroscopic'' length
-                   scales of interest. The plan is to use the
-                   microscopic rules restricted to small ``patches'' of
-                   the domain, the ``teeth,'' using interpolation to
-                   bridge the ``gaps.'' Here we explore general boundary
-                   conditions coupling the widely separated ``teeth'' of
-                   the microscopic simulation that achieve high order
-                   accuracy over the macroscale. We present the simplest
-                   case when the microscopic simulator is the
-                   quintessential example of a PDE. We argue that
-                   classic high order interpolation of the macroscopic
-                   field provides the correct forcing in whatever
-                   boundary condition is required by the microsimulator.
-                   Such interpolation leads to tooth boundary
-                   conditions, which achieve arbitrarily high order
-                   consistency. The high order consistency is
-                   demonstrated on a class of linear PDEs in two ways:
-                   first through the eigenvalues of the scheme for
-                   selected numerical problems, and second using the
-                   dynamical systems approach of holistic discretization
-                   on a general class of linear PDEs. Analytic modeling
-                   shows that, for a wide class of microscopic systems,
-                   the subgrid fields and the effective macroscopic
-                   model are largely independent of the tooth size and
-                   the particular tooth boundary conditions. When
-                   applied to patches of microscopic simulations these
-                   tooth boundary conditions promise efficient
-                   macroscale simulation. We expect the same approach
-                   will also accurately couple patch simulations in
-                   higher spatial dimensions.},
-  doi =           {10.1137/060654554},
-}
-
 @article{Liu2015,
   author =        {Liu, Ping and Samaey, Giovanni and Gear, C. William and
                    Kevrekidis, Ioannis G.},
@@ -509,86 +644,6 @@
   doi =           {http://dx.doi.org/10.1016/j.apnum.2014.12.007},
   url =           {http://www.sciencedirect.com/science/article/pii/
                    S0168927414002086},
-}
-
-@article{Bunder2013b,
-  author =        {Bunder, J.~E. and Roberts, A.~J. and
-                   Kevrekidis, I.~G.},
-  journal =       {J.~Computational Physics},
-  month =         {may},
-  pages =         {154-174},
-  title =         {Good coupling for the multiscale patch scheme on
-                   systems with microscale heterogeneity},
-  volume =        {337},
-  year =          {2017},
-  abstract =      {Computational simulation of microscale detailed
-                   systems is frequently only feasible over spatial
-                   domains much smaller than the macroscale of interest.
-                   The `equation-free' methodology couples many small
-                   patches of microscale computations across space to
-                   empower efficient computational simulation over
-                   macroscale domains of interest. Motivated by
-                   molecular or agent simulations, we analyse the
-                   performance of various coupling schemes for patches
-                   when the microscale is inherently `rough'. As a
-                   canonical problem in this universality class, we
-                   systematically analyse the case of heterogeneous
-                   diffusion on a lattice. Computer algebra explores how
-                   the dynamics of coupled patches predict the large
-                   scale emergent macroscale dynamics of the
-                   computational scheme. We determine good design for
-                   the coupling of patches by comparing the macroscale
-                   predictions from patch dynamics with the emergent
-                   macroscale on the entire domain, thus minimising the
-                   computational error of the multiscale modelling. The
-                   minimal error on the macroscale is obtained when the
-                   coupling utilises averaging regions which are between
-                   a third and a half of the patch. Moreover, when the
-                   symmetry of the inter-patch coupling matches that of
-                   the underlying microscale structure, patch dynamics
-                   predicts the desired macroscale dynamics to any
-                   specified order of error. The results confirm that
-                   the patch scheme is useful for macroscale
-                   computational simulation of a range of systems with
-                   microscale heterogeneity.},
-  doi =           {10.1016/j.jcp.2017.02.004},
-}
-
-@article{Cao2014a,
-  author =        {Cao, Meng and Roberts, A. J.},
-  journal =       {IMA J.~Applied Maths.},
-  number =        {2},
-  pages =         {228--254},
-  title =         {Multiscale modelling couples patches of nonlinear
-                   wave-like simulations},
-  volume =        {81},
-  year =          {2016},
-  abstract =      {The multiscale gap-tooth scheme is built from given
-                   microscale simulations of complicated physical
-                   processes to empower macroscale simulations. By
-                   coupling small patches of simulations over
-                   unsimulated physical gaps, large savings in
-                   computational time are possible. So far the gap-tooth
-                   scheme has been developed for dissipative systems,
-                   but wave systems are also of great interest. This
-                   article develops the gap-tooth scheme to the case of
-                   nonlinear microscale simulations of wave-like
-                   systems. Classic macroscale interpolation provides a
-                   generic coupling between patches that achieves
-                   arbitrarily high order consistency between the
-                   multiscale scheme and the underlying microscale
-                   dynamics. Eigen-analysis indicates that the resultant
-                   gap-tooth scheme empowers feasible computation of
-                   large scale simulations of wave-like dynamics with
-                   complicated underlying physics. As an pilot study, we
-                   implement numerical simulations of dam-breaking waves
-                   by the gap-tooth scheme. Comparison between a
-                   gap-tooth simulation, a microscale simulation over
-                   the whole domain, and some published experimental
-                   data on dam breaking, demonstrates that the gap-tooth
-                   scheme feasibly computes large scale wave-like
-                   dynamics with computational savings.},
-  doi =           {10.1093/imamat/hxv034},
 }
 
 @inproceedings{Cao2013,

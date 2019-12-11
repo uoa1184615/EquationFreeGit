@@ -137,6 +137,17 @@ Maclean, J. \harvardand\ Gottwald, G.~A.  \harvardyearleft
 \newline\harvardurl{http://www.sciencedirect.com/science/article/pii/
   S0377042715002149}
 
+\harvarditem[Marschler et~al.]{Marschler, Sieber, Berkemer, Kawamoto
+  \harvardand\ Starke}{2014}{Marschler2014b}
+Marschler, C., Sieber, J., Berkemer, R., Kawamoto, A. \harvardand\ Starke, J.
+  \harvardyearleft 2014\harvardyearright , `Implicit methods for equation-free
+  analysis: Convergence results and analysis of emergent waves in microscopic
+  traffic models', {\em SIAM J.~Appl. Dyn. Syst.} {\bf 13}(2),~1202--1238.
+
+\harvarditem{Petersik}{2019--}{Petersik2019}
+Petersik, P.  \harvardyearleft 2019--\harvardyearright , Equation-free
+  modeling, Technical report, [\url{https://github.com/pjpetersik/eqnfree}].
+
 \harvarditem[Plimpton et~al.]{Plimpton, Thompson, Shan, Moore, Kohlmeyer,
   Crozier \harvardand\ Stevens}{2016}{LAMMPS}
 Plimpton, S., Thompson, A., Shan, R., Moore, S., Kohlmeyer, A., Crozier, P.
@@ -167,13 +178,6 @@ Roberts, A.~J., MacKenzie, T. \harvardand\ Bunder, J.  \harvardyearleft
 Samaey, G., Kevrekidis, I.~G. \harvardand\ Roose, D.  \harvardyearleft
   2005\harvardyearright , `The gap-tooth scheme for homogenization problems',
   {\em Multiscale Modeling and Simulation} {\bf 4},~278--306.
-
-\harvarditem[Samaey et~al.]{Samaey, Roberts \harvardand\
-  Kevrekidis}{2010}{Samaey08}
-Samaey, G., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
-  2010\harvardyearright , Equation-free computation: an overview of patch
-  dynamics, {\em in} J.~Fish, ed., `Multiscale methods: bridging the scales in
-  science and engineering', Oxford University Press, chapter~8, pp.~216--246.
 
 \harvarditem[Samaey et~al.]{Samaey, Roose \harvardand\
   Kevrekidis}{2006}{Samaey04}
