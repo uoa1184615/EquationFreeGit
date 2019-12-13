@@ -183,7 +183,7 @@ Start by showing the initial conditions of
 u = reshape(permute(u0,[1 3 2 4]), [numel(x) numel(y)]);
 hsurf = surf(x(:),y(:),u');
 axis([-3 3 -3 3 -0.03 1]), view(60,40)
-legend('time = 0','Location','north')
+legend('time = 0.00','Location','north')
 xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
 %{
 \end{matlab}
@@ -203,13 +203,16 @@ applied to a nonlinear `diffusion'~\pde:
 \(t=3\).}
 \includegraphics[scale=0.9]{configPatches2ic}
 \end{figure}
-Integrate in time using standard functions.
+Integrate in time using standard functions. In Matlab
+\verb|ode15s| would be natural as the patch scheme is
+naturally stiff, but \verb|ode23| is quicker.  Ask for
+output at non-uniform times as the diffusion slows.
 \begin{matlab}
 %}
 disp('Wait while we simulate h_t=(h^3)_xx+(h^3)_yy')
 drawnow
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode15s( @patchSmooth2,[0 4],u0(:));
+    [ts,us] = ode23(@patchSmooth2,linspace(0,2).^2,u0(:));
 else % octave version is quite slow for me
     lsode_options('absolute tolerance',1e-4);
     lsode_options('relative tolerance',1e-4);
@@ -226,7 +229,7 @@ for i = 1:length(ts)
   u = patchEdgeInt2(us(i,:));
   u = reshape(permute(u,[1 3 2 4]), [numel(x) numel(y)]);
   set(hsurf,'ZData', u');
-  legend(['time = ' num2str(ts(i),2)])
+  legend(['time = ' num2str(ts(i),'%4.2f')])
   pause(0.1)
 end
 %print('-depsc2','configPatches2t3')
