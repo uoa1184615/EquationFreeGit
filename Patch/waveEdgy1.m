@@ -79,8 +79,8 @@ random log-normal values, normalised.  This normalisation
 means that macroscale wave on a domain of length~\(2\pi\)
 should have nearly integer frequencies,
 \(0,1,2,\ldots\)---except that the normalisation is exact
-only for periods~3 and~5. Then the heterogeneity is
-repeated \verb|nPeriodsPatch| times within each patch. 
+only for periods~3 and~5. Then the heterogeneity is repeated
+\verb|nPeriodsPatch| times within each patch. 
 \begin{matlab}
 %}
 clear all
@@ -252,11 +252,12 @@ leadingFreqs =
 \end{table}
 Find the eigenvalues of the Jacobian, and list for
 inspection in \cref{tbl:waveEdgy1} (using a count of zero
-crossings in the corresponding eigenvector in order to try to sort on the spatial wavenumber): the
-spectral interpolation is effectively exact for the
-macroscale; quadratic interpolation is usually
-qualitatively good; quartic interpolation appears to be
-the lowest order for quantitative accuracy.
+crossings in the corresponding eigenvector in order to try
+to sort on the spatial wavenumber): the spectral
+interpolation is effectively exact for the macroscale;
+quadratic interpolation is usually qualitatively good;
+quartic interpolation appears to be the lowest order for
+quantitative accuracy.
 \begin{matlab}
 %}
 [evecs,evals]=eig(Jac);
