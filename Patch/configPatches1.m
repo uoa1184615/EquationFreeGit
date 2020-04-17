@@ -10,9 +10,9 @@
 \subsection{Introduction}
 
 Makes the struct~\verb|patches| for use by the patch\slash
-gap-tooth time derivative\slash step
-function~\verb|patchSmooth1()|. \cref{sec:configPatches1eg}
-lists an example of its use.
+gap-tooth time derivative\slash step function
+\verb|patchSmooth1()|. \cref{sec:configPatches1eg} lists an
+example of its use.
 \begin{matlab}
 %}
 function configPatches1(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP ...
@@ -280,7 +280,9 @@ DX=X(2)-X(1);
 \end{matlab}
 Construct the microscale in each patch, assuming Dirichlet
 patch edges, and a half-patch length
-of~\(\verb|ratio|\cdot\verb|DX|\), unless \verb|patches.EdgyInt| is set in which case the patches are of length \verb|ratio*DX+dx|.
+of~\(\verb|ratio|\cdot\verb|DX|\), unless
+\verb|patches.EdgyInt| is set in which case the patches are
+of length \verb|ratio*DX+dx|.
 \begin{matlab}
 %}
 if patches.EdgyInt==0, assert(mod(nSubP,2)==1, ...

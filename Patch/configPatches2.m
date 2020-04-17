@@ -1,6 +1,6 @@
 % Creates a data struct of the design of 2D patches for
 % later use by the patch functions such as smoothPatch2() 
-% AJR, Nov 2018 -- Apr 2019
+% AJR, Nov 2018 -- 17 Apr 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches2()}: configures spatial patches in 2D}
@@ -10,9 +10,9 @@
 \subsection{Introduction}
 
 Makes the struct~\verb|patches| for use by the patch\slash
-gap-tooth time derivative\slash step
-function~\verb|patchSmooth2()|. \cref{sec:configPatches2eg}
-lists an example of its use.
+gap-tooth time derivative\slash step function
+\verb|patchSmooth2()|. \cref{sec:configPatches2eg} lists an
+example of its use.
 
 
 \begin{matlab}
@@ -78,6 +78,10 @@ edge regions of each patch.  The default is one (suitable
 for microscale lattices with only nearest neighbours.
 interactions).
 
+\item \verb|patches.EdgyInt|, \emph{optional},
+if non-zero then interpolate to left\slash right edge-values 
+from right\slash left next-to-edge values.  So far only 
+implemented for spectral interpolation, \(\verb|ordCC|=0\).
 \end{itemize}
 
 
@@ -145,14 +149,15 @@ Establish global patch data struct to interface with a
 function coding a nonlinear `diffusion' \pde: to be solved
 on \(6\times4\)-periodic domain, with \(9\times7\) patches,
 spectral interpolation~(\(0\)) couples the patches, each
-patch of half-size ratio~\(0.25\) (relatively large for
-visualisation), and with \(5\times5\) points within each
-patch. \cite{Roberts2011a} established that this scheme is
-consistent with the \pde\ (as the patch spacing decreases).
+patch of half-size ratio~\(0.4\) (relatively large for
+visualisation), and with \(5\times5\) points forming each
+patch (a \(3\times3\) interior). \cite{Roberts2011a}
+established that this scheme is consistent with the \pde\
+(as the patch spacing decreases).
 \begin{matlab}
 %}
 nSubP = 5;
-configPatches2(@nonDiffPDE,[-3 3 -2 2], nan, [9 7], 0, 0.25, nSubP);
+configPatches2(@nonDiffPDE,[-3 3 -2 2], nan, [9 7], 0, 0.4, nSubP);
 %{
 \end{matlab}
 Set a  perturbed-Gaussian initial condition using
@@ -171,7 +176,7 @@ values interior to the patches: set \(x\)~and \(y\)-edges to
 \verb|nan| to leave the gaps between patches. 
 \begin{matlab}
 %}
-figure(1), clf
+figure(1), clf, colormap(hsv)
 x = patches.x; y = patches.y;
 if 1, x([1 end],:) = nan; y([1 end],:) = nan; end
 %{
@@ -192,7 +197,7 @@ Save the initial condition to file for
 \begin{matlab}
 %}
 set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2','configPatches2ic')
+print('-depsc2','configPatches2ic')
 %{
 \end{matlab}
 \begin{figure}
@@ -212,11 +217,11 @@ output at non-uniform times as the diffusion slows.
 disp('Wait while we simulate h_t=(h^3)_xx+(h^3)_yy')
 drawnow
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode23(@patchSmooth2,linspace(0,2).^2,u0(:));
+    [ts,us] = ode23(@patchSmooth2,linspace(0,sqrt(3)).^2,u0(:));
 else % octave version is quite slow for me
     lsode_options('absolute tolerance',1e-4);
     lsode_options('relative tolerance',1e-4);
-    [ts,us] = odeOcts(@patchSmooth2,[0 1],u0(:));
+    [ts,us] = odeOcts(@patchSmooth2,[0 3],u0(:));
 end
 %{
 \end{matlab}
@@ -232,7 +237,7 @@ for i = 1:length(ts)
   legend(['time = ' num2str(ts(i),'%4.2f')])
   pause(0.1)
 end
-%print('-depsc2','configPatches2t3')
+print('-depsc2','configPatches2t3')
 %{
 \end{matlab}
 \begin{figure}
@@ -259,6 +264,17 @@ end%if no arguments
 
 \begin{devMan}
 
+Check and set default interpolation to be from mid-patches,
+not from the next-to-edges.
+\begin{matlab}
+%}
+if ~isfield(patches,'EdgyInt')
+    patches.EdgyInt=0;
+end
+%{
+\end{matlab}
+
+
 
 
 \subsection{The code to make patches}
@@ -279,8 +295,8 @@ specified by the user. Store in the struct.
 \begin{matlab}
 %}
 if nargin<8, nEdge = 1; end
-if nEdge>1, error('multi-edge-value interp not yet implemented'), end
-if 2*nEdge+1>nSubP, error('too many edge values requested'), end
+assert(nEdge==1,'multi-edge-value interp not yet implemented')
+assert(2*nEdge+1<=min(nSubP),'too many edge values requested')
 patches.nEdge = nEdge;
 %{
 \end{matlab}
@@ -299,9 +315,8 @@ the values for the inter-patch coupling conditions. Spectral
 coupling is \verb|ordCC| of~\(0\) or~\(-1\).
 \begin{matlab}
 %}
-if ~ismember(ordCC,[0])
-    error('ordCC out of allowed range [0]')
-end
+assert(ismember(ordCC,[0]), ...
+    'ordCC out of allowed range [0]')
 %{
 \end{matlab}
 For odd~\verb|ordCC| do interpolation based upon odd
@@ -368,16 +383,25 @@ DY = Y(2)-Y(1);
 \end{matlab}
 Construct the microscale in each patch, assuming Dirichlet
 patch edges, and a half-patch length of~\(\verb|ratio(1)|
-\cdot \verb|DX|\) and~\(\verb|ratio(2)| \cdot \verb|DY|\).
+\cdot \verb|DX|\) and~\(\verb|ratio(2)| \cdot \verb|DY|\),
+unless \verb|patches.EdgyInt| is set in which case the
+patches are of length \verb|ratio*DX+dx| and
+\verb|ratio*DY+dy|.
 \begin{matlab}
 %}
 nSubP = nSubP(:)'; % force to be row vector
-if mod(nSubP,2)==[0 0], error('configPatches2: nSubP must be odd'), end
+if patches.EdgyInt==0, assert(prod(mod(nSubP,2))==1, ...
+    'configPatches2: nSubP must be odd')
+end
 i0 = (nSubP(1)+1)/2;
-dx = ratio(1)*DX/(i0-1);
+if patches.EdgyInt==0, dx = ratio(1)*DX/(i0-1);
+else                   dx = ratio(1)*DX/(nSubP(1)-2);
+end
 patches.x = bsxfun(@plus,dx*(-i0+1:i0-1)',X); % micro-grid
 i0 = (nSubP(2)+1)/2;
-dy = ratio(2)*DY/(i0-1);
+if patches.EdgyInt==0, dy = ratio(2)*DY/(i0-1);
+else                   dy = ratio(2)*DY/(nSubP(2)-2);
+end
 patches.y = bsxfun(@plus,dy*(-i0+1:i0-1)',Y); % micro-grid
 end% function
 %{

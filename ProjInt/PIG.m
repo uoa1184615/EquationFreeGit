@@ -244,7 +244,7 @@ Fourth, invoke \verb|PIG| to use \script's
 evolution. Integrate the micro-bursts over \(0\leq t\leq6\)
 from initial condition \(\xv(0)=(1,0)\). You could set
 \verb|Tspan=[0 -6]| to integrate backward in macroscale time
-with forward microscale bursts \cite[]{Gear03b}.
+with forward microscale bursts \cite[]{Gear03b, Frewen2009}.
 \begin{matlab}
 %}
 Tspan = [0 6]; 

@@ -39,9 +39,9 @@ singularly perturbed system of differential equations for
 \end{equation*}
 With initial conditions \(x(0)=y(0)=0.2\), the following
 code uses forward time bursts in order to integrate
-backwards in time to \(t=-5\). It plots the computed
-solution over time \(-5\leq t\leq0\) for parameter
-\(\epsilon=0.1\)\,. Since the rate of decay is
+backwards in time to \(t=-5\) \cite[e.g.]{Frewen2009}. It
+plots the computed solution over time \(-5\leq t\leq0\) for
+parameter \(\epsilon=0.1\)\,. Since the rate of decay is
 \(\beta\approx 1/\epsilon\) we choose a burst length
 \(\epsilon\log(|\Delta|/\epsilon)\) as here the macroscale
 time-step \(\Delta=-1\).

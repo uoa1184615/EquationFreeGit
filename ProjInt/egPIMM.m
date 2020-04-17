@@ -101,7 +101,7 @@ alignment along the slow manifold.}
 \paragraph{Simulate backward in time}
 \cref{fig:egPIMM3} shows that projective integration even
 simulates backward in time along the slow manifold using
-short forward bursts \cite[]{Gear03b}. Such backward
+short forward bursts \cite[]{Gear03b, Frewen2009}. Such backward
 macroscale simulations succeed despite the fast
 variable~\(y(t)\), when backward in time, being viciously
 unstable.  However, backward integration appears to need

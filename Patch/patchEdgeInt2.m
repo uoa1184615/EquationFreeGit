@@ -1,6 +1,6 @@
 % Provides the interpolation across 2D space for 2D patches
 % of simulations of a smooth lattice system such as PDE
-% discretisations.  AJR, Nov 2018
+% discretisations.  AJR, Nov 2018 -- 17 Apr 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section[\texttt{patchEdgeInt2()}: 2D patch edge values from 2D interpolation]
@@ -53,6 +53,10 @@ equi-spaced lattice on both macro- and microscales.
 %(alternating) interpolation.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl|---not yet used
+
+\item \verb|.EdgyInt| in \(\{0,1\}\) is one for
+interpolating patch-edge values from opposite next-to-edge
+values (often preserves symmetry).
 \end{itemize}
 \end{itemize}
 
@@ -83,7 +87,8 @@ u = reshape(u,[nx ny Nx Ny nVars]);
 %{
 \end{matlab}
 With Dirichlet patches, the half-length of a patch is
-\(h=dx(n_\mu-1)/2\) (or~\(-2\) for specified flux), and the
+\(h=dx(n_\mu-1)/2\) (or~\(-2\) for specified flux), unless
+we are interpolating from next-to-edge values, and the
 ratio needed for interpolation is then \(r=h/\Delta X\).
 Compute lattice sizes from inside the patches as the edge
 values may be \nan{}s, etc.
@@ -91,10 +96,15 @@ values may be \nan{}s, etc.
 %}
 dx = patches.x(3,1)-patches.x(2,1);
 DX = patches.x(2,2)-patches.x(2,1);
-rx = dx*(nx-1)/2/DX;
+if patches.EdgyInt==0, rx = dx*(nx-1)/2/DX;
+    else               rx = dx*(nx-2)/DX;
+    end
 dy = patches.y(3,1)-patches.y(2,1);
 DY = patches.y(2,2)-patches.y(2,1);
-ry = dy*(ny-1)/2/DY;
+if patches.EdgyInt==0, ry = dy*(ny-1)/2/DY;
+    else               ry = dy*(ny-2)/DY;
+    end
+
 %{
 \end{matlab}
 
@@ -204,10 +214,11 @@ the middle of the gaps and swapped.
 %  end
 %{
 \end{matlab}
-Now set wavenumbers in the two directions.  In the case of
-even~\(N\) these compute the \(+\)-case for the highest
-wavenumber zig-zag mode, \(\mathcode`\,="213B k=(0,1,
-\ldots, k_{\max}, +(k_{\max}+1) -k_{\max}, \ldots, -1)\).
+Now set wavenumbers in the two directions into two row
+vectors.  In the case of even~\(N\) these compute the
+\(+\)-case for the highest wavenumber zig-zag mode,
+\(\mathcode`\,="213B k=(0,1, \ldots, k_{\max}, +(k_{\max}+1)
+-k_{\max}, \ldots, -1)\).
 \begin{matlab}
 %}
   kMax = floor((Nx-1)/2); 
@@ -220,109 +231,49 @@ Test for reality of the field values, and define a function
 accordingly.
 \begin{matlab}
 %}
-  if imag(u(i0,j0,:,:,:))==0, uclean = @(u) real(u);
-                         else uclean = @(u) u; end
+  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
+       uclean=@(u) real(u);
+  else uclean=@(u) u; 
+  end
 %{
 \end{matlab}
-Compute the Fourier transform of the patch centre-values for
-all the fields. If there are an even number of points, then
-zero the zig-zag mode in the \textsc{ft} and add it in later
-as cosine.
+Compute the Fourier transform of the mid-patch values for
+all the fields.  Unless doing patch-edgy interpolation when
+FT the next-to-edge values.  If there are an even number of
+patches, then treat highest wavenumber as positive, but then
+take only real-part when real data.
 \begin{matlab}
 %}
-  Ck = fft2(squeeze(u(i0,j0,:,:,:)));
-%{
-\end{matlab}
-The inverse Fourier transform gives the edge values via a
-shift a fraction~\(\verb|rx|/\verb|ry|\) to the next
-macroscale grid point. Initially preallocate storage for all
-the \textsc{ifft}s that we need to cater for the zig-zag
-modes when there are an even number of patches in the
-directions.
-\begin{matlab}
-%}
-nFTx = 2-mod(Nx,2);
-nFTy = 2-mod(Ny,2);
-unj = nan(1,ny,Nx,Ny,nVars,nFTx*nFTy);
-u1j = nan(1,ny,Nx,Ny,nVars,nFTx*nFTy);
-uin = nan(nx,1,Nx,Ny,nVars,nFTx*nFTy);
-ui1 = nan(nx,1,Nx,Ny,nVars,nFTx*nFTy);
-%{
-\end{matlab}
-Loop over the required \textsc{ifft}s.
-\begin{matlab}
-%}
-iFT = 0;
-for iFTx = 1:nFTx
-for iFTy = 1:nFTy
-iFT = iFT+1;
-%{
-\end{matlab}
-First interpolate onto \(x\)-limits of the patches. (It may
-be more efficient to product exponentials of vectors,
-instead of exponential of array---only for \(N>100\).  Can
-this be vectorised further??)
-\begin{matlab}
-%}
-for jj = 1:ny 
-  ks = (jj-j0)*2/(ny-1)*kry; % fraction of kry along the edge
-  unj(1,jj,:,:,iV,iFT) = ifft2( bsxfun(@times,Ck ...
-      ,exp(1i*bsxfun(@plus,altShift+krx',ks))));
-  u1j(1,jj,:,:,iV,iFT) = ifft2( bsxfun(@times,Ck ...
-      ,exp(1i*bsxfun(@plus,altShift-krx',ks))));
+ix=2:nx-1;  iy=2:ny-1; % indices of interior
+if patches.EdgyInt==0
+     Cle = fft2(shiftdim(u(i0,j0,:,:,:),2)); 
+     Cbo=Cle;
+else Cle = fft2(shiftdim(u(   2,iy ,:,:,:),2));
+     Cri = fft2(shiftdim(u(nx-1,iy ,:,:,:),2));
+     Cbo = fft2(shiftdim(u(ix,2    ,:,:,:),2));
+     Cto = fft2(shiftdim(u(ix,ny-1 ,:,:,:),2));
 end
-%{
-\end{matlab}
-Second interpolate onto \(y\)-limits of the patches.
-\begin{matlab}
-%}
-for i = 1:nx 
-  ks = (i-i0)*2/(nx-1)*krx; % fraction of krx along the edge
-  uin(i,1,:,:,iV,iFT) = ifft2( bsxfun(@times,Ck ...
-      ,exp(1i*bsxfun(@plus,ks',altShift+kry))));
-  ui1(i,1,:,:,iV,iFT) = ifft2( bsxfun(@times,Ck ...
-      ,exp(1i*bsxfun(@plus,ks',altShift-kry))));
+% fill in the cross of Fourier-shifted mid-values
+if patches.EdgyInt==0 
+  % y-fraction of kry along left/right edges
+  ks = (shiftdim(iy ,-3)-j0)*2/(ny-1).*kry; 
+  Cle = bsxfun(@times,Cle,exp(1i*ks)); 
+  Cri = Cle;
+  % x-fraction of krx along bottom/top edges
+  ks = (shiftdim(ix',-3)-i0)*2/(nx-1).*krx'; 
+  Cbo = bsxfun(@times,Cbo,exp(1i*ks)); 
+  Cto = Cbo;
 end
-%{
-\end{matlab}
-When either direction have even number of patches then swap
-the zig-zag wavenumber to the conjugate.
-\begin{matlab}
-%}
-if nFTy==2, kry(Ny/2+1) = -kry(Ny/2+1); end
-end% iFTy-loop
-if nFTx==2, krx(Nx/2+1) = -krx(Nx/2+1); end
-end% iFTx-loop
-%{
-\end{matlab}
-Put edge-values into the \(u\)-array, using \verb|mean()| to
-treat a zig-zag mode as cosine. Enforce reality when
-appropriate via \verb|uclean()|. 
-\begin{matlab}
-%}
-if numel(size(unj))>5
-	u(end,:,:,:,iV) = uclean( mean(unj,6) );
-	u( 1 ,:,:,:,iV) = uclean( mean(u1j,6) );
-	u(:,end,:,:,iV) = uclean( mean(uin,6) );
-	u(:, 1 ,:,:,iV) = uclean( mean(ui1,6) );
-else
-	u(end,:,:,:,iV) = uclean( unj );
-	u( 1 ,:,:,:,iV) = uclean( u1j );
-	u(:,end,:,:,iV) = uclean( uin );
-	u(:, 1 ,:,:,iV) = uclean( ui1 );
-end
-%{
-\end{matlab}
-Restore staggered grid when appropriate. Is there a better
-way to do this??
-\begin{matlab}
-%}
-%if patches.alt
-%  nVars=nVars/2;  nPatch=2*nPatch;
-%  v(:,1:2:nPatch,:)=u(:,:,1:nVars);
-%  v(:,2:2:nPatch,:)=u(:,:,nVars+1:2*nVars);    
-%  u=v;
-%end
+% put edge values into the patch field
+u(end,iy,:,:,:) = uclean( shiftdim( ifft2( ...
+    bsxfun(@times,Cle,exp(1i*(altShift+krx')))  ),2+(nVars>1)) );
+u( 1 ,iy,:,:,:) = uclean( shiftdim( ifft2( ...
+    bsxfun(@times,Cri,exp(1i*(altShift-krx')))  ),2+(nVars>1)) );
+u(ix,end,:,:,:) = uclean( shiftdim( ifft2( ...
+    bsxfun(@times,Cbo,exp(1i*(altShift+kry)))  ),2+(nVars>1)) );
+u(ix, 1 ,:,:,:) = uclean( shiftdim( ifft2( ...
+    bsxfun(@times,Cto,exp(1i*(altShift-kry)))  ),2+(nVars>1)) );
+
 end% if spectral 
 end% function patchEdgeInt2
 %{

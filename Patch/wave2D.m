@@ -1,6 +1,6 @@
 % Simulate the linear wave PDE in 2D on patches.
 % First it checks the spectrum of the system.
-% AJR, Nov 2018 -- Feb 2019
+% AJR, Nov 2018 -- 17 Apr 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{wave2D}: example of a wave on patches in 2D}
@@ -23,12 +23,13 @@ function recursion).
 
 
 \begin{devMan}
-Establish the global data struct \verb|patches| to interface with a
-function coding the wave \pde: to be solved on
+Establish the global data struct \verb|patches| to interface
+with a function coding the wave \pde: to be solved on
 \(2\pi\)-periodic domain, with \(9\times9\) patches,
 spectral interpolation~(\(0\)) couples the patches, each
-patch of half-size ratio~\(0.25\) (big enough for visualisation), and with a \(5\times5\)
-micro-grid within each patch.
+patch of half-size ratio~\(0.25\) (big enough for
+visualisation), and with a \(5\times5\) micro-grid within
+each patch.
 \begin{matlab}
 %}
 clear all, close all
@@ -55,7 +56,8 @@ uv0(:,[1 end],:,:,:) = nan;
 i = find(~isnan(uv0));
 %{
 \end{matlab}
-Now construct the Jacobian. Since this is a \emph{linear} wave \pde, use large perturbations.
+Now construct the Jacobian. Since this is a \emph{linear}
+wave \pde, use large perturbations.
 \begin{matlab}
 %}
 small = 1;
@@ -70,8 +72,8 @@ end
 %{
 \end{matlab}
 Now explore the eigenvalues a little: find the ten with the
-biggest real-part; if these are small enough, then the method may be
-good.
+biggest real-part; if these are small enough, then the
+method may be good.
 \begin{matlab}
 %}
 evals = eig(jac);
@@ -83,7 +85,8 @@ if abs(real(evals(k(1))))>1e-4
     return, end
 %{
 \end{matlab}
-Check that the eigenvalues are close to true waves of the \pde\ (not yet the micro-discretised equations).
+Check that the eigenvalues are close to true waves of the
+\pde\ (not yet the micro-discretised equations).
 \begin{matlab}
 %}
 kwave = 0:(nPatch-1)/2;
@@ -126,6 +129,7 @@ usurf = surf(x(:),y(:),u');
 axis([-3 3 -3 3 -0.5 1]), view(60,40)
 xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
 legend('time = 0','Location','north')
+colormap(hsv)
 drawnow
 set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
 %print('-depsc','wave2Dic')
@@ -143,7 +147,7 @@ Integrate in time using standard functions.
 %}
 disp('Wait while we simulate u_t=v, v_t=u_xx+u_yy')
 if ~exist('OCTAVE_VERSION','builtin')
-[ts,uvs] = ode15s( @patchSmooth2,[0 2],[u0(:);v0(:)]);
+[ts,uvs] = ode23( @patchSmooth2,[0 6],[u0(:);v0(:)]);
 else % octave version is slower
 [ts,uvs] = odeOcts(@patchSmooth2,[0 1],[u0(:);v0(:)]);
 end
