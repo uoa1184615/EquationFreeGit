@@ -80,11 +80,13 @@ one.  This normalisation then means that macroscale
 diffusion on a domain of length~\(2\pi\) should have near
 integer decay rates, the squares of \(0,1,2,\ldots\). Then
 the heterogeneity is repeated \verb|nPeriodsPatch| times
-within each patch. 
+within each patch (although this fixed number of periods in each patch
+is not necessary when implementing an ensemble of heterogeneity 
+configurations).
 \begin{matlab}
 %}
 clear all
-mPeriod = 3
+mPeriod = 5
 cHetr = exp(1*randn(mPeriod,1));
 cHetr = cHetr*mean(1./cHetr) % normalise
 nPeriodsPatch=1
@@ -104,23 +106,39 @@ from interpolating the opposite next-to-edge values of the
 patches (not the mid-patch values).  In this case we appear
 to need at least fourth order (quartic) interpolation to get
 accurate decay rate for heterogeneous diffusion.
+Setting \verb|patches.EdgyEns| to one simulates an ensemble 
+of heterogeneous diffusion configurations with edge-values obtained from
+opposite next-to-edge values, thus assuming \verb|patches.EdgyInt|  
+equals one. When simulating an ensemble of configurations, \verb|nSubP| 
+(the number of points in a patch) need not be dependent on the period of
+the heterogeneous diffusion.
 \begin{matlab}
 %}
 global patches
 nPatch = 9
-ratio = 0.25
+ratio = 0.3;
 nSubP = nPeriodsPatch*mPeriod+2
 patches.EdgyInt = 1; % one to use edges for interpolation
-configPatches1(@heteroDiff,[-pi pi],nan,nPatch ...
-    ,4,ratio,nSubP);
+patches.EdgyEns=0; % one for ensemble of configurations
+%nSubP = 6 % when EdgyEns=1, nSubP need not depend on mPeriod
+if patches.EdgyEns % EdgyEns=1 implies EdgyInt=1
+    patches.EdgyInt=1; 
+end
+configPatches1(@heteroDiff,[0 2*pi],nan,nPatch ...
+    ,0,ratio,nSubP);
 %{
 \end{matlab}
 
 Replicate the heterogeneous coefficients across the width of
-each patch.
+each patch. For \verb|patches.EdgyEns| an ensemble of configurations 
+is constructed.
 \begin{matlab}
 %}
-patches.c=[repmat(cHetr,(nSubP-2)/mPeriod,1);cHetr(1)];
+if patches.EdgyEns    
+   patches.c=reshape(cHetr(mod(bsxfun(@plus,0:(mPeriod-1),(0:(nSubP-2))'),mPeriod)+1),nSubP-1,1,mPeriod);
+else
+   patches.c=[repmat(cHetr,(nSubP-2)/mPeriod,1);cHetr(1)];
+end;
 %{
 \end{matlab}
 
@@ -130,16 +148,20 @@ lump perturbed by significant random microscale noise,
 via~\verb|randn|.
 \begin{matlab}
 %}
-u0 = exp(-patches.x.^2)+0.1*randn(nSubP,nPatch);
+if patches.EdgyEns 
+    u0 = repmat(exp(-patches.x.^2)+0.1*randn(nSubP,nPatch),1,1,mPeriod);
+else
+    u0 = exp(-patches.x.^2)+0.1*randn(nSubP,nPatch);
+end
 %{
 \end{matlab}
 Integrate using standard stiff integrators.
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode15s(@patchSmooth1, [0 0.5], u0(:));
+    [ts,us] = ode15s(@patchSmooth1, [0 0.6], u0(:));
 else % octave version
-    [ts,us] = odeOcts(@patchSmooth1, [0 0.5], u0(:));
+    [ts,us] = odeOcts(@patchSmooth1, [0 0.6], u0(:));
 end
 %{
 \end{matlab}
@@ -149,14 +171,26 @@ We want to see the edge values of the patches, so we adjoin
 a row of \verb|nan|s in between patches. For the field
 values (which are rows in~\verb|us|) we need to reshape,
 permute, interpolate to get edge values, pad with
-\verb|nan|s, and reshape again.
+\verb|nan|s, and reshape again. In the case of an ensemble of 
+configurations, we take the mean over the ensemble.
 \begin{matlab}
 %}
 xs = patches.x;  xs(end+1,:) = nan;
-us = patchEdgeInt1( permute( reshape(us,length(ts) ...
+if patches.EdgyEns
+   for s=1:length(ts)
+       us(s,:) = reshape( patchEdgeInt1(us(s,:)),1,[]);
+   end
+   us=permute(mean(reshape(us,length(ts) ...
+     ,size(patches.x,1),size(patches.x,2),[]),4),[2 3 1]);
+else
+   us = patchEdgeInt1( permute( reshape(us,length(ts) ...
      ,size(patches.x,1),size(patches.x,2)) ,[2 3 1]) );
+end
+
 us(end+1,:,:) = nan;
+
 us=reshape(us,[],length(ts));
+
 %{
 \end{matlab}
 
@@ -175,12 +209,16 @@ for p=1:2
   end
   figure(p),clf
   mesh(ts(j),xs(:),us(:,j)),  view(60,40)
-  xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-  set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
+  xlabel('time t'), ylabel('space x'), zlabel('u(x,t)'), colormap(0.8*jet);
+  axis tight; 
+  set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10],'renderer','Painters')
+%set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 9 7],'renderer','Painters')
   print('-depsc2',['homoDiffEdgyU' num2str(p)])
 end
 %{
 \end{matlab}
+
+
 
 \paragraph{Compute Jacobian and its spectrum}
 Let's explore the Jacobian dynamics for a range of orders of
@@ -190,9 +228,10 @@ as we do not plot.
 \begin{matlab}
 %}
 ratio=0.1
-nPatch=19
+nPatch=17
+
 leadingEvals=[];
-for ord=0:2:6
+for ord=0:2:40
 ordInterp=ord
 configPatches1(@heteroDiff,[-pi pi],nan,nPatch ...
     ,ord,ratio,nSubP);
@@ -205,7 +244,12 @@ indices of the micro-grid points that are interior to the
 patches and hence are the system variables.
 \begin{matlab}
 %}
-u0=0*patches.x; u0([1 end],:)=nan; u0=u0(:);
+if patches.EdgyEns 
+   u0 = 0*repmat(patches.x,1,1,mPeriod);
+else   
+   u0=0*patches.x;
+end
+u0([1 end],:)=nan; u0=u0(:);
 i=find(~isnan(u0));
 nJ=length(i);
 Jac=nan(nJ);
@@ -215,7 +259,7 @@ for j=1:nJ
    Jac(:,j)=dudt(i);
 end
 nonSymmetric=norm(Jac-Jac')
-assert(nonSymmetric<1e-10,'failed symmetry')
+assert(nonSymmetric<5e-9,'failed symmetry')
 Jac(abs(Jac)<1e-12)=0;
 %{
 \end{matlab}
@@ -256,13 +300,16 @@ reliable quantitative accuracy.
 %}
 [evecs,evals]=eig(Jac);
 eval=-sort(-diag(real(evals)));
-leadingEvals=[leadingEvals eval(1:2:nPatch+4)]
+stp=sum(eval(:)>-1e-5) % no. zero eigenvals = no. decoupled systems
+%leadingEvals=[leadingEvals eval(1:(2*stp):(stp*(nPatch+4)))];
+leadingEvals=[leadingEvals eval(1:(2):(stp*(nPatch+10)))];
 %{
 \end{matlab}
 End of the for-loop over orders of interpolation
 \begin{matlab}
 %}
 end
+leadingEvals=leadingEvals
 %{
 \end{matlab}
 

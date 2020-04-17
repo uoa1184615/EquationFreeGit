@@ -185,11 +185,18 @@ in the ensemble.
 %{
 \end{matlab}
 The second case is where next-to-edge values interpolate to
-the opposite edge-values.
+the opposite edge-values. When we have an ensemble of configurations,
+different configurations might be coupled to each other, depending
+on the period of the heterogeneous diffusion.
 \begin{matlab}
 %}
   elseif patches.EdgyInt
-    lVars=1:nVars; rVars=nVars+lVars;
+     if patches.EdgyEns
+       lVars=mod((1:nVars)+rem(nSubP-2,nVars)-1,nVars)+1;
+       rVars=mod((1:nVars)-rem(nSubP-2,nVars)-1,nVars)+1+nVars;
+     else
+        lVars=1:nVars; rVars=nVars+lVars;
+     end
     u(nSubP,j,:) = shiftdim(uCore(j,lVars),-1)*(1-patches.alt) ...
       +sum(bsxfun(@times,patches.Cwtsr,dmu(:,:,lVars)));
     u(  1  ,j,:) = shiftdim(uCore(j,rVars),-1)*(1-patches.alt) ...      
@@ -282,8 +289,12 @@ as cosine.
 %}
 if patches.EdgyInt==0
      Cleft = fft(u(  i0   ,:,:)); Cright = Cleft;
-else Cleft = fft(u(   2   ,:,:));
+elseif patches.EdgyEns==0 
+     Cleft = fft(u(   2   ,:,:));
      Cright= fft(u(nSubP-1,:,:));
+else
+    Cleft = fft(u(   2   ,:,mod((1:nVars)+rem(nSubP-2,nVars)-1,nVars)+1));
+    Cright= fft(u(nSubP-1,:,mod((1:nVars)-rem(nSubP-2,nVars)-1,nVars)+1));
 end
 %{
 \end{matlab}
