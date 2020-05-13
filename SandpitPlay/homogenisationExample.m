@@ -63,7 +63,7 @@ values for the inter-patch coupling conditions.
 \begin{matlab}
 %}
 global patches
-nPatch = 9
+nPatch = 10
 ratio = 0.2
 nSubP = 2*mPeriod+1
 Len = 2*pi;
@@ -98,7 +98,7 @@ microscale differential equations.
 %}
 u0 = sin(patches.x)+0.4*randn(nSubP,nPatch);
 if ~exist('OCTAVE_VERSION','builtin')
-[ts,ucts] = ode23(@patchSmooth1, linspace(0,2/cHomo,51), u0(:));
+[ts,ucts] = ode23(@patchSmooth1, linspace(0,0.3,51), u0(:));
 else % octave version
 [ts,ucts] = odeOcts(@patchSmooth1, [0 2/cHomo], u0(:));
 end
