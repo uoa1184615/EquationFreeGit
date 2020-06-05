@@ -142,7 +142,7 @@ if patches.ordCC>0 % then non-spectral interpolation
   elseif patches.EdgyInt % next-to-edge values as double nVars, left first
     uCore = reshape(shiftdim(u([2 end-1],j,:),1),nPatch,[]);
     dmu = zeros(patches.ordCC,nPatch,2*nVars);
-  else
+  else 
     uCore = reshape(sum(u((i0-c):(i0+c),j,:),1),nPatch,nVars);
     dmu = zeros(patches.ordCC,nPatch,nVars);
   end;
@@ -186,21 +186,23 @@ in the ensemble.
 \end{matlab}
 The second case is where next-to-edge values interpolate to
 the opposite edge-values. When we have an ensemble of configurations,
-different configurations might be coupled to each other, depending
-on the period of the heterogeneous diffusion.
+different configurations might be coupled to each other, as specified by 
+\verb|patches.le| and \verb|patches.ri|.
 \begin{matlab}
 %}
   elseif patches.EdgyInt
      if patches.EdgyEns
-       lVars=mod((1:nVars)+rem(nSubP-2,nVars)-1,nVars)+1;
-       rVars=mod((1:nVars)-rem(nSubP-2,nVars)-1,nVars)+1+nVars;
+        u(nSubP,j,:) = shiftdim(uCore(j,patches.le),-1)*(1-patches.alt) ...
+          +sum(bsxfun(@times,patches.Cwtsr,dmu(:,:,patches.le)));
+        u(  1  ,j,:) = shiftdim(uCore(j,patches.ri+nVars),-1)*(1-patches.alt) ...      
+          +sum(bsxfun(@times,patches.Cwtsl,dmu(:,:,patches.ri+nVars)));  
      else
-        lVars=1:nVars; rVars=nVars+lVars;
+        u(nSubP,j,:) = shiftdim(uCore(j,1:nVars),-1)*(1-patches.alt) ...
+          +sum(bsxfun(@times,patches.Cwtsr,dmu(:,:,1:nVars)));
+        u(  1  ,j,:) = shiftdim(uCore(j,(nVars+1):(2*nVars)),-1)*(1-patches.alt) ...      
+          +sum(bsxfun(@times,patches.Cwtsl,dmu(:,:,(nVars+1):(2*nVars))));
      end
-    u(nSubP,j,:) = shiftdim(uCore(j,lVars),-1)*(1-patches.alt) ...
-      +sum(bsxfun(@times,patches.Cwtsr,dmu(:,:,lVars)));
-    u(  1  ,j,:) = shiftdim(uCore(j,rVars),-1)*(1-patches.alt) ...      
-      +sum(bsxfun(@times,patches.Cwtsl,dmu(:,:,rVars)));
+     
 %{
 \end{matlab}
 Thirdly, the original, the core (one or more) of each patch
@@ -284,7 +286,9 @@ accordingly.
 Compute the Fourier transform of the patch centre-values for
 all the fields. If there are an even number of points, then
 if complex, treat as positive wavenumber, but if real, treat
-as cosine.
+as cosine. When we have an ensemble of configurations,
+different configurations might be coupled to each other, 
+as specified by \verb|patches.le| and \verb|patches.ri|.
 \begin{matlab}
 %}
 if patches.EdgyInt==0
@@ -293,8 +297,8 @@ elseif patches.EdgyEns==0
      Cleft = fft(u(   2   ,:,:));
      Cright= fft(u(nSubP-1,:,:));
 else
-    Cleft = fft(u(   2   ,:,mod((1:nVars)+rem(nSubP-2,nVars)-1,nVars)+1));
-    Cright= fft(u(nSubP-1,:,mod((1:nVars)-rem(nSubP-2,nVars)-1,nVars)+1));
+    Cleft = fft(u(   2   ,:,patches.le));
+    Cright= fft(u(nSubP-1,:,patches.ri));
 end
 %{
 \end{matlab}

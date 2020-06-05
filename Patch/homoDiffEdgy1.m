@@ -87,7 +87,11 @@ configurations).
 %}
 clear all
 mPeriod = 5
-cHetr = exp(1*randn(mPeriod,1));
+% set random diffusion coefficients
+%rng('default');
+%rng(50); % to help replication use seed=ratio*100 when ratio=0.3, 0.5
+cHetr=exp(1*randn(mPeriod,1));
+%cHetr = [3.966;2.531;0.838;0.331;7.276];
 cHetr = cHetr*mean(1./cHetr) % normalise
 nPeriodsPatch=1
 %{
@@ -120,9 +124,9 @@ ratio = 0.3;
 nSubP = nPeriodsPatch*mPeriod+2
 patches.EdgyInt = 1; % one to use edges for interpolation
 patches.EdgyEns=0; % one for ensemble of configurations
-%nSubP = 6 % when EdgyEns=1, nSubP need not depend on mPeriod
 if patches.EdgyEns % EdgyEns=1 implies EdgyInt=1
     patches.EdgyInt=1; 
+    nSubP = 5; % >2
 end
 configPatches1(@heteroDiff,[0 2*pi],nan,nPatch ...
     ,0,ratio,nSubP);
@@ -131,11 +135,13 @@ configPatches1(@heteroDiff,[0 2*pi],nan,nPatch ...
 
 Replicate the heterogeneous coefficients across the width of
 each patch. For \verb|patches.EdgyEns| an ensemble of configurations 
-is constructed.
+is constructed and need to specify how these configuruations are coupled.
 \begin{matlab}
 %}
 if patches.EdgyEns    
    patches.c=reshape(cHetr(mod(bsxfun(@plus,0:(mPeriod-1),(0:(nSubP-2))'),mPeriod)+1),nSubP-1,1,mPeriod);
+   patches.le=mod((1:mPeriod)+rem(nSubP-2,mPeriod)-1,mPeriod)+1;
+   patches.ri=mod((1:mPeriod)-rem(nSubP-2,mPeriod)-1,mPeriod)+1;
 else
    patches.c=[repmat(cHetr,(nSubP-2)/mPeriod,1);cHetr(1)];
 end;
@@ -150,8 +156,10 @@ via~\verb|randn|.
 %}
 if patches.EdgyEns 
     u0 = repmat(exp(-patches.x.^2)+0.1*randn(nSubP,nPatch),1,1,mPeriod);
+%    u0=repmat(sign(sin(patches.x))+0.4*randn(nSubP,nPatch),1,1,mPeriod);
 else
     u0 = exp(-patches.x.^2)+0.1*randn(nSubP,nPatch);
+%    u0=sin(patches.x)+0.4*randn(nSubP,nPatch);
 end
 %{
 \end{matlab}
@@ -188,6 +196,11 @@ else
 end
 
 us(end+1,:,:) = nan;
+% use following four lines if don't want to plot edge fields
+us(end-1,:,:) = nan;
+us(1,:,:) = nan;
+xs(1,:,:)=nan;
+xs(end-1,:,:)=nan;
 
 us=reshape(us,[],length(ts));
 
@@ -227,11 +240,27 @@ heterogeneity.  Here use a smaller ratio, and more patches,
 as we do not plot.
 \begin{matlab}
 %}
-ratio=0.1
-nPatch=17
+
+nPatch = 20
+ratio = 0.1;
+configPatches1(@heteroDiff,[0 2*pi],nan,nPatch ...
+    ,0,ratio,nSubP);
+
+if patches.EdgyEns    
+   patches.c=reshape(cHetr(mod(bsxfun(@plus,0:(mPeriod-1),(0:(nSubP-2))'),mPeriod)+1),nSubP-1,1,mPeriod);
+   patches.le=mod((1:mPeriod)+rem(nSubP-2,mPeriod)-1,mPeriod)+1;
+   patches.ri=mod((1:mPeriod)-rem(nSubP-2,mPeriod)-1,mPeriod)+1;
+else
+   patches.c=[repmat(cHetr,(nSubP-2)/mPeriod,1);cHetr(1)];
+end;
+
+ords=0:2:40;
 
 leadingEvals=[];
-for ord=0:2:40
+for p=ords
+    
+ord=p;
+%patches.c=[repmat(cHetr,(nSubP-2)/mPeriod,1);cHetr(1)];
 ordInterp=ord
 configPatches1(@heteroDiff,[-pi pi],nan,nPatch ...
     ,ord,ratio,nSubP);
@@ -301,8 +330,9 @@ reliable quantitative accuracy.
 [evecs,evals]=eig(Jac);
 eval=-sort(-diag(real(evals)));
 stp=sum(eval(:)>-1e-5) % no. zero eigenvals = no. decoupled systems
-%leadingEvals=[leadingEvals eval(1:(2*stp):(stp*(nPatch+4)))];
-leadingEvals=[leadingEvals eval(1:(2):(stp*(nPatch+10)))];
+%leadingEvals=[leadingEvals eval([1, (stp+1):(2*stp):(stp*nPatch+4)])];
+leadingEvals=[leadingEvals eval([1, (stp+1):2:(stp*nPatch+4)])];
+%leadingEvals=[leadingEvals eval([1, (stp+1):(2*stp):(stp*(maxP+4))])];
 %{
 \end{matlab}
 End of the for-loop over orders of interpolation
@@ -322,4 +352,3 @@ End of the main script.
 
 Fin.
 %}
-
