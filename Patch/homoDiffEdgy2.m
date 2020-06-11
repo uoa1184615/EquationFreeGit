@@ -22,8 +22,8 @@ cHetr = cHetr*mean(1./cHetr(:)) % normalise
 nPeriodsPatch=[1 1]
 
 global patches
-nPatch = [5 5]
-ratio = [0.5 0.4];
+nPatch = [11 11]
+ratio = [0.3 0.5];
 nSubP = [nPeriodsPatch(1)*mPeriod(1)+2 nPeriodsPatch(2)*mPeriod(2)+2]
 patches.EdgyInt = 1; % one to use edges for interpolation
 patches.EdgyEns=0; % one for ensemble of configurations
@@ -83,9 +83,9 @@ Integrate using standard stiff integrators.
 %}
 
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode15s(@patchSmooth2, [0 0.005 0.05 0.5], u0(:));
+    [ts,us] = ode15s(@patchSmooth2, [0 0.5], u0(:));
 else % octave version
-    [ts,us] = odeOcts(@patchSmooth2, [0 0.6], u0(:));
+    [ts,us] = odeOcts(@patchSmooth2, [0 0.5], u0(:));
 end
 
 %{
@@ -93,6 +93,9 @@ end
 Plot field solutions.
 \begin{matlab}
 %}
+
+%  % for video
+%frames = struct('cdata', cell(1, length(ts)), 'colormap', cell(1, length(ts)));
 
 disp('plot sequence of surfaces')
 figure(1), clf, colormap(hsv)
@@ -115,8 +118,13 @@ for i = 1:length(ts)
   legend(['time = ' num2str(ts(i),2)],'Location','north')
   caxis([0 1])
   pause(0.1)
+%  frames(i) = getframe(gcf); 
 end
-
+% % for video
+%       vw = VideoWriter('diffusion2d','MPEG-4');  %taking a guess that you intend to modify the filename each time you write a video
+%       open(vw);
+%       writeVideo(vw, frames);
+%       close(vw);
 
 %{
 \end{matlab}
@@ -208,7 +216,7 @@ end
 noe=20;
 err=abs((egs(2:end,2:noe)-egs(1,2:noe))./egs(1,2:noe));
 set(0,'defaultAxesLineStyleOrder','o-|x-|v-|s-|p-|h-|d-|^-')
-
+figure;
 plot(1:(ords/2),err(:,1:2:end))
 xlabel('coupling order')
 ylabel('eigenvalue relative error')
