@@ -1,7 +1,6 @@
 % Computes the time derivatives of heterogeneous diffusion
 % in 1D on patches.  Used by homogenisationExample.m,
-% ensembleAverageExample.m  Optionally becomes Burgers PDE
-% with heterogeneous advection.
+% ensembleAverageExample.m
 % AJR, 4 Apr 2019 -- 7 Feb 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
@@ -18,17 +17,15 @@ coefficients~\(c_i\) have previously been stored in
 struct~\verb|patches|.
 \begin{matlab}
 %}
-function ut = heteroDiff(t,u,x)
+function ut = ensHeteroDiff(t,u,x)
   global patches
   dx = diff(x(2:3)); % space step
   i = 2:size(u,1)-1; % interior points in a patch
+  m = size(u,3);
+  j=1:m; jp=[2:m 1]; jm=[m 1:m-1]; % ensemble indices
   ut = nan(size(u)); % preallocate output array
-  ut(i,:) = diff(patches.c.*diff(u))/dx^2; 
-  % if set, include heterogeneous Burgers' advection 
-  if isfield(patches,'b') % check for advection coeffs
-    buu = patches.b.*u.^2;
-    ut(i,:) = ut(i,:)-(buu(i+1,:)-buu(i-1,:))/(dx*2);   
-  end
+  ut(i,:,j) = (patches.c(1,1,jp).*(u(i+1,:,jp)-u(i,:,j)) ...
+               +patches.c(1,1,j).*(u(i-1,:,jm)-u(i,:,j)))/dx^2; 
 end% function
 %{
 \end{matlab}

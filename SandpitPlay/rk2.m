@@ -1,5 +1,7 @@
-% Second order Runge-Kutta. No adaptive stepping, no error control. Use when
-% testing other schemes.
+% Second order Runge-Kutta. No adaptive stepping, no error
+% control. Use when testing other schemes.  Alternatively
+% see RKint/rk2int.m for a documented code that also
+% estimates errors.
 % Inputs: 
 % differential equation dxdt = dxdt(t,x)
 % vector of times tSpan

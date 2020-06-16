@@ -5,6 +5,8 @@ Users: Place this toolbox's folder in a path searched by
 Matlab/Octave.  The document `eqnFreeUserMan-newest.pdf`
 describes how to use the main functions of interest to you.
 
+[![View Equation-Free Toolbox on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://au.mathworks.com/matlabcentral/fileexchange/73632-equation-free-toolbox)
+
 Contributors: This project aims to collectively develop a
 Matlab/Octave toolbox of *equation-free* algorithms.
 Initially the algorithms are to be straightforward.  The

@@ -109,6 +109,14 @@ else r = dx*(nSubP-2)/DX;
 end
 %{
 \end{matlab}
+AJR perhaps prefer ensemble to be catered for in nVars.
+\begin{matlab}
+%}
+if ~isfield(patches,'EdgyEns')
+    patches.EdgyEns = 0;
+end
+%{
+\end{matlab}
 
 For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
