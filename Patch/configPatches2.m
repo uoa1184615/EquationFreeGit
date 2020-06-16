@@ -1,6 +1,6 @@
 % Creates a data struct of the design of 2D patches for
 % later use by the patch functions such as smoothPatch2() 
-% AJR, Nov 2018 -- 17 Apr 2020
+% AJR, Nov 2018 -- 15 Apr 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches2()}: configures spatial patches in 2D}
@@ -149,15 +149,14 @@ Establish global patch data struct to interface with a
 function coding a nonlinear `diffusion' \pde: to be solved
 on \(6\times4\)-periodic domain, with \(9\times7\) patches,
 spectral interpolation~(\(0\)) couples the patches, each
-patch of half-size ratio~\(0.4\) (relatively large for
-visualisation), and with \(5\times5\) points forming each
-patch (a \(3\times3\) interior). \cite{Roberts2011a}
-established that this scheme is consistent with the \pde\
-(as the patch spacing decreases).
+patch of half-size ratio~\(0.25\) (relatively large for
+visualisation), and with \(5\times5\) points within each
+patch. \cite{Roberts2011a} established that this scheme is
+consistent with the \pde\ (as the patch spacing decreases).
 \begin{matlab}
 %}
 nSubP = 5;
-configPatches2(@nonDiffPDE,[-3 3 -2 2], nan, [9 7], 0, 0.4, nSubP);
+configPatches2(@nonDiffPDE,[-3 3 -2 2], nan, [9 7], 0, 0.25, nSubP);
 %{
 \end{matlab}
 Set a  perturbed-Gaussian initial condition using
@@ -176,7 +175,7 @@ values interior to the patches: set \(x\)~and \(y\)-edges to
 \verb|nan| to leave the gaps between patches. 
 \begin{matlab}
 %}
-figure(1), clf, colormap(hsv)
+figure(1), clf
 x = patches.x; y = patches.y;
 if 1, x([1 end],:) = nan; y([1 end],:) = nan; end
 %{
@@ -197,7 +196,7 @@ Save the initial condition to file for
 \begin{matlab}
 %}
 set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-print('-depsc2','configPatches2ic')
+%print('-depsc2','configPatches2ic')
 %{
 \end{matlab}
 \begin{figure}
@@ -217,11 +216,11 @@ output at non-uniform times as the diffusion slows.
 disp('Wait while we simulate h_t=(h^3)_xx+(h^3)_yy')
 drawnow
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode23(@patchSmooth2,linspace(0,sqrt(3)).^2,u0(:));
+    [ts,us] = ode23(@patchSmooth2,linspace(0,2).^2,u0(:));
 else % octave version is quite slow for me
     lsode_options('absolute tolerance',1e-4);
     lsode_options('relative tolerance',1e-4);
-    [ts,us] = odeOcts(@patchSmooth2,[0 3],u0(:));
+    [ts,us] = odeOcts(@patchSmooth2,[0 1],u0(:));
 end
 %{
 \end{matlab}
@@ -237,7 +236,7 @@ for i = 1:length(ts)
   legend(['time = ' num2str(ts(i),'%4.2f')])
   pause(0.1)
 end
-print('-depsc2','configPatches2t3')
+%print('-depsc2','configPatches2t3')
 %{
 \end{matlab}
 \begin{figure}
@@ -264,8 +263,7 @@ end%if no arguments
 
 \begin{devMan}
 
-Check and set default interpolation to be from mid-patches,
-not from the next-to-edges.
+Check and set default edgy interpolation.
 \begin{matlab}
 %}
 if ~isfield(patches,'EdgyInt')
@@ -295,8 +293,8 @@ specified by the user. Store in the struct.
 \begin{matlab}
 %}
 if nargin<8, nEdge = 1; end
-assert(nEdge==1,'multi-edge-value interp not yet implemented')
-assert(2*nEdge+1<=min(nSubP),'too many edge values requested')
+if nEdge>1, error('multi-edge-value interp not yet implemented'), end
+if 2*nEdge+1>nSubP, error('too many edge values requested'), end
 patches.nEdge = nEdge;
 %{
 \end{matlab}
@@ -315,8 +313,9 @@ the values for the inter-patch coupling conditions. Spectral
 coupling is \verb|ordCC| of~\(0\) or~\(-1\).
 \begin{matlab}
 %}
-assert(ismember(ordCC,[0]), ...
-    'ordCC out of allowed range [0]')
+% if ~ismember(ordCC,[0])
+%     error('ordCC out of allowed range [0]')
+% end
 %{
 \end{matlab}
 For odd~\verb|ordCC| do interpolation based upon odd
@@ -353,18 +352,12 @@ if patches.alt  % eqn (7) in \cite{Cao2014a}
     (-225+259*ratio.^2-35*ratio.^4+ratio.^6)/46080
     (-225+259*ratio.^2-35*ratio.^4+ratio.^6).*ratio/645120 ];
 else % 
-  patches.Cwtsr = [ratio
-    ratio.^2/2
-    (-1+ratio.^2).*ratio/6
-    (-1+ratio.^2).*ratio.^2/24
-    (4-5*ratio.^2+ratio.^4).*ratio/120
-    (4-5*ratio.^2+ratio.^4).*ratio.^2/720
-    (-36+49*ratio.^2-14*ratio.^4+ratio.^6).*ratio/5040
-    (-36+49*ratio.^2-14*ratio.^4+ratio.^6).*ratio.^2/40320 ];
+    patches.Cwtsr(1:2:ordCC,1:2)=(cumprod(ratio.^2- ...
+      (((1:(ordCC/2))'-1)).^2)./factorial(2*(1:(ordCC/2))'-1)./ratio);
+    patches.Cwtsr(2:2:ordCC,1:2)=(cumprod(ratio.^2- ...
+      (((1:(ordCC/2))'-1)).^2)./factorial(2*(1:(ordCC/2))'));
 end
-patches.Cwtsr = patches.Cwtsr(1:ordCC,:);
-% maybe should avoid this next implicit auto-replication
-patches.Cwtsl = (-1).^((1:ordCC)'-patches.alt).*patches.Cwtsr;
+patches.Cwtsl = repmat((-1).^((1:ordCC)'-patches.alt),[1,2]).*patches.Cwtsr;
 %{
 \end{matlab}
 
@@ -390,7 +383,7 @@ patches are of length \verb|ratio*DX+dx| and
 \begin{matlab}
 %}
 nSubP = nSubP(:)'; % force to be row vector
-if patches.EdgyInt==0, assert(prod(mod(nSubP,2))==1, ...
+if patches.EdgyInt==0, assert(mod(nSubP,2)==[1 1], ...
     'configPatches2: nSubP must be odd')
 end
 i0 = (nSubP(1)+1)/2;
