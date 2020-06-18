@@ -106,6 +106,15 @@ if patches.EdgyInt==0, ry = dy*(ny-1)/2/DY;
 %{
 \end{matlab}
 
+AJR perhaps prefer ensemble to be catered for in nVars.
+\begin{matlab}
+%}
+if ~isfield(patches,'EdgyEns')
+    patches.EdgyEns = 0;
+end
+%{
+\end{matlab}
+
 For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
 eventually cater for periodic, odd-mid-gap, even-mid-gap,

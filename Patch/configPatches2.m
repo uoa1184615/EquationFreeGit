@@ -175,7 +175,7 @@ values interior to the patches: set \(x\)~and \(y\)-edges to
 \verb|nan| to leave the gaps between patches. 
 \begin{matlab}
 %}
-figure(1), clf
+figure(1), clf, colormap(hsv)
 x = patches.x; y = patches.y;
 if 1, x([1 end],:) = nan; y([1 end],:) = nan; end
 %{
