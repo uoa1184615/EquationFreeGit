@@ -1,7 +1,7 @@
 % Provides an interface to time integrators for the dynamics
 % on patches  coupled across space. The system must be a
 % smooth lattice system such as PDE discretisations.
-% AJR, Nov 2017 -- Sep 2018
+% AJR, Nov 2017 -- Jun 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchSmooth1()}: interface to time integrators}
@@ -87,7 +87,7 @@ column vector.
 \begin{matlab}
 %}
 dudt=patches.fun(t,u,patches.x);
-dudt([1 end],:,:)=0;
+dudt([1 end],:,:,:)=0;
 dudt=reshape(dudt,[],1);
 %{
 \end{matlab}

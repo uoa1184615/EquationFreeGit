@@ -20,6 +20,8 @@ struct~\verb|patches|.
 %}
 function ut = heteroDiff(t,u,x)
   global patches
+%  if t==0, sizeu=size(u),   sizec=size(patches.c), end
+  u = squeeze(u);    % omit singleton dimensions
   dx = diff(x(2:3)); % space step
   i = 2:size(u,1)-1; % interior points in a patch
   ut = nan(size(u)); % preallocate output array
