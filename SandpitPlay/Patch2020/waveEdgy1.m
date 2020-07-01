@@ -86,7 +86,7 @@ only for periods~3 and~5. Then the heterogeneity is repeated
 %}
 clear all
 mPeriod = 5 % needs to be odd for a wave
-cHetr = exp(0.3*randn(mPeriod,1)); % 0.3 appears max reasonable
+cHetr = exp(0.1*randn(mPeriod,1)); % 0.3 appears max reasonable
 if mPeriod==3, 
     cHetr=cHetr*mean(cHetr.^2)/prod(cHetr) % normalise
 elseif mPeriod==5, 
@@ -105,17 +105,24 @@ ratio~\(0.25\) from one side to the other, with five
 micro-grid points in each patch, and quartic
 interpolation~(\(4\)) to provide the edge-values via the
 inter-patch coupling conditions. Setting
-\verb|EdgyInt| to true means the edge-values come
-from interpolating the opposite next-to-edge values of the
-patches (not the mid-patch values).  
+\verb|EdgyInt| to 
+\begin{itemize}
+\item true means the edge-values come from interpolating the
+opposite next-to-edge values of the patches (not the
+mid-patch values); whereas
+\item false  means the time integration appears OK, but the
+Jacobian is, correctly, not skew-symmetric for this case of
+interpolating mid-patch values.
 \begin{matlab}
 %}
 global patches
 nPatch = 9
 ratio = 0.25
-nSubP = nPeriodsPatch*mPeriod+2
+EdgyInt=true 
+nPeriodsPatch = (2-EdgyInt)*nPeriodsPatch;
+nSubP = nPeriodsPatch*mPeriod+1+EdgyInt
 configPatches1(@waveFirst,[-pi pi],nan,nPatch ...
-    ,4,ratio,nSubP,'EdgyInt',true);
+    ,4,ratio,nSubP,'EdgyInt',EdgyInt); 
 %{
 \end{matlab}
 
@@ -125,7 +132,7 @@ fast, microscale waves.
 \begin{matlab}
 %}
 patches.c=[repmat(cHetr,nPeriodsPatch,1);cHetr(1)];
-patches.nu=0.001;
+patches.nu=0.003;
 %{
 \end{matlab}
 
@@ -135,14 +142,15 @@ sine wave perturbed by significant random microscale noise,
 via~\verb|randn|.
 \begin{matlab}
 %}
-u0 = sin(patches.x)+0.1*randn(nSubP,nPatch);
+xs=squeeze(patches.x);
+u0 = -sin(xs)+0.1*randn(nSubP,nPatch);
 %{
 \end{matlab}
 Integrate using standard stiff integrators.
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode15s(@patchSmooth1, [0 3.5], u0(:));
+    [ts,us] = ode23(@patchSmooth1, [0 3.5], u0(:));
 else % octave version
     [ts,us] = odeOcts(@patchSmooth1, [0 0.5], u0(:));
 end
@@ -156,11 +164,11 @@ interpolate with \verb|patchEdgeInt1| to get edge values,
 pad with \verb|nan|s, and reshape again.
 \begin{matlab}
 %}
-xs = patches.x;  xs(end+1,:) = nan;
-us = patchEdgeInt1( permute( reshape(us,length(ts) ...
-     ,size(patches.x,1),size(patches.x,2)) ,[2 3 1]) );
-us(end+1,:,:) = nan;
-us=reshape(us,[],length(ts));
+xs(end+1,:) = nan;
+us = patchEdgeInt1( permute( reshape(us ...
+     ,length(ts),nSubP,nPatch) ,[2 1 3]) );
+us(end+1,:) = nan;
+us=reshape(permute(squeeze(us),[1 3 2]),[],length(ts));
 %{
 \end{matlab}
 
@@ -171,11 +179,11 @@ lattice.
 \begin{matlab}
 %}
 [~,j]=min(abs(ts-linspace(ts(1),ts(end),50)));
-figure(2),clf
+figure(1),clf
 mesh(ts(j),xs(:),us(:,j)),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-print('-depsc2',['waveEdgyU' num2str(2)])
+%print('-depsc2',['waveEdgyU' num2str(2)])
 %{
 \end{matlab}
 
@@ -188,13 +196,13 @@ explore the ideal case of the wave
 system~\eqref{eq:waveEdgy1}.
 \begin{matlab}
 %}
-ratio=0.03
+ratio=0.01
 nPatch=19
 leadingFreqs=[];
 for ord=0:2:6
 ordInterp=ord
 configPatches1(@waveFirst,[-pi pi],nan,nPatch ...
-    ,ord,ratio,nSubP,'EdgyInt',true);
+    ,ord,ratio,nSubP,'EdgyInt',EdgyInt);
 patches.nu=0;
 %{
 \end{matlab}

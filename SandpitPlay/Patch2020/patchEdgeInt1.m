@@ -31,18 +31,20 @@ global patches
 \end{matlab}
 \paragraph{Input}
 \begin{itemize}
-\item \verb|u| is a vector (or indeed any dim array) of length \(\verb|nSubP|\cdot
-\verb|nVars|\cdot \verb|nEnsem|\cdot \verb|nPatch|\) where there are
-\verb|nVars|\cdot \verb|nEnsem| field values at each of the points in the
-\(\verb|nSubP|\times \verb|nPatch|\) grid.
+\item \verb|u| is a vector (or indeed any dim array) of
+length \(\verb|nSubP|\cdot \verb|nVars|\cdot
+\verb|nEnsem|\cdot \verb|nPatch|\) where there are
+\verb|nVars|\cdot \verb|nEnsem| field values at each of the
+points in the \(\verb|nSubP|\times \verb|nPatch|\) grid.
 
 \item \verb|patches| a struct largely set by
 \verb|configPatches1()|, and which includes the following.
 \begin{itemize}
-\item \verb|.x| is \(\verb|nSubP|\times \verb|nPatch|\)
-array of the spatial locations~\(x_{ij}\) of the microscale
-grid points in every patch. Currently it \emph{must} be an
-equi-spaced lattice on both macro- and microscales.
+\item \verb|.x| is \(\verb|nSubP| \times1 \times1 \times
+\verb|nPatch|\) array of the spatial locations~\(x_{ij}\) of
+the microscale grid points in every patch. Currently it
+\emph{must} be an equi-spaced lattice on both macro- and
+microscales.
 
 \item \verb|.ordCC| is order of interpolation integer~\(\geq
 -1\).
@@ -62,7 +64,9 @@ values (often preserves symmetry).
 
 \paragraph{Output}
 \begin{itemize}
-\item \verb|u| is \(\verb|nSubP| \times \verb|nVars| \times \verb|nEnsem| \times \verb|nPatch|\) 4D array of the fields with edge values set by interpolation.
+\item \verb|u| is \(\verb|nSubP| \times \verb|nVars| \times
+\verb|nEnsem| \times \verb|nPatch|\) 4D array of the fields
+with edge values set by interpolation.
 \end{itemize}
 
 
@@ -77,7 +81,7 @@ Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
 %}
-[nSubP,nPatch] = size(patches.x);
+[nSubP,~,~,nPatch] = size(patches.x);
 nEnsem = patches.nEnsem;
 nVars = round(numel(u)/numel(patches.x)/nEnsem);
 assert(numel(u)==nSubP*nVars*nEnsem*nPatch ...
@@ -89,8 +93,8 @@ Compute lattice sizes from inside the patches as the edge
 values may be \nan{}s, etc.
 \begin{matlab}
 %}
-dx = patches.x(3,1)-patches.x(2,1);
-DX = patches.x(2,2)-patches.x(2,1);
+dx = patches.x(3,1,1,1)-patches.x(2,1,1,1);
+DX = patches.x(2,1,1,2)-patches.x(2,1,1,1);
 %{
 \end{matlab}
 If the user has not defined the patch core, then we assume
@@ -101,7 +105,7 @@ reduced, as described by \cite{Bunder2013b}.
 \begin{matlab}
 %}
 if ~patches.EdgyInt
-     r = dx*(nSubP-1)/2/DX*(nSubP - patches.nCore)/(nSubP - 1);
+     r = dx*(nSubP-1)/2/DX*(nSubP-patches.nCore)/(nSubP-1);
 else r = dx*(nSubP-2)/DX;
 end
 %{
@@ -110,7 +114,7 @@ end
 For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
 eventually cater for periodic, odd-mid-gap, even-mid-gap,
-even-mid-patch, Dirichlet, Neumann etc. These index vectors
+even-mid-patch, Dirichlet, Neumann, etc. These index vectors
 point to patches and their two immediate neighbours.
 \begin{matlab}
 %}
@@ -133,19 +137,17 @@ the domain is macro-periodic.
 \begin{matlab}
 %}
 if patches.ordCC>0 % then non-spectral interpolation
-  if patches.nEnsem>1
-    uCore = sum(mean(u((i0-c):(i0+c),:,:,j),3),1)';
-    dmu = zeros(patches.ordCC,nPatch);
-  elseif patches.EdgyInt % next-to-edge values as double nVars, left first
-    uCore = reshape(shiftdim(u([2 end-1],:,:,j),1),nPatch,[]);
-    dmu = zeros(patches.ordCC,nPatch,2*nVars);
-  else 
-    uCore = reshape(sum(u((i0-c):(i0+c),:,:,j),1),nPatch,nVars);
-    dmu = zeros(patches.ordCC,nPatch,nVars);
+  if patches.EdgyInt % next-to-edge as double nVars, interleaved
+    uCore = reshape(u([2 end-1],:,:,j),2*nVars,nEnsem,nPatch);
+    dmu = zeros(patches.ordCC,2*nVars,nEnsem,nPatch);
+  else % not yet checked ??
+    uCore = reshape(sum(u((i0-c):(i0+c),:,:,j),1),nVars,nEnsem,nPatch);
+    sizeUCore145=size(uCore) % for checking jul 2020
+    dmu = zeros(patches.ordCC,nVars,nEnsem,nPatch);
   end;
   if patches.alt % use only odd numbered neighbours
-    dmu(1,:,:) = (uCore(:,:,jp)+uCore(:,:,jm))/2; % \mu
-    dmu(2,:,:) = (uCore(:,:,jp)-uCore(:,:,jm)); % \delta
+    dmu(1,:,:,j) = (uCore(:,:,jp)+uCore(:,:,jm))/2; % \mu
+    dmu(2,:,:,j) = (uCore(:,:,jp)-uCore(:,:,jm)); % \delta
     jp = jp(jp); jm = jm(jm); % increase shifts to \pm2
   else % standard
     dmu(1,:,:,j) = (uCore(:,:,jp)-uCore(:,:,jm))/2; % \mu\delta
@@ -159,7 +161,7 @@ in parallel).
 \begin{matlab}
 %}
   for k = 3:patches.ordCC
-    dmu(k,:,:) = dmu(k-2,:,:,jp)-2*dmu(k-2,:,:,j)+dmu(k-2,:,:,jm);
+    dmu(k,:,:,:) = dmu(k-2,:,:,jp)-2*dmu(k-2,:,:,j)+dmu(k-2,:,:,jm);
   end
 %{
 \end{matlab}
@@ -168,47 +170,29 @@ each patch \cite[]{Roberts06d, Bunder2013b}, using weights
 computed in \verb|configPatches1()|. Here interpolate to
 specified order.
 
-In this first case of ensemble averaging, interpolate each
-in the ensemble.
-\begin{matlab}
-%}
-  if patches.nEnsem>1      
-    u(nSubP,:,:,j) = repmat(uCore(j)'*(1-patches.alt) ...      
-      +sum(bsxfun(@times,patches.Cwtsr,dmu)),[1,1,nVars]) ...
-      -sum(u((nSubP-patches.nCore+1):(nSubP-1),:,:),1);
-    u(1,:,:,j) = repmat(uCore(j)'*(1-patches.alt) ...      
-      +sum(bsxfun(@times,patches.Cwtsl,dmu)),[1,1,nVars]) ...
-      -sum(u(2:patches.nCore,:,:),1);
-%{
-\end{matlab}
-The second case is where next-to-edge values interpolate to
-the opposite edge-values. When we have an ensemble of configurations,
-different configurations might be coupled to each other, as specified by 
+For the case point values interpolate to point edge-values.
+When we have an ensemble of configurations, different
+realisations are coupled to each other as specified by
 \verb|patches.le| and \verb|patches.ri|.
 \begin{matlab}
 %}
-  elseif patches.EdgyInt
-     if patches.nEnsem>1
-        u(nSubP,:,:,j) = shiftdim(uCore(j,patches.le),-1)*(1-patches.alt) ...
-          +sum(bsxfun(@times,patches.Cwtsr,dmu(:,:,patches.le)));
-        u(  1  ,:,:,j) = shiftdim(uCore(j,patches.ri+nVars),-1)*(1-patches.alt) ...      
-          +sum(bsxfun(@times,patches.Cwtsl,dmu(:,:,patches.ri+nVars)));  
-     else
-        u(nSubP,:,:,j) = shiftdim(uCore(j,1:nVars),-1)*(1-patches.alt) ...
-          +sum(bsxfun(@times,patches.Cwtsr,dmu(:,:,1:nVars)));
-        u(  1  ,:,:,j) = shiftdim(uCore(j,(nVars+1):(2*nVars)),-1)*(1-patches.alt) ...      
-          +sum(bsxfun(@times,patches.Cwtsl,dmu(:,:,(nVars+1):(2*nVars))));
-     end
-     
+  if patches.nCore==1
+        u(nSubP,:,patches.ri,j) ...
+        = shiftdim(uCore(1:2:end,:,j),-1)*(1-patches.alt) ...
+          +sum(bsxfun(@times,patches.Cwtsr,dmu(:,1:2:end,:,j)));
+        u(  1  ,:,patches.le,j) ...
+        = shiftdim(uCore(2:2:end,:,j),-1)*(1-patches.alt) ...      
+          +sum(bsxfun(@times,patches.Cwtsl,dmu(:,2:2:end,:,j)));
 %{
 \end{matlab}
-Thirdly, the original, the core (one or more) of each patch
-interpolates to the edge action regions. When more than one
-in the core, the edge is set depending upon near edge values
-so the average near the edge is correct.
+For a non-point core then more needs doing: the core (one or
+more) of each patch interpolates to the edge action regions.
+When more than one in the core, the edge is set depending
+upon near edge values so the average near the edge is
+correct.
 \begin{matlab}
 %}
-  else
+  else % not yet considered, jul 2020 ??
     u(nSubP,:,:,j) = uCore(:,:,j)*(1-patches.alt) ...
       + reshape(-sum(u((nSubP-patches.nCore+1):(nSubP-1),:,:,j),1) ...
       +sum(bsxfun(@times,patches.Cwtsr,dmu)),nPatch,nVars);

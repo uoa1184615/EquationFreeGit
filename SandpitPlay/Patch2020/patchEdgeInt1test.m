@@ -1,6 +1,6 @@
 % Test the spectral interpolation of patchEdgeInt1()
-% All tests passed.  But changing in 2020
-% AJR, 26 Sep 2018 -- Jun 2020
+% All tests passed in 2019.  But changing in 2020
+% AJR, 26 Sep 2018 -- 1 July 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt1test}: test the spectral interpolation}
@@ -20,15 +20,18 @@ i0=(nSubP+1)/2; % centre-patch index
 
 \paragraph{Test standard spectral interpolation}
 Test over various numbers of patches, random domain lengths
-and random ratios.
+and random ratios.  Say do three realisations for each
+number of patches.
 \begin{matlab}
 %}
-for nPatch=5:10
+nReal=3 
+for nPatch=repmat(5:10,1,nReal) 
 nPatch=nPatch
 Len=10*rand
 ratio=0.5*rand
 configPatches1(@sin,[0,Len],nan,nPatch,0,ratio,nSubP ...
     ,'EdgyInt',rand<0.5); % random Edgy or not
+if mod(nPatch,2)==0, disp('Avoiding highest wavenumber'), end
 kMax=floor((nPatch-1)/2);
 if patches.EdgyInt, i0=[2 nSubP-1], else i0=(nSubP+1)/2, end
 %{
@@ -94,18 +97,18 @@ disp('Passed standard spectral interpolation tests')
 
 \paragraph{Now test spectral interpolation on staggered grid}
 Must have even number of patches for a staggered grid.
-Currently works for false EdgyInt?? 
 \begin{matlab}
 %}
 disp('*** spectral interpolation on staggered grid')
-for nPatch=6:2:20
+for nPatch=repmat(6:2:20,1,nReal)
 nPatch=nPatch
 ratio=0.5*rand
 nSubP=7; % of form 4*N-1
 Len=10*rand
 configPatches1(@simpleWavepde,[0,Len],nan,nPatch,-1,ratio,nSubP ...
-    ,'EdgyInt',true);
-kMax=floor((nPatch/2-1)/2)
+    ,'EdgyInt',rand<0.5);
+if mod(nPatch,4)==0, disp('Avoiding highest wavenumber'), end
+kMax=floor((nPatch/2-1)/2) 
 if patches.EdgyInt, i0=[2 nSubP-1], else i0=(nSubP+1)/2, end%??
 %{
 \end{matlab}
@@ -135,7 +138,6 @@ for k=-kMax:kMax
     error(['staggered: failed single sys interpolation k=' num2str(k)])
   end
 end
-disp('staggered: passed single sys interp')
 %{
 \end{matlab}
 
@@ -161,7 +163,7 @@ fprintf('Staggered: Two field-pairs test.\n')
 x0=patches.x((nSubP+1)/2,1);
 patches.x=patches.x-x0;
 oddP=1:2:nPatch; evnP=2:2:nPatch;
-for k=1:nPatch/4
+for k=1:kMax
   U0=nan(nSubP,1,1,nPatch); V0=U0;
   U0(hPts)=rand*sin(k*patches.x(hPts)*2*pi/Len);
   U0(uPts)=rand*sin(k*patches.x(uPts)*2*pi/Len);

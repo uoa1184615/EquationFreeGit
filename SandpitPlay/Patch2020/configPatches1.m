@@ -60,24 +60,32 @@ lattice points in each patch. Must be odd so that there is a
 central lattice point.
 
 \item \verb|'nEdge'| (not yet implemented), \emph{optional},
-for each patch, the number of edge values set by
+default=1, for each patch, the number of edge values set by
 interpolation at the edge regions of each patch.  May be
 omitted.  The default is one (suitable for microscale
 lattices with only nearest neighbour interactions).
 
 \item \verb|'EdgyInt'|, true/false, \emph{optional},
-if true then interpolate to left\slash right edge-values 
-from right\slash left next-to-edge values.  So far only 
-implemented for spectral interpolation, \(\verb|ordCC|=0\).
+default=false, if true then interpolate to left\slash right
+edge-values from right\slash left next-to-edge values.  So
+far only implemented for spectral interpolation,
+\(\verb|ordCC|=0\).
 
 \item \verb|'nEnsem'|,  \emph{optional-experimental},
 default one, but if more, then an ensemble over this
 number of realisations.
 
-%Do we want two sorts of ensemble: one for homogenising periodicity? one for just averaging?? Possibly not as one for just averaging available by choosing nEnsem to divide into size of patch.
+%Do we want two sorts of ensemble: one for homogenising
+%periodicity? one for just averaging?? Possibly not as one
+%for just averaging available by choosing nEnsem to divide
+%into size of patch.
 
-\item \verb|'nCore'|,  \emph{optional-experimental},
-default one, but if more, and only for non-EdgyInt, then interpolates from an average over the core of a patch, a core of size ??.  Then edge values are set according to interpolation of the averages?? or so that average at edges is the interpolant??
+\item \verb|'nCore'|,  \emph{optional-experimental}, default
+one, but if more, and only for non-EdgyInt, then
+interpolates from an average over the core of a patch, a
+core of size ??.  Then edge values are set according to
+interpolation of the averages?? or so that average at edges
+is the interpolant??
 
 \end{itemize}
 
@@ -254,7 +262,7 @@ coupling is \verb|ordCC| of~\(0\) and~\(-1\).
 \begin{matlab}
 %}
 assert((ordCC>=-1) & (floor(ordCC)==ordCC), ...
-    'ordCC out of allowed range integer>-2')
+    'ordCC out of allowed range integer>=-1')
 %{
 \end{matlab}
 For odd~\verb|ordCC|, interpolate based upon odd
@@ -325,10 +333,12 @@ patches.x=reshape(patches.x,nSubP,1,1,nPatch);
 \end{matlab}
 
 \paragraph{Set ensemble inter-patch communication}
-For \verb|EdgyInt| or centre interpolation respectively,
-the right-edge/centre realisations \verb|1:nEnsem| are to interpolate to left-edge~\verb|le|, and 
-the left-edge/centre realisations \verb|1:nEnsem| are to interpolate to~\verb|re|.
-\verb|re| and \verb|li| are transposes or each other as \verb|re(li)=le(ri)| are both \verb|1:nEnsem|.
+For \verb|EdgyInt| or centre interpolation respectively, the
+right-edge/centre realisations \verb|1:nEnsem| are to
+interpolate to left-edge~\verb|le|, and the left-edge/centre
+realisations \verb|1:nEnsem| are to interpolate
+to~\verb|re|. \verb|re| and \verb|li| are transposes or each
+other as \verb|re(li)=le(ri)| are both \verb|1:nEnsem|.
 \begin{matlab}
 %}
 nE=patches.nEnsem;

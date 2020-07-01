@@ -20,16 +20,20 @@ struct~\verb|patches|.
 %}
 function ut = heteroDiff(t,u,x)
   global patches
-%  if t==0, sizeu=size(u),   sizec=size(patches.c), end
-  u = squeeze(u);    % omit singleton dimensions
-  dx = diff(x(2:3)); % space step
-  i = 2:size(u,1)-1; % interior points in a patch
-  ut = nan(size(u)); % preallocate output array
-  ut(i,:) = diff(patches.c.*diff(u))/dx^2; 
-  % if set, include heterogeneous Burgers' advection 
-  if isfield(patches,'b') % check for advection coeffs
-    buu = patches.b.*u.^2;
-    ut(i,:) = ut(i,:)-(buu(i+1,:)-buu(i-1,:))/(dx*2);   
+  dx = diff(x(2:3));   % space step
+  i = 2:size(u,1)-1;   % interior points in a patch
+  if patches.nEnsem==1 % simpler case  
+    u = squeeze(u);    % omit singleton dimensions
+    ut = nan(size(u)); % preallocate output array
+    ut(i,:) = diff(patches.c.*diff(u))/dx^2; 
+    % if set, include heterogeneous Burgers' advection 
+    if isfield(patches,'b') % check for advection coeffs
+      buu = patches.b.*u.^2;
+      ut(i,:) = ut(i,:)-(buu(i+1,:)-buu(i-1,:))/(dx*2);   
+    end
+  else % nEnsem>1 so keep more dimensions
+    ut = nan(size(u)); % preallocate output array
+    ut(i,:,:,:) = diff(patches.c.*diff(u))/dx^2; 
   end
 end% function
 %{
