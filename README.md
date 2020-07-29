@@ -1,11 +1,26 @@
 <h3>Equation-Free function toolbox for Matlab/Octave</h3>
 
-<b>Users:</b> Place this toolbox's folder in a path searched by
-Matlab/Octave.  The document <tt>eqnFreeUserMan-newest.pdf</tt>
-describes how to use the main functions of interest to you.
+<b>Users:</b> <a
+href="https://github.com/uoa1184615/EquationFreeGit">
+Download the toolbox via Github</a> and place the toolbox's
+folder in a path searched by Matlab/Octave. 
+
+<p>This <em>equation-free toolbox</em> empowers the
+computer-assisted analysis of complex, multiscale systems.
+Its aim is to enable you to use microscopic simulators to
+perform system level tasks and analysis, because microscale
+simulations are often the best available description of a
+system. The methodology bypasses the derivation of
+macroscopic evolution equations by computing only short
+bursts of of the microscale simulator, and often only
+computing on small patches of the spatial domain. This suite
+of functions empowers users to start implementing such
+methods in their own applications. The document
+<tt>eqnFreeUserMan-newest.pdf</tt> describes how to use the
+main functions of interest to you.
 
 <p><a href="https://au.mathworks.com/matlabcentral/fileexchange/73632-equation-free-toolbox"> 
-View Equation-Free Toolbox on File Exchange</a>
+View Equation-Free Toolbox on Matlab's File Exchange</a>
 
 <p><b>Contributors:</b> This project aims to collectively develop a
 Matlab/Octave toolbox of <em>equation-free</em> algorithms.
