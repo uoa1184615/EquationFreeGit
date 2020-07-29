@@ -199,12 +199,11 @@ legend('time = 0.00','Location','north')
 xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
 %{
 \end{matlab}
-Save the initial condition to file for
+Save the initial condition to graphic file for
 \cref{fig:configPatches2ic}.
 \begin{matlab}
 %}
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2',['Figs/' mfilename 'ic'])
+ourcf2eps([mfilename 'ic'])
 %{
 \end{matlab}
 \begin{figure}
@@ -245,7 +244,7 @@ for i = 1:length(ts)
   legend(['time = ' num2str(ts(i),'%4.2f')])
   pause(0.1)
 end
-%print('-depsc2',['Figs/' mfilename 't3')
+ourcf2eps([mfilename 't3'])
 %{
 \end{matlab}
 \begin{figure}
@@ -436,7 +435,7 @@ patches.y = reshape(patches.y,1,nSubP,1,1,1,nPatch);
 %{
 \end{matlab}
 
-%\paragraph{Set ensemble inter-patch communication}
+\paragraph{Set ensemble inter-patch communication}
 %For \verb|EdgyInt| or centre interpolation respectively, the
 %right-edge/centre realisations \verb|1:nEnsem| are to
 %interpolate to left-edge~\verb|le|, and the left-edge/centre
@@ -451,7 +450,7 @@ patches.y = reshape(patches.y,1,nSubP,1,1,1,nPatch);
 %of microscale heterogeneity (see \verb|homoDiffEdgy1| of
 %\cref{sec:homoDiffEdgy1}).
 %\begin{matlab}
-%%}
+%}
 %nE=patches.nEnsem;
 %if patches.EdgyInt, nP=nSubP-2;
 %   else nP=(nSubP-1)/2; end

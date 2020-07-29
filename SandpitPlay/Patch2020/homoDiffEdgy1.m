@@ -197,9 +197,7 @@ for p=1:2
   mesh(ts(j),xs(:),us(:,j)) 
   view(60,40), colormap(0.8*hsv)
   xlabel('time t'), ylabel('space x'), zlabel('u(x,t)') 
-  set(gcf,'PaperUnits','centimeters' ...
-     ,'PaperPosition',[0 0 14 10],'renderer','Painters')
-%  print('-depsc2',[mfilename 'U' num2str(p)])
+  ourcf2eps([mfilename 'U' num2str(p)])
 end
 pause(3)
 %{

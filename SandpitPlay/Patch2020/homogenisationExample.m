@@ -108,8 +108,7 @@ figure(1),clf
 xs = patches.x;  xs([1 end],:) = nan;
 mesh(ts,xs(:),ucts'),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2',[mfilename 'CtsU'])
+ourcf2eps([mfilename 'CtsU'])
 %{
 \end{matlab}
 
@@ -171,8 +170,7 @@ figure(2),clf
 plot(xs(:),us','.')
 ylabel('u(x,t)'), xlabel('space x')
 legend(num2str(ts',3))
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2',[mfilename 'U'])
+ourcf2eps([mfilename 'U'])
 %{
 \end{matlab}
 Also plot a surface detailing the microscale bursts as shown
@@ -193,8 +191,7 @@ for k = 1:2, subplot(2,2,k)
   ylabel('x'), xlabel('t'), zlabel('u(x,t)')
   axis tight, view(126-4*k,45)
 end
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2',[mfilename 'Micro'])
+ourcf2eps([mfilename 'Micro'])
 %{
 \end{matlab}
 End of this example script.

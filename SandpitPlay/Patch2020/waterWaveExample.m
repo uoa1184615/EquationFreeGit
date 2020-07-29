@@ -190,8 +190,7 @@ Plot the simulation.
 Optionally save the plot to file.
 \begin{matlab}
 %}
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2',[mfilename num2str(k) 'CtsUH'])
+ourcf2eps([mfilename num2str(k) 'CtsUH'])
 %{
 \end{matlab}
 

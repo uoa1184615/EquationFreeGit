@@ -184,8 +184,7 @@ lattice.
 figure(1),clf
 mesh(ts(j),xs(:),us(:,j)),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2',[mfilename 'U' num2str(2)])
+ourcf2eps([mfilename 'U' num2str(2)])
 %{
 \end{matlab}
 

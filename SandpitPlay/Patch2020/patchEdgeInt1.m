@@ -40,6 +40,7 @@ points in the \(\verb|nSubP| \times \verb|nPatch|\) grid.
 \item \verb|patches| a struct largely set by
 \verb|configPatches1()|, and which includes the following.
 \begin{itemize}
+
 \item \verb|.x| is \(\verb|nSubP| \times1 \times1 \times
 \verb|nPatch|\) array of the spatial locations~\(x_{ij}\) of
 the microscale grid points in every patch. Currently it
@@ -52,11 +53,12 @@ microscales.
 \item \verb|.alt| in \(\{0,1\}\) is one for staggered grid
 (alternating) interpolation.
 
-\item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling.
+\item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
+coefficients for finite width interpolation.
 
-\item \verb|.EdgyInt| true/false is true for
-interpolating patch-edge values from opposite next-to-edge
-values (often preserves symmetry).
+\item \verb|.EdgyInt| true/false is true for interpolating
+patch-edge values from opposite next-to-edge values (often
+preserves symmetry).
 
 \item \verb|.nEnsem| the number of realisations in the ensemble.
 \end{itemize}
@@ -84,7 +86,7 @@ reshape indicates~\verb|u| has the wrong size.
 [nSubP,~,~,nPatch] = size(patches.x);
 nEnsem = patches.nEnsem;
 nVars = round(numel(u)/numel(patches.x)/nEnsem);
-assert(numel(u)==nSubP*nVars*nEnsem*nPatch ...
+assert(numel(u) == nSubP*nVars*nEnsem*nPatch ...
   ,'patchEdgeInt1: input u has wrong size for parameters')
 u = reshape(u,nSubP,nVars,nEnsem,nPatch);
 %{
@@ -114,7 +116,7 @@ end
 For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
 eventually cater for periodic, odd-mid-gap, even-mid-gap,
-even-mid-patch, Dirichlet, Neumann, etc. These index vectors
+even-mid-patch, Dirichlet, Neumann, ??. These index vectors
 point to patches and their two immediate neighbours.
 \begin{matlab}
 %}

@@ -180,8 +180,7 @@ for p=1:2
   figure(p),clf
   mesh(ts(j),xs(:),squeeze(us(:,1,j))),  view(60,40)
   xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-  set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%  print('-depsc2',[mfilename 'U' num2str(p)])
+  ourcf2eps([mfilename 'U' num2str(p)])
 end
 %{
 \end{matlab}
