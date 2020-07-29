@@ -1,0 +1,6 @@
+% 2D stuff
+\input{../Patch/configPatches2.m}
+\input{../Patch/patchSmooth2.m}
+\input{../Patch/patchEdgeInt2.m}
+\begin{devMan}
+\input{../Patch/wave2D.m}

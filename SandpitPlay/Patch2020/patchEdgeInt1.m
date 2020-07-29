@@ -17,12 +17,12 @@ symmetry). This function is primarily used by
 \verb|patchSmooth1()| but is also useful for user graphics.
 A spatially discrete system could be integrated in time via
 the patch or gap-tooth scheme \cite[]{Roberts06d}. When
-using core averages, assumes they are in some sense
-\emph{smooth} so that these averages are sensible macroscale
-variables: then patch edge values are determined by
-macroscale interpolation of the core averages
-\citep{Bunder2013b}. Communicates patch-design variables via
-the global struct~\verb|patches|.
+using core averages (not yet implemented in this version??),
+assumes they are in some sense \emph{smooth} so that these
+averages are sensible macroscale variables: then patch edge
+values are determined by macroscale interpolation of the
+core averages \citep{Bunder2013b}. Communicates patch-design
+variables via the global struct~\verb|patches|.
 \begin{matlab}
 %}
 function u=patchEdgeInt1(u)
@@ -32,10 +32,10 @@ global patches
 \paragraph{Input}
 \begin{itemize}
 \item \verb|u| is a vector (or indeed any dim array) of
-length \(\verb|nSubP|\cdot \verb|nVars|\cdot
+length \(\verb|nSubP| \cdot \verb|nVars|\cdot
 \verb|nEnsem|\cdot \verb|nPatch|\) where there are
 \verb|nVars|\cdot \verb|nEnsem| field values at each of the
-points in the \(\verb|nSubP|\times \verb|nPatch|\) grid.
+points in the \(\verb|nSubP| \times \verb|nPatch|\) grid.
 
 \item \verb|patches| a struct largely set by
 \verb|configPatches1()|, and which includes the following.
@@ -140,9 +140,8 @@ if patches.ordCC>0 % then non-spectral interpolation
   if patches.EdgyInt % next-to-edge as double nVars, interleaved
     uCore = reshape(u([2 end-1],:,:,j),2*nVars,nEnsem,nPatch);
     dmu = zeros(patches.ordCC,2*nVars,nEnsem,nPatch);
-  else % not yet checked ??
+  else % interpolate mid-patch values
     uCore = reshape(sum(u((i0-c):(i0+c),:,:,j),1),nVars,nEnsem,nPatch);
-    sizeUCore145=size(uCore) % for checking jul 2020
     dmu = zeros(patches.ordCC,nVars,nEnsem,nPatch);
   end;
   if patches.alt % use only odd numbered neighbours
@@ -177,15 +176,24 @@ realisations are coupled to each other as specified by
 \begin{matlab}
 %}
   if patches.nCore==1
+     if patches.EdgyInt
         u(nSubP,:,patches.ri,j) ...
         = shiftdim(uCore(1:2:end,:,j),-1)*(1-patches.alt) ...
           +sum(bsxfun(@times,patches.Cwtsr,dmu(:,1:2:end,:,j)));
         u(  1  ,:,patches.le,j) ...
         = shiftdim(uCore(2:2:end,:,j),-1)*(1-patches.alt) ...      
           +sum(bsxfun(@times,patches.Cwtsl,dmu(:,2:2:end,:,j)));
+     else % mid-patch interpolation
+        u(nSubP,:,patches.ri,j) ...
+        = shiftdim(uCore(:,:,j),-1)*(1-patches.alt) ...
+          +sum(bsxfun(@times,patches.Cwtsr,dmu(:,:,:,j)));
+        u(  1  ,:,patches.le,j) ...
+        = shiftdim(uCore(:,:,j),-1)*(1-patches.alt) ...      
+          +sum(bsxfun(@times,patches.Cwtsl,dmu(:,:,:,j)));
+     end
 %{
 \end{matlab}
-For a non-point core then more needs doing: the core (one or
+For a non-trivial core then more needs doing: the core (one or
 more) of each patch interpolates to the edge action regions.
 When more than one in the core, the edge is set depending
 upon near edge values so the average near the edge is

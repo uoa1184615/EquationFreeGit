@@ -1,6 +1,6 @@
 % Creates a data struct of the design of patches for later
 % use by the patch functions such as smoothPatch1().  
-% AJR, Nov 2017 -- Jun 2020
+% AJR, Nov 2017 -- July 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches1()}: configures spatial patches in 1D}
@@ -18,14 +18,15 @@ example of its use.
 function configPatches1(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP ...
                        ,varargin)
 global patches
-disp('****** new configPatches1')
 %{
 \end{matlab}
+
 \paragraph{Input}
 If invoked with no input arguments, then executes an example
 of simulating Burgers' \pde---see \cref{sec:configPatches1eg}
 for the example code.
 \begin{itemize}
+
 \item \verb|fun| is the name of the user function,
 \verb|fun(t,u,x)|, that computes time derivatives (or
 time-steps) of quantities on the patches.
@@ -42,31 +43,33 @@ is assumed macro-periodic in the spatial domain.
 patches.
 
 \item \verb|ordCC|, must be~\(\geq -1\), is the `order' of
-interpolation across empty space of the macroscale mid-patch
+interpolation across empty space of the macroscale patch
 values to the edge of the patches for inter-patch coupling:
 where \verb|ordCC| of~\(0\) or~\(-1\) gives spectral
 interpolation; and \verb|ordCC| being odd is for staggered
 spatial grids.
 
-\item \verb|ratio| (real) is the ratio of the half-width of
-a patch to the spacing of the patch mid-points: so
-\(\verb|ratio|=\tfrac12\) means the patches abut;
+\item \verb|ratio| (real) is the ratio of (depending upon
+\verb|EdgyInt|) either the half-width or full-width of a
+patch to the spacing of the patch mid-points.  So either
+\(\verb|ratio|=\tfrac12\) means the patches abut and
 \(\verb|ratio|=1\) is overlapping patches as in holistic
-discretisation; and small~\verb|ratio| should greatly reduce
+discretisation, or \(\verb|ratio|=1\) means the patches
+abut.  Small~\verb|ratio| should greatly reduce
 computational time.
 
 \item \verb|nSubP| is the number of equi-spaced microscale
-lattice points in each patch. Must be odd so that there is a
-central lattice point.
+lattice points in each patch. If not using \verb|EdgyInt|,
+then must be odd so that there is a central lattice point.
 
 \item \verb|'nEdge'| (not yet implemented), \emph{optional},
 default=1, for each patch, the number of edge values set by
-interpolation at the edge regions of each patch.  May be
-omitted.  The default is one (suitable for microscale
-lattices with only nearest neighbour interactions).
+interpolation at the edge regions of each patch.  The
+default is one (suitable for microscale lattices with only
+nearest neighbour interactions).
 
 \item \verb|'EdgyInt'|, true/false, \emph{optional},
-default=false, if true then interpolate to left\slash right
+default=false.  If true, then interpolate to left\slash right
 edge-values from right\slash left next-to-edge values.  So
 far only implemented for spectral interpolation,
 \(\verb|ordCC|=0\).
@@ -109,9 +112,10 @@ the usual case of all neighbour coupling.
 interpolation onto the right and left edges (respectively)
 with patch:macroscale ratio as specified.
 
-\item \verb|.x| is \(\verb|nSubP|\times \verb|nPatch|\)
-array of the regular spatial locations~\(x_{ij}\) of the
-\(i\)th~microscale grid point in the \(j\)th~patch.  
+\item \verb|.x| (4D) is \(\verb|nSubP| \times1 \times1
+\times \verb|nPatch|\) array of the regular spatial
+locations~\(x_{ij}\) of the \(i\)th~microscale grid point in
+the \(j\)th~patch.  
 
 \item \verb|.nEdge| is, for each patch, the number of edge
 values set by interpolation at the edge regions of each
@@ -201,6 +205,9 @@ end%if no arguments
 \input{../Patch/odeOcts.m}
 
 
+
+
+
 \begin{devMan}
 
 \subsection{Parse input arguments and defaults}
@@ -222,33 +229,31 @@ parse(p,fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,varargin{:});
 %{
 \end{matlab}
 Set the optional parameters. 
-(Perhaps we could simply start with \verb|patches=p.Results| ?)
 \begin{matlab}
 %}
-%pResults=p.Results
 patches.nEdge = p.Results.nEdge;
 patches.EdgyInt = p.Results.EdgyInt;
 patches.nEnsem = p.Results.nEnsem;
 patches.nCore = p.Results.nCore;
 %{
 \end{matlab}
-
-
-
-
-
-\subsection{The code to make patches and interpolation}
-If not specified by a user, then set interpolation to
-compute one edge-value on each patch edge. Store in the
-struct~\verb|patches|.
+Check parameters.
 \begin{matlab}
 %}
 assert(patches.nEdge==1 ...
       ,'multi-edge-value interp not yet implemented')
 assert(2*patches.nEdge+1<=nSubP ...
       ,'too many edge values requested')
+if patches.nCore>1
+    warning('nCore>1 not yet tested in this version')
+    end
 %{
 \end{matlab}
+
+
+
+
+\subsection{The code to make patches and interpolation}
 First, store the pointer to the time derivative function in
 the struct.
 \begin{matlab}
@@ -256,6 +261,7 @@ the struct.
 patches.fun=fun;
 %{
 \end{matlab}
+
 Second, store the order of interpolation that is to provide
 the values for the inter-patch coupling conditions. Spectral
 coupling is \verb|ordCC| of~\(0\) and~\(-1\).
@@ -295,7 +301,7 @@ if patches.alt  % eqn (7) in \cite{Cao2014a}
     patches.Cwtsr(2:2:ordCC)=[ratio/2 ...
       cumprod((ratio^2-(1:2:(ordCC-2)).^2)/4)./ ...
       factorial(2*(1:(ordCC/2-1))+1)*ratio/2];
-else % 
+else % not staggered macro-grid
     patches.Cwtsr(1:2:ordCC)=(cumprod(ratio^2- ...
       (((1:(ordCC/2))-1)).^2)./factorial(2*(1:(ordCC/2))-1)/ratio);
     patches.Cwtsr(2:2:ordCC)=(cumprod(ratio^2- ...
@@ -304,6 +310,8 @@ end
 patches.Cwtsl=(-1).^((1:ordCC)'-patches.alt).*patches.Cwtsr;
 %{
 \end{matlab}
+
+
 Third, set the centre of the patches in a the macroscale
 grid of patches assuming periodic macroscale domain.
 \begin{matlab}
@@ -313,12 +321,12 @@ X=X(1:nPatch)+diff(X)/2;
 DX=X(2)-X(1);
 %{
 \end{matlab}
-Construct the microscale grid in each patch, assuming Dirichlet
-patch edges, and a half-patch length of
-\(\verb|ratio|\cdot\verb|DX|\), unless
+Construct the microscale grid in each patch, assuming
+Dirichlet patch edges, and a half-patch length of
+\(\verb|ratio| \cdot \verb|DX|\), unless
 \verb|patches.EdgyInt| is set in which case the patches are
-of length \verb|ratio*DX+dx|.
-Reshape the grid to be 4D to suit dimensions (micro,Vars,Ens,macro).
+of length \verb|ratio*DX+dx|. Reshape the grid to be 4D to
+suit dimensions (micro,Vars,Ens,macro).
 \begin{matlab}
 %}
 assert(patches.EdgyInt | mod(nSubP,2)==1, ...
@@ -327,8 +335,8 @@ i0=(nSubP+1)/2;
 if ~patches.EdgyInt, dx = ratio*DX/(i0-1);  
 else                 dx = ratio*DX/(nSubP-2);
 end
-patches.x=bsxfun(@plus,dx*(-i0+1:i0-1)',X); % micro-grid
-patches.x=reshape(patches.x,nSubP,1,1,nPatch);
+patches.x = dx*(-i0+1:i0-1)'+X; % micro-grid
+patches.x = reshape(patches.x,nSubP,1,1,nPatch);
 %{
 \end{matlab}
 
@@ -338,14 +346,21 @@ right-edge/centre realisations \verb|1:nEnsem| are to
 interpolate to left-edge~\verb|le|, and the left-edge/centre
 realisations \verb|1:nEnsem| are to interpolate
 to~\verb|re|. \verb|re| and \verb|li| are transposes or each
-other as \verb|re(li)=le(ri)| are both \verb|1:nEnsem|.
+other as \verb|re(li)=le(ri)| are both \verb|1:nEnsem|. One
+may use the statement
+\begin{verbatim}
+c=toeplitz(c(1:nSubP-1),c([1 nEnsem:-1:2]));
+\end{verbatim}
+to \emph{correspondingly} generates all phase shifted copies
+of microscale heterogeneity (see \verb|homoDiffEdgy1| of
+\cref{sec:homoDiffEdgy1}).
 \begin{matlab}
 %}
 nE=patches.nEnsem;
 if patches.EdgyInt, nP=nSubP-2;
    else nP=(nSubP-1)/2; end
-patches.le=mod((0:nE-1)+mod(nP,nE),nE)+1;
-patches.ri=mod((0:nE-1)-mod(nP,nE),nE)+1;
+patches.le=mod((0:nE-1)-mod(nP,nE),nE)+1;
+patches.ri=mod((0:nE-1)+mod(nP,nE),nE)+1;
 
 end% function
 %{

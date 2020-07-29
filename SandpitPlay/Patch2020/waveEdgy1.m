@@ -46,8 +46,10 @@ With dependent variables~\(u_i(t)\), simulate the microscale
 lattice, in terms of the centred difference~\(\delta\) and
 mean~\(\mu\), wave system
 \begin{align}
-\de t{u_{i}}&= -\frac1{2d}\left[ \delta(c_i\mu u_{i}) +\mu(c_i\delta u_i) \right]
-= -\frac1{2d}\left[ c_{i+\tfrac12}u_{i+1} -c_{i-\tfrac12}u_{i-1} \right].
+\de t{u_{i}}&= -\frac1{2d}\left[ \delta(c_i\mu u_{i})
++\mu(c_i\delta u_i) \right]
+= -\frac1{2d}\left[ c_{i+\tfrac12}u_{i+1}
+-c_{i-\tfrac12}u_{i-1} \right].
 \label{eq:waveEdgy1}
 \end{align}
 \cref{fig:waveEdgyU2} shows one patch simulation of this
@@ -183,7 +185,7 @@ figure(1),clf
 mesh(ts(j),xs(:),us(:,j)),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2',['waveEdgyU' num2str(2)])
+%print('-depsc2',[mfilename 'U' num2str(2)])
 %{
 \end{matlab}
 
@@ -281,6 +283,7 @@ display the spectra.
 \begin{matlab}
 %}
 end
+disp('     spectral    quadratic      quartic  sixth-order')
 leadingFreqs = leadingFreqs
 %{
 \end{matlab}

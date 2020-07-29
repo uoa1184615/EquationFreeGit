@@ -104,10 +104,10 @@ inter-patch coupling conditions. Setting
 from interpolating the opposite next-to-edge values of the
 patches (not the mid-patch values).  In this case we appear
 to need at least fourth order (quartic) interpolation to get
-reasonable decay rate for heterogeneous diffusion. When simulating an
-ensemble of configurations, \verb|nSubP| (the number of
-points in a patch) need not be dependent on the period of
-the heterogeneous diffusion.
+reasonable decay rate for heterogeneous diffusion. When
+simulating an ensemble of configurations, \verb|nSubP| (the
+number of points in a patch) need not be dependent on the
+period of the heterogeneous diffusion.
 \begin{matlab}
 %}
 global patches
@@ -122,12 +122,12 @@ configPatches1(@heteroDiff,[-pi pi],nan,nPatch ...
 \end{matlab}
 
 Replicate the heterogeneous coefficients across the width of
-each patch. For \verb|nEnsem>1| an ensemble of
-phase-shifted realisations are constructed.
+each patch. For \verb|nEnsem>1| an ensemble of phase-shifted
+realisations are constructed.
 \begin{matlab}
 %}
 cHetr=repmat(cHetr,nSubP,1); % copy excessively
-cHetr=flipud(toeplitz(cHetr(1:nSubP-1),cHetr([1 nEnsem:-1:2])))
+cHetr=toeplitz(cHetr(1:nSubP-1),cHetr([1 nEnsem:-1:2]))
 patches.c=reshape(cHetr,nSubP-1,1,nEnsem);
 %{
 \end{matlab}
@@ -158,8 +158,8 @@ We want to see the edge values of the patches, so we adjoin
 a row of \verb|nan|s in between patches. For the field
 values (which are rows in~\verb|us|) we need to reshape,
 permute, interpolate to get edge values, pad with
-\verb|nan|s, and reshape again. In the case of an ensemble of 
-phase-shifts, we plot the mean over the ensemble.
+\verb|nan|s, and reshape again. In the case of an ensemble
+of phase-shifts, we plot the mean over the ensemble.
 \begin{matlab}
 %}
 xs = squeeze(patches.x);  
@@ -197,9 +197,9 @@ for p=1:2
   mesh(ts(j),xs(:),us(:,j)) 
   view(60,40), colormap(0.8*hsv)
   xlabel('time t'), ylabel('space x'), zlabel('u(x,t)') 
-%  set(gcf,'PaperUnits','centimeters' ...
-%     ,'PaperPosition',[0 0 14 10],'renderer','Painters')
-%  print('-depsc2',['homoDiffEdgyU' num2str(p)])
+  set(gcf,'PaperUnits','centimeters' ...
+     ,'PaperPosition',[0 0 14 10],'renderer','Painters')
+%  print('-depsc2',[mfilename 'U' num2str(p)])
 end
 pause(3)
 %{
@@ -282,18 +282,23 @@ interpolation is effectively exact for the macroscale;
 quadratic interpolation is usually quantitatively in error;
 quartic interpolation appears to be the lowest order for
 reliable quantitative accuracy.
+
+The number of zero eigenvalues, \verb|nZeroEv|, indicates
+the number of decoupled systems in this patch configuration.
 \begin{matlab}
 %}
   [evecs,evals]=eig(Jac);
   eval=-sort(-diag(real(evals)));
-  nZeroEv=sum(eval(:)>-1e-5) % no. zero eigenvals = no. decoupled systems
+  nZeroEv=sum(eval(:)>-1e-5) 
   leadingEvals=[leadingEvals eval([1, (nZeroEv+1):2:(nZeroEv*nPatch+4)])];
 %{
 \end{matlab}
-End of the for-loop over orders of interpolation
+End of the for-loop over orders of interpolation, and output
+the tables of eigenvalues.
 \begin{matlab}
 %}
 end
+disp('     spectral    quadratic      quartic  sixth-order eighth-order')
 leadingEvals=leadingEvals
 %{
 \end{matlab}
