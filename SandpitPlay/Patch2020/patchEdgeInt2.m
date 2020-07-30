@@ -150,18 +150,18 @@ if patches.ordCC>0 % then non-spectral interpolation
   if patches.EdgyInt % next-to-edge values as double nVars, left first    
     uCorex = u([2 nx-1],2:(ny-1),:,:,I,J);
     uCorey = u(2:(nx-1),[2 ny-1],:,:,I,J);
-    dmux = zeros([patches.ordCC,size(uCorex)]);      
-    dmuy = zeros([patches.ordCC,size(uCorey)]);   
+    dmux = zeros([patches.ordCC,size(uCorex)]); % 7D
+    dmuy = zeros([patches.ordCC,size(uCorey)]); % 7D
   else 
     error('non-spectral interpolation only available for next-to-edge coupling')
   end;
   if patches.alt % use only odd numbered neighbours
     error('non-spectral interpolation not yet implemented for alternative (odd) patch coupling')
   else % standard   
-    dmux(1,:,:,i,:,:) = (uCorex(:,:,ip,:,:)-uCorex(:,:,im,:,:))/2; % \mu\delta 
-    dmux(2,:,:,i,:,:) = (uCorex(:,:,ip,:,:)-2*uCorex(:,:,i,:,:)+uCorex(:,:,im,:,:)); % \delta^2    
-    dmuy(1,:,:,:,j,:) = (uCorey(:,:,:,jp,:)-uCorey(:,:,:,jm,:))/2; % \mu\delta 
-    dmuy(2,:,:,:,j,:) = (uCorey(:,:,:,jp,:)-2*uCorey(:,:,:,j,:)+uCorey(:,:,:,jm,:)); % \delta^2
+    dmux(1,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) -uCorex(:,:,:,:,Im,:))/2; % \mu\delta 
+    dmux(2,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) -2*uCorex(:,:,:,:,I,:) +uCorex(:,:,:,:,Im,:)); % \delta^2    
+    dmuy(1,:,:,:,:,:,J) = (uCorey(:,:,:,:,:,Jp) -uCorey(:,:,:,:,:,Jm))/2; % \mu\delta 
+    dmuy(2,:,:,:,:,J,:) = (uCorey(:,:,:,:,:,Jp) -2*uCorey(:,:,:,:,:,J) +uCorey(:,:,:,:,:,Jm)); % \delta^2
   end% if odd/even
 %{
 \end{matlab}
@@ -170,8 +170,10 @@ centred differences.
 \begin{matlab}
 %}
    for k = 3:patches.ordCC    
-    dmux(k,:,:,i,:,:) = dmux(k-2,:,:,ip,:,:)-2*dmux(k-2,:,:,i,:,:)+dmux(k-2,:,:,im,:,:);    
-    dmuy(k,:,:,:,j,:) = dmuy(k-2,:,:,:,jp,:)-2*dmuy(k-2,:,:,:,j,:)+dmuy(k-2,:,:,:,jm,:);
+    dmux(k,:,:,:,:,I,:) = dmux(k-2,:,:,:,:,Ip,:) ...
+    -2*dmux(k-2,:,:,:,:,I,:) +dmux(k-2,:,:,:,:,Im,:);    
+    dmuy(k,:,:,:,:,:,J) = dmuy(k-2,:,:,:,:,:,Jp) ...
+    -2*dmuy(k-2,:,:,:,:,:,J) +dmuy(k-2,:,:,:,:,:,Jm);
   end
 %{
 \end{matlab}
@@ -180,39 +182,50 @@ each patch \cite[]{Roberts06d, Bunder2013b}, using weights
 computed in \verb|configPatches2()|. Here interpolate to
 specified order.
 
-Where next-to-edge values interpolate to
-the opposite edge-values. When we have an ensemble of configurations,
-different configurations might be coupled to each other, as specified by 
-\verb|patches.le|, \verb|patches.ri|, \verb|patches.to| and 
-\verb|patches.bo|.
+Where next-to-edge values interpolate to the opposite
+edge-values. When we have an ensemble of configurations,
+different configurations might be coupled to each other, as
+specified by \verb|patches.le|, \verb|patches.ri|,
+\verb|patches.to| and \verb|patches.bo|.
 \begin{matlab}
 %}
   if patches.EdgyInt
-     if patches.EdgyEns==0 %
-       u(nx,2:(end-1),i,:,:) = uCorex(1,:,:,:,:)*(1-patches.alt) ...
-            +reshape(sum(bsxfun(@times,patches.Cwtsr(:,1),dmux(:,1,:,:,:,:))),1,ny-2,Nx,Ny,nVars);  
-       u(  1  ,2:(end-1),i,:,:) = uCorex(2,:,:,:,:)*(1-patches.alt) ...      
-            +reshape(sum(bsxfun(@times,patches.Cwtsl(:,1),dmux(:,2,:,:,:,:))),1,ny-2,Nx,Ny,nVars);
-       u(2:(end-1),ny,:,j,:) = uCorey(:,1,:,:,:)*(1-patches.alt) ...
-            +reshape(sum(bsxfun(@times,patches.Cwtsr(:,2),dmuy(:,:,1,:,:,:))),nx-2,1,Nx,Ny,nVars);
-       u(2:(end-1),1,:,j,:) = uCorey(:,2,:,:,:)*(1-patches.alt) ...
-            +reshape(sum(bsxfun(@times,patches.Cwtsl(:,2),dmuy(:,:,2,:,:,:))),nx-2,1,Nx,Ny,nVars);
-     else
-       u(nx,2:(end-1),i,:,:) = uCorex(1,:,:,:,patches.le)*(1-patches.alt) ...
-           +reshape(sum(patches.Cwtsr(:,1).*dmux(:,1,:,:,:,patches.le)),1,ny-2,Nx,Ny,nVars);  
-       u(  1  ,2:(end-1),i,:,:) = uCorex(2,:,:,:,patches.ri)*(1-patches.alt) ...      
-            +reshape(sum(patches.Cwtsl(:,1).*dmux(:,2,:,:,:,patches.ri)),1,ny-2,Nx,Ny,nVars);
-       u(2:(end-1),ny,:,j,:) = uCorey(:,1,:,:,patches.bo)*(1-patches.alt) ...
-            +reshape(sum(patches.Cwtsr(:,2).*dmuy(:,:,1,:,:,patches.bo)),nx-2,1,Nx,Ny,nVars);
-       u(2:(end-1),1,:,j,:) = uCorey(:,2,:,:,patches.to)*(1-patches.alt) ...
-            +reshape(sum(patches.Cwtsl(:,2).*dmuy(:,:,2,:,:,patches.to)),nx-2,1,Nx,Ny,nVars);
+     if patches.nEnsem==0 %
+       u(nx,2:(end-1),:,:,I,:) = uCorex(1,:,:,:,:.:)*(1-patches.alt) ...
+            +reshape(sum( patches.Cwtsr(:,1).*dmux(:,1,:,:,:,:,:)) ...
+            ,1,ny-2,nVars,nEnsem,Nx,Ny);  
+       u(1 ,2:(end-1),:,:,I,:) = uCorex(2,:,:,:,:,:)*(1-patches.alt) ...      
+            +reshape(sum( patches.Cwtsl(:,1).*dmux(:,2,:,:,:,:,:)) ...
+            ,1,ny-2,nVars,nEnsem,Nx,Ny);
+       u(2:(end-1),ny,:,:,:,J) = uCorey(:,1,:,:,:,:)*(1-patches.alt) ...
+            +reshape(sum( patches.Cwtsr(:,2).*dmuy(:,:,1,:,:,:,:)) ...
+            ,nx-2,1,nVars,nEnsem,Nx,Ny);
+       u(2:(end-1),1 ,:,:,:,J) = uCorey(:,2,:,:,:,:)*(1-patches.alt) ...
+            +reshape(sum( patches.Cwtsl(:,2).*dmuy(:,:,2,:,:,:,:)) ...
+            ,nx-2,1,nVars,nEnsem,Nx,Ny);
+     else warning('what is this alternative??')
+       u(nx,2:(end-1),:,:,I,:) ...
+       = uCorex(1,:,patches.le,:,:)*(1-patches.alt) ...
+           +reshape(sum(patches.Cwtsr(:,1).*dmux(:,1,:,:,patches.le,:,:)) ...
+           ,1,ny-2,nVars,nEnsem,Nx,Ny);  
+       u(  1  ,2:(end-1),i,:,:) ...
+       = uCorex(2,:,:,patches.ri,:,:)*(1-patches.alt) ...      
+            +reshape(sum(patches.Cwtsl(:,1).*dmux(:,2,:,:,patches.ri,:,:)) ...
+            ,1,ny-2,nVars,nEnsem,Nx,Ny);
+       u(2:(end-1),ny,:,j,:) ...
+       = uCorey(:,1,:,patches.bo,:,:)*(1-patches.alt) ...
+            +reshape(sum(patches.Cwtsr(:,2).*dmuy(:,:,1,:,patches.bo,:,:)) ...
+            ,nx-2,1,nVars,nEnsem,Nx,Ny);
+       u(2:(end-1),1,:,j,:) ...
+       = uCorey(:,2,:,patches.to,:,:)*(1-patches.alt) ...
+            +reshape(sum(patches.Cwtsl(:,2).*dmuy(:,:,2,:,patches.to,:,:)) ...
+            ,nx-2,1,nVars,nEnsem,Nx,Ny);
      end
   end
-u(end,[1 ny],:,:,:)=nan; % remove corner values
-u(1,[1 ny],:,:,:)=nan;  
-   
+u([1 nx],[1 ny],:,:,:,:)=nan; % remove corner values
 %{
 \end{matlab}
+
 
 
 \paragraph{Case of spectral interpolation}
@@ -242,19 +255,19 @@ patch-ratio is effectively halved. The patch edges are near
 the middle of the gaps and swapped.
 \begin{matlab}
 %}
-%  if patches.alt % transform by doubling the number of fields
-%  error('staggered grid not yet implemented')
-%    v=nan(size(u)); % currently to restore the shape of u
-%    u=cat(3,u(:,1:2:nPatch,:),u(:,2:2:nPatch,:));
-%    altShift=reshape(0.5*[ones(nVars,1);-ones(nVars,1)],1,1,[]);
-%    iV=[nVars+1:2*nVars 1:nVars]; % scatter interp to alternate field
-%    r=r/2;           % ratio effectively halved
-%    nPatch=nPatch/2; % halve the number of patches
-%    nVars=nVars*2;   % double the number of fields
-%  else % the values for standard spectral
+ if patches.alt % transform by doubling the number of fields
+ error('staggered grid not yet implemented??')
+   v=nan(size(u)); % currently to restore the shape of u
+   u=cat(3,u(:,1:2:nPatch,:),u(:,2:2:nPatch,:));
+   altShift=reshape(0.5*[ones(nVars,1);-ones(nVars,1)],1,1,[]);
+   iV=[nVars+1:2*nVars 1:nVars]; % scatter interp to alternate field
+   r=r/2;           % ratio effectively halved
+   nPatch=nPatch/2; % halve the number of patches
+   nVars=nVars*2;   % double the number of fields
+ else % the values for standard spectral
     altShift = 0;  
     iV = 1:nVars;
-%  end
+ end
 %{
 \end{matlab}
 Now set wavenumbers in the two directions into two row
@@ -271,7 +284,9 @@ vectors.  In the case of even~\(N\) these compute the
 %{
 \end{matlab}
 Test for reality of the field values, and define a function
-accordingly.
+accordingly.  Could be problematic if some variables are
+real and some are complex, or if variables are of quite
+different sizes.
 \begin{matlab}
 %}
   if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
@@ -283,55 +298,56 @@ accordingly.
 Compute the Fourier transform of the patch centre-values for
 all the fields.  Unless doing patch-edgy interpolation when
 FT the next-to-edge values.  If there are an even number of
-points, then zero the zig-zag mode in the \textsc{ft} and
-add it in later as cosine. When we have an ensemble of configurations,
-different configurations might be coupled to each other, as specified by 
-\verb|patches.le|, \verb|patches.ri|, \verb|patches.to| and 
-\verb|patches.bo|.
+points, then if complex, treat as positive wavenumber, but
+if real, treat as cosine. When using an ensemble of
+configurations, different configurations might be coupled to
+each other, as specified by \verb|patches.le|,
+\verb|patches.ri|, \verb|patches.to| and \verb|patches.bo|.
 \begin{matlab}
 %}
 ix=2:nx-1;  iy=2:ny-1; % indices of interior
-if patches.EdgyInt==0
-     Cle = fft2(shiftdim(u(i0,j0,:,:,:),2)); 
-     Cbo=Cle;
-elseif patches.EdgyEns==0
-     Cle = fft2(shiftdim(u(   2,iy ,:,:,:),2));
-     Cri = fft2(shiftdim(u(nx-1,iy ,:,:,:),2));
-     Cbo = fft2(shiftdim(u(ix,2    ,:,:,:),2));
-     Cto = fft2(shiftdim(u(ix,ny-1 ,:,:,:),2));
+if ~patches.EdgyInt
+     Cle = fft2(shiftdim(u(i0,j0,:,:,:,:),4)); 
+     Cbo = Cle;
+elseif patches.nEnsem==0
+     Cle = fft2(shiftdim(u(   2,iy ,:,:,:,:),4));
+     Cri = fft2(shiftdim(u(nx-1,iy ,:,:,:,:),4));
+     Cbo = fft2(shiftdim(u(ix,2    ,:,:,:,:),4));
+     Cto = fft2(shiftdim(u(ix,ny-1 ,:,:,:,:),4));
 else 
-     Cle = fft2(shiftdim(u(   2,iy ,:,:,patches.le),2));
-     Cri = fft2(shiftdim(u(nx-1,iy ,:,:,patches.ri),2));
-     Cbo = fft2(shiftdim(u(ix,2    ,:,:,patches.bo),2));
-     Cto = fft2(shiftdim(u(ix,ny-1 ,:,:,patches.to),2));
+     Cle = fft2(shiftdim(u(   2,iy ,:,patches.le,:,:),4));
+     Cri = fft2(shiftdim(u(nx-1,iy ,:,patches.ri,:,:),4));
+     Cbo = fft2(shiftdim(u(ix,2    ,:,patches.bo,:,:),4));
+     Cto = fft2(shiftdim(u(ix,ny-1 ,:,patches.to,:,:),4));
 end     
 % fill in the cross of Fourier-shifted mid-values
-if patches.EdgyInt==0 
+% something strange here as both krx and kry are row vectors
+if ~patches.EdgyInt 
+sizekrx=size(krx), sizekry=size(kry) %%%%%%%%%%%%%%%%%%%%%%%
   % y-fraction of kry along left/right edges
-  ks = (shiftdim(iy ,-3)-j0)*2/(ny-1)*kry; 
-  Cle = bsxfun(@times,Cle,exp(1i*ks)); 
+  ks = (shiftdim(iy ,-4)-j0)*2/(ny-1)*kry; 
+  Cle = Cle.*exp(1i*ks); 
   Cri = Cle;
   % x-fraction of krx along bottom/top edges
-  ks = (shiftdim(ix',-3)-i0)*2/(nx-1)*krx; 
-  Cbo = bsxfun(@times,Cbo,exp(1i*ks)); 
+  ks = (shiftdim(ix',-4)-i0)*2/(nx-1)*krx'; %?? originally not transposed
+  Cbo = Cbo.*exp(1i*ks); 
   Cto = Cbo;
 end
-u(end,iy,:,:,:) = uclean( shiftdim( ifft2( ...
-    bsxfun(@times,Cle,exp(1i*(altShift+krx')))  ),2+(nVars>1)) );
-u( 1 ,iy,:,:,:) = uclean( shiftdim( ifft2( ...
-    bsxfun(@times,Cri,exp(1i*(altShift-krx')))  ),2+(nVars>1)) );
-u(ix,end,:,:,:) = uclean( shiftdim( ifft2( ...
-    bsxfun(@times,Cbo,exp(1i*(altShift+kry)))  ),2+(nVars>1)) );
-u(ix, 1 ,:,:,:) = uclean( shiftdim( ifft2( ...
-    bsxfun(@times,Cto,exp(1i*(altShift-kry)))  ),2+(nVars>1)) );
-u(end,[1 ny],:,:,:)=nan; % remove corner values
-u(1,[1 ny],:,:,:)=nan;
+u(nx,iy,:,:,:,:) = uclean( shiftdim( ifft2( ...
+    Cle.*exp(1i*(altShift+krx'))  ),2) );
+u( 1,iy,:,:,:,:) = uclean( shiftdim( ifft2( ...
+    Cri.*exp(1i*(altShift-krx'))  ),2) );
+u(ix,ny,:,:,:,:) = uclean( shiftdim( ifft2( ...
+    Cbo.*exp(1i*(altShift+kry))  ),2) );
+u(ix, 1,:,:,:,:) = uclean( shiftdim( ifft2( ...
+    Cto.*exp(1i*(altShift-kry))  ),2) );
+u([1 nx],[1 ny],:,:,:)=nan; % remove corner values
 
 end% if spectral 
 end% function patchEdgeInt2
 %{
 \end{matlab}
-Fin, returning the 4/5D array of field values with
+Fin, returning the 6D array of field values with
 interpolated edges. 
 \end{devMan} 
 %}

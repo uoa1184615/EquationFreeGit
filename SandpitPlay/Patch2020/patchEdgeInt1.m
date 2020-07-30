@@ -181,17 +181,17 @@ realisations are coupled to each other as specified by
      if patches.EdgyInt
         u(nSubP,:,patches.ri,j) ...
         = shiftdim(uCore(1:2:end,:,j),-1)*(1-patches.alt) ...
-          +sum(bsxfun(@times,patches.Cwtsr,dmu(:,1:2:end,:,j)));
+          +sum( patches.Cwtsr.*dmu(:,1:2:end,:,j) );
         u(  1  ,:,patches.le,j) ...
         = shiftdim(uCore(2:2:end,:,j),-1)*(1-patches.alt) ...      
-          +sum(bsxfun(@times,patches.Cwtsl,dmu(:,2:2:end,:,j)));
+          +sum( patches.Cwtsl.*dmu(:,2:2:end,:,j) );
      else % mid-patch interpolation
         u(nSubP,:,patches.ri,j) ...
         = shiftdim(uCore(:,:,j),-1)*(1-patches.alt) ...
-          +sum(bsxfun(@times,patches.Cwtsr,dmu(:,:,:,j)));
+          +sum( patches.Cwtsr.*dmu(:,:,:,j) );
         u(  1  ,:,patches.le,j) ...
         = shiftdim(uCore(:,:,j),-1)*(1-patches.alt) ...      
-          +sum(bsxfun(@times,patches.Cwtsl,dmu(:,:,:,j)));
+          +sum( patches.Cwtsl.*dmu(:,:,:,j) );
      end
 %{
 \end{matlab}
@@ -202,13 +202,13 @@ upon near edge values so the average near the edge is
 correct.
 \begin{matlab}
 %}
-  else % not yet considered, jul 2020 ??
+  else error('not yet considered, july 2020 ??')
     u(nSubP,:,:,j) = uCore(:,:,j)*(1-patches.alt) ...
       + reshape(-sum(u((nSubP-patches.nCore+1):(nSubP-1),:,:,j),1) ...
-      +sum(bsxfun(@times,patches.Cwtsr,dmu)),nPatch,nVars);
+      +sum( patches.Cwtsr.*dmu ),nPatch,nVars);
     u(1,:,:,j) = uCore(:,:,j)*(1-patches.alt) ...      
       +reshape(-sum(u(2:patches.nCore,:,:,j),1)  ...
-      +sum(bsxfun(@times,patches.Cwtsl,dmu)),nPatch,nVars);
+      +sum( patches.Cwtsl.*dmu ),nPatch,nVars);
   end;
 %{
 \end{matlab}
@@ -267,7 +267,9 @@ wavenumber is~$\pi$).
 %{
 \end{matlab}
 Test for reality of the field values, and define a function
-accordingly.
+accordingly.  Could be problematic if some variables are
+real and some are complex, or if variables are of quite
+different sizes.
 \begin{matlab}
 %}
   if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
@@ -276,16 +278,18 @@ accordingly.
   end
 %{
 \end{matlab}
-Compute the Fourier transform across patches of the patch centre-values for
-all the fields. If there are an even number of points, then
-if complex, treat as positive wavenumber, but if real, treat
-as cosine. When we have an ensemble of configurations,
-different configurations might be coupled to each other, 
-as specified by \verb|patches.le| and \verb|patches.ri|.
+Compute the Fourier transform across patches of the patch
+centre-values for all the fields. If there are an even
+number of points, then if complex, treat as positive
+wavenumber, but if real, treat as cosine. When using an
+ensemble of configurations, different configurations might
+be coupled to each other, as specified by \verb|patches.le|
+and \verb|patches.ri|.
 \begin{matlab}
 %}
 if ~patches.EdgyInt
-     Cleft = fft(u(  i0   ,:,:,:),[],4); Cright = Cleft;
+    Cleft = fft(u(  i0   ,:,:,:),[],4); 
+    Cright = Cleft;
 else
     Cleft = fft(u(   2   ,:,:,:),[],4);
     Cright= fft(u(nSubP-1,:,:,:),[],4);
@@ -298,10 +302,10 @@ Enforce reality when appropriate.
 \begin{matlab}
 %}
 %sizeks=size(ks), sizealtShift=size(altShift), sizer=size(r), sizeCle=size(Cleft)
-  u(nSubP,iV,patches.ri,:) = uclean(ifft(bsxfun(@times,Cleft ...
-      ,exp(1i*bsxfun(@times,ks,altShift+r))),[],4));
-  u(  1  ,iV,patches.le,:) = uclean(ifft(bsxfun(@times,Cright ...
-      ,exp(1i*bsxfun(@times,ks,altShift-r))),[],4));
+  u(nSubP,iV,patches.ri,:) = uclean(ifft( ...
+      Cleft.*exp(1i*ks.*(altShift+r)) ,[],4));
+  u(  1  ,iV,patches.le,:) = uclean(ifft( ...
+      Cright.*exp(1i*ks.*(altShift-r)) ,[],4));
 %{
 \end{matlab}
 Restore staggered grid when appropriate. 
