@@ -1,6 +1,3 @@
-<div style="column-width:20em;
-        -moz-column-width:20em;
-     -webkit-column-width:20em;">
 
 <h3>Equation-Free function toolbox for Matlab/Octave</h3>
 
@@ -33,8 +30,7 @@ http://www.maths.adelaide.edu.au/anthony.roberts/ </a>
 
 
 
-<p><img src="https://github.com/uoa1184615/EquationFreeGit/raw/master/Patch/Figs/nonlinearDiffusion.png" width="100%""
-style="margin: 0px 10px 5px 0px;"/>
+<p><img src="https://github.com/uoa1184615/EquationFreeGit/raw/master/Patch/Figs/nonlinearDiffusion.png" style="max-width:100%; width=300"/>
 
 <h4>Sparse simulation on only small patches of space</h4>
 
@@ -81,4 +77,3 @@ projective integration, but in python, see
 <a href="https://github.com/pjpetersik/eqnfree">
 https://github.com/pjpetersik/eqnfree </a>
 
-</div>
