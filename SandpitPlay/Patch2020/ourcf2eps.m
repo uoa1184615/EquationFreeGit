@@ -1,15 +1,14 @@
 function ourcf2eps(fileName)
-% If uNFC3x6L variable exists in the Workspace (any value),
+% If global uNFC3x6L variable exists with non-zero value,
 % then outputs the current figure to fileName.eps in the
-% local Figs folder. If uNFC3x6L does not exist, then
-% nothing happens.  Use 'clear uNFC3x6L' to remove variable
-% if necessary.    AJR, 29 July 2020
+% local Figs folder, otherwise nothing happens.    
+% AJR, 31 July 2020      
 global uNFC3x6L
-if exist('uNFC3x6L')
+if ~isempty(uNFC3x6L) && uNFC3x6L
   set(gcf,'PaperUnits','centimeters' ...
       ,'PaperPosition',[0 0 14 10] ...
       ,'renderer','Painters')
-  disp(['Making file Figs/' fileName '.eps'])
+  disp(['***** Making file Figs/' fileName '.eps'])
   print('-depsc2',['Figs/' fileName])
 end
 end

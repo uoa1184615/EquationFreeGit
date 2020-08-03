@@ -159,21 +159,22 @@ Establish global patch data struct to interface with a
 function coding a nonlinear `diffusion' \pde: to be solved
 on \(6\times4\)-periodic domain, with \(9\times7\) patches,
 spectral interpolation~(\(0\)) couples the patches, each
-patch of half-size ratio~\(0.25\) (relatively large for
-visualisation), and with \(5\times5\) points within each
+patch of half-size ratio~\(0.4\) (relatively large for
+visualisation), and with \(5\times5\) points forming each
 patch. \cite{Roberts2011a} established that this scheme is
 consistent with the \pde\ (as the patch spacing decreases).
 \begin{matlab}
 %}
 nSubP = 5;
-configPatches2(@nonDiffPDE,[-3 3 -2 2], nan, [9 7], 0, 0.25, nSubP);
+configPatches2(@nonDiffPDE,[-3 3 -2 2], nan, [9 7] ...
+    , 0, 0.4, nSubP ,'EdgyInt',true);
 %{
 \end{matlab}
 Set a  perturbed-Gaussian initial condition using
 auto-replication of the spatial grid.
 \begin{matlab}
 %}
-u0 = exp(-x.^2-y.^2);
+u0 = exp(-patches.x.^2-patches.y.^2);
 u0 = u0.*(0.9+0.1*rand(size(u0)));
 %{
 \end{matlab}
@@ -197,9 +198,10 @@ hsurf = surf(x(:),y(:),u');
 axis([-3 3 -3 3 -0.03 1]), view(60,40)
 legend('time = 0.00','Location','north')
 xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
+colormap(hsv)
 %{
 \end{matlab}
-Save the initial condition to graphic file for
+Optionally save the initial condition to graphic file for
 \cref{fig:configPatches2ic}.
 \begin{matlab}
 %}
@@ -220,7 +222,7 @@ naturally stiff, but \verb|ode23| is quicker.  Ask for
 output at non-uniform times as the diffusion slows.
 \begin{matlab}
 %}
-disp('Wait while we simulate h_t=(h^3)_xx+(h^3)_yy')
+disp('Wait while simulating nonlinear diffusion h_t=(h^3)_xx+(h^3)_yy')
 drawnow
 if ~exist('OCTAVE_VERSION','builtin')
     [ts,us] = ode23(@patchSmooth2,linspace(0,2).^2,u0(:));
@@ -315,7 +317,7 @@ Check parameters.
 %}
 assert(patches.nEdge==1 ...
       ,'multi-edge-value interp not yet implemented')
-assert(2*patches.nEdge+1<=nSubP ...
+assert(all(2*patches.nEdge<nSubP) ...
       ,'too many edge values requested')
 %if patches.nCore>1
 %    warning('nCore>1 not yet tested in this version')
@@ -359,9 +361,9 @@ patches.ordCC = ordCC;
 Check for staggered grid and periodic case.
 \begin{matlab}
 %}
-  if patches.alt, assert(mod(nPatch,2)==0, ...
+if patches.alt, assert(mod(nPatch,2)==0, ...
     'Require an even number of patches for staggered grid')
-  end
+end
 %{
 \end{matlab}
 Might as well precompute the weightings for the
@@ -371,28 +373,23 @@ values.)
 \begin{matlab}
 %}
 ratio = reshape(ratio,1,2); % force to be row vector
-if patches.alt  % eqn (7) in \cite{Cao2014a}
+if ordCC>0
+  if patches.alt  % eqn (7) in \cite{Cao2014a}
     patches.Cwtsr(1:2:ordCC,1:2)=[1 ...
       cumprod((ratio.^2-(1:2:(ordCC-2))'.^2)/4)./ ...
       factorial(2*(1:(ordCC/2-1))')];    
     patches.Cwtsr(2:2:ordCC,1:2)=[ratio/2 ...
       cumprod((ratio.^2-(1:2:(ordCC-2))'.^2)/4)./ ...
       factorial(2*(1:(ordCC/2-1))'+1).*ratio/2];
-%  patches.Cwtsr = [1
-%    ratio/2
-%    (-1+ratio.^2)/8
-%    (-1+ratio.^2).*ratio/48
-%    (9-10*ratio.^2+ratio.^4)/384
-%    (9-10*ratio.^2+ratio.^4).*ratio/3840
-%    (-225+259*ratio.^2-35*ratio.^4+ratio.^6)/46080
-%    (-225+259*ratio.^2-35*ratio.^4+ratio.^6).*ratio/645120 ];
-else % not staggered macro-grid
-    patches.Cwtsr(1:2:ordCC,1:2)=(cumprod(ratio.^2- ...
-      (((1:(ordCC/2))'-1)).^2)./factorial(2*(1:(ordCC/2))'-1)./ratio);
-    patches.Cwtsr(2:2:ordCC,1:2)=(cumprod(ratio.^2- ...
-      (((1:(ordCC/2))'-1)).^2)./factorial(2*(1:(ordCC/2))'));
-end
-patches.Cwtsl = (-1).^((1:ordCC)'-patches.alt).*patches.Cwtsr;
+  else %disp('normal, not staggered, macro-grid')
+    ks=1:2:ordCC; ps=(1:ordCC/2)'-1; 
+    patches.Cwtsr(ks  ,1:2)=cumprod(ratio.^2-ps.^2,1) ...
+        ./factorial(2*ps+1)./ratio;
+    patches.Cwtsr(ks+1,1:2)=cumprod(ratio.^2-ps.^2,1) ...
+        ./factorial(2*ps+2);
+  end
+  patches.Cwtsl = (-1).^((1:ordCC)'-patches.alt).*patches.Cwtsr;
+end% if ordCC>0
 %{
 \end{matlab}
 
@@ -418,20 +415,20 @@ patches are of length \verb|ratio*DX+dx| and
 \begin{matlab}
 %}
 nSubP = reshape(nSubP,1,2); % force to be row vector
-assert(patches.EdgyInt | mod(nSubP,2)==1, ...
+assert(patches.EdgyInt | all(mod(nSubP,2)==1), ...
     'configPatches2: nSubP must be odd')
 i0 = (nSubP(1)+1)/2;
 if ~patches.EdgyInt, dx = ratio(1)*DX/(i0-1);
 else                 dx = ratio(1)*DX/(nSubP(1)-2);
 end
 patches.x = dx*(-i0+1:i0-1)'+X;  % micro-grid
-patches.x = reshape(patches.x,nSubP,1,1,1,nPatch,1);
+patches.x = reshape(patches.x,nSubP(1),1,1,1,nPatch(1),1);
 i0 = (nSubP(2)+1)/2;
 if ~patches.EdgyInt, dy = ratio(2)*DY/(i0-1);
 else                 dy = ratio(2)*DY/(nSubP(2)-2);
 end
 patches.y = dy*(-i0+1:i0-1)'+Y;  % micro-grid
-patches.y = reshape(patches.y,1,nSubP,1,1,1,nPatch);
+patches.y = reshape(patches.y,1,nSubP(2),1,1,1,nPatch(2));
 %{
 \end{matlab}
 
@@ -451,7 +448,9 @@ patches.y = reshape(patches.y,1,nSubP,1,1,1,nPatch);
 %\cref{sec:homoDiffEdgy1}).
 %\begin{matlab}
 %}
-%nE=patches.nEnsem;
+nE=patches.nEnsem;
+patches.le=1:nE;  patches.ri=1:nE;  % nothing shifty for now??
+patches.bo=1:nE;  patches.to=1:nE; 
 %if patches.EdgyInt, nP=nSubP-2;
 %   else nP=(nSubP-1)/2; end
 %patches.le=mod((0:nE-1)-mod(nP,nE),nE)+1;

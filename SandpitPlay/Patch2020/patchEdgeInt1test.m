@@ -6,7 +6,7 @@
 % AJR, 26 Sep 2018 -- 28 July 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{patchEdgeInt1test}: test the spectral interpolation}
+\subsection{\texttt{patchEdgeInt1test}: test the patch coupling}
 \label{sec:patchEdgeInt1test}
 
 A script to test the spectral and finite-width interpolation
@@ -275,7 +275,7 @@ end,end,end
 disp('Passed all standard polynomial interpolation')
 %{
 \end{matlab}
-\endinput
+\endinput%%%%%%%%%%%%%%%%%%%%%%%%%%??
 
 
 
@@ -362,7 +362,7 @@ end
 %{
 \end{matlab}
 
-End for-loop over patches
+End for-loop over the cases
 \begin{matlab}
 %}
 end
