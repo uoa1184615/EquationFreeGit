@@ -4,9 +4,9 @@
 % AJR & JB, Sep 2018 -- Jun 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{patchEdgeInt1()}: sets edge values from interpolation over the macroscale}
+\section{\texttt{patchEdgeInt1()}: sets edge values from
+interpolation over the macroscale}
 \label{sec:patchEdgeInt1}
-%\localtableofcontents
 
 
 Couples 1D patches across 1D space by computing their edge
@@ -50,7 +50,7 @@ microscales.
 \item \verb|.ordCC| is order of interpolation integer~\(\geq
 -1\).
 
-\item \verb|.alt| in \(\{0,1\}\) is one for staggered grid
+\item \verb|.stag| in \(\{0,1\}\) is one for staggered grid
 (alternating) interpolation.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
@@ -146,7 +146,7 @@ if patches.ordCC>0 % then non-spectral interpolation
     uCore = reshape(sum(u((i0-c):(i0+c),:,:,j),1),nVars,nEnsem,nPatch);
     dmu = zeros(patches.ordCC,nVars,nEnsem,nPatch);
   end;
-  if patches.alt % use only odd numbered neighbours
+  if patches.stag % use only odd numbered neighbours
     dmu(1,:,:,j) = (uCore(:,:,jp)+uCore(:,:,jm))/2; % \mu
     dmu(2,:,:,j) = (uCore(:,:,jp)-uCore(:,:,jm)); % \delta
     jp = jp(jp); jm = jm(jm); % increase shifts to \pm2
@@ -180,17 +180,17 @@ realisations are coupled to each other as specified by
   if patches.nCore==1
      if patches.EdgyInt
         u(nSubP,:,patches.ri,j) ...
-        = shiftdim(uCore(1:2:end,:,j),-1)*(1-patches.alt) ...
+        = shiftdim(uCore(1:2:end,:,j),-1)*(1-patches.stag) ...
           +sum( patches.Cwtsr.*dmu(:,1:2:end,:,j) );
         u(  1  ,:,patches.le,j) ...
-        = shiftdim(uCore(2:2:end,:,j),-1)*(1-patches.alt) ...      
+        = shiftdim(uCore(2:2:end,:,j),-1)*(1-patches.stag) ...      
           +sum( patches.Cwtsl.*dmu(:,2:2:end,:,j) );
      else % mid-patch interpolation
         u(nSubP,:,patches.ri,j) ...
-        = shiftdim(uCore(:,:,j),-1)*(1-patches.alt) ...
+        = shiftdim(uCore(:,:,j),-1)*(1-patches.stag) ...
           +sum( patches.Cwtsr.*dmu(:,:,:,j) );
         u(  1  ,:,patches.le,j) ...
-        = shiftdim(uCore(:,:,j),-1)*(1-patches.alt) ...      
+        = shiftdim(uCore(:,:,j),-1)*(1-patches.stag) ...      
           +sum( patches.Cwtsl.*dmu(:,:,:,j) );
      end
 %{
@@ -203,10 +203,10 @@ correct.
 \begin{matlab}
 %}
   else error('not yet considered, july 2020 ??')
-    u(nSubP,:,:,j) = uCore(:,:,j)*(1-patches.alt) ...
+    u(nSubP,:,:,j) = uCore(:,:,j)*(1-patches.stag) ...
       + reshape(-sum(u((nSubP-patches.nCore+1):(nSubP-1),:,:,j),1) ...
       +sum( patches.Cwtsr.*dmu ),nPatch,nVars);
-    u(1,:,:,j) = uCore(:,:,j)*(1-patches.alt) ...      
+    u(1,:,:,j) = uCore(:,:,j)*(1-patches.stag) ...      
       +reshape(-sum(u(2:patches.nCore,:,:,j),1)  ...
       +sum( patches.Cwtsl.*dmu ),nPatch,nVars);
   end;
@@ -242,16 +242,16 @@ the middle of the gaps and swapped.
 Have not yet tested whether works for Edgy Interpolation??
 \begin{matlab}
 %}
-  if patches.alt % transform by doubling the number of fields
+  if patches.stag % transform by doubling the number of fields
     v = nan(size(u)); % currently to restore the shape of u
     u = [u(:,:,:,1:2:nPatch) u(:,:,:,2:2:nPatch)];
-    altShift = 0.5*[ones(1,nVars) -ones(1,nVars)];
+    stagShift = 0.5*[ones(1,nVars) -ones(1,nVars)];
     iV = [nVars+1:2*nVars 1:nVars]; % scatter interp to alternate field
     r = r/2;           % ratio effectively halved
     nPatch = nPatch/2; % halve the number of patches
     nVars = nVars*2;   % double the number of fields
   else % the values for standard spectral
-    altShift = 0;  
+    stagShift = 0;  
     iV = 1:nVars;
   end
 %{
@@ -301,11 +301,10 @@ shift a fraction~\(r\) to the next macroscale grid point.
 Enforce reality when appropriate. 
 \begin{matlab}
 %}
-%sizeks=size(ks), sizealtShift=size(altShift), sizer=size(r), sizeCle=size(Cleft)
   u(nSubP,iV,patches.ri,:) = uclean(ifft( ...
-      Cleft.*exp(1i*ks.*(altShift+r)) ,[],4));
+      Cleft.*exp(1i*ks.*(stagShift+r)) ,[],4));
   u(  1  ,iV,patches.le,:) = uclean(ifft( ...
-      Cright.*exp(1i*ks.*(altShift-r)) ,[],4));
+      Cright.*exp(1i*ks.*(stagShift-r)) ,[],4));
 %{
 \end{matlab}
 Restore staggered grid when appropriate. 
@@ -313,7 +312,7 @@ This dimensional shifting appears to work.
 %Is there a better way to do this??
 \begin{matlab}
 %}
-if patches.alt
+if patches.stag
   nVars = nVars/2;  
   u=reshape(u,nSubP,nVars,2,nEnsem,nPatch);
   nPatch = 2*nPatch;

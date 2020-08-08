@@ -3,10 +3,10 @@
 % discretisations.  AJR, Nov 2018 -- 15 Apr 2020 -- July 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section[\texttt{patchEdgeInt2()}: 2D patch edge values from 2D interpolation]
-{\texttt{patchEdgeInt2()}: sets 2D patch edge values from 2D macroscale interpolation}
+\section[\texttt{patchEdgeInt2()}: 2D patch edge values from
+2D interpolation] {\texttt{patchEdgeInt2()}: sets 2D patch
+edge values from 2D macroscale interpolation}
 \label{sec:patchEdgeInt2}
-%\localtableofcontents
 
 
 Couples 2D patches across 2D space by computing their edge
@@ -52,7 +52,7 @@ both macro- and microscales.
 \item \verb|.ordCC| is order of interpolation, currently
 (July 2020) only \(\{0,2,4,\ldots\}\)
 
-\item \verb|.alt| in \(\{0,1\}\) is one for staggered grid
+\item \verb|.stag| in \(\{0,1\}\) is one for staggered grid
 (alternating) interpolation.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
@@ -159,7 +159,7 @@ if ordCC>0 % then finite-width polynomial interpolation
   end;
   dmux = zeros([ordCC,size(uCorex)]); % 7D
   dmuy = zeros([ordCC,size(uCorey)]); % 7D
-  if patches.alt % use only odd numbered neighbours
+  if patches.stag % use only odd numbered neighbours
     error('polynomial interpolation not yet implemented for alternative (odd) patch coupling')
   else %disp('starting standard interpolation')   
     dmux(1,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) -uCorex(:,:,:,:,Im,:))/2; % \mu\delta 
@@ -195,33 +195,18 @@ specified by \verb|patches.le|, \verb|patches.ri|,
 \begin{matlab}
 %}
 k=1+patches.EdgyInt; % use centre or two edges
-if patches.nEnsem==1 %disp('centre-cross or edgy interp here')
-       u(nx,2:(ny-1),:,:,I,:) = uCorex(1,:,:,:,:,:)*(1-patches.alt) ...
-            +shiftdim(sum( patches.Cwtsr(:,1).*dmux(:,1,:,:,:,:,:) ),1);  
-       u(1 ,2:(ny-1),:,:,I,:) = uCorex(k,:,:,:,:,:)*(1-patches.alt) ...      
-            +shiftdim(sum( patches.Cwtsl(:,1).*dmux(:,k,:,:,:,:,:) ),1);
-       u(2:(nx-1),ny,:,:,:,J) = uCorey(:,1,:,:,:,:)*(1-patches.alt) ...
-            +shiftdim(sum( patches.Cwtsr(:,2).*dmuy(:,:,1,:,:,:,:) ),1);
-       u(2:(nx-1),1 ,:,:,:,J) = uCorey(:,k,:,:,:,:)*(1-patches.alt) ...
-            +shiftdim(sum( patches.Cwtsl(:,2).*dmuy(:,:,k,:,:,:,:) ),1);
-   else error('what is this ensemble alternative??') 
-       u(nx,2:(end-1),:,:,I,:) ...
-       = uCorex(1,:,:,patches.le,:,:)*(1-patches.alt) ...
-           +reshape(sum(patches.Cwtsr(:,1).*dmux(:,1,:,:,patches.le,:,:)) ...
-           ,1,ny-2,nVars,nEnsem,Nx,Ny);  
-       u(  1  ,2:(end-1),:,:,I,:) ...
-       = uCorex(2,:,:,patches.ri,:,:)*(1-patches.alt) ...      
-            +reshape(sum(patches.Cwtsl(:,1).*dmux(:,2,:,:,patches.ri,:,:)) ...
-            ,1,ny-2,nVars,nEnsem,Nx,Ny);
-       u(2:(end-1),ny,:,:,:,J) ...
-       = uCorey(:,1,:,patches.bo,:,:)*(1-patches.alt) ...
-            +reshape(sum(patches.Cwtsr(:,2).*dmuy(:,:,1,:,patches.bo,:,:)) ...
-            ,nx-2,1,nVars,nEnsem,Nx,Ny);
-       u(2:(end-1),1,:,:,:,J) ...
-       = uCorey(:,2,:,patches.to,:,:)*(1-patches.alt) ...
-            +reshape(sum(patches.Cwtsl(:,2).*dmuy(:,:,2,:,patches.to,:,:)) ...
-            ,nx-2,1,nVars,nEnsem,Nx,Ny);
-end
+u(nx,2:(ny-1),:,patches.ri,I,:) ...
+  = uCorex(1,:,:,:,:,:)*(1-patches.stag) ...
+    +shiftdim(sum( patches.Cwtsr(:,1).*dmux(:,1,:,:,:,:,:) ),1);  
+u(1 ,2:(ny-1),:,patches.le,I,:) ...
+  = uCorex(k,:,:,:,:,:)*(1-patches.stag) ...      
+    +shiftdim(sum( patches.Cwtsl(:,1).*dmux(:,k,:,:,:,:,:) ),1);
+u(2:(nx-1),ny,:,patches.to,:,J) ...
+  = uCorey(:,1,:,:,:,:)*(1-patches.stag) ...
+    +shiftdim(sum( patches.Cwtsr(:,2).*dmuy(:,:,1,:,:,:,:) ),1);
+u(2:(nx-1),1 ,:,patches.bo,:,J) ...
+  = uCorey(:,k,:,:,:,:)*(1-patches.stag) ...
+    +shiftdim(sum( patches.Cwtsl(:,2).*dmuy(:,:,k,:,:,:,:) ),1);
 u([1 nx],[1 ny],:,:,:,:)=nan; % remove corner values
 %{
 \end{matlab}
@@ -255,17 +240,17 @@ patch-ratio is effectively halved. The patch edges are near
 the middle of the gaps and swapped.
 \begin{matlab}
 %}
- if patches.alt % transform by doubling the number of fields
+ if patches.stag % transform by doubling the number of fields
  error('staggered grid not yet implemented??')
    v=nan(size(u)); % currently to restore the shape of u
    u=cat(3,u(:,1:2:nPatch,:),u(:,2:2:nPatch,:));
-   altShift=reshape(0.5*[ones(nVars,1);-ones(nVars,1)],1,1,[]);
+   stagShift=reshape(0.5*[ones(nVars,1);-ones(nVars,1)],1,1,[]);
    iV=[nVars+1:2*nVars 1:nVars]; % scatter interp to alternate field
    r=r/2;           % ratio effectively halved
    nPatch=nPatch/2; % halve the number of patches
    nVars=nVars*2;   % double the number of fields
  else % the values for standard spectral
-    altShift = 0;  
+    stagShift = 0;  
     iV = 1:nVars;
  end
 %{
@@ -328,13 +313,13 @@ if ~patches.EdgyInt
   Cto = Cbo;
 end
 u(nx,iy,:,:,:,:) = uclean( ifft(ifft( ...
-    Cle.*exp(1i*(altShift+krx))  ,[],5),[],6) );
+    Cle.*exp(1i*(stagShift+krx))  ,[],5),[],6) );
 u( 1,iy,:,:,:,:) = uclean( ifft(ifft( ...
-    Cri.*exp(1i*(altShift-krx))  ,[],5),[],6) );
+    Cri.*exp(1i*(stagShift-krx))  ,[],5),[],6) );
 u(ix,ny,:,:,:,:) = uclean( ifft(ifft( ...
-    Cbo.*exp(1i*(altShift+kry))  ,[],5),[],6) );
+    Cbo.*exp(1i*(stagShift+kry))  ,[],5),[],6) );
 u(ix, 1,:,:,:,:) = uclean( ifft(ifft( ...
-    Cto.*exp(1i*(altShift-kry))  ,[],5),[],6) );
+    Cto.*exp(1i*(stagShift-kry))  ,[],5),[],6) );
 u([1 nx],[1 ny],:,:,:)=nan; % remove corner values
 
 end% if spectral 

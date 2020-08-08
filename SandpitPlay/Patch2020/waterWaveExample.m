@@ -116,7 +116,6 @@ within each patch, and spectral interpolation~(\(-1\)) of
 the inter-patch coupling conditions.
 \begin{matlab}
 %}
-clear all
 global patches
 nPatch = 8
 ratio = 0.2
@@ -132,7 +131,7 @@ the struct~\verb|patches| for use by the time derivative
 function.
 \begin{matlab}
 %}
-uPts = mod( bsxfun(@plus,(1:nSubP)',(1:nPatch)) ,2);
+uPts = mod( (1:nSubP)'+(1:nPatch) ,2);
 hPts = find(uPts==0);
 uPts = find(uPts==1);
 patches.hPts = hPts; patches.uPts = uPts;
@@ -190,7 +189,7 @@ Plot the simulation.
 Optionally save the plot to file.
 \begin{matlab}
 %}
-ourcf2eps([mfilename num2str(k) 'CtsUH'])
+ifOurCf2eps([mfilename num2str(k) 'CtsUH'])
 %{
 \end{matlab}
 

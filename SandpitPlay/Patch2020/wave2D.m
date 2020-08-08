@@ -32,7 +32,6 @@ visualisation), and with a \(5\times5\) micro-grid within
 each patch.
 \begin{matlab}
 %}
-clear all, close all
 global patches
 nSubP = 5;
 nPatch = 9;
@@ -129,7 +128,7 @@ xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
 legend('time = 0','Location','north')
 colormap(hsv)
 drawnow
-ourcf2eps([mfilename 'ic'])
+ifOurCf2eps([mfilename 'ic'])
 %{
 \end{matlab}
 \begin{figure}
@@ -164,7 +163,7 @@ for i = [1:di:length(ts)-1 length(ts)]
   legend(['time = ' num2str(ts(i),2)])
   pause(0.1)
 end
-ourcf2eps([mfilename 't' num2str(ts(end))])
+ifOurCf2eps([mfilename 't' num2str(ts(end))])
 %{
 \end{matlab}
 \begin{figure}

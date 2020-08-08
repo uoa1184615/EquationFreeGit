@@ -86,14 +86,13 @@ only for periods~3 and~5. Then the heterogeneity is repeated
 \verb|nPeriodsPatch| times within each patch. 
 \begin{matlab}
 %}
-clear all
 mPeriod = 5 % needs to be odd for a wave
 cHetr = exp(0.1*randn(mPeriod,1)); % 0.3 appears max reasonable
 if mPeriod==3, 
     cHetr=cHetr*mean(cHetr.^2)/prod(cHetr) % normalise
 elseif mPeriod==5, 
     cHetr=cHetr*mean(cHetr.^2.*cHetr([3 4 5 1 2]).^2)/prod(cHetr)
-else cHetr=cHetr*mean(1./cHetr) % not correct normalise
+else cHetr=cHetr*mean(1./cHetr) % roughly normalise
 end
 nPeriodsPatch=1 % also needs to be odd
 %{
@@ -123,17 +122,15 @@ ratio = 0.25
 EdgyInt=true 
 nPeriodsPatch = (2-EdgyInt)*nPeriodsPatch;
 nSubP = nPeriodsPatch*mPeriod+1+EdgyInt
-configPatches1(@waveFirst,[-pi pi],nan,nPatch ...
-    ,4,ratio,nSubP,'EdgyInt',EdgyInt); 
+configPatches1(@waveFirst,[-pi pi],nan,nPatch,4 ...
+    ,ratio,nSubP,'EdgyInt',EdgyInt,'hetCoeffs',cHetr); 
 %{
 \end{matlab}
 
-Replicate the heterogeneous coefficients across the width of
-each patch. Also specify the weak damping of the sub-patch,
+Specify the weak damping of the sub-patch,
 fast, microscale waves.
 \begin{matlab}
 %}
-patches.c=[repmat(cHetr,nPeriodsPatch,1);cHetr(1)];
 patches.nu=0.003;
 %{
 \end{matlab}
@@ -184,7 +181,7 @@ lattice.
 figure(1),clf
 mesh(ts(j),xs(:),us(:,j)),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-ourcf2eps([mfilename 'U' num2str(2)])
+ifOurCf2eps([mfilename 'U' num2str(2)])
 %{
 \end{matlab}
 
@@ -200,11 +197,11 @@ system~\eqref{eq:waveEdgy1}.
 ratio=0.01
 nPatch=19
 leadingFreqs=[];
-for ord=0:2:6
-ordInterp=ord
-configPatches1(@waveFirst,[-pi pi],nan,nPatch ...
-    ,ord,ratio,nSubP,'EdgyInt',EdgyInt);
-patches.nu=0;
+for ord=0:2:8
+    ordInterp=ord
+    configPatches1(@waveFirst,[-pi pi],nan,nPatch,ord ...
+        ,ratio,nSubP,'EdgyInt',EdgyInt,'hetCoeffs',cHetr);
+    patches.nu=0;
 %{
 \end{matlab}
 
@@ -214,18 +211,18 @@ indices of the micro-grid points that are interior to the
 patches and hence are the system variables.
 \begin{matlab}
 %}
-u0=0*patches.x; u0([1 end],:)=nan; u0=u0(:);
-i=find(~isnan(u0));
-nJ=length(i);
-Jac=nan(nJ);
-for j=1:nJ
-   u0(i)=((1:nJ)==j);
-   dudt=patchSmooth1(0,u0);
-   Jac(:,j)=dudt(i);
-end
-nonSkewSymmetric=norm(Jac+Jac')
-assert(nonSkewSymmetric<1e-10,'failed skew-symmetry')
-Jac(abs(Jac)<1e-12)=0;
+    u0=0*patches.x; u0([1 end],:)=nan; u0=u0(:);
+    i=find(~isnan(u0));
+    nJ=length(i);
+    Jac=nan(nJ);
+    for j=1:nJ
+       u0(i)=((1:nJ)==j);
+       dudt=patchSmooth1(0,u0);
+       Jac(:,j)=dudt(i);
+    end
+    nonSkewSymmetric=norm(Jac+Jac')
+    assert(nonSkewSymmetric<1e-10,'failed skew-symmetry')
+    Jac(abs(Jac)<1e-12)=0;
 %{
 \end{matlab}
 \begin{table}
@@ -260,21 +257,26 @@ leadingFreqs =
 \end{verbatim}
 \end{table}
 Find the eigenvalues of the Jacobian, and list for
-inspection in \cref{tbl:waveEdgy1} (using a count of zero
-crossings in the corresponding eigenvector in order to try
-to sort on the spatial wavenumber): the spectral
+inspection in \cref{tbl:waveEdgy1}: the spectral
 interpolation is effectively exact for the macroscale;
 quadratic interpolation is usually qualitatively good;
 quartic interpolation appears to be the lowest order for
 quantitative accuracy.
 \begin{matlab}
 %}
-[evecs,evals]=eig(Jac);
-maxRealPartEvals=max(abs(real(diag(evals))))
-assert(maxRealPartEvals<1e-10,'failed real-part zero')
-freqs=imag(diag(evals));
-[~,j]=sort(sum(abs(diff(sign(real(evecs))))));
-leadingFreqs=[leadingFreqs -freqs(j(1:2:nPatch+4))];
+    [evecs,evals]=eig(Jac);
+    maxRealPartEvals=max(abs(real(diag(evals))))
+    assert(maxRealPartEvals<1e-10,'failed real-part zero')
+    freqs=imag(diag(evals));
+%{
+\end{matlab}
+Use a count of zero crossings in the corresponding 
+eigenvector in order to try to sort on the spatial 
+wavenumber.
+\begin{matlab}
+%}
+    [~,j]=sort(sum(abs(diff(sign(real(evecs))))));
+    leadingFreqs=[leadingFreqs -freqs(j(1:2:nPatch+4))];
 %{
 \end{matlab}
 End of the for-loop over orders of interpolation, and
@@ -282,7 +284,7 @@ display the spectra.
 \begin{matlab}
 %}
 end
-disp('     spectral    quadratic      quartic  sixth-order')
+disp('     spectral    quadratic      quartic  sixth-order ...')
 leadingFreqs = leadingFreqs
 %{
 \end{matlab}

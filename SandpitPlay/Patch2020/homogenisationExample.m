@@ -48,7 +48,6 @@ choose random microscale diffusion coefficients (with
 subscripts shifted by a half).
 \begin{matlab}
 %}
-clear all
 mPeriod = 3
 cDiff = exp(randn(mPeriod,1))
 cHomo = 1/mean(1./cDiff)
@@ -59,7 +58,8 @@ Establish global data struct~\verb|patches| for
 heterogeneous diffusion on \(2\pi\)-periodic domain. Use
 nine patches, each patch of half-size ratio~\(0.2\). Quartic
 (fourth-order) interpolation  \(\verb|ordCC|=4\) provides
-values for the inter-patch coupling conditions. 
+values for the inter-patch coupling conditions. Here include
+the diffusivity coefficients, repeated to fill up a patch.
 \begin{matlab}
 %}
 global patches
@@ -69,18 +69,10 @@ nSubP = 2*mPeriod+1
 Len = 2*pi;
 ordCC = 4;
 configPatches1(@heteroDiff,[0 Len],nan,nPatch ...
-    ,ordCC,ratio,nSubP);
+    ,ordCC,ratio,nSubP,'hetCoeffs',cDiff);
 %{
 \end{matlab}
 
-A user may add information to~\verb|patches| in order to
-communicate to the time derivative function: here include
-the diffusivity coefficients, repeated to fill up a patch
-\begin{matlab}
-%}
-patches.c=repmat(cDiff,(nSubP-1)/mPeriod,1);
-%{
-\end{matlab}
 
 \paragraph{For comparison: conventional integration in time}
 Set an initial condition, and here integrate forward in time
@@ -108,7 +100,7 @@ figure(1),clf
 xs = patches.x;  xs([1 end],:) = nan;
 mesh(ts,xs(:),ucts'),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-ourcf2eps([mfilename 'CtsU'])
+ifOurCf2eps([mfilename 'CtsU'])
 %{
 \end{matlab}
 
@@ -170,7 +162,7 @@ figure(2),clf
 plot(xs(:),us','.')
 ylabel('u(x,t)'), xlabel('space x')
 legend(num2str(ts',3))
-ourcf2eps([mfilename 'U'])
+ifOurCf2eps([mfilename 'U'])
 %{
 \end{matlab}
 Also plot a surface detailing the microscale bursts as shown
@@ -191,7 +183,7 @@ for k = 1:2, subplot(2,2,k)
   ylabel('x'), xlabel('t'), zlabel('u(x,t)')
   axis tight, view(126-4*k,45)
 end
-ourcf2eps([mfilename 'Micro'])
+ifOurCf2eps([mfilename 'Micro'])
 %{
 \end{matlab}
 End of this example script.

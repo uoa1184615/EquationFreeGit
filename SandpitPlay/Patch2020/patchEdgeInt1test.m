@@ -135,7 +135,7 @@ if patches.EdgyInt, i0=[2 nSubP-1], else i0=(nSubP+1)/2, end%??
 Identify which microscale grid points are \(h\)~or~\(u\) values.
 \begin{matlab}
 %}
-uPts=mod( bsxfun(@plus,(1:nSubP)',(1:nPatch)) ,2);
+uPts=mod( (1:nSubP)'+(1:nPatch) ,2);
 hPts=find(1-uPts);
 uPts=find(uPts);
 %{
@@ -304,7 +304,7 @@ kMax=floor((nPatch/2-1)/2)
 Identify which microscale grid points are \(h\)~or~\(u\) values.
 \begin{matlab}
 %}
-uPts=mod( bsxfun(@plus,(1:nSubP)',(1:nPatch)) ,2);
+uPts=mod( (1:nSubP)'+(1:nPatch) ,2);
 hPts=find(1-uPts);
 uPts=find(uPts);
 %{

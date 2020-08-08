@@ -5,7 +5,9 @@
 % explore the Jacobian and eigenvalues.  AJR, 27 Nov 2019 -- Jul 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{homoDiffEdgy1}: computational homogenisation of a 1D diffusion by simulation on small patches}
+\section{\texttt{homoDiffEdgy1}: computational
+homogenisation of a 1D diffusion by simulation on small
+patches}
 \label{sec:homoDiffEdgy1}
 %\localtableofcontents
 
@@ -83,10 +85,9 @@ the heterogeneity is repeated to fill each patch, and
 phase-shifted for an ensemble.
 \begin{matlab}
 %}
-clear all
-mPeriod = 4
+mPeriod = 3%randi([2 5])
 % set random diffusion coefficients
-cHetr=exp(1*randn(mPeriod,1));
+cHetr=exp(0*randn(mPeriod,1));
 %cHetr = [3.966;2.531;0.838;0.331;7.276];
 cHetr = cHetr*mean(1./cHetr) % normalise
 %{
@@ -113,24 +114,15 @@ period of the heterogeneous diffusion.
 global patches
 nPatch = 9
 ratio = 0.25;
-nSubP = randi([3 2*mPeriod+2])
+nSubP = mPeriod+3 %randi([mPeriod+1 2*mPeriod+2])
 nEnsem = mPeriod % number realisations in ensemble
 if mod(nSubP,mPeriod)==2, nEnsem=1, end
 configPatches1(@heteroDiff,[-pi pi],nan,nPatch ...
-    ,4,ratio,nSubP,'EdgyInt',true,'nEnsem',nEnsem);
+    ,4,ratio,nSubP,'EdgyInt',true,'nEnsem',nEnsem ...
+    ,'hetCoeffs',cHetr);
 %{
 \end{matlab}
 
-Replicate the heterogeneous coefficients across the width of
-each patch. For \verb|nEnsem>1| an ensemble of phase-shifted
-realisations are constructed.
-\begin{matlab}
-%}
-cHetr=repmat(cHetr,nSubP,1); % copy excessively
-cHetr=toeplitz(cHetr(1:nSubP-1),cHetr([1 nEnsem:-1:2]))
-patches.c=reshape(cHetr,nSubP-1,1,nEnsem);
-%{
-\end{matlab}
 
 \paragraph{Simulate}
 Set the initial conditions of a simulation to be that of a
@@ -197,7 +189,7 @@ for p=1:2
   mesh(ts(j),xs(:),us(:,j)) 
   view(60,40), colormap(0.8*hsv)
   xlabel('time t'), ylabel('space x'), zlabel('u(x,t)') 
-  ourcf2eps([mfilename 'U' num2str(p)])
+  ifOurCf2eps([mfilename 'U' num2str(p)])
 end
 pause(3)
 %{
@@ -214,14 +206,13 @@ as we do not plot.
 %}
 nPatch = 13
 ratio = 0.01;
-configPatches1(@heteroDiff,[0 2*pi],nan,nPatch ...
-    ,0,ratio,nSubP,'EdgyInt',true,'nEnsem',nEnsem);
 
 leadingEvals=[];
 for ord=0:2:8
   ordInterp=ord
   configPatches1(@heteroDiff,[-pi pi],nan,nPatch ...
-      ,ord,ratio,nSubP,'EdgyInt',true,'nEnsem',nEnsem);
+      ,ord,ratio,nSubP,'EdgyInt',true,'nEnsem',nEnsem ...
+    ,'hetCoeffs',cHetr);
 %{
 \end{matlab}
 
@@ -288,7 +279,8 @@ the number of decoupled systems in this patch configuration.
   [evecs,evals]=eig(Jac);
   eval=-sort(-diag(real(evals)));
   nZeroEv=sum(eval(:)>-1e-5) 
-  leadingEvals=[leadingEvals eval([1, (nZeroEv+1):2:(nZeroEv*nPatch+4)])];
+  leadingEvals=[leadingEvals eval(1:3*nPatch)];
+%  leadingEvals=[leadingEvals eval([1, (nZeroEv+1):2:(nZeroEv*nPatch+4)])];
 %{
 \end{matlab}
 End of the for-loop over orders of interpolation, and output
@@ -296,7 +288,7 @@ the tables of eigenvalues.
 \begin{matlab}
 %}
 end
-disp('     spectral    quadratic      quartic  sixth-order eighth-order')
+disp('     spectral    quadratic      quartic  sixth-order ...')
 leadingEvals=leadingEvals
 %{
 \end{matlab}

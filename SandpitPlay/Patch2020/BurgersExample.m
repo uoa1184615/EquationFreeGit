@@ -47,7 +47,6 @@ with seven points within each patch, and say fourth-order
 interpolation provides edge-values that couple the patches.
 \begin{matlab}
 %}
-clear all
 global patches
 nPatch = 8
 ratio = 0.2
@@ -81,7 +80,7 @@ view(105,45)
 Save the plot to file to form \cref{fig:BurgersMapU}.
 \begin{matlab}
 %}
-ourcf2eps([mfilename 'MapU'])
+ifOurCf2eps([mfilename 'MapU'])
 %{
 \end{matlab}
 
@@ -138,7 +137,7 @@ midP = (nSubP+1)/2;
 mesh(ts,xs(midP,:),us(:,midP:nSubP:end)')
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 view(120,50)
-ourcf2eps([mfilename 'U'])
+ifOurCf2eps([mfilename 'U'])
 %{
 \end{matlab}
 Then plot and save the microscale mesh of the microscale
@@ -159,7 +158,7 @@ for k = 1:2, subplot(2,2,k)
   ylabel('x'),xlabel('t'),zlabel('u(x,t)')
   axis tight, view(126-4*k,50)
 end
-ourcf2eps([mfilename 'Micro'])
+ifOurCf2eps([mfilename 'Micro'])
 %{
 \end{matlab}
 

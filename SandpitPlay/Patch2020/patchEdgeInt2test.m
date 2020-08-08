@@ -39,7 +39,7 @@ periodic-patches, randomly edge or mid-patch interpolation.
 Lx = 1+3*rand, Ly = 1+3*rand
 nSubP = 1+2*randi(3,1,2)
 ratios = rand(1,2)/2
-nPatch = 2+randi(4,1,2)
+nPatch = randi([3 6],1,2)
 edgyInt = (rand>0.5)
 configPatches2(@sin,[0 Lx 0 Ly],nan,nPatch,0,ratios,nSubP ...
     ,'EdgyInt',edgyInt)
@@ -111,7 +111,7 @@ numbers of patches, random domain lengths and random ratios.
 for ordCC=2:2:8
 for realisations=1:9
     ordCC=ordCC
-    nPatch=ordCC+1+randi(3,1,2)
+    nPatch=ordCC+randi([2 4],1,2)
     edgyInt = (rand>0.5)
     nSubP = 1+2*randi(3,1,2)
     Domain=5*[-rand rand -rand rand]

@@ -5,7 +5,8 @@
 % Nov 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{homoWaveEdgy1}: computational homogenisation of a 1D wave by simulation on small patches}
+\section{\texttt{homoWaveEdgy1}: computational
+homogenisation of a 1D wave by simulation on small patches}
 \label{sec:homoWaveEdgy1}
 %\localtableofcontents
 
@@ -87,7 +88,6 @@ a domain of length~\(2\pi\) have near integer frequencies,
 \verb|nPeriodsPatch| times within each patch. 
 \begin{matlab}
 %}
-clear all
 mPeriod = 3
 cHetr = exp(1*randn(mPeriod,1));
 cHetr = cHetr*mean(1./cHetr) % normalise
@@ -113,17 +113,11 @@ nPatch = 7
 ratio = 0.25
 nSubP = nPeriodsPatch*mPeriod+2
 configPatches1(@heteroWave,[-pi pi],nan,nPatch ...
-    ,0,ratio,nSubP,'EdgyInt',true);
+    ,0,ratio,nSubP,'EdgyInt',true,'hetCoeffs',cHetr);
 %{
 \end{matlab}
 
-Replicate the heterogeneous coefficients across the width of
-each patch.
-\begin{matlab}
-%}
-patches.c=[repmat(cHetr,(nSubP-2)/mPeriod,1);cHetr(1)];
-%{
-\end{matlab}
+
 
 \paragraph{Simulate}
 Set the initial conditions of a simulation to be that of a
@@ -180,7 +174,7 @@ for p=1:2
   figure(p),clf
   mesh(ts(j),xs(:),squeeze(us(:,1,j))),  view(60,40)
   xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-  ourcf2eps([mfilename 'U' num2str(p)])
+  ifOurCf2eps([mfilename 'U' num2str(p)])
 end
 %{
 \end{matlab}
