@@ -3,16 +3,15 @@
 % discretisations.  AJR, Aug 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section[\texttt{patchEdgeInt3()}: 3D patch edge values from
+\section[\texttt{patchEdgeInt3()}: 3D patch face values from
 3D interpolation] {\texttt{patchEdgeInt3()}: sets 3D patch
-edge values from 3D macroscale interpolation}
+face values from 3D macroscale interpolation}
 \label{sec:patchEdgeInt3}
 
-
-Couples 3D patches across 3D space by computing their edge
+Couples 3D patches across 3D space by computing their face
 values via macroscale interpolation.  Assumes that the patch
 centre-values are sensible macroscale variables, and patch
-edge values are determined by macroscale interpolation of
+face values are determined by macroscale interpolation of
 the patch-centre values??  Communicate patch-design variables
 via the global struct~\verb|patches|.
 \begin{matlab}
@@ -26,28 +25,36 @@ global patches
 \begin{itemize}
 
 \item \verb|u| is a vector of length \(\verb|nSubP1| \cdot
-\verb|nSubP2| \cdot \verb|nSubP3| \cdot \verb|nVars|\cdot \verb|nEnsem| \cdot
-\verb|nPatch1| \cdot \verb|nPatch2| \cdot \verb|nPatch3|\) where there are
-\verb|nVars| field values at each of the points in the
-\(\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nSubP3| \cdot \verb|nPatch1|
-\cdot \verb|nPatch2| \cdot \verb|nPatch3|\) grid on the \(\verb|nPatch1| \cdot
-\verb|nPatch2| \cdot \verb|nPatch3|\) array of patches.
+\verb|nSubP2| \cdot \verb|nSubP3| \cdot \verb|nVars|\cdot
+\verb|nEnsem| \cdot \verb|nPatch1| \cdot \verb|nPatch2|
+\cdot \verb|nPatch3|\) where there are \verb|nVars| field
+values at each of the points in the \(\verb|nSubP1| \cdot
+\verb|nSubP2| \cdot \verb|nSubP3| \cdot \verb|nPatch1| \cdot
+\verb|nPatch2| \cdot \verb|nPatch3|\) grid on the
+\(\verb|nPatch1| \cdot \verb|nPatch2| \cdot \verb|nPatch3|\)
+array of patches.
 
 \item \verb|patches| a struct set by \verb|configPatches3()|
 which includes the following information.
 \begin{itemize}
 
 \item \verb|.x| is \(\verb|nSubP1| \times1 \times1 \times1
-\times \verb|nPatch1| \times1 \) array of the spatial
-locations~\(x_{ij}\) of the microscale grid points in every
-patch. Currently it \emph{must} be an equi-spaced lattice on
-both macro- and microscales.
+\times1 \times \verb|nPatch1| \times1 \times1 \) array of
+the spatial locations~\(x_{ijk}\) of the microscale grid
+points in every patch. Currently it \emph{must} be an
+equi-spaced lattice on both macro- and micro-scales.
 
-\item \verb|.y| is similarly \(\times1 \verb|nSubP1| \times1
-\times1 \times1 \times \verb|nPatch1|\) array of the spatial
-locations~\(y_{ij}\) of the microscale grid points in every
-patch. Currently it \emph{must} be an equi-spaced lattice on
-both macro- and microscales.
+\item \verb|.y| is similarly \(\times1 \verb|nSubP2| \times1
+\times1 \times1 \times1 \times \verb|nPatch2| \times1\)
+array of the spatial locations~\(y_{ijk}\) of the microscale
+grid points in every patch. Currently it \emph{must} be an
+equi-spaced lattice on both macro- and micro-scales.
+
+\item \verb|.z| is similarly \(\times1 \times1 \verb|nSubP3|
+\times1 \times1 \times1 \times1 \times \verb|nPatch3|\)
+array of the spatial locations~\(z_{ijk}\) of the microscale
+grid points in every patch. Currently it \emph{must} be an
+equi-spaced lattice on both macro- and micro-scales.
 
 \item \verb|.ordCC| is order of interpolation, currently
 (Aug 2020) only \(\{0,2,4,\ldots\}\)
@@ -59,7 +66,7 @@ both macro- and microscales.
 coefficients for finite width interpolation.
 
 \item \verb|.EdgyInt| true/false is true for interpolating
-patch-edge values from opposite next-to-edge values (often
+patch-face values from opposite next-to-face values (often
 preserves symmetry).
 
 \end{itemize}
@@ -67,11 +74,11 @@ preserves symmetry).
 
 \paragraph{Output}
 \begin{itemize}
-\item \verb|u| is \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nSubP3| \cdot
-\verb|nVars|\cdot \verb|nEnsem| \cdot \verb|nPatch1| \cdot
-\verb|nPatch2| \cdot
-\verb|nPatch3|\) 8D array of the fields with edge values set
-by interpolation.
+\item \verb|u| is \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot
+\verb|nSubP3| \cdot \verb|nVars|\cdot \verb|nEnsem| \cdot
+\verb|nPatch1| \cdot \verb|nPatch2| \cdot \verb|nPatch3|\)
+8D array of the fields with face values set by
+interpolation.
 \end{itemize}
 
 
@@ -90,8 +97,9 @@ reshape indicates~\verb|u| has the wrong size.
 [~,ny,~,~,~,~,Ny,~] = size(patches.y);
 [nx,~,~,~,~,Nx,~,~] = size(patches.x);
 nEnsem = patches.nEnsem;
-nVars = round(numel(u)/numel(patches.x) ...
-    /numel(patches.y)/numel(patches.z)/nEnsem);
+nVars = round( numel(u)/numel(patches.x) ...
+    /numel(patches.y)/numel(patches.z)/nEnsem );
+numelu=numel(u);
 assert(numel(u) == nx*ny*nz*Nx*Ny*Nz*nVars*nEnsem ...
   ,'patchEdgeInt3: input u has wrong size for parameters')
 u = reshape(u,[nx ny nz nVars nEnsem Nx Ny Nz]);
@@ -99,9 +107,9 @@ u = reshape(u,[nx ny nz nVars nEnsem Nx Ny Nz]);
 \end{matlab}
 With Dirichlet patches, the half-length of a patch is
 \(h=dx(n_\mu-1)/2\) (or~\(-2\) for specified flux), unless
-we are interpolating from next-to-edge values, and the
+we are interpolating from next-to-face values, and the
 ratio needed for interpolation is then \(r=h/\Delta X\).
-Compute lattice sizes from inside the patches as the edge
+Compute lattice sizes from inside the patches as the face
 values may be \nan{}s, etc.
 \begin{matlab}
 %}
@@ -147,21 +155,21 @@ k0 = round((nz+1)/2);
 \end{matlab}
 
 
-\paragraph{Lagrange interpolation gives patch-edge values}
+\paragraph{Lagrange interpolation gives patch-face values}
 Compute centred differences of the mid-patch values for
 the macro-interpolation, of all fields. Assumes the domain
 is macro-periodic.
-Currently, only next-to-edge interpolation is implemented.
+Currently, only next-to-face interpolation is implemented.
 \begin{matlab}
 %}
 ordCC=patches.ordCC;
 if ordCC>0 % then finite-width polynomial interpolation
-  if patches.EdgyInt % next-to-edge values    
+  if patches.EdgyInt % next-to-face values    
     uCorex = u([2 nx-1],2:(ny-1),2:(nz-1),:,:,I,J,K);
     uCorey = u(2:(nx-1),[2 ny-1],2:(nz-1),:,:,I,J,K);
     uCorez = u(2:(nx-1),2:(ny-1),[2 nz-1],:,:,I,J,K);
   else 
-    %disp('polynomial interpolation, currently couple from the centre-cross??')
+    %disp('currently couple from the mid-planes??')
     uCorex = u(i0,2:(ny-1),2:(nz-1),:,:,I,J,K);
     uCorey = u(2:(nx-1),j0,2:(nz-1),:,:,I,J,K);
     uCorez = u(2:(nx-1),2:(ny-1),k0,:,:,I,J,K);
@@ -170,7 +178,7 @@ if ordCC>0 % then finite-width polynomial interpolation
   dmuy = zeros([ordCC,size(uCorey)]); % 9D
   dmuz = zeros([ordCC,size(uCorez)]); % 9D
   if patches.stag % use only odd numbered neighbours
-    error('polynomial interpolation not yet implemented for alternative (odd) patch coupling')
+    error('polynomial interpolation not yet for staggered patch coupling')
   else %disp('starting standard interpolation')   
     dmux(1,:,:,:,:,:,I,:,:) = (uCorex(:,:,:,:,:,Ip,:,:) -uCorex(:,:,:,:,:,Im,:,:))/2; % \mu\delta 
     dmux(2,:,:,:,:,:,I,:,:) = (uCorex(:,:,:,:,:,Ip,:,:) -2*uCorex(:,:,:,:,:,I,:,:) +uCorex(:,:,:,:,:,Im,:,:)); % \delta^2    
@@ -195,19 +203,20 @@ centred differences.
   end
 %{
 \end{matlab}
-Interpolate macro-values to be Dirichlet edge values for
+Interpolate macro-values to be Dirichlet face values for
 each patch \cite[]{Roberts06d, Bunder2013b}, using weights
 computed in \verb|configPatches2()|. Here interpolate to
 specified order.
 
-Where next-to-edge values interpolate to the opposite
-edge-values. When we have an ensemble of configurations,
+Where next-to-face values interpolate to the opposite
+face-values. When we have an ensemble of configurations,
 different configurations might be coupled to each other, as
 specified by \verb|patches.le|, \verb|patches.ri|,
-\verb|patches.to| and \verb|patches.bo|.
+\verb|patches.to|, \verb|patches.bo|,
+\verb|patches.fr| and \verb|patches.ba|.
 \begin{matlab}
 %}
-k=1+patches.EdgyInt; % use centre or two edges
+k=1+patches.EdgyInt; % use centre or two faces
 u(nx,2:(ny-1),2:(nz-1),:,patches.ri,I,:,:) ...
   = uCorex(1,:,:,:,:,:,:,:)*(1-patches.stag) ...
     +shiftdim(sum( patches.Cwtsr(:,1).*dmux(:,1,:,:,:,:,:,:,:) ),1);  
@@ -226,7 +235,6 @@ u(2:(nx-1),2:(ny-1),nz,:,patches.fr,:,:,K) ...
 u(2:(nx-1),2:(ny-1),1 ,:,patches.ba,:,:,K) ...
   = uCorez(:,:,k,:,:,:,:,:)*(1-patches.stag) ...
     +shiftdim(sum( patches.Cwtsl(:,3).*dmuz(:,:,:,k,:,:,:,:,:) ),1);
-u([1 nx],[1 ny],[1 nz],:,:,:,:,:)=nan; % remove corner values
 %{
 \end{matlab}
 
@@ -238,7 +246,7 @@ terms of the patch index~\(j\), say, not directly in space.
 As the macroscale fields are \(N\)-periodic in the patch
 index~\(j\), the macroscale Fourier transform writes the
 centre-patch values as \(U_j=\sum_{k}C_ke^{ik2\pi j/N}\).
-Then the edge-patch values \(U_{j\pm r}
+Then the face-patch values \(U_{j\pm r}
 =\sum_{k}C_ke^{ik2\pi/N(j\pm r)} =\sum_{k}C'_ke^{ik2\pi
 j/N}\) where \(C'_k=C_ke^{ikr2\pi/N}\). For \(N\)~patches we
 resolve `wavenumbers' \(|k|<N/2\), so set row vector
@@ -255,7 +263,7 @@ else% spectral interpolation
 Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches2|
 tests there are an even number of patches). Then the
-patch-ratio is effectively halved. The patch edges are near
+patch-ratio is effectively halved. The patch faces are near
 the middle of the gaps and swapped.
 \begin{matlab}
 %}
@@ -303,12 +311,13 @@ different sizes.
 \end{matlab}
 Compute the Fourier transform of the patch centre-values for
 all the fields.  Unless doing patch-edgy interpolation when
-FT the next-to-edge values.  If there are an even number of
+FT the next-to-face values.  If there are an even number of
 points, then if complex, treat as positive wavenumber, but
 if real, treat as cosine. When using an ensemble of
 configurations, different configurations might be coupled to
 each other, as specified by \verb|patches.le|,
-\verb|patches.ri|, \verb|patches.to|, \verb|patches.bo|, \verb|patches.fr| and \verb|patches.ba|.
+\verb|patches.ri|, \verb|patches.to|, \verb|patches.bo|,
+\verb|patches.fr| and \verb|patches.ba|.
 \begin{matlab}
 %}
 % indices of interior
@@ -326,9 +335,9 @@ else
          ,[],6),[],7),[],8);
      Cto = fft(fft(fft( u(ix,ny-1,iz ,:,patches.to,:,:,:) ...
          ,[],6),[],7),[],8);
-     Cba = fft(fft(fft( u(ix,iy,2    ,:,patches.bo,:,:,:) ...
+     Cba = fft(fft(fft( u(ix,iy,2    ,:,patches.ba,:,:,:) ...
          ,[],6),[],7),[],8);
-     Cfr = fft(fft(fft( u(ix,iy,nz-1 ,:,patches.to,:,:,:) ...
+     Cfr = fft(fft(fft( u(ix,iy,nz-1 ,:,patches.fr,:,:,:) ...
          ,[],6),[],7),[],8);
 end     
 %{
@@ -337,22 +346,23 @@ Fill in the cross of Fourier-shifted mid-values
 \begin{matlab}
 %}
 if ~patches.EdgyInt 
-  % yz-fraction of kry/z along left/right edges
+  % yz-fraction of kry/z along left/right faces
   ks = (iy-j0)*2/(ny-1).*kry+(iz-k0)*2/(nz-1).*krz; 
   Cle = Cle.*exp(1i*ks); 
   Cri = Cle;
-  % xz-fraction of krx/z along bottom/top edges
+  % xz-fraction of krx/z along bottom/top faces
   ks = (ix-i0)*2/(nx-1).*krx+(iz-k0)*2/(nz-1).*krz;
   Cbo = Cbo.*exp(1i*ks); 
   Cto = Cbo;
-  % xy-fraction of krx/y along bottom/top edges
+  % xy-fraction of krx/y along back/front faces
   ks = (ix-i0)*2/(nx-1).*krx+(iy-j0)*2/(ny-1).*kry;
   Cba = Cba.*exp(1i*ks); 
   Cfr = Cba;
 end
 %{
 \end{matlab}
-Now invert the triple Fourier transforms to complete interpolation.
+Now invert the triple Fourier transforms to complete
+interpolation.
 \begin{matlab}
 %}
 u(nx,iy,iz,:,:,:,:,:) = uclean( ifft(ifft(ifft( ...
@@ -367,12 +377,19 @@ u(ix,iy,nz,:,:,:,:,:) = uclean( ifft(ifft(ifft( ...
     Cba.*exp(1i*(stagShift+krz))  ,[],6),[],7),[],8) );
 u(ix,iy, 1,:,:,:,:,:) = uclean( ifft(ifft(ifft( ...
     Cfr.*exp(1i*(stagShift-krz))  ,[],6),[],7),[],8) );
-u([1 nx],[1 ny],[1 nz],:,:,:,:,:)=nan; % remove corner values
 end% if spectral 
+%{
+\end{matlab}
+Nan the values in corners and edges, of every 3D patch.
+\begin{matlab}
+%}
+u(:,[1 ny],[1 nz],:)=nan; 
+u([1 nx],:,[1 nz],:)=nan; 
+u([1 nx],[1 ny],:,:)=nan; 
 end% function patchEdgeInt2
 %{
 \end{matlab}
 Fin, returning the 8D array of field values with
-interpolated edges. 
+interpolated faces. 
 \end{devMan} 
 %}

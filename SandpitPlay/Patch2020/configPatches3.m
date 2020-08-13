@@ -28,9 +28,7 @@ global patches
 
 \paragraph{Input}
 If invoked with no input arguments, then executes an example
-of simulating a nonlinear diffusion \pde\ relevant to the
-lubrication flow of a thin layer of fluid---see
-\cref{sec:configPatches3eg} for the example code.
+of simulating a heterogeneous wave \pde.
 \begin{itemize}
 
 \item \verb|fun| is the name of the user function,
@@ -78,8 +76,8 @@ in each direction.
 lattice points in each patch: if scalar, then use the same
 number in both directions, otherwise \verb|nSubP(1:3)| gives
 the number in each direction. If not using \verb|EdgyInt|,
-then must be odd so that there is a central micro-grid point
-in each patch.
+then must be odd so that there is a central micro-grid 
+point/planes in each patch.
 
 \item \verb|'nEdge'| (not yet implemented), \emph{optional},
 default=1, for each patch, the number of edge values set by
@@ -89,24 +87,26 @@ nearest neighbour interactions).
 
 \item \verb|'EdgyInt'|, true/false, \emph{optional},
 default=false.  If true, then interpolate to left\slash
-right\slash top\slash bottom edge-values from right\slash
-left\slash bottom\slash top next-to-edge values.  
+right\slash top\slash bottom\slash front\slash back
+face-values from right\slash left\slash bottom\slash
+top\slash back\slash front next-to-face values.  
 
 \item \verb|'nEnsem'|,  \emph{optional-experimental},
 default one, but if more, then an ensemble over this
 number of realisations.
 
 \item \verb|'hetCoeffs'|, \emph{optional}, default empty.
-Supply an array of microscale heterogeneous coefficients to
-be used by the given microscale \verb|fun| in each patch.
+Supply a 3/4D array of microscale heterogeneous coefficients
+to be used by the given microscale \verb|fun| in each patch.
 Say the given array~\verb|cs| is of size \(m_x\times
-m_y\times n_c\), where \(n_c\)~is the number of different
-sets of coefficients. For example, in heterogeneous
-diffusion, \(n_c=3\) for the diffusivities in the \emph{three}
-different spatial directions. The coefficients are to
-be the same for each and every patch; however, macroscale
-variations are catered for by the \(n_c\)~coefficients being
-\(n_c\)~parameters in some macroscale formula.
+m_y\times m_z\times n_c\), where \(n_c\)~is the number of
+different arrays of coefficients. For example, in
+heterogeneous diffusion, \(n_c=3\) for the diffusivities in
+the \emph{three} different spatial directions.  The
+coefficients are to be the same for each and every patch. 
+However, macroscale variations are catered for by the
+\(n_c\)~coefficients being \(n_c\)~parameters in some
+macroscale formula.
 \begin{itemize}
 
 \item If \(\verb|nEnsem|=1\), then the array of coefficients
@@ -114,13 +114,14 @@ is just tiled across the patch size to fill up each patch,
 starting from the \((1,1)\)-element.
 
 \item If \(\verb|nEnsem|>1\) (value immaterial), then reset
-\(\verb|nEnsem|:=m_x\cdot m_y\) and construct an ensemble of
-all \(m_x\cdot m_y\) phase-shifts of the coefficients. In
-this scenario, the inter-patch coupling couples different
-members in the ensemble. When \verb|EdgyInt| is true, and
-when the coefficients are diffusivities\slash elasticities
-in~\(x\) and~\(y\) directions, respectively, then this
-coupling cunningly preserves symmetry.
+\(\verb|nEnsem|:=m_x\cdot m_y\cdot m_z\) and construct an
+ensemble of all \(m_x\cdot m_y\cdot m_z\) phase-shifts of
+the coefficients. In this scenario, the inter-patch coupling
+couples different members in the ensemble.  When
+\verb|EdgyInt| is true, and when the coefficients are
+diffusivities\slash elasticities in~\(x,y,z\) directions,
+respectively, then this coupling cunningly preserves
+symmetry.
 
 \end{itemize}
 
@@ -133,7 +134,7 @@ is created and set with the following components.
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,x,y)| that computes the time derivatives (or
+\verb|fun(t,u,x,y,z)| that computes the time derivatives (or
 steps) on the patchy lattice. 
 
 \item \verb|.ordCC| is the specified order of inter-patch
@@ -145,25 +146,25 @@ the usual case of all neighbour coupling---not yet
 implemented.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| are the
-\(\verb|ordCC|\times 3\)-array of weights for the inter-patch
-interpolation onto the right\slash top and left\slash bottom
-edges (respectively) with patch:macroscale ratio as
-specified.
+\(\verb|ordCC|\times 3\)-array of weights for the
+inter-patch interpolation onto the right\slash top and
+left\slash bottom edges (respectively) with patch:macroscale
+ratio as specified.
 
-\item \verb|.x| (8D) is \(\verb|nSubP(1)| \times1 \times1 \times1
-\times1 \times \verb|nPatch(1)| \times1 \times1\) array of the
-regular spatial locations~\(x_{ijk}\) of the microscale grid
-points in every patch.  
+\item \verb|.x| (8D) is \(\verb|nSubP(1)| \times1 \times1
+\times1 \times1 \times \verb|nPatch(1)| \times1 \times1\)
+array of the regular spatial locations~\(x_{ijk}\) of the
+microscale grid points in every patch.  
 
-\item \verb|.y| (8D) is \(1 \times \verb|nSubP(2)| \times1 \times1
-\times1 \times1 \times \verb|nPatch(2)| \times1\) array of the
-regular spatial locations~\(y_{ijk}\) of the microscale grid
-points in every patch.  
+\item \verb|.y| (8D) is \(1 \times \verb|nSubP(2)| \times1
+\times1 \times1 \times1 \times \verb|nPatch(2)| \times1\)
+array of the regular spatial locations~\(y_{ijk}\) of the
+microscale grid points in every patch.  
 
-\item \verb|.z| (8D) is \(1 \times1 \times \verb|nSubP(3)| \times1
-\times1 \times1 \times1 \times \verb|nPatch(3)|\) array of the
-regular spatial locations~\(z_{ijk}\) of the microscale grid
-points in every patch.  
+\item \verb|.z| (8D) is \(1 \times1 \times \verb|nSubP(3)|
+\times1 \times1 \times1 \times1 \times \verb|nPatch(3)|\)
+array of the regular spatial locations~\(z_{ijk}\) of the
+microscale grid points in every patch.  
 
 \item \verb|.nEdge| is, for each patch, the number of edge
 values set by interpolation at the edge regions of each
@@ -210,7 +211,7 @@ recursion).
 \end{enumerate}
 
 Set random heterogeneous
-diffusivities of random period in each of the two
+coefficients of period two in each of the three
 directions. Crudely normalise by the harmonic mean so the
 decay time scale is roughly one. 
 \begin{matlab}
@@ -234,8 +235,8 @@ configPatches3(@heteroWave3,[-pi pi], nan, 5 ...
     ,'hetCoeffs',cHetr);
 %{
 \end{matlab}
-Set a  perturbed-Gaussian initial condition using
-auto-replication of the spatial grid.
+Set a  perturbed-Gaussian initial state, with say 
+zero derivative, using auto-replication of the spatial grid.
 \begin{matlab}
 %}
 u0 = exp(-patches.x.^2-patches.y.^2-patches.z.^2);
@@ -244,8 +245,8 @@ uv0 = cat(4,u0,0*u0);
 %{
 \end{matlab}
 Initiate a plot of the simulation using only the microscale
-values interior to the patches: set \(x\), \(y\) and \(z\)-edges to
-\verb|nan| to just show interior data. 
+values interior to the patches: set \(x\), \(y\) and
+\(z\)-edges to \verb|nan| to just show interior data. 
 \begin{matlab}
 %}
 figure(1), clf, colormap(0.8*hsv)
@@ -284,8 +285,8 @@ ifOurCf2eps([mfilename 'ic'])
 \centering \caption{\label{fig:configPatches3ic}initial
 field~\(u(x,y,z,t)\) at time \(t=0\) of the patch scheme
 applied to a nonlinear wave~\pde:
-\cref{fig:configPatches3fin} plots the computed field at time
-\(t=2\).}
+\cref{fig:configPatches3fin} plots the computed field at
+time \(t=2\).}
 \includegraphics[scale=0.9]{configPatches3ic}
 \end{figure}
 Integrate in time using standard functions. In Matlab
@@ -305,8 +306,9 @@ end
 %{
 \end{matlab}
 Animate the computed simulation to end with
-\cref{fig:configPatches3fin}.  Use \verb|patchEdgeInt3| 
-to interpolate patch-edge values (even if not drawn) in order to most easily reconstruct the array data structure.
+\cref{fig:configPatches3fin}.  Use \verb|patchEdgeInt3| to
+interpolate patch-edge values (even if not drawn) in order
+to most easily reconstruct the array data structure.
 \begin{matlab}
 %}
 disp('Type space character to animate simulation'),pause
@@ -324,8 +326,8 @@ ifOurCf2eps([mfilename 'fin'])
 \end{matlab}
 \begin{figure}
 \centering
-\caption{\label{fig:configPatches3fin}field~\(u(x,y,z,t)\) at
-time \(t=2\) of the patch scheme applied to a nonlinear
+\caption{\label{fig:configPatches3fin}field~\(u(x,y,z,t)\)
+at time \(t=2\) of the patch scheme applied to a nonlinear
 wave~\pde\ with initial condition in
 \cref{fig:configPatches3ic}.}
 \includegraphics[scale=0.9]{configPatches3fin}
@@ -473,10 +475,10 @@ DZ = Z(2)-Z(1);
 \end{matlab}
 Construct the microscale in each patch, assuming Dirichlet
 patch edges, and a half-patch length of~\(\verb|ratio(1)|
-\cdot \verb|DX|\), \(\verb|ratio(2)| \cdot \verb|DY|\) and~\(\verb|ratio(3)| \cdot \verb|DZ|\),
-unless \verb|patches.EdgyInt| is set in which case the
-patches are of length \verb|ratio*DX+dx|,
-\verb|ratio*DY+dy| and
+\cdot \verb|DX|\), \(\verb|ratio(2)| \cdot \verb|DY|\)
+and~\(\verb|ratio(3)| \cdot \verb|DZ|\), unless
+\verb|patches.EdgyInt| is set in which case the patches are
+of length \verb|ratio*DX+dx|, \verb|ratio*DY+dy| and
 \verb|ratio*DZ+dz|.
 \begin{matlab}
 %}
@@ -551,9 +553,10 @@ sub-sample to patch size, and store coefficients in
 %{
 \end{matlab}
 But for $\verb|nEnsem|>1$ an ensemble of
-\(m_xm_ym_z\)~phase-shifts of the coefficients is constructed
-from the over-supply.  Here code phase-shifts over the
-periods---the phase shifts are like Hankel-matrices.
+\(m_xm_ym_z\)~phase-shifts of the coefficients is
+constructed from the over-supply.  Here code phase-shifts
+over the periods---the phase shifts are like
+Hankel-matrices.
 \begin{matlab}
 %}
     patches.nEnsem = mx*my*mz;
@@ -588,9 +591,9 @@ preserve symmetry in the system when also invoking
     to = mod(mmy-mod(ny-2,my),my)+1;
     patches.to = reshape( 1+mmx+mx*(to-1+my*mmz) ,[],1);
     ba = mod(mmz+mod(nz-2,mz),mz)+1;
-    patches.bo = reshape( 1+mmx+mx*(mmy+my*(ba-1)) ,[],1);
+    patches.ba = reshape( 1+mmx+mx*(mmy+my*(ba-1)) ,[],1);
     fr = mod(mmz-mod(nz-2,mz),mz)+1;
-    patches.to = reshape( 1+mmx+mx*(mmy+my*(fr-1)) ,[],1);
+    patches.fr = reshape( 1+mmx+mx*(mmy+my*(fr-1)) ,[],1);
 %{
 \end{matlab}
 Issue warning if the ensemble is likely to be affected by

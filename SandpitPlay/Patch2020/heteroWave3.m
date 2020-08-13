@@ -11,14 +11,13 @@ inside the patches.  The wave \pde\ is
 u_t=v,\quad v_t=\grad(C\divv u)
 \end{equation*}
 for diagonal matrix~\(C\) which has microscale variations.
-For 8D input arrays~\verb|u|, \verb|x|,
-\verb|y|, and~\verb|z| (via edge-value interpolation of
+For 8D input arrays~\verb|u|, \verb|x|, \verb|y|,
+and~\verb|z| (via edge-value interpolation of
 \verb|patchSmooth3|, \cref{sec:patchSmooth3}), computes the
-time derivative at each
-point in the interior of a patch, output in~\verb|ut|.  The
-three 3D array of heterogeneous coefficients,~$c^x_{ijk}$, $c^y_{ijk}$
-and~$c^z_{ijk}$, have previously been stored
-in~\verb|patches.cs| (4D). 
+time derivative at each point in the interior of a patch,
+output in~\verb|ut|.  The three 3D array of heterogeneous
+coefficients,~$c^x_{ijk}$, $c^y_{ijk}$ and~$c^z_{ijk}$, have
+previously been stored in~\verb|patches.cs| (4D). 
 \begin{matlab}
 %}
 function ut = heteroWave3(t,u,x,y,z)

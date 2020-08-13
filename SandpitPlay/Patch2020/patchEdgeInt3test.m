@@ -124,8 +124,9 @@ for realisations=1:9
 \end{matlab}
 
 \paragraph{Check multiple fields simultaneously}
-Set profiles to be various powers of~\(x,y,z\), namely \verb|ps|, \verb|qs|, \verb|rs|, and
-store as different `variables' at each point.  
+Set profiles to be various powers of~\(x,y,z\), namely
+\verb|ps|, \verb|qs|, \verb|rs|, and store as different
+`variables' at each point.  
 \begin{matlab}
 %}
     [ps,qs,rs]=meshgrid(0:ordCC);

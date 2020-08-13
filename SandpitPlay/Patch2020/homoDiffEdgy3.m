@@ -1,7 +1,7 @@
-% Simulate heterogeneous diffusion in 3D on patches as an
-% example application of patches in space. Here the
-% microscale is of known period so we interpolate
-% next-to-edge values to get opposite edge values.  
+% Simulate heterogeneous diffusion in 3D space on 3D patches
+% as an example application. Here the microscale is of known
+% period so we interpolate next-to-edge values to get
+% opposite edge values.  
 % JEB & AJR, May 2020 -- Aug 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
@@ -13,15 +13,15 @@ patches}
 
 
 This section extends to 3D the 2D code discussed in
-\cref{sec:homoDiffEdgy1}. First set random heterogeneous
-diffusivities of random period in each of the two
+\cref{sec:homoDiffEdgy2}. First set random heterogeneous
+diffusivities of random period in each of the three
 directions. Crudely normalise by the harmonic mean so the
 decay time scale is roughly one. 
 \begin{matlab}
 %}
-mPeriod = [3 3 3]
-cHetr = exp(1*randn([mPeriod 3]));
-cHetr = cHetr*mean(1./cHetr(:)) 
+mPeriod = randi([2 3],1,3)
+cHetr = exp(0.3*randn([mPeriod 3]));
+cHetr = cHetr*mean(1./cHetr(:)); 
 %{
 \end{matlab}
 
@@ -32,9 +32,10 @@ only real eigenvalues by using edgy interpolation.  What
 happens for non-edgy interpolation is unknown.
 \begin{matlab}
 %}
-nPatch=mPeriod+2;
-configPatches3(@heteroDiff3, [-pi pi], nan, 5 ...
-    ,0, 0.3, nPatch, 'EdgyInt',true  ...
+nSubP=mPeriod+2;
+nPatch=[5 5 5];
+configPatches3(@heteroDiff3, [-pi pi], nan, nPatch ...
+    ,0, 0.3, nSubP, 'EdgyInt',true  ...
     ,'hetCoeffs',cHetr );
 %{
 \end{matlab}
@@ -46,10 +47,8 @@ in the ensemble.
 \begin{matlab}
 %}
 global patches
-%u0 = 0.8*cos(patches.x).*sin(patches.y) ...
-%     +0.1*randn([nSubP,1,1,nPatch]); 
-u0 = exp(-patches.x.^2-patches.y.^2-patches.z.^2);
-u0 = u0.*(0.9+0.1*rand(size(u0)));
+u0 = exp(-patches.x.^2/4-patches.y.^2/2-patches.z.^2);
+u0 = u0.*(1+0.3*rand(size(u0)));
 %{
 \end{matlab}
 Integrate using standard integrators, unevenly spaced in
@@ -57,9 +56,9 @@ time to better display transients.
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode23(@patchSmooth3, 0.5*linspace(0,1).^2, u0(:));
+    [ts,us] = ode23(@patchSmooth3, 0.25*linspace(0,1,50).^2, u0(:));
 else % octave version
-    [ts,us] = odeOcts(@patchSmooth3, 0.3*linspace(0,1).^2, u0(:));
+    [ts,us] = odeOcts(@patchSmooth3, 0.25*linspace(0,1).^2, u0(:));
 end
 %{
 \end{matlab}
@@ -68,12 +67,12 @@ end
 \paragraph{Plot the solution} as an animation over time.
 \begin{matlab}
 %}
-%if ts(end)>0.099, disp('plot animation of solution field')
 figure(1), clf
-colormap(0.8*hsv), rgb=solarized(7);
+rgb=get(gca,'defaultAxesColorOrder');
+colormap(0.8*hsv)
 %{
 \end{matlab}
-Get spatial coordinates.
+Get spatial coordinates of patch interiors.
 \begin{matlab}
 %}
 x = reshape( patches.x([2:end-1],:,:,:) ,[],1); 
@@ -88,17 +87,20 @@ display.
 for i = 1:length(ts)
 %{
 \end{matlab}
-Get the row vector of data, form into the 6D array, then omit patch edges, and reshape to suit the isosurface function.
-We do not use interpolation to get edge values as the interpolation omits the corner edges (makes them nan, which often messes the isosurfaces).
+Get the row vector of data, form into a 6D array, then omit
+patch faces, and reshape to suit the isosurface function. We
+do not use interpolation to get face values as the
+interpolation omits the corner edges and so breaks up the
+isosurfaces.
 \begin{matlab}
 %}
-  u = reshape( us(i,:) ,[mPeriod+2 nPatch]);
+  u = reshape( us(i,:) ,[nSubP nPatch]);
   u = u([2:end-1],[2:end-1],[2:end-1],:,:,:);
   u = reshape( permute(u,[1 4 2 5 3 6]) ...
       , [numel(x) numel(y) numel(z)]);
 %{
 \end{matlab}
-Draw the isosurfaces with labels.  
+Draw cross-eyed stereo view of some isosurfaces.  
 Could jazz up with more colour using the following.
 \begin{verbatim}
    [x,y,z,v] = flow;
@@ -114,7 +116,7 @@ Could jazz up with more colour using the following.
   for p=1:2
     subplot(1,2,p)
     for iso=1:5
-       isov=(1-iso/6).^2;
+       isov=(1-(iso-0.5)/5);
        hsurf(iso) = patch(isosurface(x,y,z,u,isov));  
        isonormals(x,y,z,u,hsurf(iso))
        set(hsurf(iso) ,'FaceColor',rgb(iso,:) ...
@@ -129,15 +131,15 @@ Could jazz up with more colour using the following.
     camlight, lighting gouraud
     hold off
   end% each p
-  pause(0.05)
+  if i==1, disp('Press any key to start'), pause
+  else pause(0.05)
+  end
 %{
 \end{matlab}
-finish the animation loop and if-plot.
+Finish the animation loop.
 \begin{matlab}
 %}
 end%for over time
-%end%if-plot
-return%%%%%%%%%%%%%%%%%
 %{
 \end{matlab}
 
@@ -148,12 +150,37 @@ return%%%%%%%%%%%%%%%%%
 
 \subsection{Compute Jacobian and its spectrum}
 Let's explore the Jacobian dynamics for a range of orders of
-interpolation, all for the same patch design and
+interpolation, all for the same random patch design and
 heterogeneity.  Except here use a small ratio as we do not
-plot.
+plot and then the scale separation is clearest.
 \begin{matlab}
 %}
-ratio = [0.1 0.1]
+ratio = 0.025*(1+rand(1,3))
+nSubP=randi([3 5],1,3)
+nPatch=[3 3 3]
+nEnsem = prod(mPeriod) % or just set one
+%{
+\end{matlab}
+Find which elements of the 8D array are interior micro-grid
+points and hence correspond to dynamical variables.
+\begin{matlab}
+%}
+    u0 = zeros([nSubP,1,nEnsem,nPatch]);
+    u0([1 end],:,:,:) = nan;
+    u0(:,[1 end],:,:) = nan;
+    u0(:,:,[1 end],:) = nan;
+    i = find(~isnan(u0));
+    sizeJacobian = length(i)
+    if sizeJacobian>4000,
+        warning('Jacobian is too big to generate and analyse')
+        return
+    end
+%{
+\end{matlab}
+Store this many eigenvalues in array across different orders
+of interpolation.
+\begin{matlab}
+%}
 nLeadEvals=prod(nPatch)+max(nPatch);
 leadingEvals=[];
 %{
@@ -163,28 +190,17 @@ Evaluate eigenvalues for spectral as the base case for
 polynomial interpolation of order \(2,4,\ldots\).
 \begin{matlab}
 %}
-maxords=10;
+maxords=6;
 for ord=0:2:maxords
     ord=ord    
 %{
 \end{matlab} 
-Configure with same parameters, then because they are reset
-by this configuration, restore coupling.
+Configure with same heterogeneity.
 \begin{matlab}
 %}
-    configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
-        ,ord,ratio,nSubP,'EdgyInt',edgyInt,'nEnsem',nEnsem ...
+    configPatches3(@heteroDiff3,[-pi pi],nan,nPatch ...
+        ,ord,ratio,nSubP,'EdgyInt',true,'nEnsem',nEnsem ...
         ,'hetCoeffs',cHetr);
-%{
-\end{matlab}
-Find which elements of the 6D array are interior micro-grid
-points and hence correspond to dynamical variables.
-\begin{matlab}
-%}
-    u0 = zeros([nSubP,1,nEnsem,nPatch]);
-    u0([1 end],:,:) = nan;
-    u0(:,[1 end],:) = nan;
-    i = find(~isnan(u0));
 %{
 \end{matlab}
 Construct the Jacobian of the scheme as the matrix of the
@@ -193,10 +209,9 @@ unit vectors.
 \begin{matlab}
 %}
     jac = nan(length(i));
-    sizeJacobian = size(jac)
     for j = 1:length(i)
       u = u0(:)+(i(j)==(1:numel(u0))');
-      tmp = patchSmooth2(0,u);
+      tmp = patchSmooth3(0,u);
       jac(:,j) = tmp(i);
     end
 %{
@@ -205,18 +220,16 @@ Test for symmetry, with error if we know it should be
 symmetric.
 \begin{matlab}
 %}
-    notSymmetric=norm(jac-jac')    
-    if edgyInt, assert(notSymmetric<1e-7,'failed symmetry')
-    elseif notSymmetric>1e-7, disp('failed symmetry')
-    end 
+    notSymmetric=norm(jac-jac')   
+    if notSymmetric>1e-7, spy(abs(jac-jac')>1e-7), end%??
+    assert(notSymmetric<1e-7,'failed symmetry')
+    pause(1)%%%%%%%%%%%%%%%%%%%%%%%%%%%%??
 %{
 \end{matlab}
 Find all the eigenvalues (as \verb|eigs| is unreliable).
 \begin{matlab}
 %}
-    if edgyInt, [evecs,evals] = eig((jac+jac')/2,'vector');
-    else evals = eig(jac);
-    end
+    [evecs,evals] = eig((jac+jac')/2,'vector');
     biggestImag=max(abs(imag(evals)));
     if biggestImag>0, biggestImag=biggestImag, end
 %{
@@ -243,30 +256,8 @@ leadingEvals=leadingEvals
 %{
 \end{matlab}
 
-Plot the errors in the eigenvalues using the spectral ones
-as accurate.  Only plot every second,~\verb|iEv|, as all are
-repeated eigenvalues.
-\begin{matlab}
-%}
-if maxords>2
-    iEv=2:2:12;
-    figure(2);
-    err=abs(leadingEvals-leadingEvals(:,1)) ...
-        ./(1e-7+abs(leadingEvals(:,1)));
-    semilogy(2:2:maxords,err(iEv,2:end)','o:')
-    xlabel('coupling order')
-    ylabel('eigenvalue relative error')
-    leg=legend( ...
-        strcat('$',num2str(real(leadingEvals(iEv,1)),'%.4f'),'$') ...
-        ,'Location','northeastoutside');
-    title(leg,'eigenvalues')
-    legend boxoff 
-end%if-plot
-%{
-\end{matlab}
 
-
-\input{../Patch/heteroDiffEdgy2.m}
+\input{../Patch/heteroDiffEdgy3.m}
 
 Fin.
 %}

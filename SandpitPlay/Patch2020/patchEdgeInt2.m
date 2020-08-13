@@ -160,7 +160,7 @@ if ordCC>0 % then finite-width polynomial interpolation
   dmux = zeros([ordCC,size(uCorex)]); % 7D
   dmuy = zeros([ordCC,size(uCorey)]); % 7D
   if patches.stag % use only odd numbered neighbours
-    error('polynomial interpolation not yet implemented for alternative (odd) patch coupling')
+    error('polynomial interpolation not yet for staggered patch coupling')
   else %disp('starting standard interpolation')   
     dmux(1,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) -uCorex(:,:,:,:,Im,:))/2; % \mu\delta 
     dmux(2,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) -2*uCorex(:,:,:,:,I,:) +uCorex(:,:,:,:,Im,:)); % \delta^2    
