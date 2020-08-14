@@ -360,7 +360,8 @@ end%if no arguments
 \begin{matlab}
 %}
 p = inputParser;
-addRequired(p,'fun'); % is there test for a function name??
+fnValidation = @(f) isa(f, 'function_handle'); %test for a function name
+addRequired(p,'fun',fnValidation); 
 addRequired(p,'Xlim',@isnumeric);
 addRequired(p,'BCs'); % nothing yet decided
 addRequired(p,'nPatch',@isnumeric);
