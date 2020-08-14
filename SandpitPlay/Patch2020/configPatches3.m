@@ -231,25 +231,26 @@ patch.
 \begin{matlab}
 %}
 configPatches3(@heteroWave3,[-pi pi], nan, 5 ...
-    , 0, 0.4, mPeriod+2 ,'EdgyInt',true ...
+    , 0, 0.35, mPeriod+2 ,'EdgyInt',true ...
     ,'hetCoeffs',cHetr);
 %{
 \end{matlab}
-Set a  perturbed-Gaussian initial state, with say 
-zero derivative, using auto-replication of the spatial grid.
+Set a  wave initial state using auto-replication of the
+spatial grid.
 \begin{matlab}
 %}
-u0 = exp(-patches.x.^2-patches.y.^2-patches.z.^2);
-u0 = u0.*(0.9+0.1*rand(size(u0)));
-uv0 = cat(4,u0,0*u0);
+u0 = 0.5+0.5*sin(patches.x+patches.y+patches.z);
+v0 =    -0.5*cos(patches.x+patches.y+patches.z)*sqrt(3);
+uv0 = cat(4,u0,v0);
 %{
 \end{matlab}
-Initiate a plot of the simulation using only the microscale
-values interior to the patches: set \(x\), \(y\) and
-\(z\)-edges to \verb|nan| to just show interior data. 
+Initiate a plot of the simulation: replicate \(x\), \(y\)
+and \(z\) arrays to get individual spatial coordinates of
+every data point.  Then, optionally, set faces to \verb|nan|
+so the plot just shows patch-interior data. 
 \begin{matlab}
 %}
-figure(1), clf, colormap(0.8*hsv)
+figure(1), clf, colormap(0.8*jet)
 xs = patches.x+0*patches.y+0*patches.z;
 ys = patches.y+0*patches.x+0*patches.z;
 zs = patches.z+0*patches.y+0*patches.x;
@@ -260,17 +261,21 @@ xs(:,:,[1 end],:)=nan;
 \end{matlab}
 Start by showing the initial conditions of
 \cref{fig:configPatches3ic} while the simulation computes.
+The functions \verb|pix()| and \verb|col()| map the
+\(u\)-data values to the size of the dots and to the colour
+of the dots, respectively.
 \begin{matlab}
 %}
-pix = @(u) 50*abs(u);
-col = @(u) sign(u).*abs(u).^(1/3);
+pix = @(u) 15*abs(u)+10;
+col = @(u) sign(u).*abs(u);
 for p=1:2
     subplot(1,2,p)
     uscat(p) = scatter3(xs(:),ys(:),zs(:) ...
             ,pix(u0(:)),col(u0(:)),'filled');
-    axis equal, caxis(col([-0.58 1])), view(65-5*p,35)
+    axis equal, caxis(col([0 1])), view(45-5*p,25)
     legend('time = 0.00','Location','north')
     xlabel('x'), ylabel('y'), zlabel('z')
+    title('view stereo pair cross-eyed')
 end
 %{
 \end{matlab}
@@ -297,11 +302,11 @@ naturally stiff, but \verb|ode23| is quicker.
 disp('Simulate heterogeneous wave u_tt=div[C*grad(u)]')
 drawnow
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode23(@patchSmooth3,linspace(0,2),uv0(:));
+    [ts,us] = ode23(@patchSmooth3,linspace(0,6),uv0(:));
 else % octave version is quite slow for me
     lsode_options('absolute tolerance',1e-4);
     lsode_options('relative tolerance',1e-4);
-    [ts,us] = odeOcts(@patchSmooth3,[0 2],uv0(:));
+    [ts,us] = odeOcts(@patchSmooth3,[0 6],uv0(:));
 end
 %{
 \end{matlab}
