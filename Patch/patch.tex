@@ -1,5 +1,5 @@
-% input *.m files for the Patch scheme in 1D and 2D. AJR,
-% Nov 2017 -- Feb 2019
+% input *.m files for the Patch scheme in 1D, 2D, and 3D. AJR,
+% Nov 2017 -- Aug 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 \chapter{Patch scheme for given microscale discrete space system}
 \label{sec:patch}
@@ -8,9 +8,10 @@
 \section{Introduction}
 
 
-Consider spatio-temporal multiscale systems where
-the spatial domain is so large that a given microscale code cannot be computed in a
-reasonable time.  The \emph{patch scheme} computes the microscale details only on small
+Consider spatio-temporal multiscale systems where the
+spatial domain is so large that a given microscale code
+cannot be computed in a reasonable time.  The \emph{patch
+scheme} computes the microscale details only on small
 patches of the space-time domain, and produce correct
 macroscale predictions by craftily coupling the patches
 across unsimulated space \cite[e.g.]{Hyman2005, Samaey03b,
@@ -19,12 +20,13 @@ predictions were generally proved to be consistent with the
 microscale dynamics, to some specified order of accuracy, in
 a series of papers: 1D-space dissipative systems
 \cite[]{Roberts06d, Bunder2013b}; 2D-space dissipative
-systems \cite[]{Roberts2011a}; and 1D-space wave-like
-systems \cite[]{Cao2014a}.
+systems \cite[]{Roberts2011a, Bunder2020a}; and 1D-space
+wave-like systems \cite[]{Cao2014a}.
 
 The microscale spatial structure is to be on a lattice such
-as obtained from finite difference\slash element\slash volume approximation of a \pde.
-The microscale is either continuous or discrete in time.
+as obtained from finite difference\slash element\slash
+volume approximation of a \pde. The microscale is either
+continuous or discrete in time.
 
 \paragraph{Quick start}
 See \cref{sec:configPatches1eg,sec:configPatches2eg} which
@@ -36,9 +38,16 @@ nonlinear `diffusion'~\pde.  Then see \cref{fig:constructpatch}.
 \begin{maxipage}
 \setlength{\WD}{0.048\linewidth}%%%%%%%%%%%%%%%%
 \centering
-\caption{\label{fig:constructpatch}The Patch methods, \cref{sec:patch}, accelerate simulation\slash integration of multiscale systems with interesting spatial\slash network structure\slash patterns. The  methods use your given microsimulators whether coded from \textsc{pde}s, lattice systems, or agent\slash particle microscale simulators.
-The patch functions require that a user configure the patches, and interface the coupled patches with a time integrator\slash simulator. 
-This chart overviews the main functional recursion involved.
+\caption{\label{fig:constructpatch}The Patch methods,
+\cref{sec:patch}, accelerate simulation\slash integration of
+multiscale systems with interesting spatial\slash network
+structure\slash patterns. The  methods use your given
+microsimulators whether coded from \textsc{pde}s, lattice
+systems, or agent\slash particle microscale simulators. The
+patch functions require that a user configure the patches,
+and interface the coupled patches with a time
+integrator\slash simulator. This chart overviews the main
+functional recursion involved.
 }
 \begin{tikzpicture}[node distance = 3ex, auto]
 \tikzstyle{bigblock} = [rectangle, draw, thick, text width=20.5\WD, text badly centered, rounded corners, minimum height=4ex]
@@ -54,23 +63,23 @@ This chart overviews the main functional recursion involved.
     \begin{tikzpicture}[node distance = 3ex, auto]
     \node [block] (configPatches) {\textbf{Setup problem and construct patches}
     
-    Invoke \texttt{configpatches1} (for 1D) or \texttt{configpatches2} (for 2D) to setup the microscale problem (\textsc{pde}, domain, boundary conditions, etc) and the desired patch structure (number of patches, patch size, coupling order, etc).
+    Invoke \texttt{configpatches1} (for 1D) or \texttt{configpatches2} (for 2D) or \texttt{configpatches3} (for 3D) to setup the microscale problem (\textsc{pde}, domain, boundary conditions, etc) and the desired patch structure (number of patches, patch size, coupling order, etc).
 These initialise the global struct \texttt{patches} that contains information required to simulate the microscale dynamics within each patch. 
 If necessary, define additional components for the struct \texttt{patches} (e.g., see \texttt{homogenisationExample.m}).};
 
     \node [block, below=of configPatches] (microPDE) {\textbf{Simulate the multiscale system}
     
-    Generally invoke a \textsc{pde} integrator to simulate the multiscale system of a user's microscale code within spatially separated patches. This integrator may be \script\ defined (e.g., \texttt{ode15s\slash ode45}) or user defined (e.g., a projective integrator).
+    Generally invoke a \textsc{pde} integrator to simulate the multiscale system of a user's microscale code within spatially separated patches. This integrator may be \script\ defined (e.g., \texttt{ode23\slash ode45}) or user defined (e.g., a projective integrator).
     
-    Input to the integrator is the function \texttt{patchSmooth1} (for 1D) or \texttt{patchSmooth2} (for 2D) which  interfaces to the microscale's code. Other inputs are the macro-time span and initial conditions. Output from the integrator is the solution field over the given time span, but only within the defined patches.};
+    Input to the integrator is the function \texttt{patchSmooth1} (for 1D) or \texttt{patchSmooth2} (for 2D) or \texttt{patchSmooth3} (for 3D) which  interfaces to the microscale's code. Other inputs are the macro-time span and initial conditions. Output from the integrator is the solution field over the given time span, but only within the defined patches.};
     
     \node [smallblock, above right=-3\WD and 2\WD of microPDE] (patchSmooth1) {\textbf{Interface to microscale}
     
-    \texttt{patchSmooth1\slash2} interfaces with the microscale \textsc{pde}\slash lattice system and invokes the patch coupling conditions. Input is the field in every patch at one time-step, and output is time-derivatives of the field, or values at the next time-step, as appropriate.};
+    \texttt{patchSmooth1\slash2\slash3} interfaces with the microscale \textsc{pde}\slash lattice system and invokes the patch coupling conditions. Input is the field in every patch at one time-step, and output is time-derivatives of the field, or values at the next time-step, as appropriate.};
     
     \node [tinyblock, below left=4ex and -3\WD of patchSmooth1] (coupling) {\textbf{Coupling conditions}
     
-    \texttt{patchEdgeInt1\slash2} (for 1D or 2D respectively) couple patches together by setting edge-values via macroscale interpolation of order in global \texttt{patches.ordCC}.};
+    \texttt{patchEdgeInt1\slash2\slash3} (for 1D, 2D, or 3D respectively) couple patches together by setting edge-values via macroscale interpolation of order in global \texttt{patches.ordCC}.};
     \node [tinyblock, below right=4ex and -3\WD of patchSmooth1] (micropde) {\textbf{Microscale system}
     
     A user's microscale code, pointed to by \texttt{patches.fun}, codes the microscale dynamics on the interior of the patch microgrids, \texttt{patches.x}, to compute either a micro-step or time-derivatives.
@@ -113,23 +122,35 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 \begin{devMan}
 \input{../Patch/wave2D.m}
 \input{../Patch/homoDiffEdgy2.m}
+\end{devMan}
+
+% 3D stuff
+\input{../Patch/configPatches3.m}
+\input{../Patch/patchSmooth3.m}
+\input{../Patch/patchEdgeInt3.m}
+\input{../Patch/homoDiffEdgy3.m}
+
+\begin{devMan}
 
 
 
 \section{To do}
 \begin{itemize}
-\item Some users will have microscale that has a fixed microscale lattice spacing, in which case we should code the scale ratio~\(r\) to follow from the choice of the number of lattice points in a patch.
+\item Some users will have microscale that has a fixed
+microscale lattice spacing, in which case we should code the
+scale ratio~\(r\) to follow from the choice of the number of
+lattice points in a patch.
 \item Core averages code.
-\item More than two space dimensions?
-%\item Heterogeneous microscale via averaging regions---but I suspect should be separated from simple homogenisation
+%\item Heterogeneous microscale via averaging regions---but
+%I suspect should be separated from simple homogenisation
 \item Parallel processing versions.  Matlab makes it easy with \verb|distributed|, \verb|codistributed|, et al.
 \item Adapt to maps in micro-time?  Surely easy, just an example.
 \end{itemize}
 
 
 \section{Miscellaneous tests}
-\input{../Patch/patchEdgeInt1check.m}
 \input{../Patch/patchEdgeInt1test.m}
 \input{../Patch/patchEdgeInt2test.m}
+\input{../Patch/patchEdgeInt3test.m}
 
 \end{devMan}

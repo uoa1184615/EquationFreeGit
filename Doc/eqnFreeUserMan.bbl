@@ -1,5 +1,12 @@
 \begin{thebibliography}{xx}
 
+\harvarditem[Bunder et~al.]{Bunder, Kevrekidis \harvardand\
+  Roberts}{2020}{Bunder2020a}
+Bunder, J.~E., Kevrekidis, I.~G. \harvardand\ Roberts, A.~J.  \harvardyearleft
+  2020\harvardyearright , Equation-free patch scheme for efficient
+  computational homogenisation via self-adjoint coupling, Technical report,
+  \url{http://arxiv.org/abs/2007.06815}.
+
 \harvarditem[Bunder et~al.]{Bunder, Roberts \harvardand\
   Kevrekidis}{2017}{Bunder2013b}
 Bunder, J.~E., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
@@ -11,6 +18,13 @@ Bunder, J.~E., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
 Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016\harvardyearright ,
   `Multiscale modelling couples patches of nonlinear wave-like simulations',
   {\em IMA J.~Applied Maths.} {\bf 81}(2),~228--254.
+
+\harvarditem[Frewen et~al.]{Frewen, Hummer \harvardand\
+  Kevrekidis}{2009}{Frewen2009}
+Frewen, T.~A., Hummer, G. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
+  2009\harvardyearright , `Exploration of effective potential landscapes using
+  coarse reverse integration', {\em The Journal of Chemical Physics} {\bf
+  131}(13),~134104.
 
 \harvarditem[Gear et~al.]{Gear, Kaper, Kevrekidis \harvardand\
   Zagaris}{2005{\em a}}{Gear04}

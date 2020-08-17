@@ -1,7 +1,7 @@
 % Simulate a microscale space-time map of Burgers' PDE
 % discretised.  Simulate on spatial patches, and via
 % projective integration.
-% AJR, Nov 2017 -- Apr 2019
+% AJR, Nov 2017 -- Jul 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{BurgersExample}: simulate Burgers' PDE on patches}
@@ -24,7 +24,7 @@ further in time.
 simulation of the Burgers' map (\cref{sec:burgersMap}) on
 patches in space. It requires many very small time-steps
 only just visible in this mesh.}
-\includegraphics[scale=0.9]{BurgersMapU}
+\includegraphics[scale=0.9]{BurgersExampleMapU}
 \end{figure}%
 
 
@@ -47,7 +47,6 @@ with seven points within each patch, and say fourth-order
 interpolation provides edge-values that couple the patches.
 \begin{matlab}
 %}
-clear all
 global patches
 nPatch = 8
 ratio = 0.2
@@ -81,8 +80,7 @@ view(105,45)
 Save the plot to file to form \cref{fig:BurgersMapU}.
 \begin{matlab}
 %}
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2','BurgersMapU')
+ifOurCf2eps([mfilename 'MapU'])
 %{
 \end{matlab}
 
@@ -94,7 +92,7 @@ set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
 space-time field \(u(x,t)\) in a basic projective
 integration of the patch scheme applied to the microscale
 Burgers' map.}
-\includegraphics[scale=0.9]{BurgersU}
+\includegraphics[scale=0.9]{BurgersExampleU}
 \end{figure}%
 Around the microscale burst \verb|burgerBurst()|, wrap the
 projective integration function \verb|PIRK2()| of
@@ -139,8 +137,7 @@ midP = (nSubP+1)/2;
 mesh(ts,xs(midP,:),us(:,midP:nSubP:end)')
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 view(120,50)
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2','BurgersU')
+ifOurCf2eps([mfilename 'U'])
 %{
 \end{matlab}
 Then plot and save the microscale mesh of the microscale
@@ -151,7 +148,7 @@ details of the fine microscale mesh are almost invisible.
 field \(u(x,t)\) during each of the microscale bursts used
 in the projective integration.  View this stereo pair
 cross-eyed.}
-\includegraphics[scale=0.85]{BurgersMicro}
+\includegraphics[scale=0.85]{BurgersExampleMicro}
 \end{figure}
 \begin{matlab}
 %}
@@ -161,8 +158,7 @@ for k = 1:2, subplot(2,2,k)
   ylabel('x'),xlabel('t'),zlabel('u(x,t)')
   axis tight, view(126-4*k,50)
 end
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2','BurgersMicro')
+ifOurCf2eps([mfilename 'Micro'])
 %{
 \end{matlab}
 

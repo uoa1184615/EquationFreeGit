@@ -1,15 +1,15 @@
 % Provides an interface to time integrators for the dynamics
 % on patches in 2D coupled across space. The system must be
 % a smooth lattice system such as PDE discretisations.
-% AJR, Nov 2018
+% AJR, Nov 2018 -- July 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{patchSmooth2()}: interface to time integrators}
+\section{\texttt{patchSmooth2()}: interface 2D space to time integrators}
 \label{sec:patchSmooth2}
 %\localtableofcontents
 
 
-To simulate in time with spatial patches we often need to
+To simulate in time with 2D spatial patches we often need to
 interface a users time derivative function with time
 integration routines such as \verb|ode15s| or~\verb|PIRK2|.
 This function provides an interface. It assumes that the
@@ -30,8 +30,9 @@ global patches
 \begin{itemize}
 
 \item \verb|u| is a vector of length \(\verb|prod(nSubP)|
-\cdot \verb|prod(nPatch)| \cdot \verb|nVars|\) where there
-are \verb|nVars| field values at each of the points in the
+\cdot \verb|nVars| \cdot \verb|nEnsem| \cdot
+\verb|prod(nPatch)|\) where there are \(\verb|nVars|\cdot
+\verb|nEnsem|\) field values at each of the points in the
 \(\verb|nSubP(1)| \times \verb|nSubP(2)|\times
 \verb|nPatch(1)| \times \verb|nPatch(2)|\) grid.
 
@@ -44,23 +45,23 @@ with the following information used here.
 \item \verb|.fun| is the name of the user's function
 \verb|fun(t,u,x,y)| that computes the time derivatives on
 the patchy lattice.  The array~\verb|u| has size
-\(\verb|nSubP(1)| \times\verb|nSubP(2)| \times
-\verb|nPatch(1)| \times \verb|nPatch(2)| \times
-\verb|nVars|\).  Time derivatives must be computed into the
-same sized array, but herein the patch edge-values are
+\(\verb|nSubP(1)| \times\verb|nSubP(2)| \times \verb|nVars|
+\times \verb|nEsem| \times \verb|nPatch(1)| \times
+\verb|nPatch(2)|\).  Time derivatives must be computed into
+the same sized array, but herein the patch edge-values are
 overwritten by zeros.
 
-\item \verb|.x| is \(\verb|nSubP(1)| \times
-\verb|nPatch(1)|\) array of the spatial locations~\(x_{ij}\)
-of the microscale grid points in every patch. Currently it
-\emph{must} be an equi-spaced lattice on both macro- and
-microscales.
+\item \verb|.x| is \(\verb|nSubP(1)| \times1 \times1 \times1
+\times1 \verb|nPatch(1)| \times1\) array of the spatial
+locations~\(x_{ij}\) of the microscale grid points in every
+patch. Currently it \emph{must} be an equi-spaced lattice on
+both macro- and microscales.
 
-\item \verb|.y| is similarly \(\verb|nSubP(2)| \times
-\verb|nPatch(2)|\) array of the spatial locations~\(y_{ij}\)
-of the microscale grid points in every patch.  Currently it
-\emph{must} be an equi-spaced lattice on both macro- and
-microscales.
+\item \verb|.y| is similarly \(1 \times \verb|nSubP(2)|
+\times1 \times1 \times1 \times \verb|nPatch(2)|\) array of
+the spatial locations~\(y_{ij}\) of the microscale grid
+points in every patch.  Currently it \emph{must} be an
+equi-spaced lattice on both macro- and microscales.
 
 \end{itemize}
 \end{itemize}
@@ -68,13 +69,13 @@ microscales.
 
 \paragraph{Output}
 \begin{itemize}
-\item \verb|dudt| is \(\verb|prod(nSubP)| \cdot
-\verb|prod(nPatch)| \cdot \verb|nVars|\) vector of time
-derivatives, but with patch edge-values set to zero.
+\item \verb|dudt| is \(\verb|prod(nSubP)| \cdot \verb|nVars|
+\cdot \verb|nEnsem| \cdot \verb|prod(nPatch)|\) vector of
+time derivatives, but with patch edge-values set to zero.
 \end{itemize}
 
 \begin{devMan}
-Reshape the fields~\verb|u| as a 4/5D-array, and sets the
+Reshape the fields~\verb|u| as a 6D-array, and sets the
 edge values from macroscale interpolation of centre-patch
 values.  \cref{sec:patchEdgeInt2} describes
 \verb|patchEdgeInt2()|.
@@ -91,8 +92,8 @@ column vector.
 \begin{matlab}
 %}
 dudt = patches.fun(t,u,patches.x,patches.y);
-dudt([1 end],:,:,:,:) = 0;
-dudt(:,[1 end],:,:,:) = 0;
+dudt([1 end],:,:,:,:,:) = 0;
+dudt(:,[1 end],:,:,:,:) = 0;
 dudt = reshape(dudt,[],1);
 %{
 \end{matlab}

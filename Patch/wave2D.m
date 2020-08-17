@@ -32,7 +32,6 @@ visualisation), and with a \(5\times5\) micro-grid within
 each patch.
 \begin{matlab}
 %}
-clear all, close all
 global patches
 nSubP = 5;
 nPatch = 9;
@@ -50,9 +49,9 @@ construct the Jacobian.
 \begin{matlab}
 %}
 disp('Check linear stability of the wave scheme')
-uv0 = zeros(nSubP,nSubP,nPatch,nPatch,2);
-uv0([1 end],:,:,:,:) = nan;
-uv0(:,[1 end],:,:,:) = nan;
+uv0 = zeros(nSubP,nSubP,2,1,nPatch,nPatch);
+uv0([1 end],:,:,:,:,:) = nan;
+uv0(:,[1 end],:,:,:,:) = nan;
 i = find(~isnan(uv0));
 %{
 \end{matlab}
@@ -103,13 +102,11 @@ freqerr = [freq; min(abs(imag(evals)-freq))]
 \subsection{Execute a simulation}
 Set a Gaussian initial condition using auto-replication of
 the spatial grid: here \verb|u0| and~\verb|v0| are in the
-form required for computation: \(n_x\times n_y\times
+form required for computation: \(n_x\times n_y\times 1\times 1\times
 N_x\times N_y\).
 \begin{matlab}
 %}
-x = reshape(patches.x,nSubP,1,[],1); 
-y = reshape(patches.y,1,nSubP,1,[]);
-u0 = exp(-x.^2-y.^2); 
+u0 = exp(-patches.x.^2-patches.y.^2); 
 v0 = zeros(size(u0));
 %{
 \end{matlab}
@@ -117,22 +114,21 @@ Initiate a plot of the simulation using only the microscale
 values interior to the patches: set \(x\)~and \(y\)-edges to
 \verb|nan| to leave the gaps. Start by showing the initial
 conditions of \cref{fig:configPatches2ic} while the
-simulation computes. To mesh/surf plot we need to
+simulation computes. To mesh/surf plot we need to ??
 `transpose' to size \(n_x\times N_x\times n_y\times N_y\),
 then reshape to size  \(n_x\cdot N_x\times n_y\cdot N_y\).
 \begin{matlab}
 %}
-x = patches.x; y = patches.y;
+x = squeeze(patches.x); y = squeeze(patches.y);
 x([1 end],:) = nan; y([1 end],:) = nan;
-u = reshape(permute(u0,[1 3 2 4]), [numel(x) numel(y)]);
+u = reshape(permute(squeeze(u0),[1 3 2 4]), [numel(x) numel(y)]);
 usurf = surf(x(:),y(:),u');
 axis([-3 3 -3 3 -0.5 1]), view(60,40)
 xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
 legend('time = 0','Location','north')
 colormap(hsv)
 drawnow
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc','wave2Dic')
+ifOurCf2eps([mfilename 'ic'])
 %{
 \end{matlab}
 \begin{figure}
@@ -146,10 +142,11 @@ Integrate in time using standard functions.
 \begin{matlab}
 %}
 disp('Wait while we simulate u_t=v, v_t=u_xx+u_yy')
+uv0 = cat(3,u0,v0);
 if ~exist('OCTAVE_VERSION','builtin')
-[ts,uvs] = ode23( @patchSmooth2,[0 6],[u0(:);v0(:)]);
+[ts,uvs] = ode23( @patchSmooth2,[0 6],uv0(:));
 else % octave version is slower
-[ts,uvs] = odeOcts(@patchSmooth2,[0 1],[u0(:);v0(:)]);
+[ts,uvs] = odeOcts(@patchSmooth2,linspace(0,6),uv0(:));
 end
 %{
 \end{matlab}
@@ -161,20 +158,20 @@ subsample to plot at most 100 times.
 di = ceil(length(ts)/100);
 for i = [1:di:length(ts)-1 length(ts)]
   uv = patchEdgeInt2(uvs(i,:)); 
-  uv = reshape(permute(uv,[1 3 2 4 5]), [numel(x) numel(y) 2]);
+  uv = reshape(permute(uv,[1 5 2 6 3 4]), [numel(x) numel(y) 2]);
   set(usurf,'ZData', uv(:,:,1)');
   legend(['time = ' num2str(ts(i),2)])
   pause(0.1)
 end
-%print('-depsc',['wave2Dt' num2str(ts(end))])
+ifOurCf2eps([mfilename 't' num2str(ts(end))])
 %{
 \end{matlab}
 \begin{figure}
 \centering
 \caption{\label{fig:wave2Dt6}field~\(u(x,y,t)\) at time
-\(t=2\) of the patch scheme applied to the simple wave~\pde\
+\(t=6\) of the patch scheme applied to the simple wave~\pde\
 with initial condition in \cref{fig:wave2Dic}.}
-\includegraphics[scale=0.9]{wave2Dt2}
+\includegraphics[scale=0.9]{wave2Dt6}
 \end{figure}
 
 \input{../Patch/wavePDE.m}

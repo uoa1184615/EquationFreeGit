@@ -1,10 +1,11 @@
 % Codes the ideal wave PDE on a staggered 1D grid inside
 % patches in space.  Used by waterWaveExample.m
-% AJR, 4 Apr 2019
+% AJR, 4 Apr 2019 -- Jul 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{idealWavePDE()}: ideal wave PDE}
 \label{sec:idealWavePDE}
+
 This function codes the staggered lattice equation inside
 the patches for the ideal wave \pde\ system \(h_t=-u_x\) and
 \(u_t=-h_x\). Here code for a staggered micro-grid,
@@ -23,6 +24,7 @@ reserve space for time derivatives.
 function Ut = idealWavePDE(t,U,x)
   global patches
   dx = diff(x(2:3));
+  U = squeeze(U);
   Ut = nan(size(U));  ht = Ut;
 %{
 \end{matlab}

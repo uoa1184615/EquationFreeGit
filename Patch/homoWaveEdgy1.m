@@ -1,11 +1,12 @@
-%Simulate heterogeneous wave propagation in 1D on patches as
-%an example application of patches in space. Here the
-%microscale is of known period so we interpolate
-%next-to-edge values to get opposite edge values. AJR, 25
-%Nov 2019
+% Simulate heterogeneous wave propagation in 1D on patches as
+% an example application of patches in space. Here the
+% microscale is of known period so we interpolate
+% next-to-edge values to get opposite edge values. AJR, 25
+% Nov 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{homoWaveEdgy1}: computational homogenisation of a 1D wave by simulation on small patches}
+\section{\texttt{homoWaveEdgy1}: computational
+homogenisation of a 1D wave by simulation on small patches}
 \label{sec:homoWaveEdgy1}
 %\localtableofcontents
 
@@ -23,7 +24,7 @@ weakly damped wave~\cref{eq:hetroWave}. The microscale
 random component to the initial condition persists in the
 simulation until the weak damping smooths the sub-patch
 fluctuations---but the macroscale wave still propagates.}
-\includegraphics[scale=0.85]{../Patch/homoWaveEdgyU2}
+\includegraphics[scale=0.85]{homoWaveEdgy1U2}
 \end{figure}
 
 
@@ -54,7 +55,7 @@ field~\(u(x,t)\) of the gap-tooth scheme applied to the
 weakly damped wave~\cref{eq:hetroWave}. Over this shorter
 meso-time we see the macroscale wave emerging from the
 damped sub-patch fast waves.}
-\includegraphics[scale=0.85]{../Patch/homoWaveEdgyU1}
+\includegraphics[scale=0.85]{homoWaveEdgy1U1}
 \end{figure}
 
 
@@ -87,7 +88,6 @@ a domain of length~\(2\pi\) have near integer frequencies,
 \verb|nPeriodsPatch| times within each patch. 
 \begin{matlab}
 %}
-clear all
 mPeriod = 3
 cHetr = exp(1*randn(mPeriod,1));
 cHetr = cHetr*mean(1./cHetr) % normalise
@@ -112,19 +112,12 @@ global patches
 nPatch = 7
 ratio = 0.25
 nSubP = nPeriodsPatch*mPeriod+2
-patches.EdgyInt = 1; % one to use edges for interpolation
 configPatches1(@heteroWave,[-pi pi],nan,nPatch ...
-    ,0,ratio,nSubP);
+    ,0,ratio,nSubP,'EdgyInt',true,'hetCoeffs',cHetr);
 %{
 \end{matlab}
 
-Replicate the heterogeneous coefficients across the width of
-each patch.
-\begin{matlab}
-%}
-patches.c=[repmat(cHetr,(nSubP-2)/mPeriod,1);cHetr(1)];
-%{
-\end{matlab}
+
 
 \paragraph{Simulate}
 Set the initial conditions of a simulation to be that of a
@@ -132,8 +125,8 @@ macroscopic progressive wave, via~\(\sin/\cos\), perturbed
 by significant random microscale noise, via~\verb|randn|.
 \begin{matlab}
 %}
-u0 = -sin(patches.x)+0.3*randn(nSubP,nPatch);
-v0 = +cos(patches.x)+0.3*randn(nSubP,nPatch);
+uv0(:,1,1,:) = -sin(patches.x)+0.3*randn(nSubP,1,1,nPatch);
+uv0(:,2,1,:) = +cos(patches.x)+0.3*randn(nSubP,1,1,nPatch);
 %{
 \end{matlab}
 Integrate for about half a wave period using standard stiff
@@ -142,9 +135,9 @@ fast waves have decayed).
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode15s(@patchSmooth1, [0 3], [u0(:);v0(:)]);
+    [ts,us] = ode15s(@patchSmooth1, [0 3], uv0(:));
 else % octave version
-    [ts,us] = odeOcts(@patchSmooth1, [0 3], [u0(:);v0(:)]);
+    [ts,us] = odeOcts(@patchSmooth1, [0 3], uv0(:));
 end
 %{
 \end{matlab}
@@ -157,11 +150,11 @@ permute, interpolate to get edge values, pad with
 \verb|nan|s, and reshape again.
 \begin{matlab}
 %}
-xs = patches.x;  xs(end+1,:) = nan;
+xs = squeeze(patches.x);  
 us = patchEdgeInt1( permute( reshape(us,length(ts) ...
-     ,size(patches.x,1),size(patches.x,2),2) ,[2 3 4 1]) );
-us(end+1,:,:,:) = nan;
-us = reshape(us,length(xs(:)),2,[]);
+     ,nSubP,2,nPatch) ,[2 3 1 4]) );
+xs(end+1,:) = nan; us(end+1,:,:,:) = nan;
+us = reshape(permute(us,[1 4 2 3]),length(xs(:)),2,[]);
 %{
 \end{matlab}
 
@@ -181,8 +174,7 @@ for p=1:2
   figure(p),clf
   mesh(ts(j),xs(:),squeeze(us(:,1,j))),  view(60,40)
   xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-  set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-  print('-depsc2',['homoWaveEdgyU' num2str(p)])
+  ifOurCf2eps([mfilename 'U' num2str(p)])
 end
 %{
 \end{matlab}
@@ -195,7 +187,7 @@ indices of the micro-grid points that are interior to the
 patches and hence are the systems variables.
 \begin{matlab}
 %}
-u0=0*patches.x; u0([1 end],:)=nan; u0=[u0(:);u0(:)];
+u0=repmat(0*patches.x,1,2); u0([1 end],:)=nan; u0=u0(:);
 i=find(~isnan(u0));
 nJ=length(i);
 Jac=nan(nJ);
@@ -237,7 +229,8 @@ Find the eigenvalues of the Jacobian, and list for inspection in \cref{tbl:homoW
 \begin{matlab}
 %}
 [evecs,evals]=eig(Jac);
-eval=sort(diag(evals))
+eval=sort(diag(evals));
+slowestEvals=eval(2:4:4*nPatch)
 %{
 \end{matlab}
 

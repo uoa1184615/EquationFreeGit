@@ -1,30 +1,33 @@
 % Creates a data struct of the design of patches for later
 % use by the patch functions such as smoothPatch1().  
-% AJR, Nov 2017 -- Nov 2019
+% AJR, Nov 2017 -- Aug 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{configPatches1()}: configures spatial patches in 1D}
+\section{\texttt{configPatches1()}: configures spatial
+patches in 1D}
 \label{sec:configPatches1}
 \localtableofcontents
 
 \subsection{Introduction}
 
 Makes the struct~\verb|patches| for use by the patch\slash
-gap-tooth time derivative\slash step
-function~\verb|patchSmooth1()|. \cref{sec:configPatches1eg}
-lists an example of its use.
+gap-tooth time derivative\slash step function
+\verb|patchSmooth1()|. \cref{sec:configPatches1eg} lists an
+example of its use.
 \begin{matlab}
 %}
 function configPatches1(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP ...
-                       ,nEdge)
+                       ,varargin)
 global patches
 %{
 \end{matlab}
+
 \paragraph{Input}
 If invoked with no input arguments, then executes an example
 of simulating Burgers' \pde---see \cref{sec:configPatches1eg}
 for the example code.
 \begin{itemize}
+
 \item \verb|fun| is the name of the user function,
 \verb|fun(t,u,x)|, that computes time derivatives (or
 time-steps) of quantities on the patches.
@@ -41,39 +44,75 @@ is assumed macro-periodic in the spatial domain.
 patches.
 
 \item \verb|ordCC|, must be~\(\geq -1\), is the `order' of
-interpolation across empty space of the macroscale mid-patch
+interpolation across empty space of the macroscale patch
 values to the edge of the patches for inter-patch coupling:
 where \verb|ordCC| of~\(0\) or~\(-1\) gives spectral
 interpolation; and \verb|ordCC| being odd is for staggered
 spatial grids.
 
-\item \verb|ratio| (real) is the ratio of the half-width of
-a patch to the spacing of the patch mid-points: so
-\(\verb|ratio|=\tfrac12\) means the patches abut;
+\item \verb|ratio| (real) is the ratio of (depending upon
+\verb|EdgyInt|) either the half-width or full-width of a
+patch to the spacing of the patch mid-points.  So either
+\(\verb|ratio|=\tfrac12\) means the patches abut and
 \(\verb|ratio|=1\) is overlapping patches as in holistic
-discretisation; and small~\verb|ratio| should greatly reduce
+discretisation, or \(\verb|ratio|=1\) means the patches
+abut.  Small~\verb|ratio| should greatly reduce
 computational time.
 
 \item \verb|nSubP| is the number of equi-spaced microscale
-lattice points in each patch. Must be odd so that there is a
-central lattice point.
+lattice points in each patch. If not using \verb|EdgyInt|,
+then must be odd so that there is a central lattice point.
 
-\item \verb|nEdge| (not yet implemented), \emph{optional},
-for each patch, the number of edge values set by
-interpolation at the edge regions of each patch.  May be
-omitted.  The default is one (suitable for microscale
-lattices with only nearest neighbour interactions).
+\item \verb|'nEdge'| (not yet implemented), \emph{optional},
+default=1, for each patch, the number of edge values set by
+interpolation at the edge regions of each patch.  The
+default is one (suitable for microscale lattices with only
+nearest neighbour interactions).
 
-\item \verb|patches.EdgyInt|, \emph{optional},
-if non-zero then interpolate to left\slash right edge-values 
-from right\slash left next-to-edge values.  So far only 
-implemented for spectral interpolation, \(\verb|ordCC|=0\).
+\item \verb|'EdgyInt'|, true/false, \emph{optional},
+default=false.  If true, then interpolate to left\slash right
+edge-values from right\slash left next-to-edge values.  
+
+\item \verb|'nEnsem'|,  \emph{optional-experimental},
+default one, but if more, then an ensemble over this
+number of realisations.
+
+\item \verb|'hetCoeffs'|, \emph{optional}, default empty.
+Supply an array of microscale heterogeneous coefficients to
+be used by the given microscale \verb|fun| in each patch.
+Say the given array~\verb|cs| is of size \(m_x\times n_c\),
+where \(n_c\)~is the number of different sets of
+coefficients. The coefficients are to be the same for each
+and every patch; however, macroscale variations are catered
+for by the \(n_c\)~coefficients being \(n_c\)~parameters in
+some macroscale formula.
+\begin{itemize}
+\item If \(\verb|nEnsem|=1\), then the array of coefficients
+is just tiled across the patch size to fill up each patch,
+starting from the first element.
+\item If \(\verb|nEnsem|>1\) (value immaterial), then reset
+\(\verb|nEnsem|:=m_x\) and construct an ensemble of all
+\(m_x\) phase-shifts of the coefficients. In this scenario,
+the inter-patch coupling couples different members in the
+ensemble. When \verb|EdgyInt| is true, and when the
+coefficients are diffusivities\slash elasticities, then this
+coupling cunningly preserves symmetry .
+\end{itemize}
+
+\item \verb|'nCore'|,  \emph{optional-experimental}, default
+one, but if more, and only for non-EdgyInt, then
+interpolates from an average over the core of a patch, a
+core of size ??.  Then edge values are set according to
+interpolation of the averages?? or so that average at edges
+is the interpolant??
+
 \end{itemize}
 
 
 \paragraph{Output} The \emph{global} struct \verb|patches|
 is created and set with the following components.
 \begin{itemize}
+
 \item \verb|.fun| is the name of the user's function
 \verb|fun(t,u,x)| that computes the time derivatives (or
 steps) on the patchy lattice. 
@@ -81,7 +120,7 @@ steps) on the patchy lattice.
 \item \verb|.ordCC| is the specified order of inter-patch
 coupling. 
 
-\item \verb|.alt| is true for interpolation using only odd
+\item \verb|.stag| is true for interpolation using only odd
 neighbouring patches as for staggered grids, and false for
 the usual case of all neighbour coupling.
 
@@ -90,13 +129,30 @@ the usual case of all neighbour coupling.
 interpolation onto the right and left edges (respectively)
 with patch:macroscale ratio as specified.
 
-\item \verb|.x| is \(\verb|nSubP|\times \verb|nPatch|\)
-array of the regular spatial locations~\(x_{ij}\) of the
-\(i\)th~microscale grid point in the \(j\)th~patch.  
+\item \verb|.x| (4D) is \(\verb|nSubP| \times1 \times1
+\times \verb|nPatch|\) array of the regular spatial
+locations~\(x_{ij}\) of the \(i\)th~microscale grid point in
+the \(j\)th~patch.  
 
 \item \verb|.nEdge| is, for each patch, the number of edge
 values set by interpolation at the edge regions of each
 patch.
+
+\item \verb|.le|, \verb|.ri|
+determine inter-patch coupling of members in an ensemble.
+Each a column vector of length~\verb|nEnsem|.
+
+\item \verb|.cs| either
+\begin{itemize}
+\item \verb|[]| 0D, or 
+\item if \(\verb|nEnsem|=1\), \((\verb|nSubP(1)|-1)\times
+n_c\) 2D array of microscale heterogeneous coefficients, or
+\item if \(\verb|nEnsem|>1\), \((\verb|nSubP(1)|-1) \times
+n_c\times m_x\) 3D array of \(m_x\)~ensemble of phase-shifts
+of the microscale
+heterogeneous coefficients.
+\end{itemize}
+
 \end{itemize}
 
 
@@ -156,18 +212,20 @@ applied to Burgers'~\pde.
 \begin{matlab}
 %}
 figure(1),clf
-if 1, patches.x([1 end],:)=nan;  us=us.';
+if 1, patches.x([1 end],:,:,:)=nan;  us=us.';
 else us=reshape(patchEdgyInt1(us.'),[],length(ts));  
 end
-surf(ts,patches.x(:),us), view(60,40)
-title('Example of Burgers PDE on patches in space')
+surf(ts,patches.x(:),us)
+view(60,40), colormap(hsv)
+title('Burgers PDE: patches in space, continuous time')
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
+ifOurCf2eps(mfilename)
 %{
 \end{matlab}
 \begin{figure}
 \centering \caption{\label{fig:config1Burgers}field
 \(u(x,t)\) of the patch scheme applied to Burgers'~\pde.}
-\includegraphics[scale=0.85]{config1Burgers}
+\includegraphics[scale=0.85]{configPatches1}
 \end{figure}
 Upon finishing execution of the example, exit this function.
 \begin{matlab}
@@ -180,40 +238,59 @@ end%if no arguments
 \input{../Patch/BurgersPDE.m}
 \input{../Patch/odeOcts.m}
 
+
+
+
+
 \begin{devMan}
 
-Check and set default edgy interpolation.
+\subsection{Parse input arguments and defaults}
 \begin{matlab}
 %}
-if ~isfield(patches,'EdgyInt')
-    patches.EdgyInt=0;
-end
+p = inputParser;
+fnValidation = @(f) isa(f, 'function_handle'); %test for a function name
+addRequired(p,'fun',fnValidation); 
+addRequired(p,'Xlim',@isnumeric);
+addRequired(p,'BCs'); % nothing yet decided
+addRequired(p,'nPatch',@isnumeric);
+addRequired(p,'ordCC',@isnumeric);
+addRequired(p,'ratio',@isnumeric);
+addRequired(p,'nSubP',@isnumeric);
+addParameter(p,'nEdge',1,@isnumeric);
+addParameter(p,'EdgyInt',false,@islogical);
+addParameter(p,'nEnsem',1,@isnumeric);
+addParameter(p,'nCore',1,@isnumeric);
+addParameter(p,'hetCoeffs',[],@isnumeric);
+parse(p,fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,varargin{:});
+%{
+\end{matlab}
+Set the optional parameters. 
+\begin{matlab}
+%}
+patches.nEdge = p.Results.nEdge;
+patches.EdgyInt = p.Results.EdgyInt;
+patches.nEnsem = p.Results.nEnsem;
+cs = p.Results.hetCoeffs;
+patches.nCore = p.Results.nCore;
+%{
+\end{matlab}
+Check parameters.
+\begin{matlab}
+%}
+assert(patches.nEdge==1 ...
+      ,'multi-edge-value interp not yet implemented')
+assert(2*patches.nEdge+1<=nSubP ...
+      ,'too many edge values requested')
+if patches.nCore>1
+    warning('nCore>1 not yet tested in this version')
+    end
 %{
 \end{matlab}
 
 
-
-
-For compatibility, by default, do not ensemble average.
-\begin{matlab}
-%}
-patches.EnsAve = 0;
-%{
-\end{matlab}
 
 
 \subsection{The code to make patches and interpolation}
-If not specified by a user, then set interpolation to
-compute one edge-value on each patch edge. Store in the
-struct~\verb|patches|.
-\begin{matlab}
-%}
-if nargin<8, nEdge=1; end
-assert(nEdge==1,'multi-edge-value interp not yet implemented')
-assert(2*nEdge+1<=nSubP,'too many edge values requested')
-patches.nEdge=nEdge;
-%{
-\end{matlab}
 First, store the pointer to the time derivative function in
 the struct.
 \begin{matlab}
@@ -221,28 +298,29 @@ the struct.
 patches.fun=fun;
 %{
 \end{matlab}
+
 Second, store the order of interpolation that is to provide
 the values for the inter-patch coupling conditions. Spectral
 coupling is \verb|ordCC| of~\(0\) and~\(-1\).
 \begin{matlab}
 %}
 assert((ordCC>=-1) & (floor(ordCC)==ordCC), ...
-    'ordCC out of allowed range integer>-2')
+    'ordCC out of allowed range integer>=-1')
 %{
 \end{matlab}
 For odd~\verb|ordCC|, interpolate based upon odd
 neighbouring patches as is useful for staggered grids.
 \begin{matlab}
 %}
-patches.alt=mod(ordCC,2);
-ordCC=ordCC+patches.alt;
+patches.stag=mod(ordCC,2);
+ordCC=ordCC+patches.stag;
 patches.ordCC=ordCC;
 %{
 \end{matlab}
 Check for staggered grid and periodic case.
 \begin{matlab}
 %}
-  if patches.alt, assert(mod(nPatch,2)==0, ...
+  if patches.stag, assert(mod(nPatch,2)==0, ...
     'Require an even number of patches for staggered grid')
   end
 %{
@@ -252,23 +330,11 @@ interpolation of field values for coupling. (Could sometime
 extend to coupling via derivative values.)
 \begin{matlab}
 %}
-patches.Cwtsr=zeros(ordCC,1);
-if patches.alt  % eqn (7) in \cite{Cao2014a}
-    patches.Cwtsr(1:2:ordCC)=[1 ...
-      cumprod((ratio^2-(1:2:(ordCC-2)).^2)/4)./ ...
-      factorial(2*(1:(ordCC/2-1)))];    
-    patches.Cwtsr(2:2:ordCC)=[ratio/2 ...
-      cumprod((ratio^2-(1:2:(ordCC-2)).^2)/4)./ ...
-      factorial(2*(1:(ordCC/2-1))+1)*ratio/2];
-else % 
-    patches.Cwtsr(1:2:ordCC)=(cumprod(ratio^2- ...
-      (((1:(ordCC/2))-1)).^2)./factorial(2*(1:(ordCC/2))-1)/ratio);
-    patches.Cwtsr(2:2:ordCC)=(cumprod(ratio^2- ...
-      (((1:(ordCC/2))-1)).^2)./factorial(2*(1:(ordCC/2))));
-end
-patches.Cwtsl=(-1).^((1:ordCC)'-patches.alt).*patches.Cwtsr;
+if ordCC>0, patchCwts(ratio,ordCC,patches.stag), end
 %{
 \end{matlab}
+
+
 Third, set the centre of the patches in a the macroscale
 grid of patches assuming periodic macroscale domain.
 \begin{matlab}
@@ -278,22 +344,124 @@ X=X(1:nPatch)+diff(X)/2;
 DX=X(2)-X(1);
 %{
 \end{matlab}
-Construct the microscale in each patch, assuming Dirichlet
-patch edges, and a half-patch length
-of~\(\verb|ratio|\cdot\verb|DX|\), unless \verb|patches.EdgyInt| is set in which case the patches are of length \verb|ratio*DX+dx|.
+Construct the microscale grid in each patch, assuming
+Dirichlet patch edges, and a half-patch length of
+\(\verb|ratio| \cdot \verb|DX|\), unless
+\verb|patches.EdgyInt| is set in which case the patches are
+of length \verb|ratio*DX+dx|. Reshape the grid to be 4D to
+suit dimensions (micro,Vars,Ens,macro).
 \begin{matlab}
 %}
-if patches.EdgyInt==0, assert(mod(nSubP,2)==1, ...
+assert(patches.EdgyInt | mod(nSubP,2)==1, ...
     'configPatches1: nSubP must be odd')
-end
 i0=(nSubP+1)/2;
-if patches.EdgyInt==0, dx = ratio*DX/(i0-1);  
-else                   dx = ratio*DX/(nSubP-2);
+if ~patches.EdgyInt, dx = ratio*DX/(i0-1);  
+else                 dx = ratio*DX/(nSubP-2);
 end
-patches.x=bsxfun(@plus,dx*(-i0+1:i0-1)',X); % micro-grid
+patches.x = dx*(-i0+1:i0-1)'+X; % micro-grid
+patches.x = reshape(patches.x,nSubP,1,1,nPatch);
+%{
+\end{matlab}
+
+
+
+
+\subsection{Set ensemble inter-patch communication}
+For \verb|EdgyInt| or centre interpolation respectively, the
+right-edge\slash centre realisations \verb|1:nEnsem| are to
+interpolate to left-edge~\verb|le|, and the left-edge\slash
+centre realisations \verb|1:nEnsem| are to interpolate
+to~\verb|re|. \verb|re| and \verb|li| are `transposes' of
+each other as \verb|re(li)=le(ri)| are both \verb|1:nEnsem|.
+Alternatively, one may use the statement
+\begin{verbatim}
+c=hankel(c(1:nSubP-1),c([nSubP 1:nSubP-2]));
+\end{verbatim}
+to \emph{correspondingly} generates all phase shifted copies
+of microscale heterogeneity (see \verb|homoDiffEdgy1| of
+\cref{sec:homoDiffEdgy1}).
+
+The default is nothing shifty.  This setting reduces the
+number of if-statements in function \verb|patchEdgeInt2()|.
+\begin{matlab}
+%}
+nE = patches.nEnsem;
+patches.le = 1:nE;  
+patches.ri = 1:nE;  
+%{
+\end{matlab}
+However, if heterogeneous coefficients are supplied via
+\verb|hetCoeffs|, then do some non-trivial replications. 
+First, get microscale periods, patch size, and replicate
+many times in order to subsequently sub-sample: 
+\verb|nSubP| times should be enough.
+\begin{matlab}
+%}
+if ~isempty(cs)
+  [mx,nc] = size(cs);
+  nx = nSubP(1); 
+  cs = repmat(cs,nSubP,1);
+%{
+\end{matlab}
+If only one member of the ensemble is required, then
+sub-sample to patch size, and store coefficients in
+\verb|patches| as is.
+\begin{matlab}
+%}
+  if nE==1, patches.cs = cs(1:nx-1,:); else
+%{
+\end{matlab}
+But for $\verb|nEnsem|>1$ an ensemble of
+\(m_x\)~phase-shifts of the coefficients is constructed
+from the over-supply.  Here code phase-shifts over the
+periods---the phase shifts are like Hankel-matrices.
+\begin{matlab}
+%}
+    patches.nEnsem = mx;
+    patches.cs = nan(nx-1,nc,mx);
+    for i = 1:mx
+        is = (i:i+nx-2);
+        patches.cs(:,:,i) = cs(is,:);
+    end
+    patches.cs = reshape(patches.cs,nx-1,nc,[]);
+%{
+\end{matlab}
+Further, set a cunning left\slash right
+realisation of inter-patch coupling.  The aim is to
+preserve symmetry in the system when also invoking
+\verb|EdgyInt|.  What this coupling does without
+\verb|EdgyInt| is unknown.  Use auto-replication.
+\begin{matlab}
+%}
+    patches.le = mod((0:mx-1)'+mod(nx-2,mx),mx)+1;
+    patches.ri = mod((0:mx-1)'-mod(nx-2,mx),mx)+1;
+%{
+\end{matlab}
+Issue warning if the ensemble is likely to be affected by
+lack of scale separation.  Need to justify this and the
+arbitrary threshold more carefully??
+\begin{matlab}
+%}
+if ratio*patches.nEnsem>0.9, warning( ...
+'Probably poor scale separation in ensemble of coupled phase-shifts')
+scaleSeparationParameter=ratio*patches.nEnsem
+end
+%{
+\end{matlab}
+End the two if-statements.
+\begin{matlab}
+%}
+  end%if nEnsem=1 or >1  
+end%if not-empty(cs)
+%{
+\end{matlab}
+
+
+\paragraph{Fin}
+\begin{matlab}
+%}
 end% function
 %{
 \end{matlab}
-Fin.
 \end{devMan}
 %}

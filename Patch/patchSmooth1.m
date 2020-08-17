@@ -4,13 +4,13 @@
 % AJR, Nov 2017 -- Jun 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{patchSmooth1()}: interface to time integrators}
+\section{\texttt{patchSmooth1()}: interface 1D space to time integrators}
 \label{sec:patchSmooth1}
 %\localtableofcontents
 
 %\subsection{Introduction}
 
-To simulate in time with spatial patches we often need to
+To simulate in time with 1D spatial patches we often need to
 interface a user's time derivative function with time
 integration routines such as \verb|ode15s| or~\verb|PIRK2|.
 This function provides an interface. It mostly assumes that

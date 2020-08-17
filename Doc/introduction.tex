@@ -23,15 +23,18 @@ Many of the main functions include, at their beginning, example code of their us
 \item To only resolve the slow dynamics in the projective integration, use lifting and restriction functions by adapting the singular perturbation \ode\ example at the beginning of \verb|PIG.m| (\cref{sec:pigeg}).
 
 \paragraph{Space-time systems}
-Consider an evolving system over a large spatial domains when all you have is a microscale code.  
+Consider an evolving system over a large spatial domain when all you have is a microscale code.  
 To efficiently simulate over the large domain, one can simulate in just small patches of the domain, appropriately coupled.
-\item In 1D adapt the code at the beginning of \verb|configPatches1.m| for Burgers' \pde\ (\cref{sec:configPatches1eg})%
+\item In 1D space adapt the code at the beginning of \verb|configPatches1.m| for Burgers' \pde\ (\cref{sec:configPatches1eg})%
 \ifcsname r@sec:wave2D\endcsname, or the staggered patches of 1D water wave equations in \verb|waterWaveExample.m| (\cref{sec:waterWaveExample})\fi.
-\item in 2D adapt the code at the beginning of \verb|configPatches2.m| for nonlinear diffusion (\cref{sec:configPatches2eg})%
-\ifcsname r@sec:wave2D\endcsname, or the regular patches of the 2D wave equation of \verb|wave2D.m| (\cref{sec:wave2D})\fi.
 
-\item The above two are for systems that have \emph{smooth} spatial structures on the microscale: when the microscale is `rough' with a known period (so far only in 1D), then adapt 
-the example of \verb|HomogenisationExample.m| (\cref{sec:HomogenisationExample}).
+\item In 2D space adapt the code at the beginning of \verb|configPatches2.m| for nonlinear diffusion (\cref{sec:configPatches2eg})%
+\ifcsname r@sec:wave2D\endcsname, or the regular patches of the 2D wave \pde\ of \verb|wave2D.m| (\cref{sec:wave2D})\fi.
+
+\item In 3D space adapt the code at the beginning of \verb|configPatches3.m| for wave propagation through a heterogeneous medium (\cref{sec:configPatches3eg})%
+\ifcsname r@sec:homoDiffEdgy3\endcsname, or the patches of the 3D heterogeneous diffusion of \verb|homoDiffEdgy3.m| (\cref{sec:homoDiffEdgy3})\fi.
+
+\item Other provided examples include cases of macroscale \emph{computational homogenisation} of microscale heterogeneity.
 \end{itemize}
 
 
@@ -42,13 +45,14 @@ In the spatial patch schemes, we measure `accuracy' by the order of consistency 
 \item \cite{Roberts06d} and \cite{Roberts2011a} proved reasonably general high-order consistency for the 1D and 2D patch schemes, respectively.
 \item In wave-like systems, \cite{Cao2014a} established high-order consistency for the 1D staggered patch scheme.
 \item A heterogeneous microscale is more difficult, but \cite{Bunder2013b} showed good accuracy in a variety of circumstances, for appropriately chosen parameters. 
+Further, \cite{Bunder2020a} developed a new `edgy' inter-patch interpolation that is proven to be good for simulating the macroscale homogenised dynamics of microscale heterogeneous systems---now coded in the toolbox.
 \end{itemize}
 
 
 
 \paragraph{Blackbox scenarios} 
 Suppose that you have a \emph{detailed and trustworthy} computational simulation of some problem of interest.
-Let's say the simulation is coded in terms of detailed (microscale) variable values~\(\uv(t)\), in~\(\RR^{p}\) for some~\(p\), and evolving time~\(t\).
+Let's say the simulation is coded in terms of detailed (microscale) variable values~\(\uv(t)\), in~\(\RR^{p}\) for some number~\(p\) of field variables, and evolving in time~\(t\).
 The details~\uv\ could represent particles, agents, or states of a system.
 When the computation is too time consuming to simulate all the times of interest, then Projective Integration may be able to predict long-time dynamics, both forward and backward in time.  
 In this case, provide your detailed computational simulation as a `black box' to the Projective Integration functions of \cref{sec:ProjInt}.

@@ -5,6 +5,7 @@
 <a href="https://github.com/uoa1184615/EquationFreeGit">
 Click to download the toolbox via Github</a>, and then place
 the toolbox's folder in a path searched by Matlab/Octave. 
+There was a major upgrade on 17 August 2020.
 
 <p>This <em>equation-free toolbox</em> empowers the
 computer-assisted analysis of complex, multiscale systems.

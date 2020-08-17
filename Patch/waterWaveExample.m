@@ -1,6 +1,6 @@
 % Simulate water waves on patches as an example of wave
 % systems in the form h_t=u_x+... and u_u=h_x+...
-% AJR, Nov 2017 -- Oct 2018
+% AJR, Nov 2017 -- Jul 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{waterWaveExample}: simulate a water wave PDE on patches}
@@ -20,7 +20,7 @@ wave \pde~\cref{eq:genwaveqn} with \(f_1=f_2=0\). The
 microscale random component to the initial condition
 persists in the simulation---but the macroscale wave still
 propagates.}
-\includegraphics[scale=0.85]{ps1WaveCtsUH}
+\includegraphics[scale=0.85]{waterWaveExample1CtsUH}
 \end{figure}
 
 This approach\ifcsname r@sec:idealWavePDE\endcsname, based
@@ -82,7 +82,7 @@ depth~\(h(x,t)\) (above) and velocity field~\(u(x,t)\)
 shallow water wave \pde{}s~\cref{eqs:patch:N}. The
 microscale random initial component decays where the water
 speed is non-zero due to `turbulent' dissipation.}
-\includegraphics[scale=0.85]{ps1WaterWaveCtsUH}
+\includegraphics[scale=0.85]{waterWaveExample2CtsUH}
 \end{figure}%
 
 
@@ -116,7 +116,6 @@ within each patch, and spectral interpolation~(\(-1\)) of
 the inter-patch coupling conditions.
 \begin{matlab}
 %}
-clear all
 global patches
 nPatch = 8
 ratio = 0.2
@@ -132,7 +131,7 @@ the struct~\verb|patches| for use by the time derivative
 function.
 \begin{matlab}
 %}
-uPts = mod( bsxfun(@plus,(1:nSubP)',(1:nPatch)) ,2);
+uPts = mod( (1:nSubP)'+(1:nPatch) ,2);
 hPts = find(uPts==0);
 uPts = find(uPts==1);
 patches.hPts = hPts; patches.uPts = uPts;
@@ -180,7 +179,7 @@ Plot the simulation.
 \begin{matlab}
 %}
   figure(k),clf
-  xs = patches.x;  xs([1 end],:) = nan;
+  xs = squeeze(patches.x);  xs([1 end],:) = nan;
   mesh(ts,xs(hPts),Ucts(:,hPts)'),hold on
   mesh(ts,xs(uPts),Ucts(:,uPts)'),hold off
   xlabel('time t'), ylabel('space x'), zlabel('u(x,t) and h(x,t)')
@@ -190,10 +189,7 @@ Plot the simulation.
 Optionally save the plot to file.
 \begin{matlab}
 %}
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%  if k==1, print('-depsc2','ps1WaveCtsUH')
-%  else print('-depsc2','ps1WaterWaveCtsUH')
-%  end
+ifOurCf2eps([mfilename num2str(k) 'CtsUH'])
 %{
 \end{matlab}
 

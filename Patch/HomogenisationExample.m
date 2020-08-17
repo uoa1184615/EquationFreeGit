@@ -1,11 +1,13 @@
 % Simulate heterogeneous diffusion in 1D on patches as an
 % example application of patches in space. Here the
 % microscale is of known period which makes accurate
-% simulation easier. AJR, Nov 2017 -- Apr 2019
+% simulation easier. AJR, Nov 2017 -- Jul 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section[\texttt{homogenisationExample}: simulate heterogeneous diffusion in 1D \ldots]
-{\texttt{homogenisationExample}: simulate heterogeneous diffusion in 1D on patches}
+\section[\texttt{homogenisationExample}: simulate
+heterogeneous diffusion in 1D \ldots]
+{\texttt{homogenisationExample}: simulate heterogeneous
+diffusion in 1D on patches}
 \label{sec:HomogenisationExample}
 \localtableofcontents
 
@@ -29,7 +31,7 @@ recursion).
 \centering \caption{\label{fig:HomogenisationCtsU}the
 diffusing field~\(u(x,t)\) in the patch (gap-tooth) scheme
 applied to microscale heterogeneous diffusion (\cref{sec:HomogenisationExample}). }
-\includegraphics[scale=0.9]{HomogenisationCtsU}
+\includegraphics[scale=0.9]{homogenisationExampleCtsU}
 \end{figure}%
 
 Consider a lattice of values~\(u_i(t)\), with lattice
@@ -48,7 +50,6 @@ choose random microscale diffusion coefficients (with
 subscripts shifted by a half).
 \begin{matlab}
 %}
-clear all
 mPeriod = 3
 cDiff = exp(randn(mPeriod,1))
 cHomo = 1/mean(1./cDiff)
@@ -59,7 +60,8 @@ Establish global data struct~\verb|patches| for
 heterogeneous diffusion on \(2\pi\)-periodic domain. Use
 nine patches, each patch of half-size ratio~\(0.2\). Quartic
 (fourth-order) interpolation  \(\verb|ordCC|=4\) provides
-values for the inter-patch coupling conditions. 
+values for the inter-patch coupling conditions. Here include
+the diffusivity coefficients, repeated to fill up a patch.
 \begin{matlab}
 %}
 global patches
@@ -69,18 +71,10 @@ nSubP = 2*mPeriod+1
 Len = 2*pi;
 ordCC = 4;
 configPatches1(@heteroDiff,[0 Len],nan,nPatch ...
-    ,ordCC,ratio,nSubP);
+    ,ordCC,ratio,nSubP,'hetCoeffs',cDiff);
 %{
 \end{matlab}
 
-A user may add information to~\verb|patches| in order to
-communicate to the time derivative function: here include
-the diffusivity coefficients, repeated to fill up a patch
-\begin{matlab}
-%}
-patches.c=repmat(cDiff,(nSubP-1)/mPeriod,1);
-%{
-\end{matlab}
 
 \paragraph{For comparison: conventional integration in time}
 Set an initial condition, and here integrate forward in time
@@ -91,7 +85,7 @@ efficiently here.  Integrate the interface
 microscale differential equations.
 \begin{matlab}
 %}
-u0 = sin(patches.x)+0.4*randn(nSubP,nPatch);
+u0 = sin(patches.x)+0.3*randn(nSubP,1,1,nPatch);
 if ~exist('OCTAVE_VERSION','builtin')
 [ts,ucts] = ode15s(@patchSmooth1, [0 2/cHomo], u0(:));
 else % octave version
@@ -108,8 +102,7 @@ figure(1),clf
 xs = patches.x;  xs([1 end],:) = nan;
 mesh(ts,xs(:),ucts'),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2','homogenisationCtsU')
+ifOurCf2eps([mfilename 'CtsU'])
 %{
 \end{matlab}
 
@@ -124,7 +117,7 @@ The code may invoke this integration interface.
 heterogeneous diffusion: different colours correspond to the
 times in the legend. This field solution displays some fine
 scale heterogeneity due to the heterogeneous diffusion.}
-\includegraphics[scale=0.9]{HomogenisationU}
+\includegraphics[scale=0.9]{homogenisationExampleU}
 \end{figure}%
 Now take \verb|patchSmooth1|, the interface to the time
 derivatives, and wrap around it the projective integration
@@ -171,8 +164,7 @@ figure(2),clf
 plot(xs(:),us','.')
 ylabel('u(x,t)'), xlabel('space x')
 legend(num2str(ts',3))
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2','homogenisationU')
+ifOurCf2eps([mfilename 'U'])
 %{
 \end{matlab}
 Also plot a surface detailing the microscale bursts as shown
@@ -183,18 +175,17 @@ in the stereo \cref{fig:HomogenisationMicro}.
 pair of the field~\(u(x,t)\) during each of the microscale
 bursts used in the projective integration of heterogeneous
 diffusion.}
-\includegraphics[scale=0.9]{HomogenisationMicro}
+\includegraphics[scale=0.9]{homogenisationExampleMicro}
 \end{figure}
 \begin{matlab}
 %}
 figure(3),clf
-for k = 1:2, subplot(1,2,k)
+for k = 1:2, subplot(2,2,k)
   surf(tss,xs(:),uss',  'EdgeColor','none')
   ylabel('x'), xlabel('t'), zlabel('u(x,t)')
   axis tight, view(126-4*k,45)
 end
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-%print('-depsc2','homogenisationMicro')
+ifOurCf2eps([mfilename 'Micro'])
 %{
 \end{matlab}
 End of this example script.

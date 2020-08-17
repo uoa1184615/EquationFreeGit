@@ -1,6 +1,6 @@
 % Microscale Euler step of the Burgers PDE on a lattice in
 % x.  Used by BurgersExample.m
-% AJR, 4 Apr 2019
+% AJR, 4 Apr 2019 -- Jul 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{burgersMap()}: discretise the PDE microscale}
@@ -12,6 +12,7 @@ overrides the edge-values anyway).
 \begin{matlab}
 %}
 function u = burgersMap(t,u,x)
+  u = squeeze(u);
   dx = diff(x(2:3));   
   dt = dx^2/2;
   i = 2:size(u,1)-1;

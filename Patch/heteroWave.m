@@ -1,6 +1,6 @@
 % Computes the time derivatives of heterogeneous wave
 % in 1D on patches.  Used by homoWaveEdgy1.m,
-% AJR, 26 Nov 2019
+% AJR, 26 Nov 2019 -- Jul 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{heteroWave()}: wave in heterogeneous
@@ -9,8 +9,8 @@ media with weak viscous damping}
 
 This function codes the lattice heterogeneous wave equation,
 with weak viscosity, inside the patches.  For 3D input
-array~\verb|u| (\(u_{ij} = \verb|u(i,j,1)|\) and \(v_{ij} =
-\verb|u(i,j,2)|\)) and 2D array~\verb|x| (obtained in full
+array~\verb|u| (\(u_{ij} = \verb|u(i,1,j)|\) and \(v_{ij} =
+\verb|u(i,2,j)|\)) and 2D array~\verb|x| (obtained in full
 via edge-value interpolation of \verb|patchSmooth1|,
 \cref{sec:patchSmooth1}), computes the time derivatives at
 each point in the interior of a patch, output in~\verb|ut|:
@@ -26,12 +26,13 @@ struct~\verb|patches|.
 %}
 function ut = heteroWave(t,u,x)
   global patches
-  dx = diff(x(2:3)); % space step
-  i = 2:size(u,1)-1; % interior points in a patch
-  ut = nan(size(u)); % preallocate output array
-  ut(i,:,1) = u(i,:,2); % du/dt=v then dvdt=
-  ut(i,:,2) = diff(patches.c.*diff(u(:,:,1)))/dx^2 ...
-        +0.02*diff(u(:,:,2),2)/dx^2; 
+  u = squeeze(u);
+  dx = diff(x(2:3));    % space step
+  i = 2:size(u,1)-1;    % interior points in a patch
+  ut = nan(size(u));    % preallocate output array
+  ut(i,1,:) = u(i,2,:); % du/dt=v then dvdt=
+  ut(i,2,:) = diff(patches.cs.*diff(u(:,1,:)))/dx^2 ...
+        +0.02*diff(u(:,2,:),2)/dx^2; 
 end% function
 %{
 \end{matlab}

@@ -1,238 +1,259 @@
-%Simulate heterogeneous diffusion in 2D on patches as an
-%example application of patches in space. Here the
-%microscale is of known period so we interpolate
-%next-to-edge values to get opposite edge values. Then
-%explore the Jacobian and eigenvalues.  JEB, May 2020
+% Simulate heterogeneous diffusion in 2D on patches as an
+% example application of patches in space. Here the
+% microscale is of known period so we interpolate
+% next-to-edge values to get opposite edge values. Then
+% explore the Jacobian and eigenvalues.  
+% JEB & AJR, May 2020 -- Aug 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{homoDiffEdgy2}: computational homogenisation of a 2D diffusion by simulation on small patches}
+\section{\texttt{homoDiffEdgy2}: computational
+homogenisation of a 2D diffusion via simulation on small
+patches}
 \label{sec:homoDiffEdgy2}
-%\localtableofcontents
 
-This section extends the 1D code discussed in \cref{sec:homoDiffEdgy2} to 2D.
 
-%}
-clear all
-mPeriod = [5 4]
-% set random diffusion coefficients
-rng('default');
-rng(1); %
-cHetr=exp(1*randn([mPeriod,2]));
-cHetr = cHetr*mean(1./cHetr(:)) % normalise
-nPeriodsPatch=[1 1]
 
-global patches
-nPatch = [11 11]
-ratio = [0.3 0.5];
-nSubP = [nPeriodsPatch(1)*mPeriod(1)+2 nPeriodsPatch(2)*mPeriod(2)+2]
-patches.EdgyInt = 1; % one to use edges for interpolation
-patches.EdgyEns=0; % one for ensemble of configurations
-if patches.EdgyEns 
-    patches.EdgyInt=1; % EdgyEns=1 implies EdgyInt=1     
-   % nSubP = [3 3] % > [2 2]; when EdgyEns=1, nSubP need not depend on mPeriod
-end
-configPatches2(@heteroDiff2,[0 2*pi 0 2*pi],nan,nPatch ...
-    ,0,ratio,nSubP);
-%{
-\end{matlab}
-
-Replicate the heterogeneous coefficients across the width of
-each patch. For \verb|patches.EdgyEns| an ensemble of configurations 
-is constructed.
+This section extends to 2D the 1D code discussed in
+\cref{sec:homoDiffEdgy1}. First set random heterogeneous
+diffusivities of random period in each of the two
+directions. Crudely normalise by the harmonic mean so the
+decay time scale is roughly one. 
 \begin{matlab}
 %}
-if patches.EdgyEns   
-   shiftx=mod(bsxfun(@plus,0:(mPeriod(1)-1),(0:(nSubP(1)-2))'),mPeriod(1))+1;
-   shifty=mod(bsxfun(@plus,0:(mPeriod(2)-1),(0:(nSubP(2)-2))'),mPeriod(2))+1;
-   patches.cx=nan(nSubP(1)-1,nSubP(2)-2,mPeriod(1)*mPeriod(2));
-   patches.cy=nan(nSubP(1)-2,nSubP(2)-1,mPeriod(1)*mPeriod(2));
-   for p=1:mPeriod(1)
-      for  q=1:mPeriod(2)
-          patches.cx(:,:,(p-1)*mPeriod(2)+q)=cHetr(shiftx(:,p),shifty(1:(end-1),q),1);
-          patches.cy(:,:,(p-1)*mPeriod(2)+q)=cHetr(shiftx(1:(end-1),p),shifty(:,q),2);
-      end
-   end
-   patches.cx=permute(repmat(patches.cx,[1,1,1,nPatch]),[1,2,4,5,3]);
-   patches.cy=permute(repmat(patches.cy,[1,1,1,nPatch]),[1,2,4,5,3]);
-   % need to specify how configurations are coupled 
-   patches.le=mod((0:(mPeriod(1)*mPeriod(2)-1))+mPeriod(2)*rem(nSubP(1)-2,mPeriod(1)),mPeriod(1)*mPeriod(2))+1;
-   patches.ri=mod((0:(mPeriod(1)*mPeriod(2)-1))-mPeriod(2)*rem(nSubP(1)-2,mPeriod(1)),mPeriod(1)*mPeriod(2))+1;
-   patches.bo=mod((1:(mPeriod(1)*mPeriod(2)))+nSubP(2)-3,mPeriod(2))+mPeriod(2)*floor((0:(mPeriod(1)*mPeriod(2)-1))/mPeriod(2))+1;
-   patches.to=mod((1:(mPeriod(1)*mPeriod(2)))-nSubP(2)+1,mPeriod(2))+mPeriod(2)*floor((0:(mPeriod(1)*mPeriod(2)-1))/mPeriod(2))+1;
-else  
-   patches.cx=[repmat(cHetr(:,:,1),[(nSubP-2)./mPeriod,1]);repmat(cHetr(1,:,1),[1,(nSubP(2)-2)/mPeriod(2)])];
-   patches.cy=[repmat(cHetr(:,:,2),[(nSubP-2)./mPeriod,1]),repmat(cHetr(:,1,2),[(nSubP(1)-2)/mPeriod(1),1])];
-end
+mPeriod = randi([2 3],1,2)
+cHetr = exp(1*randn([mPeriod 2]));
+cHetr = cHetr*mean(1./cHetr(:)) 
 %{
 \end{matlab}
+
+Configure the patch scheme with some arbitrary choices of
+domain, patches, size ratios.  Use spectral interpolation as
+we test other orders subsequently.  In 2D we appear to get
+only real eigenvalues by using edgy interpolation.  What
+happens for non-edgy interpolation is unknown.
+\begin{matlab}
+%}
+edgyInt = true; 
+nEnsem = prod(mPeriod) % or just set one
+if nEnsem==1% use more patches
+    nPatch = [9 9]
+    nSubP = (2-edgyInt)*mPeriod+1+edgyInt
+else % when nEnsem>1 use fewer patches
+    nPatch = [5 5]
+    nSubP = mPeriod+randi([1 4],1,2) % +2 is decoupled
+end
+ratio = 0.2+0.2*rand(1,2)   
+configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
+    ,0,ratio,nSubP ,'EdgyInt',edgyInt ,'nEnsem',nEnsem ...
+    ,'hetCoeffs',cHetr );
+%{
+\end{matlab}
+
 
 \paragraph{Simulate}
-Set the initial conditions of a simulation.
+Set initial conditions of a simulation, replicated for each
+in the ensemble.
 \begin{matlab}
 %}
-if patches.EdgyEns 
-    u0=repmat(permute(reshape((cos(patches.x(:))*sin(patches.y(:))'),[nSubP(1),nPatch(1),nSubP(2),nPatch(2)]),[1,3,2,4])+0.2*randn([nSubP,nPatch]) ...
-    ,1,1,1,1,mPeriod(1)*mPeriod(2));
-else
-   u0=permute(reshape((cos(patches.x(:))*sin(patches.y(:))'),[nSubP(1),nPatch(1),nSubP(2),nPatch(2)]),[1,3,2,4])+0.2*randn([nSubP,nPatch]);  
-end
+global patches
+u0 = 0.8*cos(patches.x).*sin(patches.y) ...
+     +0.1*randn([nSubP,1,1,nPatch]); 
+u0 = repmat(u0,1,1,1,nEnsem,1,1); 
 %{
 \end{matlab}
-Integrate using standard stiff integrators.
+Integrate using standard integrators, unevenly spaced in
+time to better display transients.
 \begin{matlab}
 %}
-
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode15s(@patchSmooth2, [0 0.5], u0(:));
+    [ts,us] = ode23(@patchSmooth2, 0.3*linspace(0,1).^2, u0(:));
 else % octave version
-    [ts,us] = odeOcts(@patchSmooth2, [0 0.5], u0(:));
+    [ts,us] = odeOcts(@patchSmooth2, 0.3*linspace(0,1).^2, u0(:));
 end
-
 %{
 \end{matlab}
-Plot field solutions.
+
+\paragraph{Plot the solution} as an animation over time.
 \begin{matlab}
 %}
-
-%  % for video
-%frames = struct('cdata', cell(1, length(ts)), 'colormap', cell(1, length(ts)));
-
-disp('plot sequence of surfaces')
+if ts(end)>0.099, disp('plot animation of solution field')
 figure(1), clf, colormap(hsv)
-x = patches.x; y = patches.y;
-x(end+1,:)=nan; y(end+1,:)=nan; % pad with nans
-uPad=nan([nSubP+1,nPatch]);
+%{
+\end{matlab}
+Get spatial coordinates and pad them with NaNs to separate
+patches.
+\begin{matlab}
+%}
+x = squeeze(patches.x); y = squeeze(patches.y);
+x(end+1,:)=nan;  y(end+1,:)=nan; % pad with nans
+%{
+\end{matlab}
+For every time step draw the surface and pause for a short
+display.
+\begin{matlab}
+%}
 for i = 1:length(ts)
-    if  patches.EdgyEns
-       uPad(1:(end-1),1:(end-1),:,:) = mean(reshape(patchEdgeInt2(us(i,:)'),[nSubP,nPatch,mPeriod(1)*mPeriod(2)]),5);
-    else
-        uPad(1:(end-1),1:(end-1),:,:) = reshape(patchEdgeInt2(us(i,:)'),[nSubP,nPatch]);
-    end    
-  u = reshape(permute(uPad,[1 3 2 4]), [numel(x) numel(y)]);
-  if i==1,
-  hsurf = surf(x(:),y(:),u');
-  axis([0 2*pi 0 2*pi -1.3 1.3]), view(60,40) %view(60,40)
-  xlabel('x'), ylabel('y'), zlabel('u')
-  else   set(hsurf,'ZData', u');
+%{
+\end{matlab}
+Get the row vector of data,  form into the 6D array via the
+interpolation to the edges, then pad with Nans between
+patches, and reshape to suit the surf function.
+\begin{matlab}
+%}
+  u = squeeze( mean( patchEdgeInt2(us(i,:)) ,4));
+  u(end+1,:,:,:)=nan; u(:,end+1,:,:)=nan;
+  u = reshape(permute(u,[1 3 2 4]), [numel(x) numel(y)]);
+%{
+\end{matlab}
+If the initial time then draw the surface with labels,
+otherwise just update the surface data.
+\begin{matlab}
+%}
+  if i==1
+       hsurf = surf(x(:),y(:),u'); view(60,40) 
+       axis([-pi pi -pi pi -1 1]),   caxis([-1 1])
+       xlabel('x'), ylabel('y'), zlabel('u(x,y)')
+  else set(hsurf,'ZData', u');
   end
   legend(['time = ' num2str(ts(i),2)],'Location','north')
-  caxis([0 1])
-  pause(0.1)
-%  frames(i) = getframe(gcf); 
-end
-% % for video
-%       vw = VideoWriter('diffusion2d','MPEG-4');  %taking a guess that you intend to modify the filename each time you write a video
-%       open(vw);
-%       writeVideo(vw, frames);
-%       close(vw);
-
+  pause(0.05)
+%{
+\end{matlab}
+finish the animation loop and if-plot.
+\begin{matlab}
+%}
+end%for over time
+end%if-plot
 %{
 \end{matlab}
 
-\paragraph{Compute Jacobian and its spectrum}
+
+
+
+
+
+\subsection{Compute Jacobian and its spectrum}
 Let's explore the Jacobian dynamics for a range of orders of
 interpolation, all for the same patch design and
-heterogeneity.  Here use a smaller ratio, and more patches,
-as we do not plot.
+heterogeneity.  Except here use a small ratio as we do not
+plot.
 \begin{matlab}
 %}
+ratio = [0.1 0.1]
+nLeadEvals=prod(nPatch)+max(nPatch);
+leadingEvals=[];
+%{
+\end{matlab}
 
-nPatch = [10 11]
-ratio = [0.1 0.1];
-
-nSmallEvals=nPatch(1)*(nPatch(2)+1);
-egs=nan(11,nSmallEvals);
-ords=20;
-
-configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
-    ,0,ratio,nSubP);
-
-if patches.EdgyEns   
-   nVars=mPeriod(1)*mPeriod(2);
-   shiftx=mod(bsxfun(@plus,0:(mPeriod(1)-1),(0:(nSubP(1)-2))'),mPeriod(1))+1;
-   shifty=mod(bsxfun(@plus,0:(mPeriod(2)-1),(0:(nSubP(2)-2))'),mPeriod(2))+1;
-   patches.cx=nan(nSubP(1)-1,nSubP(2)-2,mPeriod(1)*mPeriod(2));
-   patches.cy=nan(nSubP(1)-2,nSubP(2)-1,mPeriod(1)*mPeriod(2));
-   for p=1:mPeriod(1)
-      for  q=1:mPeriod(2)
-          patches.cx(:,:,(p-1)*mPeriod(2)+q)=cHetr(shiftx(:,p),shifty(1:(end-1),q),1);
-          patches.cy(:,:,(p-1)*mPeriod(2)+q)=cHetr(shiftx(1:(end-1),p),shifty(:,q),2);
-      end
-   end
-   patches.cx=permute(repmat(patches.cx,[1,1,1,nPatch]),[1,2,4,5,3]);
-   patches.cy=permute(repmat(patches.cy,[1,1,1,nPatch]),[1,2,4,5,3]);
-   % need to specify how configurations are coupled 
-   patches.le=mod((0:(mPeriod(1)*mPeriod(2)-1))+mPeriod(2)*rem(nSubP(1)-2,mPeriod(1)),mPeriod(1)*mPeriod(2))+1;
-   patches.ri=mod((0:(mPeriod(1)*mPeriod(2)-1))-mPeriod(2)*rem(nSubP(1)-2,mPeriod(1)),mPeriod(1)*mPeriod(2))+1;
-   patches.bo=mod((1:(mPeriod(1)*mPeriod(2)))+nSubP(2)-3,mPeriod(2))+mPeriod(2)*floor((0:(mPeriod(1)*mPeriod(2)-1))/mPeriod(2))+1;
-   patches.to=mod((1:(mPeriod(1)*mPeriod(2)))-nSubP(2)+1,mPeriod(2))+mPeriod(2)*floor((0:(mPeriod(1)*mPeriod(2)-1))/mPeriod(2))+1;
-else  
-   nVars=1; 
-   patches.cx=[repmat(cHetr(:,:,1),[(nSubP-2)./mPeriod,1]);repmat(cHetr(1,:,1),[1,(nSubP(2)-2)/mPeriod(2)])];
-   patches.cy=[repmat(cHetr(:,:,2),[(nSubP-2)./mPeriod,1]),repmat(cHetr(:,1,2),[(nSubP(1)-2)/mPeriod(1),1])];
-end;
-
-for ii=0:2:ords
-    
-ord=ii    
-configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
-    ,ord,ratio,nSubP);
-
-    disp('Check linear characteristics of the patch scheme')
-    u0 = zeros([nSubP, nPatch nVars]);
-    u0([1 end],:,:,:,:) = nan;
-    u0(:,[1 end],:,:,:) = nan;
+Evaluate eigenvalues for spectral as the base case for
+polynomial interpolation of order \(2,4,\ldots\).
+\begin{matlab}
+%}
+maxords=10;
+for ord=0:2:maxords
+    ord=ord    
+%{
+\end{matlab} 
+Configure with same parameters, then because they are reset
+by this configuration, restore coupling.
+\begin{matlab}
+%}
+    configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
+        ,ord,ratio,nSubP,'EdgyInt',edgyInt,'nEnsem',nEnsem ...
+        ,'hetCoeffs',cHetr);
+%{
+\end{matlab}
+Find which elements of the 6D array are interior micro-grid
+points and hence correspond to dynamical variables.
+\begin{matlab}
+%}
+    u0 = zeros([nSubP,1,nEnsem,nPatch]);
+    u0([1 end],:,:) = nan;
+    u0(:,[1 end],:) = nan;
     i = find(~isnan(u0));
-
-    disp('Construct the Jacobian, use large perturbations as linear')
-    small = 1;
+%{
+\end{matlab}
+Construct the Jacobian of the scheme as the matrix of the
+linear transformation, obtained by transforming the standard
+unit vectors.
+\begin{matlab}
+%}
     jac = nan(length(i));
     sizeJacobian = size(jac)
     for j = 1:length(i)
-      u = u0(:);
-      u(i(j)) = u(i(j))+small;
-      tmp = patchSmooth2(0,u)/small;
+      u = u0(:)+(i(j)==(1:numel(u0))');
+      tmp = patchSmooth2(0,u);
       jac(:,j) = tmp(i);
     end
+%{
+\end{matlab}
+Test for symmetry, with error if we know it should be
+symmetric.
+\begin{matlab}
+%}
     notSymmetric=norm(jac-jac')    
-    assert(notSymmetric<1e-7,'failed symmetry')
-        
-    
-    gravEvals=[];
-
-    disp('Find the smallest real-part eigenvalues')
-    evals = eig(jac);
-    biggestImag=max(abs(imag(evals)))
-    nEvals = length(evals);
-    [~,k] = sort(abs(real(evals)));
-    evals=evals(k);
-    evalsWithSmallestRealPart = evals(1:nSmallEvals);
-    gravEvals=[gravEvals real(evalsWithSmallestRealPart)];
-
-    egs(1+ord/2,:)=evalsWithSmallestRealPart;
+    if edgyInt, assert(notSymmetric<1e-7,'failed symmetry')
+    elseif notSymmetric>1e-7, disp('failed symmetry')
+    end 
+%{
+\end{matlab}
+Find all the eigenvalues (as \verb|eigs| is unreliable).
+\begin{matlab}
+%}
+    if edgyInt, [evecs,evals] = eig((jac+jac')/2,'vector');
+    else evals = eig(jac);
+    end
+    biggestImag=max(abs(imag(evals)));
+    if biggestImag>0, biggestImag=biggestImag, end
+%{
+\end{matlab}
+Sort eigenvalues on their real-part with most positive
+first, and most negative last. Store the leading eigenvalues
+in \verb|egs|, and write out when computed all orders.
+The number of zero eigenvalues, \verb|nZeroEv|, gives
+the number of decoupled systems in this patch configuration.
+\begin{matlab}
+%}
+    [~,k] = sort(-real(evals));
+    evals=evals(k); evecs=evecs(:,k);
+    if ord==0, nZeroEv=sum(abs(evals(:))<1e-5), end
+    if ord==0, evec0=evecs(:,1:nZeroEv*nLeadEvals); 
+    else % find evec closest to that of each leading spectral
+        [~,k]=max(abs(evecs'*evec0));
+        evals=evals(k); % sort in corresponding order
+    end
+    leadingEvals=[leadingEvals evals(nZeroEv*(1:nLeadEvals))];
 end 
-
-
-noe=20;
-err=abs((egs(2:end,2:noe)-egs(1,2:noe))./egs(1,2:noe));
-set(0,'defaultAxesLineStyleOrder','o-|x-|v-|s-|p-|h-|d-|^-')
-figure;
-plot(1:(ords/2),err(:,1:2:end))
-xlabel('coupling order')
-ylabel('eigenvalue relative error')
-%xlim([1 10]);
-set(gca, 'YScale', 'log')
-leg=legend(num2str(real(egs(1,2:2:noe))','%.4f'),'Location','northeastoutside');
-title(leg,'eigenvalues')
-legend boxoff 
-
-
-
+disp('     spectral    quadratic      quartic  sixth-order ...')
+leadingEvals=leadingEvals
 %{
 \end{matlab}
 
-\input{../Patch/heteroDiffEdgy2.m}
+Plot the errors in the eigenvalues using the spectral ones
+as accurate.  Only plot every second,~\verb|iEv|, as all are
+repeated eigenvalues.
+\begin{matlab}
+%}
+if maxords>2
+    iEv=2:2:12;
+    figure(2);
+    err=abs(leadingEvals-leadingEvals(:,1)) ...
+        ./(1e-7+abs(leadingEvals(:,1)));
+    semilogy(2:2:maxords,err(iEv,2:end)','o:')
+    xlabel('coupling order')
+    ylabel('eigenvalue relative error')
+    leg=legend( ...
+        strcat('$',num2str(real(leadingEvals(iEv,1)),'%.4f'),'$') ...
+        ,'Location','northeastoutside');
+    if ~exist('OCTAVE_VERSION','builtin')
+        title(leg,'eigenvalues'), end
+    legend boxoff 
+end%if-plot
+%{
+\end{matlab}
 
+
+\input{../Patch/heteroDiff2.m}
 
 Fin.
 %}

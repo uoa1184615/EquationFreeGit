@@ -1,9 +1,10 @@
-%Simulate a 1D, first-order, wave PDE on small patches as an
-%example application of patches in space. The patch coupling
-%interpolates next-to-edge values to get opposite edge
-%values.  Here the microscale has 'wave-speeds' dependent
-%upon x, and randomly chosen but specified period.   Then
-%explore stability and consistency.  AJR, 17 Dec 2019
+% Simulate a 1D, first-order, wave PDE on small patches as
+% an example application of patches in space. The patch
+% coupling interpolates next-to-edge values to get opposite
+% edge values.  Here the microscale has 'wave-speeds'
+% dependent upon x, and randomly chosen but specified
+% period.   Then explore stability and consistency.  
+% AJR, 17 Dec 2019 -- 19 Jun 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{waveEdgy1}: simulate a 1D, first-order,
@@ -27,7 +28,7 @@ the initial condition, the sub-patch fluctuations, decays,
 leaving the emergent macroscale wave in the heterogeneous
 media. This simulation uses nine patches of `large' size
 ratio~\(0.25\) for visibility.}
-\includegraphics[scale=0.85]{../Patch/waveEdgyU2}
+\includegraphics[scale=0.85]{waveEdgy1U2}
 \end{figure}
 
 The first-order wave-like \pde\ is
@@ -45,8 +46,10 @@ With dependent variables~\(u_i(t)\), simulate the microscale
 lattice, in terms of the centred difference~\(\delta\) and
 mean~\(\mu\), wave system
 \begin{align}
-\de t{u_{i}}&= -\frac1{2d}\left[ \delta(c_i\mu u_{i}) +\mu(c_i\delta u_i) \right]
-= -\frac1{2d}\left[ c_{i+\tfrac12}u_{i+1} -c_{i-\tfrac12}u_{i-1} \right].
+\de t{u_{i}}&= -\frac1{2d}\left[ \delta(c_i\mu u_{i})
++\mu(c_i\delta u_i) \right]
+= -\frac1{2d}\left[ c_{i+\tfrac12}u_{i+1}
+-c_{i-\tfrac12}u_{i-1} \right].
 \label{eq:waveEdgy1}
 \end{align}
 \cref{fig:waveEdgyU2} shows one patch simulation of this
@@ -83,14 +86,13 @@ only for periods~3 and~5. Then the heterogeneity is repeated
 \verb|nPeriodsPatch| times within each patch. 
 \begin{matlab}
 %}
-clear all
 mPeriod = 5 % needs to be odd for a wave
-cHetr = exp(0.3*randn(mPeriod,1)); % 0.3 appears max reasonable
+cHetr = exp(0.1*randn(mPeriod,1)); % 0.3 appears max reasonable
 if mPeriod==3, 
     cHetr=cHetr*mean(cHetr.^2)/prod(cHetr) % normalise
 elseif mPeriod==5, 
     cHetr=cHetr*mean(cHetr.^2.*cHetr([3 4 5 1 2]).^2)/prod(cHetr)
-else cHetr=cHetr*mean(1./cHetr) % not correct normalise
+else cHetr=cHetr*mean(1./cHetr) % roughly normalise
 end
 nPeriodsPatch=1 % also needs to be odd
 %{
@@ -104,28 +106,33 @@ ratio~\(0.25\) from one side to the other, with five
 micro-grid points in each patch, and quartic
 interpolation~(\(4\)) to provide the edge-values via the
 inter-patch coupling conditions. Setting
-\verb|patches.EdgyInt| to one means the edge-values come
-from interpolating the opposite next-to-edge values of the
-patches (not the mid-patch values).  
+\verb|EdgyInt| to 
+\begin{itemize}
+\item true means the edge-values come from interpolating the
+opposite next-to-edge values of the patches (not the
+mid-patch values); whereas
+\item false  means the time integration appears OK, but the
+Jacobian is, correctly, not skew-symmetric for this case of
+interpolating mid-patch values.
+\end{itemize}
 \begin{matlab}
 %}
 global patches
 nPatch = 9
 ratio = 0.25
-nSubP = nPeriodsPatch*mPeriod+2
-patches.EdgyInt = 1; % one to use edges for interpolation
-configPatches1(@waveFirst,[-pi pi],nan,nPatch ...
-    ,4,ratio,nSubP);
+EdgyInt=true 
+nPeriodsPatch = (2-EdgyInt)*nPeriodsPatch;
+nSubP = nPeriodsPatch*mPeriod+1+EdgyInt
+configPatches1(@waveFirst,[-pi pi],nan,nPatch,4 ...
+    ,ratio,nSubP,'EdgyInt',EdgyInt,'hetCoeffs',cHetr); 
 %{
 \end{matlab}
 
-Replicate the heterogeneous coefficients across the width of
-each patch. Also specify the weak damping of the sub-patch,
+Specify the weak damping of the sub-patch,
 fast, microscale waves.
 \begin{matlab}
 %}
-patches.c=[repmat(cHetr,nPeriodsPatch,1);cHetr(1)];
-patches.nu=0.001;
+patches.nu=0.003;
 %{
 \end{matlab}
 
@@ -135,14 +142,15 @@ sine wave perturbed by significant random microscale noise,
 via~\verb|randn|.
 \begin{matlab}
 %}
-u0 = sin(patches.x)+0.1*randn(nSubP,nPatch);
+xs=squeeze(patches.x);
+u0 = -sin(xs)+0.1*randn(nSubP,nPatch);
 %{
 \end{matlab}
 Integrate using standard stiff integrators.
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode15s(@patchSmooth1, [0 3.5], u0(:));
+    [ts,us] = ode23(@patchSmooth1, [0 3.5], u0(:));
 else % octave version
     [ts,us] = odeOcts(@patchSmooth1, [0 0.5], u0(:));
 end
@@ -156,11 +164,11 @@ interpolate with \verb|patchEdgeInt1| to get edge values,
 pad with \verb|nan|s, and reshape again.
 \begin{matlab}
 %}
-xs = patches.x;  xs(end+1,:) = nan;
-us = patchEdgeInt1( permute( reshape(us,length(ts) ...
-     ,size(patches.x,1),size(patches.x,2)) ,[2 3 1]) );
-us(end+1,:,:) = nan;
-us=reshape(us,[],length(ts));
+xs(end+1,:) = nan;
+us = patchEdgeInt1( permute( reshape(us ...
+     ,length(ts),nSubP,nPatch) ,[2 1 3]) );
+us(end+1,:,:,:) = nan;
+us=reshape(permute(squeeze(us),[1 3 2]),[],length(ts));
 %{
 \end{matlab}
 
@@ -171,11 +179,10 @@ lattice.
 \begin{matlab}
 %}
 [~,j]=min(abs(ts-linspace(ts(1),ts(end),50)));
-figure(2),clf
+figure(1),clf
 mesh(ts(j),xs(:),us(:,j)),  view(60,40)
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 14 10])
-print('-depsc2',['waveEdgyU' num2str(2)])
+ifOurCf2eps([mfilename 'U' num2str(2)])
 %{
 \end{matlab}
 
@@ -188,14 +195,14 @@ explore the ideal case of the wave
 system~\eqref{eq:waveEdgy1}.
 \begin{matlab}
 %}
-ratio=0.03
+ratio=0.01
 nPatch=19
 leadingFreqs=[];
-for ord=0:2:6
-ordInterp=ord
-configPatches1(@waveFirst,[-pi pi],nan,nPatch ...
-    ,ord,ratio,nSubP);
-patches.nu=0;
+for ord=0:2:8
+    ordInterp=ord
+    configPatches1(@waveFirst,[-pi pi],nan,nPatch,ord ...
+        ,ratio,nSubP,'EdgyInt',EdgyInt,'hetCoeffs',cHetr);
+    patches.nu=0;
 %{
 \end{matlab}
 
@@ -205,18 +212,18 @@ indices of the micro-grid points that are interior to the
 patches and hence are the system variables.
 \begin{matlab}
 %}
-u0=0*patches.x; u0([1 end],:)=nan; u0=u0(:);
-i=find(~isnan(u0));
-nJ=length(i);
-Jac=nan(nJ);
-for j=1:nJ
-   u0(i)=((1:nJ)==j);
-   dudt=patchSmooth1(0,u0);
-   Jac(:,j)=dudt(i);
-end
-nonSkewSymmetric=norm(Jac+Jac')
-assert(nonSkewSymmetric<1e-10,'failed skew-symmetry')
-Jac(abs(Jac)<1e-12)=0;
+    u0=0*patches.x; u0([1 end],:)=nan; u0=u0(:);
+    i=find(~isnan(u0));
+    nJ=length(i);
+    Jac=nan(nJ);
+    for j=1:nJ
+       u0(i)=((1:nJ)==j);
+       dudt=patchSmooth1(0,u0);
+       Jac(:,j)=dudt(i);
+    end
+    nonSkewSymmetric=norm(Jac+Jac')
+    assert(nonSkewSymmetric<1e-10,'failed skew-symmetry')
+    Jac(abs(Jac)<1e-12)=0;
 %{
 \end{matlab}
 \begin{table}
@@ -251,21 +258,26 @@ leadingFreqs =
 \end{verbatim}
 \end{table}
 Find the eigenvalues of the Jacobian, and list for
-inspection in \cref{tbl:waveEdgy1} (using a count of zero
-crossings in the corresponding eigenvector in order to try
-to sort on the spatial wavenumber): the spectral
+inspection in \cref{tbl:waveEdgy1}: the spectral
 interpolation is effectively exact for the macroscale;
 quadratic interpolation is usually qualitatively good;
 quartic interpolation appears to be the lowest order for
 quantitative accuracy.
 \begin{matlab}
 %}
-[evecs,evals]=eig(Jac);
-maxRealPartEvals=max(abs(real(diag(evals))))
-assert(maxRealPartEvals<1e-10,'failed real-part zero')
-freqs=imag(diag(evals));
-[~,j]=sort(sum(abs(diff(sign(real(evecs))))));
-leadingFreqs=[leadingFreqs -freqs(j(1:2:nPatch+4))];
+    [evecs,evals]=eig(Jac);
+    maxRealPartEvals=max(abs(real(diag(evals))))
+    assert(maxRealPartEvals<1e-10,'failed real-part zero')
+    freqs=imag(diag(evals));
+%{
+\end{matlab}
+Use a count of zero crossings in the corresponding 
+eigenvector in order to try to sort on the spatial 
+wavenumber.
+\begin{matlab}
+%}
+    [~,j]=sort(sum(abs(diff(sign(real(evecs))))));
+    leadingFreqs=[leadingFreqs -freqs(j(1:2:nPatch+4))];
 %{
 \end{matlab}
 End of the for-loop over orders of interpolation, and
@@ -273,6 +285,7 @@ display the spectra.
 \begin{matlab}
 %}
 end
+disp('     spectral    quadratic      quartic  sixth-order ...')
 leadingFreqs = leadingFreqs
 %{
 \end{matlab}
