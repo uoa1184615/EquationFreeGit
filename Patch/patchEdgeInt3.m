@@ -105,29 +105,12 @@ assert(numel(u) == nx*ny*nz*Nx*Ny*Nz*nVars*nEnsem ...
 u = reshape(u,[nx ny nz nVars nEnsem Nx Ny Nz]);
 %{
 \end{matlab}
-With Dirichlet patches, the half-length of a patch is
-\(h=dx(n_\mu-1)/2\) (or~\(-2\) for specified flux), unless
-we are interpolating from next-to-face values, and the
-ratio needed for interpolation is then \(r=h/\Delta X\).
-Compute lattice sizes from inside the patches as the face
-values may be \nan{}s, etc.
+Get the size ratios of the patches in each direction.
 \begin{matlab}
 %}
-dx = patches.x(3,1,1,1,1,1,1,1)-patches.x(2,1,1,1,1,1,1,1);
-DX = patches.x(2,1,1,1,1,2,1,1)-patches.x(2,1,1,1,1,1,1,1);
-if patches.EdgyInt==0, rx = dx*(nx-1)/2/DX;
-    else               rx = dx*(nx-2)/DX;
-    end
-dy = patches.y(1,3,1,1,1,1,1,1)-patches.y(1,2,1,1,1,1,1,1);
-DY = patches.y(1,2,1,1,1,1,2,1)-patches.y(1,2,1,1,1,1,1,1);
-if patches.EdgyInt==0, ry = dy*(ny-1)/2/DY;
-    else               ry = dy*(ny-2)/DY;
-    end
-dz = patches.z(1,1,3,1,1,1,1,1)-patches.z(1,1,2,1,1,1,1,1);
-DZ = patches.z(1,1,2,1,1,1,1,2)-patches.z(1,1,2,1,1,1,1,1);
-if patches.EdgyInt==0, rz = dz*(nz-1)/2/DZ;
-    else               rz = dz*(nz-2)/DZ;
-    end
+rx = patches.ratio(1);
+ry = patches.ratio(2);
+rz = patches.ratio(3);
 %{
 \end{matlab}
 

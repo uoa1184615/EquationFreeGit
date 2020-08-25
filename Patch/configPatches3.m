@@ -167,6 +167,9 @@ microscale grid points in every patch.
 array of the regular spatial locations~\(z_{ijk}\) of the
 microscale grid points in every patch.  
 
+\item \verb|.ratio| \(1\times 3\), are the size ratios of
+every patch.
+
 \item \verb|.nEdge| is, for each patch, the number of edge
 values set by interpolation at the edge regions of each
 patch.
@@ -460,10 +463,11 @@ end
 Might as well precompute the weightings for the
 interpolation of field values for coupling. 
 (Could sometime extend to coupling via derivative
-values.)
+values.)  Store the size ratio in \verb|patches|.
 \begin{matlab}
 %}
 ratio = reshape(ratio,1,3); % force to be row vector
+patches.ratio=ratio; 
 if ordCC>0, patchCwts(ratio,ordCC,patches.stag), end
 %{
 \end{matlab}
@@ -474,14 +478,14 @@ grid of patches assuming periodic macroscale domain.
 \begin{matlab}
 %}
 X = linspace(Xlim(1),Xlim(2),nPatch(1)+1);
-X = X(1:nPatch(1))+diff(X)/2;
 DX = X(2)-X(1);
+X = X(1:nPatch(1))+diff(X)/2;
 Y = linspace(Xlim(3),Xlim(4),nPatch(2)+1);
-Y = Y(1:nPatch(2))+diff(Y)/2;
 DY = Y(2)-Y(1);
+Y = Y(1:nPatch(2))+diff(Y)/2;
 Z = linspace(Xlim(5),Xlim(6),nPatch(3)+1);
-Z = Z(1:nPatch(3))+diff(Z)/2;
 DZ = Z(2)-Z(1);
+Z = Z(1:nPatch(3))+diff(Z)/2;
 %{
 \end{matlab}
 Construct the microscale in each patch, assuming Dirichlet

@@ -101,15 +101,11 @@ DX = patches.x(2,1,1,2)-patches.x(2,1,1,1);
 \end{matlab}
 If the user has not defined the patch core, then we assume
 it to be a single point in the middle of the patch, unless
-we are interpolating from next-to-edge values. For
-\(\verb|patches.nCore|\neq 1\) the half width ratio is
-reduced, as described by \cite{Bunder2013b}.
+we are interpolating from next-to-edge values. 
+Get the size ratios of the patches.
 \begin{matlab}
 %}
-if ~patches.EdgyInt
-     r = dx*(nSubP-1)/2/DX*(nSubP-patches.nCore)/(nSubP-1);
-else r = dx*(nSubP-2)/DX;
-end
+r = patches.ratio(1);
 %{
 \end{matlab}
 

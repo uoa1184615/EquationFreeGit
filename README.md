@@ -73,7 +73,7 @@ plan is to subsequently develop more and more capability.
 function code and many examples.  The Appendix outlines how
 to contribute to the project.
 
-<p>Paul Petersik is also developing some equation-free
+<p>By the way: Paul Petersik is also developing some equation-free
 projective integration, but in python, see
 <a href="https://github.com/pjpetersik/eqnfree">
 https://github.com/pjpetersik/eqnfree </a>

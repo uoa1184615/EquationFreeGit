@@ -134,6 +134,8 @@ with patch:macroscale ratio as specified.
 locations~\(x_{ij}\) of the \(i\)th~microscale grid point in
 the \(j\)th~patch.  
 
+\item \verb|.ratio| is the size ratio of every patch.
+
 \item \verb|.nEdge| is, for each patch, the number of edge
 values set by interpolation at the edge regions of each
 patch.
@@ -327,9 +329,11 @@ Check for staggered grid and periodic case.
 \end{matlab}
 Might as well precompute the weightings for the
 interpolation of field values for coupling. (Could sometime
-extend to coupling via derivative values.)
+extend to coupling via derivative values.)   Store the size
+ratio in \verb|patches|.
 \begin{matlab}
 %}
+patches.ratio=ratio; 
 if ordCC>0, patchCwts(ratio,ordCC,patches.stag), end
 %{
 \end{matlab}
@@ -340,8 +344,8 @@ grid of patches assuming periodic macroscale domain.
 \begin{matlab}
 %}
 X=linspace(Xlim(1),Xlim(2),nPatch+1);
-X=X(1:nPatch)+diff(X)/2;
 DX=X(2)-X(1);
+X=X(1:nPatch)+diff(X)/2;
 %{
 \end{matlab}
 Construct the microscale grid in each patch, assuming
