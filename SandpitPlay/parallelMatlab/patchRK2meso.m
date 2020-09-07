@@ -7,42 +7,59 @@
 \label{sec:patchRK2meso}
 \localtableofcontents
 
-This is a simple example of Runge--Kutta, 2nd order,
-integration of a given deterministic \ode.
+This is a Runge--Kutta, 2nd order, integration of a given
+deterministic system of \ode{}s on patches. It invokes
+meso-time updates of the patch-edge values in order to
+reduce interpolation costs, and uses a linear variation in
+edge-values over the meso-time-step \cite[case
+\(Q=2\)]{Bunder2015a}.  This function is aimed primarily for
+large problems executed on a computer cluster in order to
+reduce expensive communication between computers.
 
 \begin{matlab}
 %}
-function [xs,errs] = patchRK2meso(fun,ts,x0,nMicro)
+function [xs,errs] = patchRK2meso(ts,x0,nMicro)
+global patches
 %{
 \end{matlab}
 
 \paragraph{Input}
 \begin{itemize}
-\item \verb|fun()| is a function such as
+\item \verb|patches.fun()| is a function such as
 \verb|dxdt=fun(t,x)| that computes the right-hand side of
-the \ode\ \(d\xv/dt=\fv(t,\xv)\) where \xv~is a
-vector\slash array, \(t\)~is a
-scalar, and the result~\fv\ is a correspondingly sized vector\slash array.
+the \ode\ \(d\xv/dt=\fv(t,\xv)\) where \xv~is a vector\slash
+array, \(t\)~is a scalar, and the result~\fv\ is a
+correspondingly sized vector\slash array.
 \item \verb|x0| is an vector\slash array of initial values at
 the time \verb|ts(1)|.
-\item \verb|ts| is a vector of meso-scale times to compute the
-approximate solution, say in~\(\RR^\ell\) for
+\item \verb|ts| is a vector of meso-scale times to compute
+the approximate solution, say in~\(\RR^\ell\) for
 \(\ell\geq2\)\,.
-\item \verb|nMicro|, optional, default~\(10\), is the number of sub-steps taken in each meso-scale step.
+\item \verb|nMicro|, optional, default~\(10\), is the number
+of micro-time-steps taken for each meso-scale time-step.
 \end{itemize}
 
 \paragraph{Output}
 \begin{itemize}
-\item  \verb|xs|, array in \(\RR^{\ell\times n}\) of
-approximate solution row vector at the specified times.
-\item \verb|errs|, column vector in \(\RR^{\ell}\) of error
-estimate for  the step from \(t_{k-1}\) to~\(t_k\).
+\item  \verb|xs|, cell array of length~\(\ell\) of
+approximate solution vector\slash array at the specified times.
+\item \verb|errs|, column vector in \(\RR^{\ell}\) of local
+error estimate for the step from \(t_{k-1}\) to~\(t_k\).
 \end{itemize}
 
-Set default number of micro-scale time-steps in each requested meso-scale step of~\verb|ts|.
+Set default number of micro-scale time-steps in each
+requested meso-scale step of~\verb|ts|.
 \begin{matlab}
 %}
-if nargin<4, nMicro=10; end
+if nargin<3, nMicro=20; end
+%{
+\end{matlab}
+Set generic functions to specific 3D cases.
+\begin{matlab}
+%}
+edgeIntN = @(x) patchEdgeInt3(x);
+funN = @(t,x) patches.fun(t,x ...
+             ,patches.x,patches.y,patches.z);
 %{
 \end{matlab}
 
@@ -55,54 +72,89 @@ errs = nan(numel(ts),1);
 %{
 \end{matlab}
 Initialise first result to the given initial condition, and
-evaluate the initial time derivative into~\verb|f1|.
+evaluate the initial time derivative into~\verb|f1|. Use
+inter-patch interpolation to ensure edge values of the
+initial condition are defined and are reasonable.
 \begin{matlab}
 %}
-xs{1} = x0;
+xs{1} = edgeIntN(x0);
 errs(1) = 0;
-f1 = fun(ts(1),xs{1});%??????????
+f1 = funN(ts(1),xs{1});
 %{
 \end{matlab}
-Compute the time-steps from~\(t_k\) to~\(t_{k+1}\), copying
-the derivative~\verb|f1| at the end of the last time-step to
+Compute the meso-time-steps from~\(t_k\) to~\(t_{k+1}\), copying
+the derivative~\verb|f1| at the end of the last micro-time-step to
 be the derivative at the start of this one.
 \begin{matlab}
 %}
 for k = 1:numel(dt)
 %{
 \end{matlab}
-Perform meso-scale time step with new interpolation of edge values.
+Perform meso-time burst with the new interpolation for edge
+values, and an interpolation of the time derivatives to 
+get derivative estimates of the edge-values.
 \begin{matlab}
 %}
-  xs{k+1}=patchEdgeInt3(xs{k});
+  x0 = xs{k};
+  dx0 = edgeIntN(f1);
+%{
+\end{matlab}
+Perform the micro-time steps.
+\begin{matlab}
+%}
   for m=1:nMicro
-    f0 = f1;
+    f0 = f1; 
     assert(iscodistributed(f0),'f0 not codist')
 %{
 \end{matlab}
-Simple second-order accurate micro-scale time-step.
+For all micro-time derivative evaluations, include that the
+edge values are varying according to the estimate made at
+the start of the meso-time-step.
 \begin{matlab}
 %}
-    xh = xs{k+1}+f0*dt(k)/2;
-    fh = patches.fun(ts(k)+dt(k)*(m-0.5),xh);
-    xs{k+1} = xs{k}+fh*dt(k);
-    f1 = patches.fun(ts(k)+m*dt(k),xs{k+1}); %???????
+    f0([1 end],:,:,:,:,:,:,:)=dx0([1 end],:,:,:,:,:,:,:);
+    f0(:,[1 end],:,:,:,:,:,:)=dx0(:,[1 end],:,:,:,:,:,:);
+    f0(:,:,[1 end],:,:,:,:,:)=dx0(:,:,[1 end],:,:,:,:,:);
 %{
 \end{matlab}
-End the micro-scale burst
+Simple second-order accurate Runge--Kutta micro-scale time-step.
+\begin{matlab}
+%}
+    xh = x0+f0*dt(k)/2;
+    fh = funN(ts(k)+dt(k)*(m-0.5),xh);
+    fh([1 end],:,:,:,:,:,:,:)=dx0([1 end],:,:,:,:,:,:,:);
+    fh(:,[1 end],:,:,:,:,:,:)=dx0(:,[1 end],:,:,:,:,:,:);
+    fh(:,:,[1 end],:,:,:,:,:)=dx0(:,:,[1 end],:,:,:,:,:);
+    x0 = x0+fh*dt(k);
+%{
+\end{matlab}
+End the burst of micro-time-steps.
 \begin{matlab}
 %}
   end
 %{
 \end{matlab}
+At the end of each meso-step burst, refresh the
+interpolation of the edge values, evaluate time-derivative,
+and temporarily fill-in edges of derivatives (to ensure
+error estimate is reasonable).
+\begin{matlab}
+%}
+  xs{k+1} = edgeIntN(x0);
+  f1 = funN(ts(k+1),xs{k+1});
+  f1([1 end],:,:,:,:,:,:,:)=dx0([1 end],:,:,:,:,:,:,:);
+  f1(:,[1 end],:,:,:,:,:,:)=dx0(:,[1 end],:,:,:,:,:,:);
+  f1(:,:,[1 end],:,:,:,:,:)=dx0(:,:,[1 end],:,:,:,:,:);
+%{
+\end{matlab}
 Use the time derivative at~\(t_{k+1}\) to estimate an error
 by storing the difference with what Simpson's rule would
-estimate.
+estimate over the last micro-time step performed.
 \begin{matlab}
 %}
   f0=f0-2*fh+f1;
   assert(iscodistributed(f0),'f2ndDeriv not codist')
-  errs(k+1) = sqrt(gather(mean(f0(:).^2)))*dt(k)/6;
+  errs(k+1) = sqrt(gather(mean(f0(:).^2,'omitnan')))*dt(k)/6;
 end
 %{
 \end{matlab}

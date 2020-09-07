@@ -26,7 +26,7 @@ directions. Crudely normalise by the harmonic mean so the
 decay time scale is roughly one. 
 \begin{matlab}
 %}
-mPeriod = randi([2 3],1,3)
+mPeriod = randi([3 4],1,3)
 cHetr = exp(0.3*randn([mPeriod 3]));
 cHetr = cHetr*mean(1./cHetr(:))
 %{
@@ -41,8 +41,9 @@ happens for non-edgy interpolation is unknown.
 %}
 nSubP=mPeriod+2;
 nPatch=[7 1 1];
-configPatches3(@heteroDiff3, [-pi pi 0 1 0 1], nan, nPatch ...
-    ,0, [20 1 1], nSubP, 'EdgyInt',true  ...
+xLim=[-pi pi 0 0.5 0 0.5];
+configPatches3(@heteroDiff3, xLim, nan, nPatch ...
+    ,0, [0.3 1 1], nSubP, 'EdgyInt',true  ...
     ,'hetCoeffs',cHetr ,'parallel',true );
 %{
 \end{matlab}
@@ -70,12 +71,16 @@ computed field at time \(t=0.3\).
 }
 \includegraphics[width=\linewidth]{homoDiffEdgy31part0}
 \end{figure}
-Integrate using a distributed integrator.
-For initial parameters, need micro-time steps of about~\(0.001\) for stability, recalling that, by default, \verb|patchRK2meso| does ten micro-steps for each specified step in~\verb|ts|.
+Integrate using a distributed integrator. For initial
+parameters, need micro-time steps of roughly~\(0.0001\) for
+stability, recalling that, by default, \verb|patchRK2meso|
+does twenty micro-steps for each specified step in~\verb|ts|.
 \begin{matlab}
 %}
-ts=linspace(0,0.1,11);
-[us,uerrs]=patchRK2meso(@patchSmooth3,ts,u0);
+disp('Computation of system in time')
+ts=linspace(0,0.2,81);
+[us,uerrs]=patchRK2meso(ts,u0);
+maxError=max(uerrs)
 %{
 \end{matlab}
 
@@ -144,8 +149,7 @@ Draw cross-eyed stereo view of some isosurfaces.
            ,'FaceAlpha',iso/5); 
        hold on
     end
-    axis equal, view(45-7*p,25)
-    axis([-pi pi 0 1 0 1])
+    axis equal, axis(xLim), view(45-7*p,25)
     xlabel('x'), ylabel('y'), zlabel('z')
     legend(['time = ' num2str(ts(i),'%4.2f')],'Location','north')
     camlight, lighting gouraud
