@@ -1,6 +1,6 @@
 % Provides the interpolation across 3D space for 3D patches
 % of simulations of a smooth lattice system such as PDE
-% discretisations.  AJR, Sept 2020
+% discretisations.  AJR, Aug 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section[\texttt{patchEdgeInt3()}: 3D patch face values from
@@ -9,14 +9,11 @@ face values from 3D macroscale interpolation}
 \label{sec:patchEdgeInt3}
 
 Couples 3D patches across 3D space by computing their face
-values via macroscale interpolation.  Research
-\cite[]{Roberts2011a, Bunder2019c} indicates the patch
+values via macroscale interpolation.  Assumes that the patch
 centre-values are sensible macroscale variables, and patch
-edge values are determined by macroscale interpolation of
-the patch-centre values.  However, for computational
-homogenisation in multi-D, interpolating patch next-to-edge
-values appears better \cite[]{Bunder2020a}.  Communicate
-patch-design variables via the global struct~\verb|patches|.
+face values are determined by macroscale interpolation of
+the patch-centre values??  Communicate patch-design variables
+via the global struct~\verb|patches|.
 \begin{matlab}
 %}
 function u = patchEdgeInt3(u)
@@ -301,43 +298,24 @@ different sizes.
   end
 %{
 \end{matlab}
-Compute the Fourier transform of either the centre-patch
-values for all the fields (\verb|midPatchInterp| true), or
-using the centre-cross values (\verb|midPatchInterp| false).
- The latter appears to be much better for computational
-homogenisation.  
-\begin{matlab}
-%}
-midPatchInterp = false;
-%{
-\end{matlab}
-Unless doing patch-edgy interpolation when FT the
-next-to-face values.  If there are an even number of points,
-then if complex, treat as positive wavenumber, but if real,
-treat as cosine. When using an ensemble of configurations,
-different configurations might be coupled to each other, as
-specified by \verb|patches.le|, \verb|patches.ri|,
-\verb|patches.to|, \verb|patches.bo|, \verb|patches.fr| and
-\verb|patches.ba|.
+Compute the Fourier transform of the patch centre-values for
+all the fields.  Unless doing patch-edgy interpolation when
+FT the next-to-face values.  If there are an even number of
+points, then if complex, treat as positive wavenumber, but
+if real, treat as cosine. When using an ensemble of
+configurations, different configurations might be coupled to
+each other, as specified by \verb|patches.le|,
+\verb|patches.ri|, \verb|patches.to|, \verb|patches.bo|,
+\verb|patches.fr| and \verb|patches.ba|.
 \begin{matlab}
 %}
 % indices of interior
 ix=(2:nx-1)';  iy=2:ny-1;  iz=shiftdim(2:nz-1,-1); 
 if ~patches.EdgyInt
-  if midPatchInterp
      Cle = fft(fft(fft( u(i0,j0,k0,:,:,:,:,:) ...
          ,[],6),[],7),[],8); 
      Cbo = Cle;  Cba = Cle;
-  else % here try central cross interpolation
-     Cle = fft(fft(fft( u(i0,iy,iz ,:,:,:,:,:) ...
-         ,[],6),[],7),[],8);
-     Cbo = fft(fft(fft( u(ix,j0,iz ,:,:,:,:,:) ...
-         ,[],6),[],7),[],8);
-     Cba = fft(fft(fft( u(ix,iy,k0 ,:,:,:,:,:) ...
-         ,[],6),[],7),[],8);
-     Cri=Cle; Cto=Cbo; Cfr=Cba;
-  end
-else % edgyInt uses next-to-edge values
+else 
      Cle = fft(fft(fft( u(   2,iy,iz ,:,patches.le,:,:,:) ...
          ,[],6),[],7),[],8);
      Cri = fft(fft(fft( u(nx-1,iy,iz ,:,patches.ri,:,:,:) ...
@@ -356,7 +334,7 @@ end
 Fill in the cross of Fourier-shifted mid-values
 \begin{matlab}
 %}
-if midPatchInterp & ~patches.EdgyInt 
+if ~patches.EdgyInt 
   % yz-fraction of kry/z along left/right faces
   ks = (iy-j0)*2/(ny-1).*kry+(iz-k0)*2/(nz-1).*krz; 
   Cle = Cle.*exp(1i*ks); 
@@ -391,7 +369,7 @@ u(ix,iy, 1,:,:,:,:,:) = uclean( ifft(ifft(ifft( ...
 end% if spectral 
 %{
 \end{matlab}
-Nan the values in corners and edges, but not faces, of every 3D patch.
+Nan the values in corners and edges, of every 3D patch.
 \begin{matlab}
 %}
 u(:,[1 ny],[1 nz],:,:,:,:,:)=nan; 

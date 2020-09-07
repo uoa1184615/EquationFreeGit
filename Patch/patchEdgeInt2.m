@@ -1,6 +1,6 @@
 % Provides the interpolation across 2D space for 2D patches
 % of simulations of a smooth lattice system such as PDE
-% discretisations.  AJR, Nov 2018 -- 15 Apr 2020 -- July 2020
+% discretisations.  AJR, Nov 2018 -- 15 Apr 2020 -- Sept 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section[\texttt{patchEdgeInt2()}: 2D patch edge values from
@@ -10,11 +10,14 @@ edge values from 2D macroscale interpolation}
 
 
 Couples 2D patches across 2D space by computing their edge
-values via macroscale interpolation.  Assumes that the patch
+values via macroscale interpolation.  Research
+\cite[]{Roberts2011a, Bunder2019c} indicates the patch
 centre-values are sensible macroscale variables, and patch
 edge values are determined by macroscale interpolation of
-the patch-centre values??  Communicate patch-design variables
-via the global struct~\verb|patches|.
+the patch-centre values.  However, for computational
+homogenisation in multi-D, interpolating patch next-to-edge
+values appears better \cite[]{Bunder2020a}.  Communicate
+patch-design variables via the global struct~\verb|patches|.
 \begin{matlab}
 %}
 function u = patchEdgeInt2(u)
@@ -266,28 +269,47 @@ different sizes.
   end
 %{
 \end{matlab}
-Compute the Fourier transform of the patch centre-values for
-all the fields.  Unless doing patch-edgy interpolation when
-FT the next-to-edge values.  If there are an even number of
-points, then if complex, treat as positive wavenumber, but
-if real, treat as cosine. When using an ensemble of
-configurations, different configurations might be coupled to
-each other, as specified by \verb|patches.le|,
-\verb|patches.ri|, \verb|patches.to| and \verb|patches.bo|.
+Compute the Fourier transform of either the centre-patch
+values for all the fields (\verb|midPatchInterp| true), or
+using the centre-cross values (\verb|midPatchInterp| false).
+ The latter appears to be much better for computational
+homogenisation.  
+\begin{matlab}
+%}
+midPatchInterp = false;
+%{
+\end{matlab}
+Unless doing patch-edgy interpolation when FT the
+next-to-edge values.  If there are an even number of points,
+then if complex, treat as positive wavenumber, but if real,
+treat as cosine. When using an ensemble of configurations,
+different configurations might be coupled to each other, as
+specified by \verb|patches.le|, \verb|patches.ri|,
+\verb|patches.to| and \verb|patches.bo|.
 \begin{matlab}
 %}
 ix=(2:nx-1)';  iy=2:ny-1; % indices of interior
 if ~patches.EdgyInt
+  if midPatchInterp
      Cle = fft(fft(u(i0,j0,:,:,:,:),[],5),[],6); 
      Cbo = Cle;
-else 
+  else % here try central cross interpolation
+     Cle = fft(fft(u(i0,iy,:,:,:,:),[],5),[],6);
+     Cbo = fft(fft(u(ix,j0,:,:,:,:),[],5),[],6);
+     Cri=Cle; Cto=Cbo;
+  end
+else % edgyInt uses next-to-edge values
      Cle = fft(fft(u(   2,iy ,:,patches.le,:,:),[],5),[],6);
      Cri = fft(fft(u(nx-1,iy ,:,patches.ri,:,:),[],5),[],6);
      Cbo = fft(fft(u(ix,2    ,:,patches.bo,:,:),[],5),[],6);
      Cto = fft(fft(u(ix,ny-1 ,:,patches.to,:,:),[],5),[],6);
 end     
-% fill in the cross of Fourier-shifted mid-values
-if ~patches.EdgyInt 
+%{
+\end{matlab}
+Fill in the cross of Fourier-shifted mid-values
+\begin{matlab}
+%}
+if midPatchInterp & ~patches.EdgyInt 
   % y-fraction of kry along left/right edges
   ks = (iy-j0)*2/(ny-1).*kry; 
   Cle = Cle.*exp(1i*ks); 
@@ -305,7 +327,7 @@ u(ix,ny,:,:,:,:) = uclean( ifft(ifft( ...
     Cbo.*exp(1i*(stagShift+kry))  ,[],5),[],6) );
 u(ix, 1,:,:,:,:) = uclean( ifft(ifft( ...
     Cto.*exp(1i*(stagShift-kry))  ,[],5),[],6) );
-u([1 nx],[1 ny],:,:,:,:)=nan; % remove corner values
+u([1 nx],[1 ny],:,:,:,:)=nan; % nan the corner values
 
 end% if spectral 
 end% function patchEdgeInt2
