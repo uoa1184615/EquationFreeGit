@@ -8,10 +8,10 @@
 % JEB & AJR, May 2020 -- Aug 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{homoDiffEdgy31par}: computational
+\section{\texttt{spmdHomoDiffEdgy31}: computational
 homogenisation of a 1D diffusion via parallel simulation on small
 3D patches}
-\label{sec:homoDiffEdgy31par}
+\label{sec:spmdHomoDiffEdgy31}
 
 Simulate heterogeneous diffusion along 1D space on 3D patches
 as an example application. Then compute macroscale
@@ -26,7 +26,8 @@ directions. Crudely normalise by the harmonic mean so the
 decay time scale is roughly one. 
 \begin{matlab}
 %}
-mPeriod = randi([3 4],1,3)
+clear all% seem to need to clear old composites etc
+mPeriod = [2 3 4]%randi([3 4],1,3)
 cHetr = exp(0.3*randn([mPeriod 3]));
 cHetr = cHetr*mean(1./cHetr(:))
 %{
@@ -39,53 +40,77 @@ only real eigenvalues by using edgy interpolation.  What
 happens for non-edgy interpolation is unknown.
 \begin{matlab}
 %}
+global patches %%??
 nSubP=mPeriod+2;
 nPatch=[7 1 1];
 xLim=[-pi pi 0 0.5 0 0.5];
-configPatches3(@heteroDiff3, xLim, nan, nPatch ...
-    ,0, [0.3 1 1], nSubP, 'EdgyInt',true  ...
+patches = configPatches3(@heteroDiff3, xLim, nan ...
+    , nPatch, 0, [0.3 1 1], nSubP, 'EdgyInt',true  ...
     ,'hetCoeffs',cHetr ,'parallel',true );
+warning('**** finished configPatches3')
 %{
 \end{matlab}
 
 
 \subsection{Simulate heterogeneous diffusion}
 Set initial conditions of a simulation as shown in
-\cref{fig:homoDiffEdgy31part0}.
+\cref{fig:spmdHomoDiffEdgy31t0}.
 \begin{matlab}
 %}
-global patches
+spmd
+%warning('**** restarting spmd')
+mpiprofile on
 u0 = exp(-patches.x.^2/4-patches.y.^2/2-patches.z.^2);
+%warning('**** finished first u0 =')
 u0 = u0.*(1+0.3*rand(size(u0),patches.codist));
-du0dt = patchSmooth3(0,u0);
+%warning('**** finished second u0 =')
+du0dt = spmdPatchSmooth3(0,u0,patches);
+warning('**** finished du0dt =')
+end%spmd
 %{
 \end{matlab}
 \begin{figure}
-\centering \caption{\label{fig:homoDiffEdgy31part0}initial
+\centering \caption{\label{fig:spmdHomoDiffEdgy31t0}initial
 field~\(u(x,y,z,0)\) of the patch scheme applied to a
 heterogeneous diffusion~\pde.  Plotted are the isosurfaces
 at field values \(u=0.1,0.3,\ldots,0.9\), with the front
 quadrant omitted so you can see inside.
-\cref{fig:homoDiffEdgy31partFin} plots the isosurfaces of the
+\cref{fig:spmdHomoDiffEdgy31tFin} plots the isosurfaces of the
 computed field at time \(t=0.3\).
 }
-\includegraphics[width=\linewidth]{homoDiffEdgy31part0}
+\includegraphics[width=\linewidth]{spmdHomoDiffEdgy31t0}
 \end{figure}
 Integrate using a distributed integrator. For initial
 parameters, need micro-time steps of roughly~\(0.0001\) for
-stability, recalling that, by default, \verb|patchRK2meso|
+stability, recalling that, by default, \verb|spmdRK2mesoPatch|
 does twenty micro-steps for each specified step in~\verb|ts|.
+Use non-uniform time-steps for fun, and to show more of the
+initial rapid transients. 
 \begin{matlab}
 %}
-disp('Computation of system in time')
-ts=linspace(0,0.2,81);
-[us,uerrs]=patchRK2meso(ts,u0);
-maxError=max(uerrs)
+warning('**** Integrating system in time, wait')
+ts=0.2*linspace(0,1).^2;
+ts=ts(1:6)
+[us,uerrs]=spmdRK2mesoPatch(ts,u0);
+%warning('**** starting maxErrors')
+maxError=max(uerrs{1}) % somehow uerrs is composite, but not us
+%warning('**** finished and returning')
+spmd,mpiprofile viewer,end
+return%%%%%%%%%%%%%%%
 %{
 \end{matlab}
 
 
-\paragraph{Plot the solution} as an animation over time.
+\paragraph{Plot the solution} 
+First show the errors
+\begin{matlab}
+%}
+figure(2), clf
+semilogy(ts,uerrs)
+xlabel('time'), ylabel('estimated step error')
+%{
+\end{matlab}
+Then the solution field as an animation over time.
 \begin{matlab}
 %}
 figure(1), clf
@@ -151,7 +176,7 @@ Draw cross-eyed stereo view of some isosurfaces.
     end
     axis equal, axis(xLim), view(45-7*p,25)
     xlabel('x'), ylabel('y'), zlabel('z')
-    legend(['time = ' num2str(ts(i),'%4.2f')],'Location','north')
+    legend(['time = ' num2str(ts(i),'%5.3f')],'Location','north')
     camlight, lighting gouraud
     hold off
   end% each p
@@ -165,16 +190,16 @@ Draw cross-eyed stereo view of some isosurfaces.
 %{
 \end{matlab}
 \begin{figure}
-\centering \caption{\label{fig:homoDiffEdgy31partFin}final
+\centering \caption{\label{fig:spmdHomoDiffEdgy31tFin}final
 field~\(u(x,y,z,0.3)\) of the patch scheme applied to a
 heterogeneous diffusion~\pde.  Plotted are the isosurfaces
 at field values \(u=0.1,0.3,\ldots,0.9\), with the front
 quadrant omitted so you can see inside.}
-\includegraphics[width=\linewidth]{homoDiffEdgy31partFin}
+\includegraphics[width=\linewidth]{spmdHomoDiffEdgy31tFin}
 \end{figure}
 Finish the animation loop, and optionally output the
 isosurfaces of the final field,
-\cref{fig:homoDiffEdgy31partFin}.
+\cref{fig:spmdHomoDiffEdgy31tFin}.
 \begin{matlab}
 %}
 end%for over time

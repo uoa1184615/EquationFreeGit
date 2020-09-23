@@ -1,10 +1,10 @@
-%patchRK2meso() is a simple example of Runge--Kutta, 2nd order, 
+%spmdRK2mesoPatch() is a simple example of Runge--Kutta, 2nd order, 
 %integration of a given deterministic system on patches.
 %AJR, 3 Sept 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{patchRK2meso()}}
-\label{sec:patchRK2meso}
+\section{\texttt{spmdRK2mesoPatch()}}
+\label{sec:spmdRK2mesoPatch}
 \localtableofcontents
 
 This is a Runge--Kutta, 2nd order, integration of a given
@@ -18,7 +18,7 @@ reduce expensive communication between computers.
 
 \begin{matlab}
 %}
-function [xs,errs] = patchRK2meso(ts,x0,nMicro)
+function [xs,errs] = spmdRK2mesoPatch(ts,x0,nMicro)
 global patches
 %{
 \end{matlab}
@@ -49,21 +49,16 @@ error estimate for the step from \(t_{k-1}\) to~\(t_k\).
 
 Set default number of micro-scale time-steps in each
 requested meso-scale step of~\verb|ts|.
+Cannot use \verb|nargin| inside explicit \verb|spmd|, 
+but can use it if the \verb|spmd| is already active from the code that invokes this function.
 \begin{matlab}
 %}
 if nargin<3, nMicro=20; end
-%{
-\end{matlab}
-Set generic functions to specific 3D cases.
-\begin{matlab}
-%}
-edgeIntN = @(x) patchEdgeInt3(x);
-funN = @(t,x) patches.fun(t,x ...
-             ,patches.x,patches.y,patches.z);
+spmd%%%%%%%%%%
 %{
 \end{matlab}
 
-Compute the time-steps and create storage for outputs.
+Set the micro-time-steps and create storage for outputs.
 \begin{matlab}
 %}
 dt = diff(ts)/nMicro;
@@ -77,9 +72,13 @@ inter-patch interpolation to ensure edge values of the
 initial condition are defined and are reasonable.
 \begin{matlab}
 %}
-xs{1} = edgeIntN(x0);
+%warning('spmdRK2mesoPatch: x0 = spmdPatchEdgeInt3(x0)')
+x0 = spmdPatchEdgeInt3(x0,patches);
+assert(iscodistributed(x0),'x0 not codist one')
+xs{1} = x0;% outside spmd, this converts to array
 errs(1) = 0;
-f1 = funN(ts(1),xs{1});
+%warning('spmdRK2mesoPatch: patches.fun one')
+f1 = patches.fun(ts(1),x0,patches);
 %{
 \end{matlab}
 Compute the meso-time-steps from~\(t_k\) to~\(t_{k+1}\), copying
@@ -95,8 +94,7 @@ values, and an interpolation of the time derivatives to
 get derivative estimates of the edge-values.
 \begin{matlab}
 %}
-  x0 = xs{k};
-  dx0 = edgeIntN(f1);
+  dx0 = spmdPatchEdgeInt3(f1,patches);
 %{
 \end{matlab}
 Perform the micro-time steps.
@@ -115,17 +113,22 @@ the start of the meso-time-step.
     f0([1 end],:,:,:,:,:,:,:)=dx0([1 end],:,:,:,:,:,:,:);
     f0(:,[1 end],:,:,:,:,:,:)=dx0(:,[1 end],:,:,:,:,:,:);
     f0(:,:,[1 end],:,:,:,:,:)=dx0(:,:,[1 end],:,:,:,:,:);
+    assert(iscodistributed(f0),'f0 not codist two')
 %{
 \end{matlab}
 Simple second-order accurate Runge--Kutta micro-scale time-step.
 \begin{matlab}
 %}
     xh = x0+f0*dt(k)/2;
-    fh = funN(ts(k)+dt(k)*(m-0.5),xh);
+    assert(iscodistributed(xh),'xh not codist')
+    fh = patches.fun(ts(k)+dt(k)*(m-0.5),xh,patches);
+    assert(iscodistributed(fh),'fh not codist one')
     fh([1 end],:,:,:,:,:,:,:)=dx0([1 end],:,:,:,:,:,:,:);
     fh(:,[1 end],:,:,:,:,:,:)=dx0(:,[1 end],:,:,:,:,:,:);
     fh(:,:,[1 end],:,:,:,:,:)=dx0(:,:,[1 end],:,:,:,:,:);
+    assert(iscodistributed(fh),'fh not codist two')
     x0 = x0+fh*dt(k);
+    assert(iscodistributed(x0),'x0 not codist two')
 %{
 \end{matlab}
 End the burst of micro-time-steps.
@@ -140,8 +143,10 @@ and temporarily fill-in edges of derivatives (to ensure
 error estimate is reasonable).
 \begin{matlab}
 %}
-  xs{k+1} = edgeIntN(x0);
-  f1 = funN(ts(k+1),xs{k+1});
+  x0 = spmdPatchEdgeInt3(x0,patches);
+  xs{k+1} = x0;% outside spmd, this converts to array
+  assert(iscodistributed(x0),'x0 not codist three')
+  f1 = patches.fun(ts(k+1),x0,patches);
   f1([1 end],:,:,:,:,:,:,:)=dx0([1 end],:,:,:,:,:,:,:);
   f1(:,[1 end],:,:,:,:,:,:)=dx0(:,[1 end],:,:,:,:,:,:);
   f1(:,:,[1 end],:,:,:,:,:)=dx0(:,:,[1 end],:,:,:,:,:);
@@ -155,7 +160,9 @@ estimate over the last micro-time step performed.
   f0=f0-2*fh+f1;
   assert(iscodistributed(f0),'f2ndDeriv not codist')
   errs(k+1) = sqrt(gather(mean(f0(:).^2,'omitnan')))*dt(k)/6;
-end
+end%for-loop
+end%spmd
+end%function
 %{
 \end{matlab}
 End of the function with results returned in~\verb|xs|

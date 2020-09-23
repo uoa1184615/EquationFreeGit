@@ -4,8 +4,8 @@
 % AJR, Aug 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{patchSmooth3()}: interface 3D space to time integrators}
-\label{sec:patchSmooth3}
+\section{\texttt{spmdPatchSmooth3()}: interface 3D space to time integrators}
+\label{sec:spmdPatchSmooth3}
 %\localtableofcontents
 
 
@@ -21,8 +21,8 @@ to this function via the previously established global
 struct~\verb|patches|.
 \begin{matlab}
 %}
-function dudt = patchSmooth3(t,u)
-global patches
+function dudt = spmdPatchSmooth3(t,u,patches)
+if nargin<3, global patches, end% should work
 %{
 \end{matlab}
 
@@ -88,13 +88,13 @@ It is of total length \(\verb|prod(nSubP)| \cdot \verb|nVars|
 \begin{devMan}
 Sets the
 edge values from macroscale interpolation of centre-patch
-values, and if necessary, reshapes the fields~\verb|u| as a 8D-array.  \cref{sec:patchEdgeInt3} describes
-\verb|patchEdgeInt3()|.
+values, and if necessary, reshapes the fields~\verb|u| as a 8D-array.  \cref{sec:spmdPatchEdgeInt3} describes
+\verb|spmdPatchEdgeInt3()|.
 \begin{matlab}
 %}
-uiscodist = iscodistributed(u);
-sizeu = size(u);
-u = patchEdgeInt3(u);
+%spmd
+%warning('spmdPatchSmooth3 starting interpolation')
+u = spmdPatchEdgeInt3(u,patches);
 %{
 \end{matlab}
 
@@ -104,13 +104,20 @@ zero, then return to a to the user\slash integrator as
 same sized array as input.
 \begin{matlab}
 %}
-dudt = patches.fun(t,u,patches.x,patches.y,patches.z);
+%warning('spmdPatchSmooth3 checking on u')
+uiscodist = iscodistributed(u);
+sizeu = size(u);
+%warning('spmdPatchSmooth3 starting dudt function')
+dudt = patches.fun(t,u,patches);
+assert(iscodistributed(dudt),'dudt not codist one')
 dudt([1 end],:,:,:,:,:,:,:) = 0;
 dudt(:,[1 end],:,:,:,:,:,:) = 0;
 dudt(:,:,[1 end],:,:,:,:,:) = 0;
+assert(iscodistributed(dudt),'dudt not codist two')
 dudt = reshape(dudt,sizeu);
-assert(iscodistributed(dudt)| ~uiscodist ...
-      ,'dudt not codist, but u is')
+assert(iscodistributed(dudt),'dudt not codist three')
+%warning('spmdPatchSmooth3 finished dudt')
+%end%spmd
 %{
 \end{matlab}
 Fin.

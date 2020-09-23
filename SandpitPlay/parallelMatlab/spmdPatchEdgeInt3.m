@@ -1,12 +1,12 @@
 % Provides the interpolation across 3D space for 3D patches
 % of simulations of a smooth lattice system such as PDE
-% discretisations.  AJR, Aug 2020
+% discretisations.  AJR, Aug--Sep 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section[\texttt{patchEdgeInt3()}: 3D patch face values from
-3D interpolation] {\texttt{patchEdgeInt3()}: sets 3D patch
+\section[\texttt{spmdPatchEdgeInt3()}: 3D patch face values from
+3D interpolation] {\texttt{spmdPatchEdgeInt3()}: sets 3D patch
 face values from 3D macroscale interpolation}
-\label{sec:patchEdgeInt3}
+\label{sec:spmdPatchEdgeInt3}
 
 Couples 3D patches across 3D space by computing their face
 values via macroscale interpolation.  Assumes that the patch
@@ -16,8 +16,8 @@ the patch-centre values??  Communicate patch-design variables
 via the global struct~\verb|patches|.
 \begin{matlab}
 %}
-function u = patchEdgeInt3(u)
-global patches
+function u = spmdPatchEdgeInt3(u,patches)
+%global patches
 %{
 \end{matlab}
 
@@ -89,19 +89,40 @@ interpolation.
 
 \begin{devMan}
 
+Test for reality of the field values, and define a function
+accordingly.  Could be problematic if some variables are
+real and some are complex, or if variables are of quite
+different sizes.
+Have to do such function definition outside of \verb|spmd|-block.
+\begin{matlab}
+%}
+  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
+       uclean=@(u) real(u);
+  else uclean=@(u) u; 
+  end
+%{
+\end{matlab}
+
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
 %}
+%spmd%%%%%%%%%%
+%warning('spmdPatchEdgeInt3 before patches.z')
+%patch=patches
 [~,~,nz,~,~,~,~,Nz] = size(patches.z);
+%warning('spmdPatchEdgeInt3 before patches.y')
 [~,ny,~,~,~,~,Ny,~] = size(patches.y);
+%warning('spmdPatchEdgeInt3 before patches.x')
 [nx,~,~,~,~,Nx,~,~] = size(patches.x);
+%warning('spmdPatchEdgeInt3 before nEnsem')
 nEnsem = patches.nEnsem;
+%warning('spmdPatchEdgeInt3 before nVars')
 nVars = round( numel(u)/numel(patches.x) ...
     /numel(patches.y)/numel(patches.z)/nEnsem );
 numelu=numel(u);
 assert(numel(u) == nx*ny*nz*Nx*Ny*Nz*nVars*nEnsem ...
-  ,'patchEdgeInt3: input u has wrong size for parameters')
+  ,'spmdPatchEdgeInt3: input u has wrong size for parameters')
 u = reshape(u,[nx ny nz nVars nEnsem Nx Ny Nz]);
 %{
 \end{matlab}
@@ -286,18 +307,18 @@ mode, \(\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
   krz = shiftdim( rz*2*pi/Nz*(mod((0:Nz-1)+kMaz,Nz)-kMaz) ,-6);
 %{
 \end{matlab}
-Test for reality of the field values, and define a function
-accordingly.  Could be problematic if some variables are
-real and some are complex, or if variables are of quite
-different sizes.
-\begin{matlab}
-%}
-  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
-       uclean=@(u) real(u);
-  else uclean=@(u) u; 
-  end
-%{
-\end{matlab}
+%Test for reality of the field values, and define a function
+%accordingly.  Could be problematic if some variables are
+%real and some are complex, or if variables are of quite
+%different sizes.
+%\begin{matlab}
+%%}
+%  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
+%       uclean=@(u) real(u);
+%  else uclean=@(u) u; 
+%  end
+%%{
+%\end{matlab}
 Compute the Fourier transform of the patch centre-values for
 all the fields.  Unless doing patch-edgy interpolation when
 FT the next-to-face values.  If there are an even number of
@@ -375,7 +396,8 @@ Nan the values in corners and edges, of every 3D patch.
 u(:,[1 ny],[1 nz],:,:,:,:,:)=nan; 
 u([1 nx],:,[1 nz],:,:,:,:,:)=nan; 
 u([1 nx],[1 ny],:,:,:,:,:,:)=nan; 
-end% function patchEdgeInt2
+%end%spmd %?????????????????
+end% function spmdPatchEdgeInt3
 %{
 \end{matlab}
 Fin, returning the 8D array of field values with
