@@ -16,14 +16,13 @@ patches in 3D}
 
 Makes the struct~\verb|patches| for use by the patch\slash
 gap-tooth time derivative\slash step function
-\verb|patchSmooth3()|. 
+\verb|patchSmooth3()|, and possibly other patch functions. 
 \cref{sec:configPatches3eg,sec:homoDiffEdgy3} lists an
 example of its use.
 \begin{matlab}
 %}
 function patches = configPatches3(fun,Xlim,BCs ...
     ,nPatch,ordCC,ratio,nSubP,varargin)
-%global patches
 %{
 \end{matlab}
 
@@ -140,8 +139,16 @@ If a user has not yet established a parallel pool, then a `local' pool is starte
 
 
 
-\paragraph{Output} The \emph{global} struct \verb|patches|
+\paragraph{Output} The struct \verb|patches|
 is created and set with the following components.
+If no output variable is provided for \verb|patches|, 
+then make the struct available as a global variable.%
+\footnote{When using \verb|spmd| parallel computing, it is generally best to avoid global variables, and so instead prefer using an explicit output variable.}
+\begin{matlab}
+%}
+if nargout==0, global patches, end
+%{
+\end{matlab}
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
@@ -326,14 +333,13 @@ for i = 1:length(ts)
   for p=1:2
     subplot(1,2,p)
     if (i==1)| exist('OCTAVE_VERSION','builtin')
-      scat(p) = scatter3(xs(j),ys(j),zs(j) ...
-              ,pix(u(j)),col(u(j)),'filled');
+      scat(p) = scatter3(xs(j),ys(j),zs(j),'filled');
       axis equal, caxis(col([0 1])), view(45-5*p,25)
       xlabel('x'), ylabel('y'), zlabel('z')
       title('view stereo pair cross-eyed')
-    else % in matlab just update values
-      set(scat(p),'CData',col(u(j)),'SizeData',pix(u(j)));
-    end
+    end % in matlab just update values
+    set(scat(p),'CData',col(u(j)) ...
+       ,'SizeData',pix((8+xs(j)-ys(j)+zs(j))/6+0*u(j)));
     legend(['time = ' num2str(ts(i),'%4.2f')],'Location','north')
   end
 %{

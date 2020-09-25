@@ -40,7 +40,7 @@ only real eigenvalues by using edgy interpolation.  What
 happens for non-edgy interpolation is unknown.
 \begin{matlab}
 %}
-global patches %%??
+global patches %????????
 nSubP=mPeriod+2;
 nPatch=[7 1 1];
 xLim=[-pi pi 0 0.5 0 0.5];
@@ -58,14 +58,11 @@ Set initial conditions of a simulation as shown in
 \begin{matlab}
 %}
 spmd
-%warning('**** restarting spmd')
-mpiprofile on
-u0 = exp(-patches.x.^2/4-patches.y.^2/2-patches.z.^2);
-%warning('**** finished first u0 =')
-u0 = u0.*(1+0.3*rand(size(u0),patches.codist));
-%warning('**** finished second u0 =')
-du0dt = spmdPatchSmooth3(0,u0,patches);
-warning('**** finished du0dt =')
+    mpiprofile on
+    u0 = exp(-patches.x.^2/4-patches.y.^2/2-patches.z.^2);
+    u0 = u0.*(1+0.3*rand(size(u0),patches.codist));
+    du0dt = patchSmooth3(0,u0,patches);
+    warning('**** finished du0dt =')
 end%spmd
 %{
 \end{matlab}
@@ -82,7 +79,7 @@ computed field at time \(t=0.3\).
 \end{figure}
 Integrate using a distributed integrator. For initial
 parameters, need micro-time steps of roughly~\(0.0001\) for
-stability, recalling that, by default, \verb|spmdRK2mesoPatch|
+stability, recalling that, by default, \verb|RK2mesoPatch|
 does twenty micro-steps for each specified step in~\verb|ts|.
 Use non-uniform time-steps for fun, and to show more of the
 initial rapid transients. 
@@ -90,12 +87,23 @@ initial rapid transients.
 %}
 warning('**** Integrating system in time, wait')
 ts=0.2*linspace(0,1).^2;
-ts=ts(1:6)
-[us,uerrs]=spmdRK2mesoPatch(ts,u0);
-%warning('**** starting maxErrors')
-maxError=max(uerrs{1}) % somehow uerrs is composite, but not us
-%warning('**** finished and returning')
-spmd,mpiprofile viewer,end
+ts=ts(1:3)
+if 1 %switch between cases
+    [us,uerrs]=RK2mesoPatch(ts,u0);
+    spmd, mpiprofile viewer, end
+else
+  spmd
+    [us,uerrs]=RK2mesoPatch(ts,u0,[],patches);
+    mpiprofile viewer
+  end
+end
+%{
+\end{matlab}
+Both above versions return composites, so just get one version.
+\begin{matlab}
+%}
+us=us{1}; uerrs=uerrs{1}
+maxError=max(uerrs) 
 return%%%%%%%%%%%%%%%
 %{
 \end{matlab}

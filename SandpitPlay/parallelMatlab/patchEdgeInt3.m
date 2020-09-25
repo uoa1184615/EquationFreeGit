@@ -1,23 +1,26 @@
-% Provides the interpolation across 3D space for 3D patches
-% of simulations of a smooth lattice system such as PDE
-% discretisations.  AJR, Aug--Sep 2020
+% patchEdgeInt3() provides the interpolation across 3D space
+% for 3D patches of simulations of a smooth lattice system
+% such as PDE discretisations.  AJR, Aug--Sep 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section[\texttt{spmdPatchEdgeInt3()}: 3D patch face values from
-3D interpolation] {\texttt{spmdPatchEdgeInt3()}: sets 3D patch
+\section[\texttt{patchEdgeInt3()}: 3D patch face values from
+3D interpolation] {\texttt{patchEdgeInt3()}: sets 3D patch
 face values from 3D macroscale interpolation}
-\label{sec:spmdPatchEdgeInt3}
+\label{sec:patchEdgeInt3}
 
 Couples 3D patches across 3D space by computing their face
 values via macroscale interpolation.  Assumes that the patch
 centre-values are sensible macroscale variables, and patch
 face values are determined by macroscale interpolation of
-the patch-centre values??  Communicate patch-design variables
-via the global struct~\verb|patches|.
+the patch centre-plane values, or patch next-to-face
+values?? Communicate patch-design variables via a second
+argument (optional, except required for parallel computing
+of \verb|spmd|) or otherwise via the global
+struct~\verb|patches|.
 \begin{matlab}
 %}
-function u = spmdPatchEdgeInt3(u,patches)
-%global patches
+function u = patchEdgeInt3(u,patches)
+if nargin<2, global patches, end
 %{
 \end{matlab}
 
@@ -92,8 +95,8 @@ interpolation.
 Test for reality of the field values, and define a function
 accordingly.  Could be problematic if some variables are
 real and some are complex, or if variables are of quite
-different sizes.
-Have to do such function definition outside of \verb|spmd|-block.
+different sizes. Have to do such function definition outside
+of \verb|spmd|-block.
 \begin{matlab}
 %}
   if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
@@ -107,22 +110,20 @@ Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
 %}
-%spmd%%%%%%%%%%
-%warning('spmdPatchEdgeInt3 before patches.z')
-%patch=patches
+%warning('patchEdgeInt3 before patches.z')
 [~,~,nz,~,~,~,~,Nz] = size(patches.z);
-%warning('spmdPatchEdgeInt3 before patches.y')
+%warning('patchEdgeInt3 before patches.y')
 [~,ny,~,~,~,~,Ny,~] = size(patches.y);
-%warning('spmdPatchEdgeInt3 before patches.x')
+%warning('patchEdgeInt3 before patches.x')
 [nx,~,~,~,~,Nx,~,~] = size(patches.x);
-%warning('spmdPatchEdgeInt3 before nEnsem')
+%warning('patchEdgeInt3 before nEnsem')
 nEnsem = patches.nEnsem;
-%warning('spmdPatchEdgeInt3 before nVars')
+%warning('patchEdgeInt3 before nVars')
 nVars = round( numel(u)/numel(patches.x) ...
     /numel(patches.y)/numel(patches.z)/nEnsem );
 numelu=numel(u);
 assert(numel(u) == nx*ny*nz*Nx*Ny*Nz*nVars*nEnsem ...
-  ,'spmdPatchEdgeInt3: input u has wrong size for parameters')
+  ,'patchEdgeInt3: input u has wrong size for parameters')
 u = reshape(u,[nx ny nz nVars nEnsem Nx Ny Nz]);
 %{
 \end{matlab}
@@ -173,7 +174,7 @@ if ordCC>0 % then finite-width polynomial interpolation
     uCorey = u(2:(nx-1),[2 ny-1],2:(nz-1),:,:,I,J,K);
     uCorez = u(2:(nx-1),2:(ny-1),[2 nz-1],:,:,I,J,K);
   else 
-    %disp('currently couple from the mid-planes??')
+    %warning('currently couple from the mid-planes??')
     uCorex = u(i0,2:(ny-1),2:(nz-1),:,:,I,J,K);
     uCorey = u(2:(nx-1),j0,2:(nz-1),:,:,I,J,K);
     uCorez = u(2:(nx-1),2:(ny-1),k0,:,:,I,J,K);
@@ -183,7 +184,7 @@ if ordCC>0 % then finite-width polynomial interpolation
   dmuz = zeros([ordCC,size(uCorez)]); % 9D
   if patches.stag % use only odd numbered neighbours
     error('polynomial interpolation not yet for staggered patch coupling')
-  else %disp('starting standard interpolation')   
+  else %warning('starting standard interpolation')   
     dmux(1,:,:,:,:,:,I,:,:) = (uCorex(:,:,:,:,:,Ip,:,:) ...
     -uCorex(:,:,:,:,:,Im,:,:))/2; % \mu\delta 
     dmux(2,:,:,:,:,:,I,:,:) = (uCorex(:,:,:,:,:,Ip,:,:) ...
@@ -396,8 +397,7 @@ Nan the values in corners and edges, of every 3D patch.
 u(:,[1 ny],[1 nz],:,:,:,:,:)=nan; 
 u([1 nx],:,[1 nz],:,:,:,:,:)=nan; 
 u([1 nx],[1 ny],:,:,:,:,:,:)=nan; 
-%end%spmd %?????????????????
-end% function spmdPatchEdgeInt3
+end% function patchEdgeInt3
 %{
 \end{matlab}
 Fin, returning the 8D array of field values with
