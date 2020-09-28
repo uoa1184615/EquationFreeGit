@@ -3,8 +3,8 @@
 % AJR, Sept 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{RK2mesoPatch()}}
-\label{sec:RK2mesoPatch}
+\section{\texttt{RK2mesoPatch3()}}
+\label{sec:RK2mesoPatch3}
 \localtableofcontents
 
 This is a Runge--Kutta, 2nd order, integration of a given
@@ -18,7 +18,7 @@ reduce expensive communication between computers.
 
 \begin{matlab}
 %}
-function [xs,errs] = RK2mesoPatch(ts,x0,nMicro,patches)
+function [xs,errs] = RK2mesoPatch3(ts,x0,nMicro,patches)
 if nargin<4, global patches, end
 %{
 \end{matlab}
@@ -26,52 +26,61 @@ if nargin<4, global patches, end
 \paragraph{Input}
 \begin{itemize}
 \item \verb|patches.fun()| is a function such as
-\verb|dxdt=fun(t,x)| that computes the right-hand side of
-the \ode\ \(d\xv/dt=\fv(t,\xv)\) where \xv~is a vector\slash
-array, \(t\)~is a scalar, and the result~\fv\ is a
-correspondingly sized vector\slash array.
+\verb|dxdt=fun(t,x,patches)| that computes the right-hand
+side of the \ode\ \(d\xv/dt=\fv(t,\xv)\) where \xv~is a
+vector\slash array, \(t\)~is a scalar, and the result~\fv\
+is a correspondingly sized vector\slash array.
 \item \verb|x0| is an vector\slash array of initial values at
 the time \verb|ts(1)|.
 \item \verb|ts| is a vector of meso-scale times to compute
 the approximate solution, say in~\(\RR^\ell\) for
 \(\ell\geq2\)\,.
-\item \verb|nMicro|, optional, default~\(20\), is the number
+\item \verb|nMicro|, optional, default~\(10\), is the number
 of micro-time-steps taken for each meso-scale time-step.
-\item \verb|patches| struct ??
+\item \verb|patches| struct set by \verb|configPatches3| and
+provided as either as parameter, or as a global variable.
 \end{itemize}
 
 \paragraph{Output}
 \begin{itemize}
-\item  \verb|xs|,  9D array of length~\(\ell \times\cdots\) of
-approximate solution vector\slash array at the specified times.
+\item  \verb|xs|,  9D array of length~\(\ell \times\cdots\)
+of approximate solution vector\slash array at the specified
+times. But, if using parallel computing via \verb|spmd|,
+then \verb|xs| is a \emph{composite} 9D~array, so outside of
+an \verb|spmd|-block access a single copy of the array
+via~\verb|xs{1}|.  Similarly for~\verb|errs|.
 \item \verb|errs|, column vector in \(\RR^{\ell}\) of local
-error estimate for the step from \(t_{k-1}\) to~\(t_k\).
+error estimate for the step from~\(t_{k-1}\) to~\(t_k\).
 \end{itemize}
 
 Set default number of micro-scale time-steps in each
-requested meso-scale step of~\verb|ts|.
-Cannot use \verb|nargin| inside explicit \verb|spmd|, 
-but can use it if the \verb|spmd| is already active from the code that invokes this function.
+requested meso-scale step of~\verb|ts|. Cannot use
+\verb|nargin| inside explicit \verb|spmd|, but can use it if
+the \verb|spmd| is already active from the code that invokes
+this function.
 \begin{matlab}
 %}
-if nargin<3|isempty(nMicro), nMicro=20; end
+if nargin<3|isempty(nMicro), nMicro=10; end
 %{
 \end{matlab}
-If patches are set to be in parallel (there must be a parallel pool), but only one worker available (i.e., not already inside \verb|spmd|), then invoke function recursively inside \verb|spmd|.  
-Q:~is \verb|numlabs| defined without the parallel computing toolbox??
+If patches are set to be in parallel (there must be a
+parallel pool), but only one worker available (i.e., not
+already inside \verb|spmd|), then invoke function
+recursively inside \verb|spmd|. Q:~is \verb|numlabs| defined
+without the parallel computing toolbox??
 \begin{matlab}
 %}
-%warning('checking spmd status in RK2mesoPatch')
+%warning('checking spmd status in RK2mesoPatch3')
 if isequal(class(patches),'Composite') && numlabs==1
-    spmd%, warning('recursing into RK2mesoPatch')
-      [xs,errs] = RK2mesoPatch(ts,x0,nMicro,patches); 
-      %warning('finished recursion into RK2mesoPatch')
+    spmd%, warning('recursing into RK2mesoPatch3')
+      [xs,errs] = RK2mesoPatch3(ts,x0,nMicro,patches); 
+      %warning('finished recursion into RK2mesoPatch3')
     end% spmd
     assert(isequal(class(xs)  ,'Composite'),' xs  not composite')
     assert(isequal(class(errs),'Composite'),'errs not composite')
     return
 end
-%warning('bypassed start spmd in RK2mesoPatch')
+%warning('bypassed start spmd in RK2mesoPatch3')
 %{
 \end{matlab}
 
@@ -89,27 +98,27 @@ inter-patch interpolation to ensure edge values of the
 initial condition are defined and are reasonable.
 \begin{matlab}
 %}
-%warning('RK2mesoPatch: x0 = patchEdgeInt3(x0)')
+%warning('RK2mesoPatch3: x0 = patchEdgeInt3(x0)')
 x0 = patchEdgeInt3(x0,patches);
-assert(iscodistributed(x0),'x0 not codist one')
-%xs{1} = x0;% outside spmd, this converts to array
+%assert(iscodistributed(x0),'x0 not codist one')
 xs(1,:,:,:,:,:,:,:,:) = gather(x0);
 errs(1) = 0;
-%warning('RK2mesoPatch: patches.fun one')
+%warning('RK2mesoPatch3: patches.fun one')
 f1 = patches.fun(ts(1),x0,patches);
 %{
 \end{matlab}
-Compute the meso-time-steps from~\(t_k\) to~\(t_{k+1}\), copying
-the derivative~\verb|f1| at the end of the last micro-time-step to
-be the derivative at the start of this one.
+Compute the meso-time-steps from~\(t_k\) to~\(t_{k+1}\),
+copying the derivative~\verb|f1| at the end of the last
+micro-time-step to be the derivative at the start of this
+one.
 \begin{matlab}
 %}
 for k = 1:numel(dt)
 %{
 \end{matlab}
 Perform meso-time burst with the new interpolation for edge
-values, and an interpolation of the time derivatives to 
-get derivative estimates of the edge-values.
+values, and an interpolation of the time derivatives to get
+derivative estimates of the edge-values.
 \begin{matlab}
 %}
   dx0 = patchEdgeInt3(f1,patches);
@@ -120,7 +129,7 @@ Perform the micro-time steps.
 %}
   for m=1:nMicro
     f0 = f1; 
-    assert(iscodistributed(f0),'f0 not codist')
+%    assert(iscodistributed(f0),'f0 not codist')
 %{
 \end{matlab}
 For all micro-time derivative evaluations, include that the
@@ -131,22 +140,23 @@ the start of the meso-time-step.
     f0([1 end],:,:,:,:,:,:,:)=dx0([1 end],:,:,:,:,:,:,:);
     f0(:,[1 end],:,:,:,:,:,:)=dx0(:,[1 end],:,:,:,:,:,:);
     f0(:,:,[1 end],:,:,:,:,:)=dx0(:,:,[1 end],:,:,:,:,:);
-    assert(iscodistributed(f0),'f0 not codist two')
+%    assert(iscodistributed(f0),'f0 not codist two')
 %{
 \end{matlab}
-Simple second-order accurate Runge--Kutta micro-scale time-step.
+Simple second-order accurate Runge--Kutta micro-scale
+time-step.
 \begin{matlab}
 %}
     xh = x0+f0*dt(k)/2;
-    assert(iscodistributed(xh),'xh not codist')
+%    assert(iscodistributed(xh),'xh not codist')
     fh = patches.fun(ts(k)+dt(k)*(m-0.5),xh,patches);
-    assert(iscodistributed(fh),'fh not codist one')
+%    assert(iscodistributed(fh),'fh not codist one')
     fh([1 end],:,:,:,:,:,:,:)=dx0([1 end],:,:,:,:,:,:,:);
     fh(:,[1 end],:,:,:,:,:,:)=dx0(:,[1 end],:,:,:,:,:,:);
     fh(:,:,[1 end],:,:,:,:,:)=dx0(:,:,[1 end],:,:,:,:,:);
-    assert(iscodistributed(fh),'fh not codist two')
+%    assert(iscodistributed(fh),'fh not codist two')
     x0 = x0+fh*dt(k);
-    assert(iscodistributed(x0),'x0 not codist two')
+%    assert(iscodistributed(x0),'x0 not codist two')
 %{
 \end{matlab}
 End the burst of micro-time-steps.
@@ -162,8 +172,7 @@ error estimate is reasonable).
 \begin{matlab}
 %}
   x0 = patchEdgeInt3(x0,patches);
-  assert(iscodistributed(x0),'x0 not codist three')
-%  xs{k+1} = x0;% outside spmd, this converts to array
+%  assert(iscodistributed(x0),'x0 not codist three')
   xs(k+1,:,:,:,:,:,:,:,:) = gather(x0);
   f1 = patches.fun(ts(k+1),x0,patches);
   f1([1 end],:,:,:,:,:,:,:)=dx0([1 end],:,:,:,:,:,:,:);
@@ -177,7 +186,7 @@ estimate over the last micro-time step performed.
 \begin{matlab}
 %}
   f0=f0-2*fh+f1;
-  assert(iscodistributed(f0),'f2ndDeriv not codist')
+%  assert(iscodistributed(f0),'f2ndDeriv not codist')
   errs(k+1) = sqrt(gather(mean(f0(:).^2,'omitnan')))*dt(k)/6;
 end%for-loop
 end%function

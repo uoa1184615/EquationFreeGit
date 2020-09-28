@@ -1,6 +1,6 @@
-% Creates a data struct of the design of 3D patches for
-% later use by the patch functions such as patchSmooth3() 
-% AJR, Aug 2020
+% configPatches3() creates a data struct of the design of 3D
+% patches for later use by the patch functions such as
+% patchSmooth3() AJR, Aug--Sep 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches3()}: configures spatial
@@ -16,7 +16,7 @@ patches in 3D}
 
 Makes the struct~\verb|patches| for use by the patch\slash
 gap-tooth time derivative\slash step function
-\verb|patchSmooth3()|, and possibly other patch functions. 
+\verb|patchSmooth3()|, and possibly other patch functions.
 \cref{sec:configPatches3eg,sec:homoDiffEdgy3} lists an
 example of its use.
 \begin{matlab}
@@ -126,12 +126,23 @@ symmetry.
 \end{itemize}
 
 \item \verb|'parallel'|, true/false, \emph{optional},
-default=false.  
-If false, then all patch computations are on the user's main \textsc{cpu}---although a user may well separately invoke, say, a \textsc{gpu} to accelerate sub-patch computations.
-If true, and it requires that you have the \matlab\ Parallel Computing Toolbox, then it will distribute the patches over multiple \textsc{cpu}s\slash cores.
-In \matlab, only one array dimension can be split in the distribution, so it chooses the one space dimension~\(x,y,z\) corresponding to the highest~\verb|\nPatch| (if a tie, then chooses the rightmost of~\(x,y,z\)).
-A user may correspondingly distribute arrays with \verb|patches.codist|, or simply use formulas invoking the preset distributed arrays \verb|patches.x|, \verb|patches.y|, and \verb|patches.z|.
-If a user has not yet established a parallel pool, then a `local' pool is started.
+default=false. If false, then all patch computations are on
+the user's main \textsc{cpu}---although a user may well
+separately invoke, say, a \textsc{gpu} to accelerate
+sub-patch computations. 
+
+If true, and it requires that you have \matlab's Parallel
+Computing Toolbox, then it will distribute the patches over
+multiple \textsc{cpu}s\slash cores. In \matlab, only one
+array dimension can be split in the distribution, so it
+chooses the one space dimension~\(x,y,z\) corresponding to
+the highest~\verb|\nPatch| (if a tie, then chooses the
+rightmost of~\(x,y,z\)). A user may correspondingly
+distribute arrays with \verb|patches.codist|, or simply use
+formulas invoking the preset distributed arrays
+\verb|patches.x|, \verb|patches.y|, and \verb|patches.z|. If
+a user has not yet established a parallel pool, then a
+`local' pool is started.
 
 \end{itemize}
 
@@ -139,11 +150,13 @@ If a user has not yet established a parallel pool, then a `local' pool is starte
 
 
 
-\paragraph{Output} The struct \verb|patches|
-is created and set with the following components.
-If no output variable is provided for \verb|patches|, 
-then make the struct available as a global variable.%
-\footnote{When using \verb|spmd| parallel computing, it is generally best to avoid global variables, and so instead prefer using an explicit output variable.}
+\paragraph{Output} The struct \verb|patches| is created and
+set with the following components. If no output variable is
+provided for \verb|patches|, then make the struct available
+as a global variable.\footnote{When using \verb|spmd|
+parallel computing, it is generally best to avoid global
+variables, and so instead prefer using an explicit output
+variable.}
 \begin{matlab}
 %}
 if nargout==0, global patches, end
@@ -208,10 +221,14 @@ n_c\times m_xm_y\) 5D array of \(m_xm_y\)~ensemble of
 phase-shifts of the microscale heterogeneous coefficients.
 \end{itemize}
 
-\item \verb|.parallel|, logical: true if patches are distributed over multiple \textsc{cpu}s\slash cores for the Parallel Computing Toolbox, otherwise false (the default is to activate the \emph{local} pool).
+\item \verb|.parallel|, logical: true if patches are
+distributed over multiple \textsc{cpu}s\slash cores for the
+Parallel Computing Toolbox, otherwise false (the default is
+to activate the \emph{local} pool).
 
-\item \verb|.codist|, \emph{optional}, describes the particular parallel distribution of arrays over the active parallel pool.  
-%Can use \verb|isfield(patches,'codist')| to test whether parallel distribution has been invoked by a user.
+\item \verb|.codist|, \emph{optional}, describes the
+particular parallel distribution of arrays over the active
+parallel pool.  
 
 \end{itemize}
 
@@ -656,11 +673,17 @@ end%if not-empty(cs)
 \end{matlab}
 
 
-\paragraph{If parallel code} 
-then first assume this is not within an \verb|spmd|-environment, and so we invoke \verb|spmd...end| (which starts a parallel pool if not already started).  
-At this point, the global \verb|patches| is copied for each worker processor and so it becomes \emph{composite} when we distribute any one of the fields.
-Hereafter, \emph{all fields in the global variable \verb|patches| must only be referenced within an \verb|spmd|-environment.}%
-\footnote{If subsequently outside spmd, then one must use functions like \texttt{getfield(patches\{1\},'a')}.}
+\paragraph{If parallel code} then first assume this is not
+within an \verb|spmd|-environment, and so we invoke
+\verb|spmd...end| (which starts a parallel pool if not
+already started). At this point, the global \verb|patches|
+is copied for each worker processor and so it becomes
+\emph{composite} when we distribute any one of the fields.
+Hereafter, \emph{all fields in the global variable
+\verb|patches| must only be referenced within an
+\verb|spmd|-environment.}%
+\footnote{If subsequently outside spmd, then one must use
+functions like \texttt{getfield(patches\{1\},'a')}.}
 \begin{matlab}
 %}
 if patches.parallel
@@ -668,17 +691,21 @@ if patches.parallel
   spmd
 %{
 \end{matlab}
-Second, decide which dimension is to be sliced among parallel workers
-(for the moment, do not consider slicing the ensemble).  
-Choose the direction of most patches, biased towards the last.
+Second, decide which dimension is to be sliced among
+parallel workers (for the moment, do not consider slicing
+the ensemble). Choose the direction of most patches, biased
+towards the last.
 \begin{matlab}
 %}
   [~,pari]=max(nPatch+0.01*(1:3));
   patches.codist=codistributor1d(5+pari);
 %{
 \end{matlab}
-\verb|patches.codist.Dimension| is the index that is split among workers.
-Then distribute the appropriate coordinate direction among the workers: the function must be invoked inside an \verb|spmd|-group in order for this to work---so we do not need \verb|parallel| in argument list.
+\verb|patches.codist.Dimension| is the index that is split
+among workers. Then distribute the appropriate coordinate
+direction among the workers: the function must be invoked
+inside an \verb|spmd|-group in order for this to work---so
+we do not need \verb|parallel| in argument list.
 \begin{matlab}
 %}
   switch pari

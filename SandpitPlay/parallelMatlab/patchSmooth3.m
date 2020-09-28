@@ -95,7 +95,7 @@ describes \verb|patchEdgeInt3()|.
 \begin{matlab}
 %}
 %warning('patchSmooth3 starting interpolation')
-assert(iscodistributed(u)|~patches.parallel,'u not codist zero')
+%assert(iscodistributed(u)|~patches.parallel,'u not codist zero')
 sizeu = size(u);
 u = patchEdgeInt3(u,patches);
 %{
@@ -108,16 +108,16 @@ same sized array as input.
 \begin{matlab}
 %}
 %warning('patchSmooth3 checking on u')
-assert(iscodistributed(u)|~patches.parallel,'u not codist zero')
+%assert(iscodistributed(u)|~patches.parallel,'u not codist zero')
 %warning('patchSmooth3 starting dudt function')
 dudt = patches.fun(t,u,patches);
-assert(iscodistributed(dudt)|~patches.parallel,'dudt not codist one')
+%assert(iscodistributed(dudt)|~patches.parallel,'dudt not codist one')
 dudt([1 end],:,:,:,:,:,:,:) = 0;
 dudt(:,[1 end],:,:,:,:,:,:) = 0;
 dudt(:,:,[1 end],:,:,:,:,:) = 0;
-assert(iscodistributed(dudt)|~patches.parallel,'dudt not codist two')
+%assert(iscodistributed(dudt)|~patches.parallel,'dudt not codist two')
 dudt = reshape(dudt,sizeu);
-assert(iscodistributed(dudt)|~patches.parallel,'dudt not codist three')
+%assert(iscodistributed(dudt)|~patches.parallel,'dudt not codist three')
 %warning('patchSmooth3 finished dudt')
 %{
 \end{matlab}

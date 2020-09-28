@@ -161,10 +161,10 @@ k0 = round((nz+1)/2);
 
 
 \paragraph{Lagrange interpolation gives patch-face values}
-Compute centred differences of the mid-patch values for
-the macro-interpolation, of all fields. Assumes the domain
-is macro-periodic.
-Currently, only next-to-face interpolation is implemented.
+Compute centred differences of the mid-patch values for the
+macro-interpolation, of all fields. Assumes the domain is
+macro-periodic. Currently, only next-to-face interpolation
+is implemented.
 \begin{matlab}
 %}
 ordCC=patches.ordCC;
