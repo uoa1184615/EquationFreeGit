@@ -1,6 +1,6 @@
-% Provides the interpolation across 3D space for 3D patches
-% of simulations of a smooth lattice system such as PDE
-% discretisations.  AJR, Sept 2020
+% patchEdgeInt3() provides the interpolation across 3D space
+% for 3D patches of simulations of a smooth lattice system
+% such as PDE discretisations.  AJR, Aug--Sep 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section[\texttt{patchEdgeInt3()}: 3D patch face values from
@@ -9,18 +9,18 @@ face values from 3D macroscale interpolation}
 \label{sec:patchEdgeInt3}
 
 Couples 3D patches across 3D space by computing their face
-values via macroscale interpolation.  Research
-\cite[]{Roberts2011a, Bunder2019c} indicates the patch
+values via macroscale interpolation.  Assumes that the patch
 centre-values are sensible macroscale variables, and patch
-edge values are determined by macroscale interpolation of
-the patch-centre values.  However, for computational
-homogenisation in multi-D, interpolating patch next-to-edge
-values appears better \cite[]{Bunder2020a}.  Communicate
-patch-design variables via the global struct~\verb|patches|.
+face values are determined by macroscale interpolation of
+the patch centre-plane values, or patch next-to-face
+values?? Communicate patch-design variables via a second
+argument (optional, except required for parallel computing
+of \verb|spmd|) or otherwise via the global
+struct~\verb|patches|.
 \begin{matlab}
 %}
-function u = patchEdgeInt3(u)
-global patches
+function u = patchEdgeInt3(u,patches)
+if nargin<2, global patches, end
 %{
 \end{matlab}
 
@@ -92,6 +92,20 @@ interpolation.
 
 \begin{devMan}
 
+Test for reality of the field values, and define a function
+accordingly.  Could be problematic if some variables are
+real and some are complex, or if variables are of quite
+different sizes. Have to do such function definition outside
+of \verb|spmd|-block.
+\begin{matlab}
+%}
+  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
+       uclean=@(u) real(u);
+  else uclean=@(u) u; 
+  end
+%{
+\end{matlab}
+
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
@@ -142,10 +156,10 @@ k0 = round((nz+1)/2);
 
 
 \paragraph{Lagrange interpolation gives patch-face values}
-Compute centred differences of the mid-patch values for
-the macro-interpolation, of all fields. Assumes the domain
-is macro-periodic.
-Currently, only next-to-face interpolation is implemented.
+Compute centred differences of the mid-patch values for the
+macro-interpolation, of all fields. Assumes the domain is
+macro-periodic. Currently, only next-to-face interpolation
+is implemented.
 \begin{matlab}
 %}
 ordCC=patches.ordCC;
@@ -155,7 +169,7 @@ if ordCC>0 % then finite-width polynomial interpolation
     uCorey = u(2:(nx-1),[2 ny-1],2:(nz-1),:,:,I,J,K);
     uCorez = u(2:(nx-1),2:(ny-1),[2 nz-1],:,:,I,J,K);
   else 
-    %disp('currently couple from the mid-planes??')
+    %warning('currently couple from the mid-planes??')
     uCorex = u(i0,2:(ny-1),2:(nz-1),:,:,I,J,K);
     uCorey = u(2:(nx-1),j0,2:(nz-1),:,:,I,J,K);
     uCorez = u(2:(nx-1),2:(ny-1),k0,:,:,I,J,K);
@@ -165,7 +179,7 @@ if ordCC>0 % then finite-width polynomial interpolation
   dmuz = zeros([ordCC,size(uCorez)]); % 9D
   if patches.stag % use only odd numbered neighbours
     error('polynomial interpolation not yet for staggered patch coupling')
-  else %disp('starting standard interpolation')   
+  else %warning('starting standard interpolation')   
     dmux(1,:,:,:,:,:,I,:,:) = (uCorex(:,:,:,:,:,Ip,:,:) ...
     -uCorex(:,:,:,:,:,Im,:,:))/2; % \mu\delta 
     dmux(2,:,:,:,:,:,I,:,:) = (uCorex(:,:,:,:,:,Ip,:,:) ...
@@ -289,55 +303,36 @@ mode, \(\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
   krz = shiftdim( rz*2*pi/Nz*(mod((0:Nz-1)+kMaz,Nz)-kMaz) ,-6);
 %{
 \end{matlab}
-Test for reality of the field values, and define a function
-accordingly.  Could be problematic if some variables are
-real and some are complex, or if variables are of quite
-different sizes.
-\begin{matlab}
-%}
-  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
-       uclean=@(u) real(u);
-  else uclean=@(u) u; 
-  end
-%{
-\end{matlab}
-Compute the Fourier transform of either the centre-patch
-values for all the fields (\verb|midPatchInterp| true), or
-using the centre-cross values (\verb|midPatchInterp| false).
- The latter appears to be much better for computational
-homogenisation.  
-\begin{matlab}
-%}
-midPatchInterp = false;
-%{
-\end{matlab}
-Unless doing patch-edgy interpolation when FT the
-next-to-face values.  If there are an even number of points,
-then if complex, treat as positive wavenumber, but if real,
-treat as cosine. When using an ensemble of configurations,
-different configurations might be coupled to each other, as
-specified by \verb|patches.le|, \verb|patches.ri|,
-\verb|patches.to|, \verb|patches.bo|, \verb|patches.fr| and
-\verb|patches.ba|.
+%Test for reality of the field values, and define a function
+%accordingly.  Could be problematic if some variables are
+%real and some are complex, or if variables are of quite
+%different sizes.
+%\begin{matlab}
+%%}
+%  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
+%       uclean=@(u) real(u);
+%  else uclean=@(u) u; 
+%  end
+%%{
+%\end{matlab}
+Compute the Fourier transform of the patch centre-values for
+all the fields.  Unless doing patch-edgy interpolation when
+FT the next-to-face values.  If there are an even number of
+points, then if complex, treat as positive wavenumber, but
+if real, treat as cosine. When using an ensemble of
+configurations, different configurations might be coupled to
+each other, as specified by \verb|patches.le|,
+\verb|patches.ri|, \verb|patches.to|, \verb|patches.bo|,
+\verb|patches.fr| and \verb|patches.ba|.
 \begin{matlab}
 %}
 % indices of interior
 ix=(2:nx-1)';  iy=2:ny-1;  iz=shiftdim(2:nz-1,-1); 
 if ~patches.EdgyInt
-  if midPatchInterp
      Cle = fft(fft(fft( u(i0,j0,k0,:,:,:,:,:) ...
          ,[],6),[],7),[],8); 
      Cbo = Cle;  Cba = Cle;
-  else % here try central cross interpolation
-     Cle = fft(fft(fft( u(i0,iy,iz ,:,:,:,:,:) ...
-         ,[],6),[],7),[],8);
-     Cbo = fft(fft(fft( u(ix,j0,iz ,:,:,:,:,:) ...
-         ,[],6),[],7),[],8);
-     Cba = fft(fft(fft( u(ix,iy,k0 ,:,:,:,:,:) ...
-         ,[],6),[],7),[],8);
-     Cri=Cle; Cto=Cbo; Cfr=Cba;
-  end
-else % edgyInt uses next-to-edge values
+else 
      Cle = fft(fft(fft( u(   2,iy,iz ,:,patches.le,:,:,:) ...
          ,[],6),[],7),[],8);
      Cri = fft(fft(fft( u(nx-1,iy,iz ,:,patches.ri,:,:,:) ...
@@ -356,7 +351,7 @@ end
 Fill in the cross of Fourier-shifted mid-values
 \begin{matlab}
 %}
-if midPatchInterp & ~patches.EdgyInt 
+if ~patches.EdgyInt 
   % yz-fraction of kry/z along left/right faces
   ks = (iy-j0)*2/(ny-1).*kry+(iz-k0)*2/(nz-1).*krz; 
   Cle = Cle.*exp(1i*ks); 
@@ -391,13 +386,13 @@ u(ix,iy, 1,:,:,:,:,:) = uclean( ifft(ifft(ifft( ...
 end% if spectral 
 %{
 \end{matlab}
-Nan the values in corners and edges, but not faces, of every 3D patch.
+Nan the values in corners and edges, of every 3D patch.
 \begin{matlab}
 %}
 u(:,[1 ny],[1 nz],:,:,:,:,:)=nan; 
 u([1 nx],:,[1 nz],:,:,:,:,:)=nan; 
 u([1 nx],[1 ny],:,:,:,:,:,:)=nan; 
-end% function patchEdgeInt2
+end% function patchEdgeInt3
 %{
 \end{matlab}
 Fin, returning the 8D array of field values with

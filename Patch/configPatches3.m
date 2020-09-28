@@ -1,6 +1,6 @@
-% Creates a data struct of the design of 3D patches for
-% later use by the patch functions such as patchSmooth3() 
-% AJR, Aug 2020
+% configPatches3() creates a data struct of the design of 3D
+% patches for later use by the patch functions such as
+% patchSmooth3() AJR, Aug--Sep 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches3()}: configures spatial
@@ -16,14 +16,13 @@ patches in 3D}
 
 Makes the struct~\verb|patches| for use by the patch\slash
 gap-tooth time derivative\slash step function
-\verb|patchSmooth3()|. 
+\verb|patchSmooth3()|, and possibly other patch functions.
 \cref{sec:configPatches3eg,sec:homoDiffEdgy3} lists an
 example of its use.
 \begin{matlab}
 %}
-function configPatches3(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP ...
-    ,varargin)
-global patches
+function patches = configPatches3(fun,Xlim,BCs ...
+    ,nPatch,ordCC,ratio,nSubP,varargin)
 %{
 \end{matlab}
 
@@ -48,7 +47,7 @@ same interval in all three directions.
 \item \verb|BCs| eventually and somehow will define the
 macroscale boundary conditions.  Currently, \verb|BCs| is
 ignored and the system is assumed macro-periodic in the
-domain.
+specified rectangular domain.
 
 \item \verb|nPatch| determines the number of equi-spaced
 spaced patches: if scalar, then use the same number of
@@ -126,12 +125,43 @@ symmetry.
 
 \end{itemize}
 
+\item \verb|'parallel'|, true/false, \emph{optional},
+default=false. If false, then all patch computations are on
+the user's main \textsc{cpu}---although a user may well
+separately invoke, say, a \textsc{gpu} to accelerate
+sub-patch computations. 
+
+If true, and it requires that you have \matlab's Parallel
+Computing Toolbox, then it will distribute the patches over
+multiple \textsc{cpu}s\slash cores. In \matlab, only one
+array dimension can be split in the distribution, so it
+chooses the one space dimension~\(x,y,z\) corresponding to
+the highest~\verb|\nPatch| (if a tie, then chooses the
+rightmost of~\(x,y,z\)). A user may correspondingly
+distribute arrays with \verb|patches.codist|, or simply use
+formulas invoking the preset distributed arrays
+\verb|patches.x|, \verb|patches.y|, and \verb|patches.z|. If
+a user has not yet established a parallel pool, then a
+`local' pool is started.
+
 \end{itemize}
 
 
 
-\paragraph{Output} The \emph{global} struct \verb|patches|
-is created and set with the following components.
+
+
+\paragraph{Output} The struct \verb|patches| is created and
+set with the following components. If no output variable is
+provided for \verb|patches|, then make the struct available
+as a global variable.\footnote{When using \verb|spmd|
+parallel computing, it is generally best to avoid global
+variables, and so instead prefer using an explicit output
+variable.}
+\begin{matlab}
+%}
+if nargout==0, global patches, end
+%{
+\end{matlab}
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
@@ -191,6 +221,15 @@ n_c\times m_xm_y\) 5D array of \(m_xm_y\)~ensemble of
 phase-shifts of the microscale heterogeneous coefficients.
 \end{itemize}
 
+\item \verb|.parallel|, logical: true if patches are
+distributed over multiple \textsc{cpu}s\slash cores for the
+Parallel Computing Toolbox, otherwise false (the default is
+to activate the \emph{local} pool).
+
+\item \verb|.codist|, \emph{optional}, describes the
+particular parallel distribution of arrays over the active
+parallel pool.  
+
 \end{itemize}
 
 
@@ -234,8 +273,9 @@ visualisation), and with \(4^3\) points forming each
 patch. 
 \begin{matlab}
 %}
-configPatches3(@heteroWave3,[-pi pi], nan, 5 ...
-    , 0, 0.35, mPeriod+2 ,'EdgyInt',true ...
+global patches
+patches = configPatches3(@heteroWave3,[-pi pi], nan ...
+    , 5, 0, 0.35, mPeriod+2 ,'EdgyInt',true ...
     ,'hetCoeffs',cHetr);
 %{
 \end{matlab}
@@ -310,14 +350,13 @@ for i = 1:length(ts)
   for p=1:2
     subplot(1,2,p)
     if (i==1)| exist('OCTAVE_VERSION','builtin')
-      scat(p) = scatter3(xs(j),ys(j),zs(j) ...
-              ,pix(u(j)),col(u(j)),'filled');
+      scat(p) = scatter3(xs(j),ys(j),zs(j),'filled');
       axis equal, caxis(col([0 1])), view(45-5*p,25)
       xlabel('x'), ylabel('y'), zlabel('z')
       title('view stereo pair cross-eyed')
-    else % in matlab just update values
-      set(scat(p),'CData',col(u(j)),'SizeData',pix(u(j)));
-    end
+    end % in matlab just update values
+    set(scat(p),'CData',col(u(j)) ...
+       ,'SizeData',pix((8+xs(j)-ys(j)+zs(j))/6+0*u(j)));
     legend(['time = ' num2str(ts(i),'%4.2f')],'Location','north')
   end
 %{
@@ -380,6 +419,7 @@ addParameter(p,'nEdge',1,@isnumeric);
 addParameter(p,'EdgyInt',false,@islogical);
 addParameter(p,'nEnsem',1,@isnumeric);
 addParameter(p,'hetCoeffs',[],@isnumeric);
+addParameter(p,'parallel',false,@islogical);
 %addParameter(p,'nCore',1,@isnumeric); % not yet implemented
 parse(p,fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,varargin{:});
 %{
@@ -391,6 +431,7 @@ patches.nEdge = p.Results.nEdge;
 patches.EdgyInt = p.Results.EdgyInt;
 patches.nEnsem = p.Results.nEnsem;
 cs = p.Results.hetCoeffs;
+patches.parallel = p.Results.parallel;
 %patches.nCore = p.Results.nCore;
 %{
 \end{matlab}
@@ -525,6 +566,7 @@ patches.z = reshape(patches.z,1,1,nSubP(3),1,1,1,1,nPatch(3));
 
 
 
+
 \subsection{Set ensemble inter-patch communication}
 For \verb|EdgyInt| or centre interpolation respectively, the
 right-edge\slash centre realisations \verb|1:nEnsem| are to
@@ -629,6 +671,67 @@ End the two if-statements.
 end%if not-empty(cs)
 %{
 \end{matlab}
+
+
+\paragraph{If parallel code} then first assume this is not
+within an \verb|spmd|-environment, and so we invoke
+\verb|spmd...end| (which starts a parallel pool if not
+already started). At this point, the global \verb|patches|
+is copied for each worker processor and so it becomes
+\emph{composite} when we distribute any one of the fields.
+Hereafter, \emph{all fields in the global variable
+\verb|patches| must only be referenced within an
+\verb|spmd|-environment.}%
+\footnote{If subsequently outside spmd, then one must use
+functions like \texttt{getfield(patches\{1\},'a')}.}
+\begin{matlab}
+%}
+if patches.parallel
+%  theparpool=gcp()
+  spmd
+%{
+\end{matlab}
+Second, decide which dimension is to be sliced among
+parallel workers (for the moment, do not consider slicing
+the ensemble). Choose the direction of most patches, biased
+towards the last.
+\begin{matlab}
+%}
+  [~,pari]=max(nPatch+0.01*(1:3));
+  patches.codist=codistributor1d(5+pari);
+%{
+\end{matlab}
+\verb|patches.codist.Dimension| is the index that is split
+among workers. Then distribute the appropriate coordinate
+direction among the workers: the function must be invoked
+inside an \verb|spmd|-group in order for this to work---so
+we do not need \verb|parallel| in argument list.
+\begin{matlab}
+%}
+  switch pari
+    case 1, patches.x=codistributed(patches.x,patches.codist);
+    case 2, patches.y=codistributed(patches.y,patches.codist);
+    case 3, patches.z=codistributed(patches.z,patches.codist);
+  otherwise
+    error('should never have bad index for parallel distribution')
+  end%switch
+  end%spmd
+%{
+\end{matlab}
+
+If not parallel, then clean out \verb|patches.codist| if it exists.
+May not need, but safer.
+\begin{matlab}
+%}
+else% not parallel
+  if isfield(patches,'codist')
+     rmfield(patches,'codist'); 
+  end
+end%if-parallel
+%{
+\end{matlab}
+
+
 
 
 \paragraph{Fin}
