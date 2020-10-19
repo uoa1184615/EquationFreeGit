@@ -87,7 +87,7 @@ phase-shifted for an ensemble.
 %}
 mPeriod = 3%randi([2 5])
 % set random diffusion coefficients
-cHetr=exp(0*randn(mPeriod,1));
+cHetr=exp(0.3*randn(mPeriod,1));
 %cHetr = [3.966;2.531;0.838;0.331;7.276];
 cHetr = cHetr*mean(1./cHetr) % normalise
 %{

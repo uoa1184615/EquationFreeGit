@@ -1,4 +1,4 @@
-% Test spectral interpolation in 3D with many random parameters
+% Test inter-patch interpolation in 3D with many random parameters
 % AJR, Aug 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{

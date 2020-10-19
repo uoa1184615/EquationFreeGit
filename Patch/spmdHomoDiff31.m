@@ -1,4 +1,4 @@
-% spmdHomoDiff1 simulates heterogeneous diffusion in 1D
+% spmdHomoDiff31 simulates heterogeneous diffusion in 1D
 % space on 3D patches as a Proof of Principle example of
 % parallel computing with spmd.  The interest here is on
 % using spmd and comparing it with code not using spmd. The
@@ -8,12 +8,12 @@
 % for homoDiffEdgy3.  AJR, Aug--Sep 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{spmdHomoDiff1}: computational
-homogenisation of a 1D diffusion via parallel simulation on
-small 3D patches}
-\label{sec:spmdHomoDiff1}
+\section{\texttt{spmdHomoDiff31}: computational
+homogenisation of a 1D dispersion via parallel simulation on
+small 3D patches of diffusion}
+\label{sec:spmdHomoDiff31}
 
-Simulate heterogeneous diffusion along 1D space on 3D
+Simulate heterogeneous dispersion along 1D space on 3D
 patches as a Proof of Principle example of parallel
 computing with \verb|spmd|.  The discussion here only
 addresses issues with \verb|spmd| parallel computing.  For
@@ -24,28 +24,30 @@ diffusion, see code and documentation for
 
 Choose one of four cases:
 \begin{itemize}
-\item \verb|theCase=1| is corresponding code without using
-\verb|spmd|;
+\item \verb|theCase=1| is corresponding code without
+parallelisation (in this toy problem it is much the quickest
+because there is no expensive communication);
 \item \verb|theCase=2| for minimising coding by a user of
 \verb|spmd|-blocks;
 \item \verb|theCase=3| is for users happier to explicitly
 invoke \verb|spmd|-blocks.
-\end{itemize}
-\item \verb|theCase=4| invokes projective integration for a
-long-time simulation based upon short bursts of the
-micro-code, bursts done within \verb|spmd|-blocks for
+\item \verb|theCase=4| invokes projective integration for
+long-time simulation via short bursts of the
+micro-computation, bursts done within \verb|spmd|-blocks for
 parallel computing.
 \end{itemize}
 First, clear all to remove any existing globals, old
 composites, etc---although a parallel pool persists.
+Then choose the case.
 \begin{matlab}
 %}
 clear all
-theCase = 4
+%global OurCf2eps, OurCf2eps=true
+theCase = 3
 %{
 \end{matlab}
 
-Set heterogeneity with various periods.
+Set micro-scale heterogeneity with various periods.
 \begin{matlab}
 %}
 mPeriod = [4 3 2] %1+randperm(3) 
@@ -78,15 +80,14 @@ patches = configPatches3(@heteroDiff3, xLim, nan ...
 
 \subsection{Simulate heterogeneous diffusion}
 Set initial conditions of a simulation as shown in
-\cref{fig:spmdHomoDiff1t0}.
+\cref{fig:spmdHomoDiff31t0}.
 \begin{matlab}
 %}
 disp('**** Set initial condition and testing du0dt =')
 if theCase==1
 %{
 \end{matlab}
-Without parallel processing, invoke usual operations, and
-choose to use global patches.
+Without parallel processing, invoke the usual operations.
 \begin{matlab}
 %}
     u0 = exp( -(patches.x-xLim(2)/2).^2/xLim(2) ...
@@ -115,22 +116,23 @@ end%if theCase
 %{
 \end{matlab}
 \begin{figure}
-\centering \caption{\label{fig:spmdHomoDiff1t0}initial
+\centering \caption{\label{fig:spmdHomoDiff31t0}initial
 field~\(u(x,y,z,0)\) of the patch scheme applied to a
-heterogeneous diffusion~\pde. \cref{fig:spmdHomoDiff1tFin}
-plots the field values at time \(t=0.4\). }
-\includegraphics[scale=0.9]{spmdHomoDiff1t0}
+heterogeneous diffusion~\pde. The vertical spread indicates 
+the extent of the structure in~\(u\) in the cross-section 
+variables~\(y,z\).  \cref{fig:spmdHomoDiff31tFin}
+plots the nearly smooth field values at time \(t=0.4\). }
+\includegraphics[scale=0.8]{spmdHomoDiff31t0}
 \end{figure}
 
-Integrate in time. Now, \verb|ode23| uses time steps of
-about~\(0.005\)--\(0.03\). Use non-uniform time-steps for
+Integrate in time.  Use non-uniform time-steps for
 fun, and to show more of the initial rapid transients. 
 
 Alternatively, use \verb|RK2mesoPatch3| which reduces
 communication between patches, recalling that, by default,
 \verb|RK2mesoPatch3| does ten micro-steps for each specified
 step in~\verb|ts|. For unit cube patches, need micro-steps
-of roughly~\(0.004\) for stability.
+less than about~\(0.004\) for stability.
 \begin{matlab}
 %}
 warning('Integrating system in time, wait patiently')
@@ -163,13 +165,13 @@ case 1
 parallel patch code has been requested, but has only one cpu
 worker, so it auto-initiates an \verb|spmd|-block for the
 integration. Both this and the next case return
-\emph{composite} results, so just get one version of the
+\emph{composite} results, so just keep one version of the
 results.
 \begin{matlab}
 %}
 case 2
     us = RK2mesoPatch3(ts,u0);
-    us=us{1};  
+    us = us{1};  
 %{
 \end{matlab}
 
@@ -181,7 +183,7 @@ initial conditions.
 case 3,spmd
     us = RK2mesoPatch3(ts,u0,[],patches);
     end%spmd
-    us=us{1};
+    us = us{1};
 %{
 \end{matlab}
 
@@ -204,7 +206,7 @@ case 4
         aBurst(tb0 ,reshape(xb0,size(u0)) ,patches);
     ts = 0:3:51
     us = PIRK2(microBurst,ts,gather(u0(:)));
-    us=reshape(us,[length(ts) size(u0)]);
+    us = reshape(us,[length(ts) size(u0)]);
 %{
 \end{matlab}
 \end{enumerate}
@@ -218,10 +220,10 @@ end%switch theCase
 
 
 
-\paragraph{Plot the solution} 
-Plot the solution field as an animation over time. Since the
-spatial domain is long in~\(x\) and thin in~\(y,z\), just
-plot field values as a function of~\(x\).
+\subsection{Plot the solution} 
+Animate the solution field over time. Since the spatial
+domain is long in~\(x\) and thin in~\(y,z\), just plot field
+values as a function of~\(x\).
 \begin{matlab}
 %}
 figure(1), clf
@@ -239,7 +241,7 @@ for a short display.
 \begin{matlab}
 %}
 nTimes = length(ts)
-for i = 1:length(ts)
+for l = 1:length(ts)
 %{
 \end{matlab}
 At each time, squeeze interior point data into a 4D array,
@@ -249,36 +251,36 @@ every~\((y,z)\).
 \begin{matlab}
 %}
   u = reshape( permute( squeeze( ...
-      us(i,2:end-1,2:end-1,2:end-1,:) ) ,[1 4 2 3]) ,numel(x),[]);
+      us(l,2:end-1,2:end-1,2:end-1,:) ) ,[1 4 2 3]) ,numel(x),[]);
 %{
 \end{matlab}
 Draw point data to show spread at each cross-section, as
 well as macro-scale variation in the long space direction. 
 \begin{matlab}
 %}
-  if i==1
+  if l==1
     hp = plot(x,u,'.');
     axis([xLim(1:2) 0 max(u(:))])
-    xlabel('space x'), ylabel('u(x,t)')
+    xlabel('space x'), ylabel('u(x,y,z,t)')
     ifOurCf2eps([mfilename 't0'])
-    legend(['time = ' num2str(ts(i),'%4.2f')])
+    legend(['time = ' num2str(ts(l),'%4.2f')])
     disp('**** pausing, press blank to animate')
     pause
  else
-    for j=1:size(u,2), hp(j).YData=u(:,j); end
-    legend(['time = ' num2str(ts(i),'%4.2f')])
+    for p=1:size(u,2), hp(p).YData=u(:,p); end
+    legend(['time = ' num2str(ts(l),'%4.2f')])
     pause(0.1)
  end
 %{
 \end{matlab}
 \begin{figure}
-\centering \caption{\label{fig:spmdHomoDiff1tFin}final
+\centering \caption{\label{fig:spmdHomoDiff31tFin}final
 field~\(u(x,y,z,0.4)\) of the patch scheme applied to a
 heterogeneous diffusion~\pde.  }
-\includegraphics[scale=0.9]{spmdHomoDiff1tFin}
+\includegraphics[scale=0.8]{spmdHomoDiff31tFin}
 \end{figure}
 Finish the animation loop, and optionally output the final
-plot, \cref{fig:spmdHomoDiff1tFin}.
+plot, \cref{fig:spmdHomoDiff31tFin}.
 \begin{matlab}
 %}
 end%for over time
@@ -314,6 +316,6 @@ end%function
 
 
 
-\input{../Patch/heteroDiff3.m}
+%\input{../Patch/heteroDiff3.m}
 Fin.
 %}

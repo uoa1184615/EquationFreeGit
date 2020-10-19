@@ -1,6 +1,6 @@
-% Creates a data struct of the design of 2D patches for
+% configPatches2() creates a data struct of the design of 2D patches for
 % later use by the patch functions such as smoothPatch2() 
-% AJR, Nov 2018 -- Jul 2020
+% AJR, Nov 2018 -- Sep 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches2()}: configures spatial
@@ -20,9 +20,8 @@ gap-tooth time derivative\slash step function
 example of its use.
 \begin{matlab}
 %}
-function configPatches2(fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP ...
-    ,varargin)
-global patches
+function patches = configPatches2(fun,Xlim,BCs ...
+    ,nPatch,ordCC,ratio,nSubP,varargin)
 %{
 \end{matlab}
 
@@ -34,7 +33,7 @@ lubrication flow of a thin layer of fluid---see
 \begin{itemize}
 
 \item \verb|fun| is the name of the user function,
-\verb|fun(t,u,x,y)|, that computes time-derivatives (or
+\verb|fun(t,u,patches)|, that computes time-derivatives (or
 time-steps) of quantities on the 2D micro-grid within all
 the 2D patches.
 
@@ -48,7 +47,7 @@ square domain of the same interval in both directions.
 \item \verb|BCs| eventually and somehow will define the
 macroscale boundary conditions.  Currently, \verb|BCs| is
 ignored and the system is assumed macro-periodic in the
-domain.
+specified rectangular domain.
 
 \item \verb|nPatch| determines the number of equi-spaced
 spaced patches: if scalar, then use the same number of
@@ -77,26 +76,26 @@ in each direction.
 lattice points in each patch: if scalar, then use the same
 number in both directions, otherwise \verb|nSubP(1:2)| gives
 the number in each direction. If not using \verb|EdgyInt|,
-then must be odd so that there is a central micro-grid point
+then must be odd so that there is a central micro-grid point\slash lines
 in each patch.
 
-\item \verb|'nEdge'| (not yet implemented), \emph{optional},
+\item \verb|nEdge| (not yet implemented), \emph{optional},
 default=1, for each patch, the number of edge values set by
 interpolation at the edge regions of each patch.  The
 default is one (suitable for microscale lattices with only
 nearest neighbour interactions).
 
-\item \verb|'EdgyInt'|, true/false, \emph{optional},
+\item \verb|EdgyInt|, true/false, \emph{optional},
 default=false.  If true, then interpolate to left\slash
 right\slash top\slash bottom edge-values from right\slash
 left\slash bottom\slash top next-to-edge values.  
 
-\item \verb|'nEnsem'|,  \emph{optional-experimental},
+\item \verb|nEnsem|,  \emph{optional-experimental},
 default one, but if more, then an ensemble over this
 number of realisations.
 
-\item \verb|'hetCoeffs'|, \emph{optional}, default empty.
-Supply an array of microscale heterogeneous coefficients to
+\item \verb|hetCoeffs|, \emph{optional}, default empty.
+Supply a2/3D array of microscale heterogeneous coefficients to
 be used by the given microscale \verb|fun| in each patch.
 Say the given array~\verb|cs| is of size \(m_x\times
 m_y\times n_c\), where \(n_c\)~is the number of different
@@ -107,7 +106,6 @@ be the same for each and every patch; however, macroscale
 variations are catered for by the \(n_c\)~coefficients being
 \(n_c\)~parameters in some macroscale formula.
 \begin{itemize}
-
 \item If \(\verb|nEnsem|=1\), then the array of coefficients
 is just tiled across the patch size to fill up each patch,
 starting from the \((1,1)\)-element.
@@ -123,16 +121,45 @@ coupling cunningly preserves symmetry.
 
 \end{itemize}
 
+\item \verb|parallel|, true/false, \emph{optional},
+default=false. If false, then all patch computations are on
+the user's main \textsc{cpu}---although a user may well
+separately invoke, say, a \textsc{gpu} to accelerate
+sub-patch computations. 
+
+If true, and it requires that you have \Matlab's Parallel
+Computing Toolbox, then it will distribute the patches over
+multiple \textsc{cpu}s\slash cores. In \Matlab, only one
+array dimension can be split in the distribution, so it
+chooses the one space dimension~\(x,y\) corresponding to
+the highest~\verb|\nPatch| (if a tie, then chooses the
+rightmost of~\(x,y\)). A user may correspondingly
+distribute arrays with \verb|patches.codist|, or simply use
+formulas invoking the preset distributed arrays
+\verb|patches.x|, and \verb|patches.y|. If
+a user has not yet established a parallel pool, then a
+`local' pool is started.
+
 \end{itemize}
 
 
 
-\paragraph{Output} The \emph{global} struct \verb|patches|
-is created and set with the following components.
+\paragraph{Output} The struct \verb|patches| is created and
+set with the following components. If no output variable is
+provided for \verb|patches|, then make the struct available
+as a global variable.\footnote{When using \texttt{spmd}
+parallel computing, it is generally best to avoid global
+variables, and so instead prefer using an explicit output
+variable.}
+\begin{matlab}
+%}
+if nargout==0, global patches, end
+%{
+\end{matlab}
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,x,y)| that computes the time derivatives (or
+\verb|fun(t,u,patches)| that computes the time derivatives (or
 steps) on the patchy lattice. 
 
 \item \verb|.ordCC| is the specified order of inter-patch
@@ -151,12 +178,12 @@ specified.
 
 \item \verb|.x| (6D) is \(\verb|nSubP(1)| \times1 \times1
 \times1 \times \verb|nPatch(1)| \times1\) array of the
-regular spatial locations~\(x_{ij}\) of the microscale grid
+regular spatial locations~\(x_{iI}\) of the microscale grid
 points in every patch.  
 
 \item \verb|.y| (6D) is \(1 \times \verb|nSubP(2)| \times1
 \times1 \times1 \times \verb|nPatch(2)|\) array of the
-regular spatial locations~\(y_{ij}\) of the microscale grid
+regular spatial locations~\(y_{jJ}\) of the microscale grid
 points in every patch.  
 
 \item \verb|.ratio| \(1\times 2\), are the size ratios of
@@ -181,6 +208,15 @@ heterogeneous coefficients, or
 \(m_xm_y\)~ensemble of phase-shifts of the microscale
 heterogeneous coefficients.
 \end{itemize}
+
+\item \verb|.parallel|, logical: true if patches are
+distributed over multiple \textsc{cpu}s\slash cores for the
+Parallel Computing Toolbox, otherwise false (the default is
+to activate the \emph{local} pool).
+
+\item \verb|.codist|, \emph{optional}, describes the
+particular parallel distribution of arrays over the active
+parallel pool.  
 
 \end{itemize}
 
@@ -216,8 +252,9 @@ consistent with the \pde\ (as the patch spacing decreases).
 \begin{matlab}
 %}
 nSubP = 5;
-configPatches2(@nonDiffPDE,[-3 3 -2 2], nan, [9 7] ...
-    , 0, 0.4, nSubP ,'EdgyInt',false);
+global patches
+patches = configPatches2(@nonDiffPDE,[-3 3 -2 2], nan ...
+    , [9 7], 0, 0.4, nSubP ,'EdgyInt',false);
 %{
 \end{matlab}
 Set a  perturbed-Gaussian initial condition using
@@ -316,8 +353,8 @@ end%if no arguments
 %{
 \end{matlab}
 
-
 \input{../Patch/nonDiffPDE.m}
+
 
 
 
@@ -339,6 +376,7 @@ addParameter(p,'nEdge',1,@isnumeric);
 addParameter(p,'EdgyInt',false,@islogical);
 addParameter(p,'nEnsem',1,@isnumeric);
 addParameter(p,'hetCoeffs',[],@isnumeric);
+addParameter(p,'parallel',false,@islogical);
 %addParameter(p,'nCore',1,@isnumeric); % not yet implemented
 parse(p,fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,varargin{:});
 %{
@@ -350,6 +388,7 @@ patches.nEdge = p.Results.nEdge;
 patches.EdgyInt = p.Results.EdgyInt;
 patches.nEnsem = p.Results.nEnsem;
 cs = p.Results.hetCoeffs;
+patches.parallel = p.Results.parallel;
 %patches.nCore = p.Results.nCore;
 %{
 \end{matlab}
@@ -414,7 +453,7 @@ patches.ordCC = ordCC;
 Check for staggered grid and periodic case.
 \begin{matlab}
 %}
-if patches.stag, assert(mod(nPatch,2)==0, ...
+if patches.stag, assert(all(mod(nPatch,2)==0), ...
     'Require an even number of patches for staggered grid')
 end
 %{
@@ -568,6 +607,66 @@ End the two if-statements.
 end%if not-empty(cs)
 %{
 \end{matlab}
+
+
+
+\paragraph{If parallel code} then first assume this is not
+within an \verb|spmd|-environment, and so we invoke
+\verb|spmd...end| (which starts a parallel pool if not
+already started). At this point, the global \verb|patches|
+is copied for each worker processor and so it becomes
+\emph{composite} when we distribute any one of the fields.
+Hereafter, {\em all fields in the global variable
+\verb|patches| must only be referenced within an
+\verb|spmd|-environment.}%
+\footnote{If subsequently outside spmd, then one must use
+functions like \texttt{getfield(patches\{1\},'a')}.}
+\begin{matlab}
+%}
+if patches.parallel
+%  theparpool=gcp()
+  spmd
+%{
+\end{matlab}
+Second, decide which dimension is to be sliced among
+parallel workers (for the moment, do not consider slicing
+the ensemble). Choose the direction of most patches, biased
+towards the last.
+\begin{matlab}
+%}
+  [~,pari]=max(nPatch+0.01*(1:2));
+  patches.codist=codistributor1d(4+pari);
+%{
+\end{matlab}
+\verb|patches.codist.Dimension| is the index that is split
+among workers. Then distribute the appropriate coordinate
+direction among the workers: the function must be invoked
+inside an \verb|spmd|-group in order for this to work---so
+we do not need \verb|parallel| in argument list.
+\begin{matlab}
+%}
+  switch pari
+    case 1, patches.x=codistributed(patches.x,patches.codist);
+    case 2, patches.y=codistributed(patches.y,patches.codist);
+  otherwise
+    error('should never have bad index for parallel distribution')
+  end%switch
+  end%spmd
+%{
+\end{matlab}
+
+If not parallel, then clean out \verb|patches.codist| if it exists.
+May not need, but safer.
+\begin{matlab}
+%}
+else% not parallel
+  if isfield(patches,'codist')
+     rmfield(patches,'codist'); 
+  end
+end%if-parallel
+%{
+\end{matlab}
+
 
 
 \paragraph{Fin}

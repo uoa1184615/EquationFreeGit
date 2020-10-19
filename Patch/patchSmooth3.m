@@ -56,21 +56,21 @@ overwritten by zeros.
 
 \item \verb|.x| is \(\verb|nSubP(1)| \times1 \times1 \times1
 \times1 \times1 \verb|nPatch(1)| \times1 \times1\) array of
-the spatial locations~\(x_{ij}\) of the microscale grid
+the spatial locations~\(x_{i}\) of the microscale \((i,j,k)\)-grid
 points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and microscales.
 
 \item \verb|.y| is similarly \(1 \times \verb|nSubP(2)|
 \times1 \times1 \times1 \times1 \times \verb|nPatch(2)|
-\times1\) array of the spatial locations~\(y_{ij}\) of the
-microscale grid points in every patch.  Currently it
+\times1\) array of the spatial locations~\(y_{j}\) of the
+microscale \((i,j,k)\)-grid points in every patch.  Currently it
 \emph{must} be an equi-spaced lattice on both macro- and
 microscales.
 
 \item \verb|.z| is similarly \(1 \times1
 \times \verb|nSubP(3)| \times1 \times1 \times1 \times1 \times
-\verb|nPatch(3)|\) array of the spatial locations~\(z_{ij}\)
-of the microscale grid points in every patch.  Currently it
+\verb|nPatch(3)|\) array of the spatial locations~\(z_{k}\)
+of the microscale \((i,j,k)\)-grid points in every patch.  Currently it
 \emph{must} be an equi-spaced lattice on both macro- and
 microscales.
 
@@ -87,6 +87,8 @@ of total length \(\verb|prod(nSubP)| \cdot \verb|nVars|
 dimensions as~\verb|u|.
 \end{itemize}
 
+
+
 \begin{devMan}
 Sets the edge values from macroscale interpolation of
 centre-patch values, and if necessary, reshapes the
@@ -102,8 +104,8 @@ u = patchEdgeInt3(u,patches);
 \end{matlab}
 
 Ask the user function for the time derivatives computed in
-the array, overwrite its edge values with the dummy value of
-zero, then return to a to the user\slash integrator as
+the array, overwrite its edge and face values with the dummy
+value of zero, then return to the user\slash integrator as
 same sized array as input.
 \begin{matlab}
 %}

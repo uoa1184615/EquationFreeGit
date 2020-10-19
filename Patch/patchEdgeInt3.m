@@ -13,7 +13,7 @@ values via macroscale interpolation.  Assumes that the patch
 centre-values are sensible macroscale variables, and patch
 face values are determined by macroscale interpolation of
 the patch centre-plane values, or patch next-to-face
-values?? Communicate patch-design variables via a second
+values which appears better \cite[]{Bunder2020a}. Communicate patch-design variables via a second
 argument (optional, except required for parallel computing
 of \verb|spmd|) or otherwise via the global
 struct~\verb|patches|.
@@ -24,13 +24,14 @@ if nargin<2, global patches, end
 %{
 \end{matlab}
 
+
 \paragraph{Input}
 \begin{itemize}
 
-\item \verb|u| is a vector of length \(\verb|nSubP1| \cdot
+\item \verb|u| is a vector (or indeed any dim array) of length \(\verb|nSubP1| \cdot
 \verb|nSubP2| \cdot \verb|nSubP3| \cdot \verb|nVars|\cdot
 \verb|nEnsem| \cdot \verb|nPatch1| \cdot \verb|nPatch2|
-\cdot \verb|nPatch3|\) where there are \verb|nVars| field
+\cdot \verb|nPatch3|\) where there are \(\verb|nVars| \cdot \verb|nEnsem|\) field
 values at each of the points in the \(\verb|nSubP1| \cdot
 \verb|nSubP2| \cdot \verb|nSubP3| \cdot \verb|nPatch1| \cdot
 \verb|nPatch2| \cdot \verb|nPatch3|\) grid on the
@@ -43,19 +44,19 @@ which includes the following information.
 
 \item \verb|.x| is \(\verb|nSubP1| \times1 \times1 \times1
 \times1 \times \verb|nPatch1| \times1 \times1 \) array of
-the spatial locations~\(x_{ijk}\) of the microscale grid
+the spatial locations~\(x_{iI}\) of the microscale grid
 points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and micro-scales.
 
-\item \verb|.y| is similarly \(\times1 \verb|nSubP2| \times1
+\item \verb|.y| is similarly \(1\times \verb|nSubP2| \times1
 \times1 \times1 \times1 \times \verb|nPatch2| \times1\)
-array of the spatial locations~\(y_{ijk}\) of the microscale
+array of the spatial locations~\(y_{jJ}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and micro-scales.
 
-\item \verb|.z| is similarly \(\times1 \times1 \verb|nSubP3|
+\item \verb|.z| is similarly \(1 \times1 \times \verb|nSubP3|
 \times1 \times1 \times1 \times1 \times \verb|nPatch3|\)
-array of the spatial locations~\(z_{ijk}\) of the microscale
+array of the spatial locations~\(z_{kK}\) of the microscale
 grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and micro-scales.
 
@@ -72,13 +73,17 @@ coefficients for finite width interpolation.
 patch-face values from opposite next-to-face values (often
 preserves symmetry).
 
+\item \verb|.nEnsem| the number of realisations in the ensemble.
+
+\item \verb|.parallel| whether serial or parallel.
+
 \end{itemize}
 \end{itemize}
 
 \paragraph{Output}
 \begin{itemize}
 \item \verb|u| is \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot
-\verb|nSubP3| \cdot \verb|nVars|\cdot \verb|nEnsem| \cdot
+\verb|nSubP3| \cdot \verb|nVars| \cdot \verb|nEnsem| \cdot
 \verb|nPatch1| \cdot \verb|nPatch2| \cdot \verb|nPatch3|\)
 8D array of the fields with face values set by
 interpolation.
@@ -211,7 +216,7 @@ centred differences.
 \end{matlab}
 Interpolate macro-values to be Dirichlet face values for
 each patch \cite[]{Roberts06d, Bunder2013b}, using weights
-computed in \verb|configPatches2()|. Here interpolate to
+computed in \verb|configPatches3()|. Here interpolate to
 specified order.
 
 Where next-to-face values interpolate to the opposite
@@ -267,7 +272,7 @@ else% spectral interpolation
 %{
 \end{matlab}
 Deal with staggered grid by doubling the number of fields
-and halving the number of patches (\verb|configPatches2|
+and halving the number of patches (\verb|configPatches3|
 tests there are an even number of patches). Then the
 patch-ratio is effectively halved. The patch faces are near
 the middle of the gaps and swapped.
@@ -288,7 +293,7 @@ the middle of the gaps and swapped.
  end
 %{
 \end{matlab}
-Now set wavenumbers in the two directions into two vectors
+Now set wavenumbers in the three directions into three vectors
 at the correct dimension.  In the case of even~\(N\) these
 compute the \(+\)-case for the highest wavenumber zig-zag
 mode, \(\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
@@ -303,19 +308,8 @@ mode, \(\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
   krz = shiftdim( rz*2*pi/Nz*(mod((0:Nz-1)+kMaz,Nz)-kMaz) ,-6);
 %{
 \end{matlab}
-%Test for reality of the field values, and define a function
-%accordingly.  Could be problematic if some variables are
-%real and some are complex, or if variables are of quite
-%different sizes.
-%\begin{matlab}
-%%}
-%  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
-%       uclean=@(u) real(u);
-%  else uclean=@(u) u; 
-%  end
-%%{
-%\end{matlab}
-Compute the Fourier transform of the patch centre-values for
+
+Compute the Fourier transform of the patch values on the centre-planes for
 all the fields.  Unless doing patch-edgy interpolation when
 FT the next-to-face values.  If there are an even number of
 points, then if complex, treat as positive wavenumber, but
@@ -329,9 +323,13 @@ each other, as specified by \verb|patches.le|,
 % indices of interior
 ix=(2:nx-1)';  iy=2:ny-1;  iz=shiftdim(2:nz-1,-1); 
 if ~patches.EdgyInt
-     Cle = fft(fft(fft( u(i0,j0,k0,:,:,:,:,:) ...
+     Cle = fft(fft(fft( u(i0,iy,iz,:,:,:,:,:) ...
          ,[],6),[],7),[],8); 
-     Cbo = Cle;  Cba = Cle;
+     Cbo = fft(fft(fft( u(ix,j0,iz,:,:,:,:,:) ...
+         ,[],6),[],7),[],8); 
+     Cba = fft(fft(fft( u(ix,iy,k0,:,:,:,:,:) ...
+         ,[],6),[],7),[],8); 
+     Cri = Cle;    Cto = Cbo;    Cfr = Cba;
 else 
      Cle = fft(fft(fft( u(   2,iy,iz ,:,patches.le,:,:,:) ...
          ,[],6),[],7),[],8);
@@ -348,25 +346,25 @@ else
 end     
 %{
 \end{matlab}
-Fill in the cross of Fourier-shifted mid-values
-\begin{matlab}
-%}
-if ~patches.EdgyInt 
-  % yz-fraction of kry/z along left/right faces
-  ks = (iy-j0)*2/(ny-1).*kry+(iz-k0)*2/(nz-1).*krz; 
-  Cle = Cle.*exp(1i*ks); 
-  Cri = Cle;
-  % xz-fraction of krx/z along bottom/top faces
-  ks = (ix-i0)*2/(nx-1).*krx+(iz-k0)*2/(nz-1).*krz;
-  Cbo = Cbo.*exp(1i*ks); 
-  Cto = Cbo;
-  % xy-fraction of krx/y along back/front faces
-  ks = (ix-i0)*2/(nx-1).*krx+(iy-j0)*2/(ny-1).*kry;
-  Cba = Cba.*exp(1i*ks); 
-  Cfr = Cba;
-end
-%{
-\end{matlab}
+%Fill in the cross of Fourier-shifted mid-values
+%\begin{matlab}
+%%}
+%if ~patches.EdgyInt 
+%  % yz-fraction of kry/z along left/right faces
+%  ks = (iy-j0)*2/(ny-1).*kry+(iz-k0)*2/(nz-1).*krz; 
+%  Cle = Cle.*exp(1i*ks); 
+%  Cri = Cle;
+%  % xz-fraction of krx/z along bottom/top faces
+%  ks = (ix-i0)*2/(nx-1).*krx+(iz-k0)*2/(nz-1).*krz;
+%  Cbo = Cbo.*exp(1i*ks); 
+%  Cto = Cbo;
+%  % xy-fraction of krx/y along back/front faces
+%  ks = (ix-i0)*2/(nx-1).*krx+(iy-j0)*2/(ny-1).*kry;
+%  Cba = Cba.*exp(1i*ks); 
+%  Cfr = Cba;
+%end
+%%{
+%\end{matlab}
 Now invert the triple Fourier transforms to complete
 interpolation.
 \begin{matlab}

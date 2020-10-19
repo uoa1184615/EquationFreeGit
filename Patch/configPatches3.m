@@ -32,13 +32,13 @@ of simulating a heterogeneous wave \pde.
 \begin{itemize}
 
 \item \verb|fun| is the name of the user function,
-\verb|fun(t,u,x,y,z)|, that computes time-derivatives (or
+\verb|fun(t,u,patches)|, that computes time-derivatives (or
 time-steps) of quantities on the 3D micro-grid within all
 the 3D patches.
 
 \item \verb|Xlim| array/vector giving the macro-space domain
 of the computation: patches are distributed equi-spaced over
-the interior of the rectangle \([\verb|Xlim(1)|,
+the interior of the rectangular cuboid \([\verb|Xlim(1)|,
 \verb|Xlim(2)|] \times [\verb|Xlim(3)|, \verb|Xlim(4)|
 \times [\verb|Xlim(5)|, \verb|Xlim(6)|]\): if \verb|Xlim| is
 of length two, then the domain is the cubic domain of the
@@ -51,7 +51,7 @@ specified rectangular domain.
 
 \item \verb|nPatch| determines the number of equi-spaced
 spaced patches: if scalar, then use the same number of
-patches in both directions, otherwise \verb|nPatch(1:3)|
+patches in all three directions, otherwise \verb|nPatch(1:3)|
 gives the number of patches in each direction.
 
 \item \verb|ordCC| is the `order' of interpolation for
@@ -69,15 +69,15 @@ patch to the spacing of the patch mid-points.  So either
 discretisation, or \(\verb|ratio|=1\) means the patches
 abut.  Small~\verb|ratio| should greatly reduce
 computational time.  If scalar, then use the same ratio in
-both directions, otherwise \verb|ratio(1:3)| gives the ratio
+all three directions, otherwise \verb|ratio(1:3)| gives the ratio
 in each direction.
 
 \item \verb|nSubP| is the number of equi-spaced microscale
 lattice points in each patch: if scalar, then use the same
-number in both directions, otherwise \verb|nSubP(1:3)| gives
+number in all three directions, otherwise \verb|nSubP(1:3)| gives
 the number in each direction. If not using \verb|EdgyInt|,
 then must be odd so that there is a central micro-grid 
-point/planes in each patch.
+point\slash planes in each patch.
 
 \item \verb|'nEdge'| (not yet implemented), \emph{optional},
 default=1, for each patch, the number of edge values set by
@@ -131,9 +131,9 @@ the user's main \textsc{cpu}---although a user may well
 separately invoke, say, a \textsc{gpu} to accelerate
 sub-patch computations. 
 
-If true, and it requires that you have \matlab's Parallel
+If true, and it requires that you have \Matlab's Parallel
 Computing Toolbox, then it will distribute the patches over
-multiple \textsc{cpu}s\slash cores. In \matlab, only one
+multiple \textsc{cpu}s\slash cores. In \Matlab, only one
 array dimension can be split in the distribution, so it
 chooses the one space dimension~\(x,y,z\) corresponding to
 the highest~\verb|\nPatch| (if a tie, then chooses the
@@ -153,7 +153,7 @@ a user has not yet established a parallel pool, then a
 \paragraph{Output} The struct \verb|patches| is created and
 set with the following components. If no output variable is
 provided for \verb|patches|, then make the struct available
-as a global variable.\footnote{When using \verb|spmd|
+as a global variable.\footnote{When using \texttt{spmd}
 parallel computing, it is generally best to avoid global
 variables, and so instead prefer using an explicit output
 variable.}
@@ -178,23 +178,23 @@ implemented.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| are the
 \(\verb|ordCC|\times 3\)-array of weights for the
-inter-patch interpolation onto the right\slash top and
-left\slash bottom edges (respectively) with patch:macroscale
+inter-patch interpolation onto the right\slash top\slash front and
+left\slash bottom\slash back faces (respectively) with patch:macroscale
 ratio as specified.
 
 \item \verb|.x| (8D) is \(\verb|nSubP(1)| \times1 \times1
 \times1 \times1 \times \verb|nPatch(1)| \times1 \times1\)
-array of the regular spatial locations~\(x_{ijk}\) of the
+array of the regular spatial locations~\(x_{iI}\) of the
 microscale grid points in every patch.  
 
 \item \verb|.y| (8D) is \(1 \times \verb|nSubP(2)| \times1
 \times1 \times1 \times1 \times \verb|nPatch(2)| \times1\)
-array of the regular spatial locations~\(y_{ijk}\) of the
+array of the regular spatial locations~\(y_{jJ}\) of the
 microscale grid points in every patch.  
 
 \item \verb|.z| (8D) is \(1 \times1 \times \verb|nSubP(3)|
 \times1 \times1 \times1 \times1 \times \verb|nPatch(3)|\)
-array of the regular spatial locations~\(z_{ijk}\) of the
+array of the regular spatial locations~\(z_{kK}\) of the
 microscale grid points in every patch.  
 
 \item \verb|.ratio| \(1\times 3\), are the size ratios of
@@ -436,7 +436,7 @@ patches.parallel = p.Results.parallel;
 %{
 \end{matlab}
 
-Initially duplicate parameters for both space dimensions as
+Initially duplicate parameters for three space dimensions as
 needed.
 \begin{matlab}
 %}
@@ -496,7 +496,7 @@ patches.ordCC = ordCC;
 Check for staggered grid and periodic case.
 \begin{matlab}
 %}
-if patches.stag, assert(mod(nPatch,2)==0, ...
+if patches.stag, assert(all(mod(nPatch,2)==0), ...
     'Require an even number of patches for staggered grid')
 end
 %{
@@ -673,13 +673,15 @@ end%if not-empty(cs)
 \end{matlab}
 
 
+
+
 \paragraph{If parallel code} then first assume this is not
 within an \verb|spmd|-environment, and so we invoke
 \verb|spmd...end| (which starts a parallel pool if not
 already started). At this point, the global \verb|patches|
 is copied for each worker processor and so it becomes
 \emph{composite} when we distribute any one of the fields.
-Hereafter, \emph{all fields in the global variable
+Hereafter, {\em all fields in the global variable
 \verb|patches| must only be referenced within an
 \verb|spmd|-environment.}%
 \footnote{If subsequently outside spmd, then one must use
@@ -687,7 +689,6 @@ functions like \texttt{getfield(patches\{1\},'a')}.}
 \begin{matlab}
 %}
 if patches.parallel
-%  theparpool=gcp()
   spmd
 %{
 \end{matlab}

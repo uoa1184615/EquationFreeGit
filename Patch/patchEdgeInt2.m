@@ -1,6 +1,6 @@
-% Provides the interpolation across 2D space for 2D patches
+% patchEdgeInt2() provides the interpolation across 2D space for 2D patches
 % of simulations of a smooth lattice system such as PDE
-% discretisations.  AJR, Nov 2018 -- 15 Apr 2020 -- Sept 2020
+% discretisations.  AJR, Nov 2018 -- Sept 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section[\texttt{patchEdgeInt2()}: 2D patch edge values from
@@ -16,22 +16,25 @@ centre-values are sensible macroscale variables, and patch
 edge values are determined by macroscale interpolation of
 the patch-centre values.  However, for computational
 homogenisation in multi-D, interpolating patch next-to-edge
-values appears better \cite[]{Bunder2020a}.  Communicate
-patch-design variables via the global struct~\verb|patches|.
+values appears better \cite[]{Bunder2020a}.  Communicate patch-design variables via a second
+argument (optional, except required for parallel computing
+of \verb|spmd|) or otherwise via the global
+struct~\verb|patches|.
 \begin{matlab}
 %}
-function u = patchEdgeInt2(u)
-global patches
+function u = patchEdgeInt2(u,patches)
+if nargin<2, global patches, end
 %{
 \end{matlab}
+
 
 \paragraph{Input}
 \begin{itemize}
 
-\item \verb|u| is a vector of length \(\verb|nSubP1| \cdot
-\verb|nSubP2| \cdot \verb|nVars|\cdot \verb|nEnsem| \cdot
+\item \verb|u| is a vector (or indeed any dim array) of length \(\verb|nSubP1| \cdot
+\verb|nSubP2| \cdot \verb|nVars| \cdot \verb|nEnsem| \cdot
 \verb|nPatch1| \cdot \verb|nPatch2|\) where there are
-\verb|nVars| field values at each of the points in the
+\(\verb|nVars| \cdot \verb|nEnsem|\) field values at each of the points in the
 \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nPatch1|
 \cdot \verb|nPatch2|\) grid on the \(\verb|nPatch1| \cdot
 \verb|nPatch2|\) array of patches.
@@ -42,13 +45,13 @@ which includes the following information.
 
 \item \verb|.x| is \(\verb|nSubP1| \times1 \times1 \times1
 \times \verb|nPatch1| \times1 \) array of the spatial
-locations~\(x_{ij}\) of the microscale grid points in every
+locations~\(x_{iI}\) of the microscale grid points in every
 patch. Currently it \emph{must} be an equi-spaced lattice on
 both macro- and microscales.
 
-\item \verb|.y| is similarly \(\times1 \verb|nSubP1| \times1
-\times1 \times1 \times \verb|nPatch1|\) array of the spatial
-locations~\(y_{ij}\) of the microscale grid points in every
+\item \verb|.y| is similarly \(1 \times \verb|nSubP2| \times1
+\times1 \times1 \times \verb|nPatch2|\) array of the spatial
+locations~\(y_{jJ}\) of the microscale grid points in every
 patch. Currently it \emph{must} be an equi-spaced lattice on
 both macro- and microscales.
 
@@ -65,13 +68,17 @@ coefficients for finite width interpolation.
 patch-edge values from opposite next-to-edge values (often
 preserves symmetry).
 
+\item \verb|.nEnsem| the number of realisations in the ensemble.
+
+\item \verb|.parallel| whether serial or parallel.
+
 \end{itemize}
 \end{itemize}
 
 \paragraph{Output}
 \begin{itemize}
 \item \verb|u| is \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot
-\verb|nVars|\cdot \verb|nEnsem| \cdot \verb|nPatch1| \cdot
+\verb|nVars| \cdot \verb|nEnsem| \cdot \verb|nPatch1| \cdot
 \verb|nPatch2|\) 6D array of the fields with edge values set
 by interpolation.
 \end{itemize}
@@ -84,6 +91,19 @@ by interpolation.
 
 \begin{devMan}
 
+Test for reality of the field values, and define a function
+accordingly.  Could be problematic if some variables are
+real and some are complex, or if variables are of quite
+different sizes.
+\begin{matlab}
+%}
+  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
+       uclean=@(u) real(u);
+  else uclean=@(u) u; 
+  end
+%{
+\end{matlab}
+
 Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
@@ -94,7 +114,6 @@ nEnsem = patches.nEnsem;
 nVars = round(numel(u)/numel(patches.x)/numel(patches.y)/nEnsem);
 assert(numel(u) == nx*ny*Nx*Ny*nVars*nEnsem ...
   ,'patchEdgeInt2: input u has wrong size for parameters')
-%  nSubP=[nx ny], nPatch=[Nx Ny], nVars=nVars, sizeu=size(u)
 u = reshape(u,[nx ny nVars nEnsem Nx Ny ]);
 %{
 \end{matlab}
@@ -257,28 +276,9 @@ mode, \(\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
   kry = shiftdim( ry*2*pi/Ny*(mod((0:Ny-1)+kMay,Ny)-kMay) ,-4);
 %{
 \end{matlab}
-Test for reality of the field values, and define a function
-accordingly.  Could be problematic if some variables are
-real and some are complex, or if variables are of quite
-different sizes.
-\begin{matlab}
-%}
-  if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
-       uclean=@(u) real(u);
-  else uclean=@(u) u; 
-  end
-%{
-\end{matlab}
-Compute the Fourier transform of either the centre-patch
-values for all the fields (\verb|midPatchInterp| true), or
-using the centre-cross values (\verb|midPatchInterp| false).
- The latter appears to be much better for computational
-homogenisation.  
-\begin{matlab}
-%}
-midPatchInterp = false;
-%{
-\end{matlab}
+
+Compute the Fourier transform of 
+the centre-cross values.
 Unless doing patch-edgy interpolation when FT the
 next-to-edge values.  If there are an even number of points,
 then if complex, treat as positive wavenumber, but if real,
@@ -290,14 +290,10 @@ specified by \verb|patches.le|, \verb|patches.ri|,
 %}
 ix=(2:nx-1)';  iy=2:ny-1; % indices of interior
 if ~patches.EdgyInt
-  if midPatchInterp
-     Cle = fft(fft(u(i0,j0,:,:,:,:),[],5),[],6); 
-     Cbo = Cle;
-  else % here try central cross interpolation
+     % here try central cross interpolation
      Cle = fft(fft(u(i0,iy,:,:,:,:),[],5),[],6);
      Cbo = fft(fft(u(ix,j0,:,:,:,:),[],5),[],6);
      Cri=Cle; Cto=Cbo;
-  end
 else % edgyInt uses next-to-edge values
      Cle = fft(fft(u(   2,iy ,:,patches.le,:,:),[],5),[],6);
      Cri = fft(fft(u(nx-1,iy ,:,patches.ri,:,:),[],5),[],6);
@@ -306,19 +302,10 @@ else % edgyInt uses next-to-edge values
 end     
 %{
 \end{matlab}
-Fill in the cross of Fourier-shifted mid-values
+Now invert the triple Fourier transforms to complete
+interpolation.
 \begin{matlab}
 %}
-if midPatchInterp & ~patches.EdgyInt 
-  % y-fraction of kry along left/right edges
-  ks = (iy-j0)*2/(ny-1).*kry; 
-  Cle = Cle.*exp(1i*ks); 
-  Cri = Cle;
-  % x-fraction of krx along bottom/top edges
-  ks = (ix-i0)*2/(nx-1).*krx;
-  Cbo = Cbo.*exp(1i*ks); 
-  Cto = Cbo;
-end
 u(nx,iy,:,:,:,:) = uclean( ifft(ifft( ...
     Cle.*exp(1i*(stagShift+krx))  ,[],5),[],6) );
 u( 1,iy,:,:,:,:) = uclean( ifft(ifft( ...
@@ -327,9 +314,13 @@ u(ix,ny,:,:,:,:) = uclean( ifft(ifft( ...
     Cbo.*exp(1i*(stagShift+kry))  ,[],5),[],6) );
 u(ix, 1,:,:,:,:) = uclean( ifft(ifft( ...
     Cto.*exp(1i*(stagShift-kry))  ,[],5),[],6) );
-u([1 nx],[1 ny],:,:,:,:)=nan; % nan the corner values
-
 end% if spectral 
+%{
+\end{matlab}
+Nan the corner values of every 2D patch.
+\begin{matlab}
+%}
+u([1 nx],[1 ny],:,:,:,:)=nan; 
 end% function patchEdgeInt2
 %{
 \end{matlab}
