@@ -297,8 +297,10 @@ end
 
 
 \paragraph{Loop over the macroscale time-steps}
+Also set an initial rounding tolerance for checking.
 \begin{matlab}
 %}
+roundingTol = 1e-8;
 for jT = 2:nT
     T = tSpan(jT-1);
 %{
@@ -311,8 +313,8 @@ states to \verb|NaN|); else proceed to projective step.
     if ~isempty(bT) && 2*abs(bT)>=abs(tSpan(jT)-T) && bT*(tSpan(jT)-T)>0
         [t1,xm1] = microBurst(T, x(jT-1,:), tSpan(jT)-T);
         x(jT,:) = xm1(end,:);
-        t2=nan; xm2=nan(1,size(xm1,2));
-        dx1=xm2; dx2=xm2;
+        t2 = nan;   xm2 = nan(1,size(xm1,2));
+        dx1 = xm2;  dx2 = xm2;
     else
 %{
 \end{matlab}
@@ -339,17 +341,18 @@ least one step.
     nt = length(t1);
     optdt = min(0.1*(t1(nt)-t1(1)),sqrt(max(rms(xm1))*1e-15));
     [~,kt] = min(abs(t1(nt)-optdt-t1(1:nt-1)));
-    ktnt=[kt nt];
+    ktnt = [kt nt];
     del = t1(nt)-t1(kt);    
 %{
 \end{matlab}
-Check for round-off error.
+Check for round-off error, and decrease tolerance so that
+warnings are not repeated unless things get worse.
 \begin{matlab}
 %}
-    xt=[reshape(t1(ktnt),[],1) xm1(ktnt,:)];
-    roundingTol=1e-8;
+    xt = [reshape(t1(ktnt),[],1) xm1(ktnt,:)];
     if norm(diff(xt))/norm(xt,'fro') < roundingTol
     warning(['significant round-off error in 1st projection at T=' num2str(T)])
+    roundingTol = roundingTol/10; 
     end
 %{
 \end{matlab}
@@ -379,19 +382,21 @@ derivative.
 \begin{matlab}
 %}
     nt = length(t2);
-    optdt = min(0.1*(t2(nt)-t2(1)),sqrt(max(rms(xm1))*1e-15));
+    optdt = min(0.1*(t2(nt)-t2(1)),sqrt(max(rms(xm2))*1e-15));
     [~,kt] = min(abs(t2(nt)-optdt-t2(1:nt-1)));
     ktnt = [kt nt];
     del = t2(nt)-t2(kt);    
     dx2 = (xm2(nt,:)-xm2(kt,:))/del; 
 %{
 \end{matlab}
-Check for round-off error.
+Check for round-off error, and decrease tolerance so that
+warnings are not repeated unless things get worse.
 \begin{matlab}
 %}
-    xt=[reshape(t2(ktnt),[],1) xm2(ktnt,:)];
+    xt = [reshape(t2(ktnt),[],1) xm2(ktnt,:)];
     if norm(diff(xt))/norm(xt,'fro') < roundingTol
     warning(['significant round-off error in 2nd projection at T=' num2str(T)])
+    roundingTol = roundingTol/10; 
     end
 %{
 \end{matlab}
