@@ -1,8 +1,8 @@
-% PIRK2 implements second-order Projective Integration with
-% a user-specified microsolver.  The macrosolver adapts the
-% explicit second-order Runge--Kutta Improved Euler scheme.
-% JM and AJR, Oct 2018.  Execute with no arguments to see an
-% example.  
+% PIRK2() implements second-order Projective Integration
+% with a user-specified microsolver.  The macrosolver adapts
+% the explicit second-order Runge--Kutta Improved Euler
+% scheme. JM and AJR, Oct 2018 -- Oct 2020.  Execute with no
+% arguments to see an example.  
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 
 %{
@@ -45,6 +45,13 @@ computes a short-time burst of the microscale simulation.
   \verb|xOut|,~an array in which each \emph{row} contains
   the system state at corresponding times.
 \end{itemize}
+Be wary that for very large scale separations (such as
+\verb|MMepsilon<1e-5| in the Michaelis--Menten example),
+microscale integration by error-controlled variable-step
+routines (such as \verb|ode23/45|) often generate microscale
+variations that ruin the projective extrapolation of
+\verb|PIRK2()|.  In such cases, a fixed time-step microscale
+integrator is much better (such as \verb|rk2Int()|). 
 
 \item \verb|tSpan| is an \(\ell\)-vector of times at which
 the user requests output, of which the first element is
@@ -196,7 +203,7 @@ time-step \(\Delta=1\).
 global MMepsilon
 MMepsilon = 0.05
 ts = 0:6
-bT = MMepsilon*log((ts(2)-ts(1))/MMepsilon)
+bT = MMepsilon*log( (ts(2)-ts(1))/MMepsilon )
 [x,tms,xms] = PIRK2(@MMburst, ts, [1;0], bT);
 figure, plot(ts,x,'o:',tms,xms)
 title('Projective integration of Michaelis--Menten enzyme kinetics')
@@ -315,16 +322,31 @@ application directly follows from the initial conditions, or
 from the latest macrostep, this microscale information is
 physically meaningful as a simulation of the system. Extract
 the size of the final time-step. 
-   \begin{matlab}
+\begin{matlab}
 %}
     [t1,xm1] = microBurst(T, x(jT-1,:), bT);
-    del = t1(end)-t1(end-1);
+%{
+\end{matlab}
+To estimate the derivative by numerical differentiation, we
+balance approximation error~\(\|\ddot x\|/dt\) with
+round-off error~\(\|x\|\epsilon/dt\) by the optimal
+time-step \(dt\approx\sqrt(\|x\|\epsilon/\|\ddot x\|)\).
+Omit~\(\|\ddot x\|\) as we do not know it. Also,
+limit~\(dt\) to at most the last tenth of the burst, and at
+least one step.
+\begin{matlab}
+%}
+    nt = length(t1);
+    optdt = min(0.1*(t1(nt)-t1(1)),sqrt(max(rms(xm1))*1e-15));
+    [~,kt] = min(abs(t1(nt)-optdt-t1(1:nt-1)));
+    ktnt=[kt nt];
+    del = t1(nt)-t1(kt);    
 %{
 \end{matlab}
 Check for round-off error.
 \begin{matlab}
 %}
-    xt=[reshape(t1(end-1:end),[],1) xm1(end-1:end,:)];
+    xt=[reshape(t1(ktnt),[],1) xm1(ktnt,:)];
     roundingTol=1e-8;
     if norm(diff(xt))/norm(xt,'fro') < roundingTol
     warning(['significant round-off error in 1st projection at T=' num2str(T)])
@@ -338,7 +360,7 @@ field.
 \begin{matlab}
 %}
     Dt = tSpan(jT)-t1(end);  
-    dx1 = (xm1(end,:)-xm1(end-1,:))/del; 
+    dx1 = (xm1(nt,:)-xm1(kt,:))/del; 
 %{
 \end{matlab}
 
@@ -350,14 +372,24 @@ field (assuming the burst length is the same, or nearly so).
 %}
     xint = xm1(end,:) + (Dt-(t1(end)-t1(1)))*dx1;
     [t2,xm2] = microBurst(T+Dt, xint, bT);
-    del = t2(end)-t2(end-1);
-    dx2 = (xm2(end,:)-xm2(end-1,:))/del; 
+%{
+\end{matlab}
+As before, choose~\(dt\) as best we can to estimate
+derivative.
+\begin{matlab}
+%}
+    nt = length(t2);
+    optdt = min(0.1*(t2(nt)-t2(1)),sqrt(max(rms(xm1))*1e-15));
+    [~,kt] = min(abs(t2(nt)-optdt-t2(1:nt-1)));
+    ktnt = [kt nt];
+    del = t2(nt)-t2(kt);    
+    dx2 = (xm2(nt,:)-xm2(kt,:))/del; 
 %{
 \end{matlab}
 Check for round-off error.
 \begin{matlab}
 %}
-    xt=[reshape(t2(end-1:end),[],1) xm2(end-1:end,:)];
+    xt=[reshape(t2(ktnt),[],1) xm2(ktnt,:)];
     if norm(diff(xt))/norm(xt,'fro') < roundingTol
     warning(['significant round-off error in 2nd projection at T=' num2str(T)])
     end

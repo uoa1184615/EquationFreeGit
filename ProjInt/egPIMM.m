@@ -1,6 +1,6 @@
 % Michaelis--Menton example of projective integrating
 % fast-slow system.  This example simply introduces basic
-% usage of the PIRK2() function. AJR, 29 Sep 2018
+% use of the PIRK2() function.  AJR, Sep 2018 -- Oct 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{egPIMM}: Example projective integration
@@ -49,6 +49,8 @@ ts = 0:6
 xs = PIRK2(@MMburst, ts, [1;0], 2*MMepsilon)
 plot(ts,xs,'o:')
 xlabel('time t'), legend('x(t)','y(t)')
+title('macroscale points only')
+ifOurCf2eps([mfilename '1'])
 pause(1)
 %{
 \end{matlab}
@@ -78,6 +80,8 @@ this microscale burst information.
 [xs,tMicro,xMicro] = PIRK2(@MMburst, ts, [1;0], 2*MMepsilon);
 figure, plot(ts,xs,'o:',tMicro,xMicro)
 xlabel('time t'), legend('x(t)','y(t)')
+title('macroscale points with microscale bursts')
+ifOurCf2eps([mfilename '2'])
 pause(1)
 %{
 \end{matlab}
@@ -112,6 +116,8 @@ ts = 0:-1:-5
 [xs,tMicro,xMicro] = PIRK2(@MMburst, ts, 0.2*[1;1], 3*MMepsilon);
 figure, plot(ts,xs,'o:',tMicro,xMicro)
 xlabel('time t'), legend('x(t)','y(t)')
+title('backward integration showing points with bursts')
+ifOurCf2eps([mfilename '3'])
 %{
 \end{matlab}
 \begin{figure}

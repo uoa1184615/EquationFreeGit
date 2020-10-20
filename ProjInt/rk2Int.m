@@ -22,24 +22,26 @@ scalar, and the result~\fv\ is a column vector in~\(\RR^n\).
 \item \verb|x0| is an \(\RR^n\) vector of initial values at
 the time \verb|ts(1)|.
 
-\item \verb|ts| is the begin and end times of the integration.
+\item \verb|ts| is the begin and end times of the integration,
+or vector of proposed micro-times.
 \end{itemize}
 
 \paragraph{Output}
 \begin{itemize}
-\item \verb|ts|, vector of~$\ell$ times (guess $\ell=21$).
+\item \verb|ts|, vector of~$\ell$ times (guess $\ell=11$).
 
 \item  \verb|xs|, array in \(\RR^{\ell\times n}\) of
 approximate solution row vector at the specified times.
 \end{itemize}
 
 Compute the time-steps and create storage for outputs. Guess
-that twenty time-steps is often adequate, but need at least
+that ten time-steps is often adequate, but need at least
 sixty for homogenisationExample.
 \begin{matlab}
 %}
-ndt=20;
-for itry=1:6
+ndt=max(10,numel(ts)-1);
+maxtry=6;
+for itry=1:maxtry
 ts = linspace(ts(1),ts(end),ndt+1).';
 dt = diff(ts);
 xs = nan(numel(x0),numel(ts));
@@ -82,7 +84,7 @@ estimate.
 end
 if norm(errs)<0.01*norm(xs(~isnan(xs)),1),break,end
 ndt = ndt*3; % triple the number of time steps
-if ndt>1e4, error('too many tiny steps in rk2Int'), end
+if itry==maxtry, error('too many step reductions in rk2Int'), end
 end% try-loop
 xs = xs.';
 %{

@@ -1,6 +1,8 @@
-% Michaelis--Menton example of projective integrating
-% fast-slow system.  This example simply introduces basic
-% usage of the PIRK2() function. AJR, 1 Apr 2019
+% egPIerrs uses the Michaelis--Menton fast-slow system to
+% illustrate the behaviour of errors in projective
+% integration.  It plots errors for various burst lengths as
+% a function of macroscale time-step.  AJR, Apr 2019 -- Oct
+% 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{egPIerrs}: Errors in projective integration
@@ -15,10 +17,9 @@ singularly perturbed system of differential equations for
 \frac{dx}{dt}=-x+(x+\tfrac12)y \quad\text{and}\quad
 \frac{dy}{dt}=\frac1\epsilon\big[x-(x+1)y\big].
 \end{equation*}
-The slow
-variable~\(x(t)\) evolves on a time scale of one, whereas
-the fast variable~\(y(t)\) evolves on a time scale of the
-small parameter~\(\epsilon\).
+The slow variable~\(x(t)\) evolves on a time scale of one,
+whereas the fast variable~\(y(t)\) evolves on a time scale
+of the small parameter~\(\epsilon\).
 
 
 \subsection{Invoke projective integration}
@@ -91,10 +92,7 @@ xlabel('macro time-step'), ylabel('error at Tend')
 title(['\epsilon = ' num2str(MMepsilon) ',  for different burst lengths'])
 legend(num2str(meps', '%i\\epsilon'))
 grid off, grid
-if ~exist('OCTAVE_VERSION','builtin')
-set(gcf,'PaperPosition',[0 0 14 10])
-print('-depsc2','egPIerrs')
-end
+ifOurCf2eps(mfilename)
 %{
 \end{matlab}
 
