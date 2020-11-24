@@ -1,10 +1,9 @@
 % patchEdgeInt3() provides the interpolation across 3D space
 % for 3D patches of simulations of a smooth lattice system
-% such as PDE discretisations.  AJR, Aug--Sep 2020
+% such as PDE discretisations.  AJR, Aug--Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section[\texttt{patchEdgeInt3()}: 3D patch face values from
-3D interpolation] {\texttt{patchEdgeInt3()}: sets 3D patch
+\section{\texttt{patchEdgeInt3()}: sets 3D patch
 face values from 3D macroscale interpolation}
 \label{sec:patchEdgeInt3}
 
@@ -12,10 +11,15 @@ Couples 3D patches across 3D space by computing their face
 values via macroscale interpolation.  Assumes that the patch
 centre-values are sensible macroscale variables, and patch
 face values are determined by macroscale interpolation of
-the patch centre-plane values, or patch next-to-face
-values which appears better \cite[]{Bunder2020a}. Communicate patch-design variables via a second
-argument (optional, except required for parallel computing
-of \verb|spmd|) or otherwise via the global
+the patch centre-plane values \cite[]{Roberts2011a,
+Bunder2019c}, or patch next-to-face values which appears
+better \cite[]{Bunder2020a}. This function is primarily used
+by \verb|patchSmooth3()| but is also useful for user
+graphics. 
+
+Communicate patch-design variables via a second argument
+(optional, except required for parallel computing of
+\verb|spmd|) or otherwise via the global
 struct~\verb|patches|.
 \begin{matlab}
 %}
@@ -28,15 +32,14 @@ if nargin<2, global patches, end
 \paragraph{Input}
 \begin{itemize}
 
-\item \verb|u| is a vector (or indeed any dim array) of length \(\verb|nSubP1| \cdot
-\verb|nSubP2| \cdot \verb|nSubP3| \cdot \verb|nVars|\cdot
-\verb|nEnsem| \cdot \verb|nPatch1| \cdot \verb|nPatch2|
-\cdot \verb|nPatch3|\) where there are \(\verb|nVars| \cdot \verb|nEnsem|\) field
-values at each of the points in the \(\verb|nSubP1| \cdot
-\verb|nSubP2| \cdot \verb|nSubP3| \cdot \verb|nPatch1| \cdot
-\verb|nPatch2| \cdot \verb|nPatch3|\) grid on the
-\(\verb|nPatch1| \cdot \verb|nPatch2| \cdot \verb|nPatch3|\)
-array of patches.
+\item \verb|u| is a vector\slash array of length
+\(\verb|prod(nSubP)|  \cdot \verb|nVars| \cdot \verb|nEnsem|
+\cdot \verb|prod(nPatch)|\) where there are \(\verb|nVars|
+\cdot \verb|nEnsem|\) field values at each of the points in
+the \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nSubP3|
+\cdot \verb|nPatch1| \cdot \verb|nPatch2| \cdot
+\verb|nPatch3|\) grid on the \(\verb|nPatch1| \cdot
+\verb|nPatch2| \cdot \verb|nPatch3|\) array of patches.
 
 \item \verb|patches| a struct set by \verb|configPatches3()|
 which includes the following information.
@@ -61,13 +64,14 @@ grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and micro-scales.
 
 \item \verb|.ordCC| is order of interpolation, currently
-(Aug 2020) only \(\{0,2,4,\ldots\}\)
+(Nov 2020) only \(\{0,2,4,\ldots\}\)
 
 \item \verb|.stag| in \(\{0,1\}\) is one for staggered grid
 (alternating) interpolation.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
-coefficients for finite width interpolation.
+coefficients for finite width interpolation in each of the
+\(x,y,z\)-directions.
 
 \item \verb|.EdgyInt| true/false is true for interpolating
 patch-face values from opposite next-to-face values (often
@@ -80,13 +84,15 @@ preserves symmetry).
 \end{itemize}
 \end{itemize}
 
+
+
 \paragraph{Output}
 \begin{itemize}
-\item \verb|u| is \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot
-\verb|nSubP3| \cdot \verb|nVars| \cdot \verb|nEnsem| \cdot
-\verb|nPatch1| \cdot \verb|nPatch2| \cdot \verb|nPatch3|\)
-8D array of the fields with face values set by
-interpolation.
+\item \verb|u| is 8D array, \(\verb|nSubP1| \cdot
+\verb|nSubP2| \cdot \verb|nSubP3| \cdot \verb|nVars| \cdot
+\verb|nEnsem| \cdot \verb|nPatch1| \cdot \verb|nPatch2|
+\cdot \verb|nPatch3|\), of the fields with face values set
+by interpolation (edge and corner vales set to~\verb|NaN|).
 \end{itemize}
 
 
@@ -100,8 +106,7 @@ interpolation.
 Test for reality of the field values, and define a function
 accordingly.  Could be problematic if some variables are
 real and some are complex, or if variables are of quite
-different sizes. Have to do such function definition outside
-of \verb|spmd|-block.
+different sizes. 
 \begin{matlab}
 %}
   if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
@@ -121,7 +126,6 @@ reshape indicates~\verb|u| has the wrong size.
 nEnsem = patches.nEnsem;
 nVars = round( numel(u)/numel(patches.x) ...
     /numel(patches.y)/numel(patches.z)/nEnsem );
-numelu=numel(u);
 assert(numel(u) == nx*ny*nz*Nx*Ny*Nz*nVars*nEnsem ...
   ,'patchEdgeInt3: input u has wrong size for parameters')
 u = reshape(u,[nx ny nz nVars nEnsem Nx Ny Nz]);
@@ -139,9 +143,8 @@ rz = patches.ratio(3);
 For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
 eventually cater for periodic, odd-mid-gap, even-mid-gap,
-even-mid-patch, Dirichlet, Neumann, Robin?? These index vectors
-point to patches and their two immediate neighbours---currently 
-not needed. 
+even-mid-patch, Dirichlet, Neumann, Robin?? These index
+vectors point to patches and their six immediate neighbours.
 \begin{matlab}
 %}
 I=1:Nx; Ip=mod(I,Nx)+1; Im=mod(I-2,Nx)+1;
@@ -149,8 +152,9 @@ J=1:Ny; Jp=mod(J,Ny)+1; Jm=mod(J-2,Ny)+1;
 K=1:Nz; Kp=mod(K,Nz)+1; Km=mod(K-2,Nz)+1;
 %{
 \end{matlab}
-The centre of each patch (as \verb|nx| and~\verb|ny| are
-odd for centre-patch interpolation) is at indices
+The centre of each patch (as \verb|nx|, \verb|ny|
+and~\verb|nz| are odd for centre-patch interpolation) is at
+indices
 \begin{matlab}
 %}
 i0 = round((nx+1)/2);
@@ -160,11 +164,11 @@ k0 = round((nz+1)/2);
 \end{matlab}
 
 
+
 \paragraph{Lagrange interpolation gives patch-face values}
 Compute centred differences of the mid-patch values for the
 macro-interpolation, of all fields. Assumes the domain is
-macro-periodic. Currently, only next-to-face interpolation
-is implemented.
+macro-periodic.
 \begin{matlab}
 %}
 ordCC=patches.ordCC;
@@ -219,11 +223,11 @@ each patch \cite[]{Roberts06d, Bunder2013b}, using weights
 computed in \verb|configPatches3()|. Here interpolate to
 specified order.
 
-Where next-to-face values interpolate to the opposite
-face-values. When we have an ensemble of configurations,
-different configurations might be coupled to each other, as
-specified by \verb|patches.le|, \verb|patches.ri|,
-\verb|patches.to|, \verb|patches.bo|,
+For the case where next-to-face values interpolate to the
+opposite face-values: when we have an ensemble of
+configurations, different configurations might be coupled to
+each other, as specified by \verb|patches.le|,
+\verb|patches.ri|, \verb|patches.to|, \verb|patches.bo|,
 \verb|patches.fr| and \verb|patches.ba|.
 \begin{matlab}
 %}
@@ -252,25 +256,27 @@ u(2:(nx-1),2:(ny-1),1 ,:,patches.ba,:,:,K) ...
 
 
 \paragraph{Case of spectral interpolation}
-Assumes the domain is macro-periodic. We interpolate in
-terms of the patch index~\(j\), say, not directly in space. 
-As the macroscale fields are \(N\)-periodic in the patch
-index~\(j\), the macroscale Fourier transform writes the
-centre-patch values as \(U_j=\sum_{k}C_ke^{ik2\pi j/N}\).
-Then the face-patch values \(U_{j\pm r}
-=\sum_{k}C_ke^{ik2\pi/N(j\pm r)} =\sum_{k}C'_ke^{ik2\pi
-j/N}\) where \(C'_k=C_ke^{ikr2\pi/N}\). For \(N\)~patches we
-resolve `wavenumbers' \(|k|<N/2\), so set row vector
-\(\verb|ks|=k2\pi/N\) for `wavenumbers' \(\mathcode`\,="213B
-k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)\) for
-odd~\(N\), and \(\mathcode`\,="213B k=(0,1, \ldots,
-k_{\max}, \pm(k_{\max}+1) -k_{\max}, \ldots, -1)\) for
-even~\(N\).
+Assumes the domain is macro-periodic.
 \begin{matlab}
 %}
 else% spectral interpolation
 %{
 \end{matlab}
+We interpolate in terms of the patch index, \(j\)~say, not
+directly in space. As the macroscale fields are
+\(N\)-periodic in the patch index~\(j\), the macroscale
+Fourier transform writes the centre-patch values as
+\(U_j=\sum_{k}C_ke^{ik2\pi j/N}\). Then the face-patch
+values \(U_{j\pm r} =\sum_{k}C_ke^{ik2\pi/N(j\pm r)}
+=\sum_{k}C'_ke^{ik2\pi j/N}\) where
+\(C'_k=C_ke^{ikr2\pi/N}\). For \(N\)~patches we resolve
+`wavenumbers' \(|k|<N/2\), so set row vector
+\(\verb|ks|=k2\pi/N\) for `wavenumbers' \(\mathcode`\,="213B
+k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)\) for
+odd~\(N\), and \(\mathcode`\,="213B k=(0,1, \ldots,
+k_{\max}, \pm(k_{\max}+1) -k_{\max}, \ldots, -1)\) for
+even~\(N\).
+
 Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches3|
 tests there are an even number of patches). Then the
@@ -309,13 +315,13 @@ mode, \(\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
 %{
 \end{matlab}
 
-Compute the Fourier transform of the patch values on the centre-planes for
-all the fields.  Unless doing patch-edgy interpolation when
-FT the next-to-face values.  If there are an even number of
-points, then if complex, treat as positive wavenumber, but
-if real, treat as cosine. When using an ensemble of
-configurations, different configurations might be coupled to
-each other, as specified by \verb|patches.le|,
+Compute the Fourier transform of the patch values on the
+centre-planes for all the fields.  Unless doing patch-edgy
+interpolation when FT the next-to-face values.  If there are
+an even number of points, then if complex, treat as positive
+wavenumber, but if real, treat as cosine. When using an
+ensemble of configurations, different configurations might
+be coupled to each other, as specified by \verb|patches.le|,
 \verb|patches.ri|, \verb|patches.to|, \verb|patches.bo|,
 \verb|patches.fr| and \verb|patches.ba|.
 \begin{matlab}
@@ -366,7 +372,8 @@ end
 %%{
 %\end{matlab}
 Now invert the triple Fourier transforms to complete
-interpolation.
+interpolation.   (Should stagShift be multiplied by
+rx/ry/rz??) Enforce reality when appropriate. 
 \begin{matlab}
 %}
 u(nx,iy,iz,:,:,:,:,:) = uclean( ifft(ifft(ifft( ...

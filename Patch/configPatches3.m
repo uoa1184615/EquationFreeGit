@@ -1,6 +1,6 @@
 % configPatches3() creates a data struct of the design of 3D
 % patches for later use by the patch functions such as
-% patchSmooth3() AJR, Aug--Sep 2020
+% patchSmooth3() AJR, Aug--Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches3()}: configures spatial
@@ -10,15 +10,11 @@ patches in 3D}
 
 
 
-
-
-\subsection{Introduction}
-
 Makes the struct~\verb|patches| for use by the patch\slash
 gap-tooth time derivative\slash step function
 \verb|patchSmooth3()|, and possibly other patch functions.
-\cref{sec:configPatches3eg,sec:homoDiffEdgy3} lists an
-example of its use.
+\cref{sec:configPatches3eg,sec:homoDiffEdgy3} list examples
+of its use.
 \begin{matlab}
 %}
 function patches = configPatches3(fun,Xlim,BCs ...
@@ -26,15 +22,18 @@ function patches = configPatches3(fun,Xlim,BCs ...
 %{
 \end{matlab}
 
+
+
 \paragraph{Input}
 If invoked with no input arguments, then executes an example
-of simulating a heterogeneous wave \pde.
+of simulating a heterogeneous wave \pde---see
+\cref{sec:configPatches3eg} for the example code.
 \begin{itemize}
 
 \item \verb|fun| is the name of the user function,
-\verb|fun(t,u,patches)|, that computes time-derivatives (or
-time-steps) of quantities on the 3D micro-grid within all
-the 3D patches.
+\verb|fun(t,u,patches)| or \verb|fun(t,u)|, that computes
+time-derivatives (or time-steps) of quantities on the 3D
+micro-grid within all the 3D~patches.
 
 \item \verb|Xlim| array/vector giving the macro-space domain
 of the computation: patches are distributed equi-spaced over
@@ -49,10 +48,10 @@ macroscale boundary conditions.  Currently, \verb|BCs| is
 ignored and the system is assumed macro-periodic in the
 specified rectangular domain.
 
-\item \verb|nPatch| determines the number of equi-spaced
-spaced patches: if scalar, then use the same number of
-patches in all three directions, otherwise \verb|nPatch(1:3)|
-gives the number of patches in each direction.
+\item \verb|nPatch| sets the number of equi-spaced spaced
+patches: if scalar, then use the same number of patches in
+all three directions, otherwise \verb|nPatch(1:3)| gives the
+number~(\(\geq1\)) of patches in each direction.
 
 \item \verb|ordCC| is the `order' of interpolation for
 inter-patch coupling across empty space of the macroscale
@@ -69,15 +68,15 @@ patch to the spacing of the patch mid-points.  So either
 discretisation, or \(\verb|ratio|=1\) means the patches
 abut.  Small~\verb|ratio| should greatly reduce
 computational time.  If scalar, then use the same ratio in
-all three directions, otherwise \verb|ratio(1:3)| gives the ratio
-in each direction.
+all three directions, otherwise \verb|ratio(1:3)| gives the
+ratio in each of the three directions.
 
 \item \verb|nSubP| is the number of equi-spaced microscale
 lattice points in each patch: if scalar, then use the same
-number in all three directions, otherwise \verb|nSubP(1:3)| gives
-the number in each direction. If not using \verb|EdgyInt|,
-then must be odd so that there is a central micro-grid 
-point\slash planes in each patch.
+number in all three directions, otherwise \verb|nSubP(1:3)|
+sets the number in each direction. If not using
+\verb|EdgyInt|, then must be odd so that there is/are
+centre-patch micro-grid point\slash planes in each patch.
 
 \item \verb|'nEdge'| (not yet implemented), \emph{optional},
 default=1, for each patch, the number of edge values set by
@@ -89,7 +88,8 @@ nearest neighbour interactions).
 default=false.  If true, then interpolate to left\slash
 right\slash top\slash bottom\slash front\slash back
 face-values from right\slash left\slash bottom\slash
-top\slash back\slash front next-to-face values.  
+top\slash back\slash front next-to-face values.  If false or
+omitted, then interpolate from centre-patch planes.  
 
 \item \verb|'nEnsem'|,  \emph{optional-experimental},
 default one, but if more, then an ensemble over this
@@ -100,10 +100,10 @@ Supply a 3/4D array of microscale heterogeneous coefficients
 to be used by the given microscale \verb|fun| in each patch.
 Say the given array~\verb|cs| is of size \(m_x\times
 m_y\times m_z\times n_c\), where \(n_c\)~is the number of
-different arrays of coefficients. For example, in
+different arrays of coefficients.  For example, in
 heterogeneous diffusion, \(n_c=3\) for the diffusivities in
 the \emph{three} different spatial directions.  The
-coefficients are to be the same for each and every patch. 
+coefficients are to be the same for each and every patch.
 However, macroscale variations are catered for by the
 \(n_c\)~coefficients being \(n_c\)~parameters in some
 macroscale formula.
@@ -111,15 +111,15 @@ macroscale formula.
 
 \item If \(\verb|nEnsem|=1\), then the array of coefficients
 is just tiled across the patch size to fill up each patch,
-starting from the \((1,1)\)-element.
+starting from the \((1,1,1)\)-point in each patch.
 
 \item If \(\verb|nEnsem|>1\) (value immaterial), then reset
 \(\verb|nEnsem|:=m_x\cdot m_y\cdot m_z\) and construct an
 ensemble of all \(m_x\cdot m_y\cdot m_z\) phase-shifts of
-the coefficients. In this scenario, the inter-patch coupling
-couples different members in the ensemble.  When
+the coefficients.  In this scenario, the inter-patch
+coupling couples different members in the ensemble.  When
 \verb|EdgyInt| is true, and when the coefficients are
-diffusivities\slash elasticities in~\(x,y,z\) directions,
+diffusivities\slash elasticities in \(x,y,z\)-directions,
 respectively, then this coupling cunningly preserves
 symmetry.
 
@@ -137,9 +137,9 @@ multiple \textsc{cpu}s\slash cores. In \Matlab, only one
 array dimension can be split in the distribution, so it
 chooses the one space dimension~\(x,y,z\) corresponding to
 the highest~\verb|\nPatch| (if a tie, then chooses the
-rightmost of~\(x,y,z\)). A user may correspondingly
-distribute arrays with \verb|patches.codist|, or simply use
-formulas invoking the preset distributed arrays
+rightmost of~\(x,y,z\)).  A user may correspondingly
+distribute arrays with property \verb|patches.codist|, or
+simply use formulas invoking the preset distributed arrays
 \verb|patches.x|, \verb|patches.y|, and \verb|patches.z|. If
 a user has not yet established a parallel pool, then a
 `local' pool is started.
@@ -148,10 +148,8 @@ a user has not yet established a parallel pool, then a
 
 
 
-
-
 \paragraph{Output} The struct \verb|patches| is created and
-set with the following components. If no output variable is
+set with the following components.  If no output variable is
 provided for \verb|patches|, then make the struct available
 as a global variable.\footnote{When using \texttt{spmd}
 parallel computing, it is generally best to avoid global
@@ -165,8 +163,8 @@ if nargout==0, global patches, end
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,x,y,z)| that computes the time derivatives (or
-steps) on the patchy lattice. 
+\verb|fun(t,u,patches)| or \verb|fun(t,u)| that computes the
+time derivatives (or steps) on the patchy lattice. 
 
 \item \verb|.ordCC| is the specified order of inter-patch
 coupling. 
@@ -178,9 +176,9 @@ implemented.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| are the
 \(\verb|ordCC|\times 3\)-array of weights for the
-inter-patch interpolation onto the right\slash top\slash front and
-left\slash bottom\slash back faces (respectively) with patch:macroscale
-ratio as specified.
+inter-patch interpolation onto the right\slash top\slash
+front and left\slash bottom\slash back faces (respectively)
+with patch:macroscale ratio as specified.
 
 \item \verb|.x| (8D) is \(\verb|nSubP(1)| \times1 \times1
 \times1 \times1 \times \verb|nPatch(1)| \times1 \times1\)
@@ -217,7 +215,7 @@ length~\verb|nEnsem|.
 array of microscale heterogeneous coefficients, or
 \item if \(\verb|nEnsem|>1\), \((\verb|nSubP(1)|-1)\times
 (\verb|nSubP(2)|-1)\times (\verb|nSubP(3)|-1)\times
-n_c\times m_xm_y\) 5D array of \(m_xm_y\)~ensemble of
+n_c\times m_xm_ym_z\) 5D array of \(m_xm_ym_z\)~ensemble of
 phase-shifts of the microscale heterogeneous coefficients.
 \end{itemize}
 
@@ -264,12 +262,13 @@ cHetr = exp(0.3*randn([mPeriod 3]));
 cHetr = cHetr*mean(1./cHetr(:)) 
 %{
 \end{matlab}
+
 Establish global patch data struct to interface with a
 function coding a nonlinear `diffusion' \pde: to be solved
-on \([-\pi,\pi]^3\)-periodic domain, with \(5^3\) patches,
+on \([-\pi,\pi]^3\)-periodic domain, with \(5^3\)~patches,
 spectral interpolation~(\(0\)) couples the patches, each
 patch of half-size ratio~\(0.4\) (relatively large for
-visualisation), and with \(4^3\) points forming each
+visualisation), and with \(4^3\)~points forming each
 patch. 
 \begin{matlab}
 %}
@@ -279,8 +278,9 @@ patches = configPatches3(@heteroWave3,[-pi pi], nan ...
     ,'hetCoeffs',cHetr);
 %{
 \end{matlab}
-Set a  wave initial state using auto-replication of the
+Set a wave initial state using auto-replication of the
 spatial grid, and as \cref{fig:configPatches3ic} shows.
+This wave propagates diagonally across space.
 \begin{matlab}
 %}
 u0 = 0.5+0.5*sin(patches.x+patches.y+patches.z);
@@ -296,9 +296,10 @@ applied to a heterogeneous wave~\pde:
 time \(t=6\).}
 \includegraphics[scale=0.9]{configPatches3ic}
 \end{figure}
-Integrate in time using standard functions. In Matlab
-\verb|ode15s| would be natural as the patch scheme is
-naturally stiff, but \verb|ode23| is much quicker.
+Integrate in time to \(t=6\) using standard functions. In
+Matlab \verb|ode15s| would be natural as the patch scheme is
+naturally stiff, but \verb|ode23| is much quicker
+\cite[Fig.~4]{Maclean2020a}.
 \begin{matlab}
 %}
 disp('Simulate heterogeneous wave u_tt=div[C*grad(u)]')
@@ -313,12 +314,13 @@ end
 \end{matlab}
 Animate the computed simulation to end with
 \cref{fig:configPatches3fin}.  Use \verb|patchEdgeInt3| to
-interpolate patch-edge values (even if not drawn) in order
-to most easily reconstruct the array data structure.
+obtain patch-face values (but not edge nor corner values,
+and even if not drawn) in order to most easily reconstruct
+the array data structure.
 
-Replicate \(x\), \(y\), and \(z\) arrays to get individual
+Replicate \(x\), \(y\), and~\(z\) arrays to get individual
 spatial coordinates of every data point.  Then, optionally,
-set faces to \verb|nan| so the plot just shows
+set faces to~\verb|nan| so the plot just shows
 patch-interior data. 
 \begin{matlab}
 %}
@@ -326,15 +328,16 @@ figure(1), clf, colormap(0.8*jet)
 xs = patches.x+0*patches.y+0*patches.z;
 ys = patches.y+0*patches.x+0*patches.z;
 zs = patches.z+0*patches.y+0*patches.x;
-xs([1 end],:,:,:)=nan;  
-xs(:,[1 end],:,:)=nan;  
-xs(:,:,[1 end],:)=nan;  
+if 1, xs([1 end],:,:,:)=nan;  
+      xs(:,[1 end],:,:)=nan;  
+      xs(:,:,[1 end],:)=nan;  
+end;%option
 j=find(~isnan(xs));
 %{
 \end{matlab}
-The functions \verb|pix()| and \verb|col()| map the
-\(u\)-data values to the size of the dots and to the colour
-of the dots, respectively.
+In the scatter plot, these functions \verb|pix()| and
+\verb|col()| map the \(u\)-data values to the size of the
+dots and to the colour of the dots, respectively.
 \begin{matlab}
 %}
 pix = @(u) 15*abs(u)+7;
@@ -407,7 +410,7 @@ end%if no arguments
 \begin{matlab}
 %}
 p = inputParser;
-fnValidation = @(f) isa(f, 'function_handle'); %test for a function name
+fnValidation = @(f) isa(f, 'function_handle'); %test for fn name
 addRequired(p,'fun',fnValidation); 
 addRequired(p,'Xlim',@isnumeric);
 addRequired(p,'BCs'); % nothing yet decided
@@ -476,7 +479,7 @@ patches.fun = fun;
 
 Second, store the order of interpolation that is to provide
 the values for the inter-patch coupling conditions. Spectral
-coupling is \verb|ordCC| of~\(0\) or~\(-1\).
+coupling is \verb|ordCC| of~\(0\) or (not yet??)~\(-1\).
 \begin{matlab}
 %}
 assert((ordCC>=-1) & (floor(ordCC)==ordCC), ...
@@ -509,13 +512,15 @@ values.)  Store the size ratio in \verb|patches|.
 %}
 ratio = reshape(ratio,1,3); % force to be row vector
 patches.ratio=ratio; 
-if ordCC>0, patchCwts(ratio,ordCC,patches.stag), end
+if ordCC>0
+    [Cwtsr,Cwtsl] = patchCwts(ratio,ordCC,patches.stag);
+    patches.Cwtsr = Cwtsr;  patches.Cwtsl = Cwtsl;
+end
 %{
 \end{matlab}
 
-
-Third, set the centre of the patches in a the macroscale
-grid of patches assuming periodic macroscale domain.
+Third, set the centre of the patches in the macroscale grid
+of patches, assuming periodic macroscale domain for now.
 \begin{matlab}
 %}
 X = linspace(Xlim(1),Xlim(2),nPatch(1)+1);
@@ -530,11 +535,11 @@ Z = Z(1:nPatch(3))+diff(Z)/2;
 %{
 \end{matlab}
 Construct the microscale in each patch, assuming Dirichlet
-patch edges, and a half-patch length of~\(\verb|ratio(1)|
+patch edges, and half-patch widths of~\(\verb|ratio(1)|
 \cdot \verb|DX|\), \(\verb|ratio(2)| \cdot \verb|DY|\)
 and~\(\verb|ratio(3)| \cdot \verb|DZ|\), unless
-\verb|patches.EdgyInt| is set in which case the patches are
-of length \verb|ratio*DX+dx|, \verb|ratio*DY+dy| and
+\verb|patches.EdgyInt| is true in which case every patch is
+of widths \verb|ratio*DX+dx|, \verb|ratio*DY+dy| and
 \verb|ratio*DZ+dz|.
 \begin{matlab}
 %}
@@ -568,15 +573,22 @@ patches.z = reshape(patches.z,1,1,nSubP(3),1,1,1,1,nPatch(3));
 
 
 \subsection{Set ensemble inter-patch communication}
-For \verb|EdgyInt| or centre interpolation respectively, the
-right-edge\slash centre realisations \verb|1:nEnsem| are to
-interpolate to left-edge~\verb|le|, and the left-edge\slash
-centre realisations \verb|1:nEnsem| are to interpolate
-to~\verb|re|. \verb|re| and \verb|li| are `transposes' of
-each other as \verb|re(li)=le(ri)| are both \verb|1:nEnsem|.
-Similarly for bottom-edge\slash centre interpolation to
-top-edge via~\verb|to| and top-edge\slash centre
-interpolation to bottom-edge via~\verb|bo|.
+For \verb|EdgyInt| or centre interpolation respectively, 
+\begin{itemize}
+\item the right-face\slash centre realisations
+\verb|1:nEnsem| are to interpolate to left-face~\verb|le|,
+and 
+\item the left-face\slash centre realisations
+\verb|1:nEnsem| are to interpolate to~\verb|re|.
+\end{itemize}
+\verb|re| and \verb|li| are `transposes' of each other as
+\verb|re(li)=le(ri)| are both \verb|1:nEnsem|. Similarly for
+bottom-face\slash centre interpolation to top-face
+via~\verb|to|, top-face\slash centre interpolation to
+bottom-face via~\verb|bo|, back-face\slash centre
+interpolation to front-face via~\verb|fr|, and
+front-face\slash centre interpolation to back-face
+via~\verb|ba|.
 
 The default is nothing shifty.  This setting reduces the
 number of if-statements in function \verb|patchEdgeInt3()|.
@@ -588,6 +600,7 @@ patches.bo = 1:nE;  patches.to = 1:nE;
 patches.ba = 1:nE;  patches.fr = 1:nE; 
 %{
 \end{matlab}
+
 However, if heterogeneous coefficients are supplied via
 \verb|hetCoeffs|, then do some non-trivial replications. 
 First, get microscale periods, patch size, and replicate
@@ -632,10 +645,10 @@ Hankel-matrices.
 %{
 \end{matlab}
 Further, set a cunning left\slash right\slash bottom\slash
-top realisation of inter-patch coupling.  The aim is to
-preserve symmetry in the system when also invoking
-\verb|EdgyInt|.  What this coupling does without
-\verb|EdgyInt| is unknown.  Use auto-replication.
+top\slash front\slash back realisation of inter-patch
+coupling.  The aim is to preserve symmetry in the system
+when also invoking \verb|EdgyInt|.  What this coupling does
+without \verb|EdgyInt| is unknown.  Use auto-replication.
 \begin{matlab}
 %}
     mmx=(0:mx-1)'; mmy=0:my-1; mmz=shiftdim(0:mz-1,-1);
@@ -660,25 +673,24 @@ arbitrary threshold more carefully??
 %}
 if prod(ratio)*patches.nEnsem>0.9, warning( ...
 'Probably poor scale separation in ensemble of coupled phase-shifts')
-scaleSeparationParameter=ratio*patches.nEnsem
+scaleSeparationParameter = ratio*patches.nEnsem
 end
 %{
 \end{matlab}
 End the two if-statements.
 \begin{matlab}
 %}
-  end%if nEnsem=1 or >1  
+  end%if-else nEnsem>1  
 end%if not-empty(cs)
 %{
 \end{matlab}
 
 
 
-
 \paragraph{If parallel code} then first assume this is not
 within an \verb|spmd|-environment, and so we invoke
 \verb|spmd...end| (which starts a parallel pool if not
-already started). At this point, the global \verb|patches|
+already started).  At this point, the global \verb|patches|
 is copied for each worker processor and so it becomes
 \emph{composite} when we distribute any one of the fields.
 Hereafter, {\em all fields in the global variable
@@ -703,7 +715,7 @@ towards the last.
 %{
 \end{matlab}
 \verb|patches.codist.Dimension| is the index that is split
-among workers. Then distribute the appropriate coordinate
+among workers.  Then distribute the appropriate coordinate
 direction among the workers: the function must be invoked
 inside an \verb|spmd|-group in order for this to work---so
 we do not need \verb|parallel| in argument list.

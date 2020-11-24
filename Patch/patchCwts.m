@@ -16,10 +16,11 @@ in parameter \verb|ratio|.  Used by
 \verb|configPatches|\(n\) for \(n=1,2,\ldots\)\,.
 \begin{matlab}
 %}
-function patchCwts(ratio,ordCC,stag)
-global patches
+function [Cwtsr,Cwtsl] = patchCwts(ratio,ordCC,stag)
 %{
 \end{matlab}
+
+
 \paragraph{Input} \begin{itemize}
 \item \verb|ratio| row vector, one element for each axis of
 the spatial domain, of either the half-width or full-width
@@ -38,10 +39,12 @@ tested in 1D.
 
 \end{itemize}
 
-\paragraph{Output} The \emph{global} struct \verb|patches|
-has the following components added.
+
+
+\paragraph{Output} For the \emph{global} struct \verb|patches|,
+constructs the following components.
 \begin{itemize}
-\item \verb|.Cwtsr| and \verb|.Cwtsl|, when \(n\)~is the
+\item \verb|Cwtsr| and \verb|Cwtsl|, when \(n\)~is the
 number of elements of \verb|ratio|, are the
 \(\verb|ordCC|\times n\)-array of weights for the
 inter-patch interpolation onto the `right' edges and `left'
@@ -55,7 +58,7 @@ First check, reserve storage, and define some index vectors.
 \begin{matlab}
 %}
 assert(ordCC>0,'order of poly interp must be positive')
-patches.Cwtsr=nan(ordCC,numel(ratio));
+Cwtsr=nan(ordCC,numel(ratio));
 ks = (1:2:ordCC)';   
 ps = (1:ordCC/2)'-1; 
 %{
@@ -65,10 +68,10 @@ in \cite{Cao2014a}.  But so far only tested for 1D??
 \begin{matlab}
 %}
 if stag 
-    patches.Cwtsr(ks  ,:) = [ones(size(ratio)) ...
+    Cwtsr(ks  ,:) = [ones(size(ratio)) ...
       cumprod( (ratio.^2-ks(1:end-1).^2)/4 ,1) ...
       ./factorial(2*ps(1:end-1)) ];    
-    patches.Cwtsr(ks+1,:) = [ratio/2 ...
+    Cwtsr(ks+1,:) = [ratio/2 ...
       cumprod( (ratio.^2-ks(1:end-1).^2)/4 ,1) ...
       ./factorial(2*ps(1:end-1)+1).*ratio/2 ];
 %{
@@ -78,12 +81,12 @@ interpolation, use these weights.
 \begin{matlab}
 %}
 else 
-    patches.Cwtsr(ks  ,:) = cumprod(ratio.^2-ps.^2,1) ...
+    Cwtsr(ks  ,:) = cumprod(ratio.^2-ps.^2,1) ...
         ./factorial(2*ps+1)./ratio;
-    patches.Cwtsr(ks+1,:) = cumprod(ratio.^2-ps.^2,1) ...
+    Cwtsr(ks+1,:) = cumprod(ratio.^2-ps.^2,1) ...
         ./factorial(2*ps+2);
 end
-patches.Cwtsl = (-1).^((1:ordCC)'-patches.stag).*patches.Cwtsr;
+Cwtsl = (-1).^((1:ordCC)'-stag).*Cwtsr;
 %{
 \end{matlab}
 Fin.

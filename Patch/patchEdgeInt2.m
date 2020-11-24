@@ -1,10 +1,9 @@
-% patchEdgeInt2() provides the interpolation across 2D space for 2D patches
-% of simulations of a smooth lattice system such as PDE
-% discretisations.  AJR, Nov 2018 -- Sept 2020
+% patchEdgeInt2() provides the interpolation across 2D space
+% for 2D patches of simulations of a smooth lattice system
+% such as PDE discretisations.  AJR, Nov 2018 -- Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section[\texttt{patchEdgeInt2()}: 2D patch edge values from
-2D interpolation] {\texttt{patchEdgeInt2()}: sets 2D patch
+\section{\texttt{patchEdgeInt2()}: sets 2D patch
 edge values from 2D macroscale interpolation}
 \label{sec:patchEdgeInt2}
 
@@ -12,13 +11,17 @@ edge values from 2D macroscale interpolation}
 Couples 2D patches across 2D space by computing their edge
 values via macroscale interpolation.  Research
 \cite[]{Roberts2011a, Bunder2019c} indicates the patch
-centre-values are sensible macroscale variables, and patch
-edge values are determined by macroscale interpolation of
-the patch-centre values.  However, for computational
-homogenisation in multi-D, interpolating patch next-to-edge
-values appears better \cite[]{Bunder2020a}.  Communicate patch-design variables via a second
-argument (optional, except required for parallel computing
-of \verb|spmd|) or otherwise via the global
+centre-values are sensible macroscale variables, and
+macroscale interpolation of these determine patch-edge
+values. However, for computational homogenisation in
+multi-D, interpolating patch next-to-edge values appears
+better \cite[]{Bunder2020a}. This function is primarily used
+by \verb|patchSmooth2()| but is also useful for user
+graphics. 
+ 
+Communicate patch-design variables via a second argument
+(optional, except required for parallel computing of
+\verb|spmd|) or otherwise via the global
 struct~\verb|patches|.
 \begin{matlab}
 %}
@@ -31,11 +34,11 @@ if nargin<2, global patches, end
 \paragraph{Input}
 \begin{itemize}
 
-\item \verb|u| is a vector (or indeed any dim array) of length \(\verb|nSubP1| \cdot
-\verb|nSubP2| \cdot \verb|nVars| \cdot \verb|nEnsem| \cdot
-\verb|nPatch1| \cdot \verb|nPatch2|\) where there are
-\(\verb|nVars| \cdot \verb|nEnsem|\) field values at each of the points in the
-\(\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nPatch1|
+\item \verb|u| is a vector\slash array of length
+\(\verb|prod(nSubP)|  \cdot \verb|nVars| \cdot \verb|nEnsem|
+\cdot \verb|prod(nPatch)|\) where there are \(\verb|nVars|
+\cdot \verb|nEnsem|\) field values at each of the points in
+the \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nPatch1|
 \cdot \verb|nPatch2|\) grid on the \(\verb|nPatch1| \cdot
 \verb|nPatch2|\) array of patches.
 
@@ -56,13 +59,14 @@ patch. Currently it \emph{must} be an equi-spaced lattice on
 both macro- and microscales.
 
 \item \verb|.ordCC| is order of interpolation, currently
-(July 2020) only \(\{0,2,4,\ldots\}\)
+(Nov 2020) only \(\{0,2,4,\ldots\}\)
 
 \item \verb|.stag| in \(\{0,1\}\) is one for staggered grid
 (alternating) interpolation.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
-coefficients for finite width interpolation.
+coefficients for finite width interpolation in both the
+\(x,y\)-directions.
 
 \item \verb|.EdgyInt| true/false is true for interpolating
 patch-edge values from opposite next-to-edge values (often
@@ -75,12 +79,15 @@ preserves symmetry).
 \end{itemize}
 \end{itemize}
 
+
+
 \paragraph{Output}
 \begin{itemize}
-\item \verb|u| is \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot
-\verb|nVars| \cdot \verb|nEnsem| \cdot \verb|nPatch1| \cdot
-\verb|nPatch2|\) 6D array of the fields with edge values set
-by interpolation.
+\item \verb|u| is 6D array, \(\verb|nSubP1| \cdot
+\verb|nSubP2| \cdot \verb|nVars| \cdot \verb|nEnsem| \cdot
+\verb|nPatch1| \cdot \verb|nPatch2|\), of the fields with
+edge values set by interpolation (and corner vales set
+to~\verb|NaN|).
 \end{itemize}
 
 
@@ -94,7 +101,7 @@ by interpolation.
 Test for reality of the field values, and define a function
 accordingly.  Could be problematic if some variables are
 real and some are complex, or if variables are of quite
-different sizes.
+different sizes. 
 \begin{matlab}
 %}
   if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
@@ -128,9 +135,9 @@ ry = patches.ratio(2);
 For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
 eventually cater for periodic, odd-mid-gap, even-mid-gap,
-even-mid-patch, Dirichlet, Neumann, Robin?? These index vectors
-point to patches and their two immediate neighbours---currently 
-not needed. 
+even-mid-patch, Dirichlet, Neumann, Robin?? These index
+vectors point to patches and their four immediate
+neighbours. 
 \begin{matlab}
 %}
 I=1:Nx; Ip=mod(I,Nx)+1; Im=mod(I-2,Nx)+1;
@@ -152,7 +159,6 @@ j0 = round((ny+1)/2);
 Compute centred differences of the mid-patch values for
 the macro-interpolation, of all fields. Assumes the domain
 is macro-periodic.
-Currently, only next-to-edge interpolation is implemented.
 \begin{matlab}
 %}
 ordCC=patches.ordCC;
@@ -170,10 +176,14 @@ if ordCC>0 % then finite-width polynomial interpolation
   if patches.stag % use only odd numbered neighbours
     error('polynomial interpolation not yet for staggered patch coupling')
   else %disp('starting standard interpolation')   
-    dmux(1,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) -uCorex(:,:,:,:,Im,:))/2; % \mu\delta 
-    dmux(2,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) -2*uCorex(:,:,:,:,I,:) +uCorex(:,:,:,:,Im,:)); % \delta^2    
-    dmuy(1,:,:,:,:,:,J) = (uCorey(:,:,:,:,:,Jp) -uCorey(:,:,:,:,:,Jm))/2; % \mu\delta 
-    dmuy(2,:,:,:,:,:,J) = (uCorey(:,:,:,:,:,Jp) -2*uCorey(:,:,:,:,:,J) +uCorey(:,:,:,:,:,Jm)); % \delta^2
+    dmux(1,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) ...
+    -uCorex(:,:,:,:,Im,:))/2; % \mu\delta 
+    dmux(2,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) ...
+    -2*uCorex(:,:,:,:,I,:) +uCorex(:,:,:,:,Im,:)); % \delta^2    
+    dmuy(1,:,:,:,:,:,J) = (uCorey(:,:,:,:,:,Jp) ...
+    -uCorey(:,:,:,:,:,Jm))/2; % \mu\delta 
+    dmuy(2,:,:,:,:,:,J) = (uCorey(:,:,:,:,:,Jp) ...
+    -2*uCorey(:,:,:,:,:,J) +uCorey(:,:,:,:,:,Jm)); % \delta^2
   end% if odd/even
 %{
 \end{matlab}
@@ -187,7 +197,6 @@ centred differences.
     dmuy(k,:,:,:,:,:,J) = dmuy(k-2,:,:,:,:,:,Jp) ...
     -2*dmuy(k-2,:,:,:,:,:,J) +dmuy(k-2,:,:,:,:,:,Jm);
   end
-%dmux33=dmux(:,:,:,:,:,3,3),sizedmux33=size(dmux33)
 %{
 \end{matlab}
 Interpolate macro-values to be Dirichlet edge values for
@@ -195,11 +204,11 @@ each patch \cite[]{Roberts06d, Bunder2013b}, using weights
 computed in \verb|configPatches2()|. Here interpolate to
 specified order.
 
-Where next-to-edge values interpolate to the opposite
-edge-values. When we have an ensemble of configurations,
-different configurations might be coupled to each other, as
-specified by \verb|patches.le|, \verb|patches.ri|,
-\verb|patches.to| and \verb|patches.bo|.
+For the case where next-to-edge values interpolate to the
+opposite edge-values: when we have an ensemble of
+configurations, different configurations might be coupled to
+each other, as specified by \verb|patches.le|,
+\verb|patches.ri|, \verb|patches.to| and \verb|patches.bo|.
 \begin{matlab}
 %}
 k=1+patches.EdgyInt; % use centre or two edges
@@ -222,25 +231,27 @@ u([1 nx],[1 ny],:,:,:,:)=nan; % remove corner values
 
 
 \paragraph{Case of spectral interpolation}
-Assumes the domain is macro-periodic. We interpolate in
-terms of the patch index~\(j\), say, not directly in space. 
-As the macroscale fields are \(N\)-periodic in the patch
-index~\(j\), the macroscale Fourier transform writes the
-centre-patch values as \(U_j=\sum_{k}C_ke^{ik2\pi j/N}\).
-Then the edge-patch values \(U_{j\pm r}
-=\sum_{k}C_ke^{ik2\pi/N(j\pm r)} =\sum_{k}C'_ke^{ik2\pi
-j/N}\) where \(C'_k=C_ke^{ikr2\pi/N}\). For \(N\)~patches we
-resolve `wavenumbers' \(|k|<N/2\), so set row vector
-\(\verb|ks|=k2\pi/N\) for `wavenumbers' \(\mathcode`\,="213B
-k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)\) for
-odd~\(N\), and \(\mathcode`\,="213B k=(0,1, \ldots,
-k_{\max}, \pm(k_{\max}+1) -k_{\max}, \ldots, -1)\) for
-even~\(N\).
+Assumes the domain is macro-periodic.
 \begin{matlab}
 %}
 else% spectral interpolation
 %{
 \end{matlab}
+We interpolate in terms of the patch index, \(j\)~say, not
+directly in space. As the macroscale fields are
+\(N\)-periodic in the patch index~\(j\), the macroscale
+Fourier transform writes the centre-patch values as
+\(U_j=\sum_{k}C_ke^{ik2\pi j/N}\). Then the edge-patch
+values \(U_{j\pm r} =\sum_{k}C_ke^{ik2\pi/N(j\pm r)}
+=\sum_{k}C'_ke^{ik2\pi j/N}\) where
+\(C'_k=C_ke^{ikr2\pi/N}\). For \(N\)~patches we resolve
+`wavenumbers' \(|k|<N/2\), so set row vector
+\(\verb|ks|=k2\pi/N\) for `wavenumbers' \(\mathcode`\,="213B
+k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)\) for
+odd~\(N\), and \(\mathcode`\,="213B k=(0,1, \ldots,
+k_{\max}, \pm(k_{\max}+1) -k_{\max}, \ldots, -1)\) for
+even~\(N\).
+
 Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches2|
 tests there are an even number of patches). Then the
@@ -277,8 +288,7 @@ mode, \(\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
 %{
 \end{matlab}
 
-Compute the Fourier transform of 
-the centre-cross values.
+Compute the Fourier transform of the centre-cross values.
 Unless doing patch-edgy interpolation when FT the
 next-to-edge values.  If there are an even number of points,
 then if complex, treat as positive wavenumber, but if real,
@@ -302,8 +312,9 @@ else % edgyInt uses next-to-edge values
 end     
 %{
 \end{matlab}
-Now invert the triple Fourier transforms to complete
-interpolation.
+Now invert the double Fourier transforms to complete
+interpolation. (Should stagShift be multiplied by rx/ry??)
+Enforce reality when appropriate. 
 \begin{matlab}
 %}
 u(nx,iy,:,:,:,:) = uclean( ifft(ifft( ...

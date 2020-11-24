@@ -1,7 +1,7 @@
 % patchSmooth3() provides an interface to time integrators
 % for the dynamics on patches in 3D coupled across space.
 % The system must be a lattice system such as PDE
-% discretisations. AJR, Aug--Sep 2020
+% discretisations. AJR, Aug--Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchSmooth3()}: interface 3D space to time integrators}
@@ -16,16 +16,21 @@ This function provides an interface. It assumes that the
 sub-patch structure is \emph{smooth enough} so that the
 patch centre-values are sensible macroscale variables, and
 patch edge-values are determined by macroscale interpolation
-of the patch-centre values. Communicate patch-design
-variables via a third argument (optional, except required
-for parallel computing of \verb|spmd|) or otherwise via the
-global struct~\verb|patches|.
+of the patch-centre or edge values. Nonetheless, microscale
+heterogeneous systems may be accurately simulated with this
+function via appropriate interpolation. Communicate
+patch-design variables (\cref{sec:configPatches3}) either
+via the global struct~\verb|patches| or via an optional
+third argument (except that this last is required for
+parallel computing of \verb|spmd|).
+
 \begin{matlab}
 %}
 function dudt = patchSmooth3(t,u,patches)
 if nargin<3, global patches, end
 %{
 \end{matlab}
+
 
 \paragraph{Input}
 \begin{itemize}
@@ -43,6 +48,7 @@ user's time derivative function.
 
 \item \verb|patches| a struct set by \verb|configPatches3()|
 with the following information used here.
+
 \begin{itemize}
 \item \verb|.fun| is the name of the user's function
 \verb|fun(t,u,patches)| that computes the time derivatives
@@ -51,28 +57,29 @@ on the patchy lattice.  The array~\verb|u| has size
 \verb|nSubP(3)| \times \verb|nVars| \times \verb|nEsem|
 \times \verb|nPatch(1)| \times \verb|nPatch(2)| \times
 \verb|nPatch(3)|\).  Time derivatives must be computed into
-the same sized array, but herein the patch edge-values are
-overwritten by zeros.
+the same sized array, although herein the patch edge-values
+are overwritten by zeros.
 
 \item \verb|.x| is \(\verb|nSubP(1)| \times1 \times1 \times1
-\times1 \times1 \verb|nPatch(1)| \times1 \times1\) array of
-the spatial locations~\(x_{i}\) of the microscale \((i,j,k)\)-grid
-points in every patch. Currently it \emph{must} be an
-equi-spaced lattice on both macro- and microscales.
+\times1 \verb|nPatch(1)| \times1 \times1\) array of the
+spatial locations~\(x_{i}\) of the microscale
+\((i,j,k)\)-grid points in every patch.  Currently it
+\emph{must} be an equi-spaced lattice on both macro- and
+microscales.
 
 \item \verb|.y| is similarly \(1 \times \verb|nSubP(2)|
 \times1 \times1 \times1 \times1 \times \verb|nPatch(2)|
 \times1\) array of the spatial locations~\(y_{j}\) of the
-microscale \((i,j,k)\)-grid points in every patch.  Currently it
-\emph{must} be an equi-spaced lattice on both macro- and
-microscales.
+microscale \((i,j,k)\)-grid points in every patch. 
+Currently it \emph{must} be an equi-spaced lattice on both
+macro- and microscales.
 
-\item \verb|.z| is similarly \(1 \times1
-\times \verb|nSubP(3)| \times1 \times1 \times1 \times1 \times
+\item \verb|.z| is similarly \(1 \times1 \times
+\verb|nSubP(3)| \times1 \times1 \times1 \times1 \times
 \verb|nPatch(3)|\) array of the spatial locations~\(z_{k}\)
-of the microscale \((i,j,k)\)-grid points in every patch.  Currently it
-\emph{must} be an equi-spaced lattice on both macro- and
-microscales.
+of the microscale \((i,j,k)\)-grid points in every patch.
+Currently it \emph{must} be an equi-spaced lattice on both
+macro- and microscales.
 
 \end{itemize}
 \end{itemize}
@@ -104,7 +111,7 @@ u = patchEdgeInt3(u,patches);
 \end{matlab}
 
 Ask the user function for the time derivatives computed in
-the array, overwrite its edge and face values with the dummy
+the array, overwrite its edge\slash face values with the dummy
 value of zero, then return to the user\slash integrator as
 same sized array as input.
 \begin{matlab}
