@@ -5,7 +5,7 @@
 % of the patch scheme applied to this heterogeneous
 % diffusion to validate and to compare various orders of
 % inter-patch interpolation.
-% JEB & AJR, May 2020 -- Aug 2020
+% JEB & AJR, May 2020 -- Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoDiffEdgy3}: computational
@@ -156,7 +156,7 @@ Draw cross-eyed stereo view of some isosurfaces.
   if i==1 % pause for the viewer
        makeJpeg=false;
        if makeJpeg, print(['Figs/' mfilename 't0'],'-djpeg'), end
-       disp('Press any key to start animation')
+       disp('Press any key to start animation of isosurfaces')
        pause
   else pause(0.05)
   end

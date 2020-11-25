@@ -155,7 +155,7 @@ cross-eyed.}
 figure(3),clf
 for k = 1:2, subplot(2,2,k)
   mesh(tss,xs(:),uss')
-  ylabel('x'),xlabel('t'),zlabel('u(x,t)')
+  ylabel('space x'),xlabel('time t'),zlabel('u(x,t)')
   axis tight, view(126-4*k,50)
 end
 ifOurCf2eps([mfilename 'Micro'])

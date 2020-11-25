@@ -1,6 +1,6 @@
 % Codes a nonlinear water wave PDE on a staggered 1D grid
 % inside patches in space.  Used by waterWaveExample.m
-% AJR, 4 Apr 2019 -- Jul 2020
+% AJR, 4 Apr 2019 -- Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{waterWavePDE()}: water wave PDE}
@@ -13,8 +13,7 @@ value appearing the the \pde{}s via the one-line
 function~\verb|rabs()|.
 \begin{matlab}
 %}
-function Ut = waterWavePDE(t,U,x)
-  global patches
+function Ut = waterWavePDE(t,U,patches)
   rabs = @(u) sqrt(1e-4 + u.^2);
 %{
 \end{matlab}
@@ -23,7 +22,7 @@ time derivatives, and index the patch-interior points of the
 micro-grid.
 \begin{matlab}
 %}
-  dx = diff(x(2:3));
+  dx = diff(patches.x(2:3));
   U = squeeze(U);
   Ut = nan(size(U));  ht = Ut;
   i = 2:size(U,1)-1;

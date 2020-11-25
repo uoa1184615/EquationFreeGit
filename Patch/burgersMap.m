@@ -1,6 +1,5 @@
 % Microscale Euler step of the Burgers PDE on a lattice in
-% x.  Used by BurgersExample.m
-% AJR, 4 Apr 2019 -- Jul 2020
+% x.  Used by BurgersExample.m AJR, 4 Apr 2019 -- Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{burgersMap()}: discretise the PDE microscale}
@@ -11,9 +10,9 @@ the patch-interior values are mapped (\verb|patchSmooth1()|
 overrides the edge-values anyway).
 \begin{matlab}
 %}
-function u = burgersMap(t,u,x)
+function u = burgersMap(t,u,patches)
   u = squeeze(u);
-  dx = diff(x(2:3));   
+  dx = diff(patches.x(2:3));   
   dt = dx^2/2;
   i = 2:size(u,1)-1;
   u(i,:) = u(i,:) +dt*( diff(u,2)/dx^2 ...

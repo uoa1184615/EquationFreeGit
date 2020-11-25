@@ -1,6 +1,6 @@
 % Computes the time derivatives of heterogeneous wave
 % in 1D on patches.  Used by homoWaveEdgy1.m,
-% AJR, 26 Nov 2019 -- Jul 2020
+% AJR, 26 Nov 2019 -- Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{heteroWave()}: wave in heterogeneous
@@ -24,10 +24,9 @@ coefficients~\(c_i\) have previously been stored in
 struct~\verb|patches|.
 \begin{matlab}
 %}
-function ut = heteroWave(t,u,x)
-  global patches
+function ut = heteroWave(t,u,patches)
   u = squeeze(u);
-  dx = diff(x(2:3));    % space step
+  dx = diff(patches.x(2:3));    % space step
   i = 2:size(u,1)-1;    % interior points in a patch
   ut = nan(size(u));    % preallocate output array
   ut(i,1,:) = u(i,2,:); % du/dt=v then dvdt=
