@@ -12,6 +12,7 @@
 homogenisation of a 1D dispersion via parallel simulation on
 small 3D patches of diffusion}
 \label{sec:spmdHomoDiff31}
+\localtableofcontents
 
 Simulate heterogeneous dispersion along 1D space on 3D
 patches as a Proof of Principle example of parallel
@@ -42,8 +43,7 @@ Then choose the case.
 \begin{matlab}
 %}
 clear all
-%global OurCf2eps, OurCf2eps=true
-theCase = 3
+theCase = 2
 %{
 \end{matlab}
 
@@ -65,7 +65,7 @@ Case~1, which invokes \verb|spmd|-block internally, so that
 field variables become \emph{distributed} across cpus.
 \begin{matlab}
 %}
-if any(theCase==[1]), global patches, end
+if any(theCase==[1 2]), global patches, end
 nSubP=mPeriod+2
 nPatch=[9 1 1]
 ratio=0.3
@@ -128,9 +128,9 @@ plots the nearly smooth field values at time \(t=0.4\). }
 Integrate in time.  Use non-uniform time-steps for
 fun, and to show more of the initial rapid transients. 
 
-Alternatively, use \verb|RK2mesoPatch3| which reduces
+Alternatively, use \verb|RK2mesoPatch| which reduces
 communication between patches, recalling that, by default,
-\verb|RK2mesoPatch3| does ten micro-steps for each specified
+\verb|RK2mesoPatch| does ten micro-steps for each specified
 step in~\verb|ts|. For unit cube patches, need micro-steps
 less than about~\(0.004\) for stability.
 \begin{matlab}
@@ -146,7 +146,7 @@ switch theCase
 %{
 \end{matlab}
 \begin{enumerate}
-\item For non-parallel, we could use \verb|RK2mesoPatch3| as
+\item For non-parallel, we could use \verb|RK2mesoPatch| as
 indicated below, but instead choose to use standard
 \verb|ode23| as here \verb|patchSmooth3| accesses patch
 information via global \verb|patches|. For post-processing,
@@ -155,13 +155,13 @@ correct array size---that of the initial condition.
 \begin{matlab}
 %}
 case 1
-%    [us,uerrs] = RK2mesoPatch3(ts,u0);
+%    [us,uerrs] = RK2mesoPatch(ts,u0);
     [ts,us] = ode23(@patchSmooth3,ts,u0(:));
     us=reshape(us,[length(ts) size(u0)]);
 %{
 \end{matlab}
 
-\item In the second case, \verb|RK2mesoPatch3| detects a
+\item In the second case, \verb|RK2mesoPatch| detects a
 parallel patch code has been requested, but has only one cpu
 worker, so it auto-initiates an \verb|spmd|-block for the
 integration. Both this and the next case return
@@ -170,7 +170,7 @@ results.
 \begin{matlab}
 %}
 case 2
-    us = RK2mesoPatch3(ts,u0);
+    us = RK2mesoPatch(ts,u0);
     us = us{1};  
 %{
 \end{matlab}
@@ -181,7 +181,7 @@ initial conditions.
 \begin{matlab}
 %}
 case 3,spmd
-    us = RK2mesoPatch3(ts,u0,[],patches);
+    us = RK2mesoPatch(ts,u0,[],patches);
     end%spmd
     us = us{1};
 %{
@@ -221,6 +221,12 @@ end%switch theCase
 
 
 \subsection{Plot the solution} 
+Optionally save some plots to file.
+\begin{matlab}
+%}
+if 0, global OurCf2eps, OurCf2eps=true, end
+%{
+\end{matlab}
 Animate the solution field over time. Since the spatial
 domain is long in~\(x\) and thin in~\(y,z\), just plot field
 values as a function of~\(x\).
@@ -307,7 +313,7 @@ function [tbs,xbs] = aBurst(tb0,xb0,patches)
     tbs = tb0+(0:0.02:0.2);
     spmd
       xb0 = codistributed(xb0,patches.codist);
-      xbs = RK2mesoPatch3(tbs,xb0,[],patches);
+      xbs = RK2mesoPatch(tbs,xb0,[],patches);
     end%spmd
     xbs=reshape(xbs{1},length(tbs),[]);
 end%function

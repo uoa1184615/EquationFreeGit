@@ -9,16 +9,26 @@
 Get familiar with the patch scheme of \cref{sec:patch}.
 
 For large-scale simulations, we here assume you have a compute cluster with many independent computer processors linked by a high-speed network.
-The aim is to distribute computations in parallel across the cluster.
+The functions we provide here aims to distribute computations in parallel across the cluster.
 \Matlab's Parallel Computing Toolbox empowers a reasonably straightforward way to implement this.
 
 The patch scheme has a clear domain decomposition of assigning a few patches to each processor.  
 
+As in all parallel cluster computing, interprocessor communication time all to often dominates.  It is important to reduce communication as much as possible compared to computation.  Consequently, parallel computing is only effective when there is a very large amount of microscale computation done on each processor per communication.
+
+To minimise communication in time-dependent problems we have drafted a special integrator \verb|RK2mesoPatch3|,  \cref{sec:RK2mesoPatch3}, that communicates between patches only on a meso-time.
+
 
 \input{../Patch/spmdHomoDiff31.m}
 
+\input{../Patch/RK2mesoPatch.m}
+
+
 
 \begin{devMan}
+
+\input{../Patch/chanDispSpmd.m}
+
 
 \section{To do}
 \begin{itemize}

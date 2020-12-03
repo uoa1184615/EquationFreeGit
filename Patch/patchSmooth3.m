@@ -6,7 +6,6 @@
 %{
 \section{\texttt{patchSmooth3()}: interface 3D space to time integrators}
 \label{sec:patchSmooth3}
-%\localtableofcontents
 
 
 To simulate in time with 3D spatial patches we often need to

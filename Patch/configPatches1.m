@@ -454,6 +454,7 @@ However, if heterogeneous coefficients are supplied via
 First, get microscale periods, patch size, and replicate
 many times in order to subsequently sub-sample: 
 \verb|nSubP| times should be enough.
+If \verb|cs| is more then 2D, then the higher-dimensions are reshaped into the 2nd dimension.
 \begin{matlab}
 %}
 if ~isempty(cs)

@@ -511,7 +511,7 @@ values.)  Store the size ratio in \verb|patches|.
 \begin{matlab}
 %}
 ratio = reshape(ratio,1,3); % force to be row vector
-patches.ratio=ratio; 
+patches.ratio = ratio; 
 if ordCC>0
     [Cwtsr,Cwtsl] = patchCwts(ratio,ordCC,patches.stag);
     patches.Cwtsr = Cwtsr;  patches.Cwtsl = Cwtsl;
@@ -606,6 +606,7 @@ However, if heterogeneous coefficients are supplied via
 First, get microscale periods, patch size, and replicate
 many times in order to subsequently sub-sample: 
 \verb|nSubP| times should be enough.
+If \verb|cs| is more then 4D, then the higher-dimensions are reshaped into the 4th dimension.
 \begin{matlab}
 %}
 if ~isempty(cs)

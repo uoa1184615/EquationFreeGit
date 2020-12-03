@@ -150,6 +150,13 @@ Liu, P., Samaey, G., Gear, C.~W. \harvardand\ Kevrekidis, I.~G.
 \newline\harvardurl{http://www.sciencedirect.com/science/article/pii/
   S0168927414002086}
 
+\harvarditem{MacKenzie \harvardand\ Roberts}{2003}{MacKenzie03}
+MacKenzie, T. \harvardand\ Roberts, A.~J.  \harvardyearleft
+  2003\harvardyearright , Holistic discretisation of shear dispersion in a
+  two-dimensional channel, {\em in} K.~Burrage \harvardand\ R.~B. Sidje, eds,
+  `Proc. of 10th Computational Techniques and Applications Conference
+  CTAC-2001', Vol.~44, pp.~C512--C530.
+
 \harvarditem[Maclean et~al.]{Maclean, Bunder \harvardand\
   Roberts}{2020}{Maclean2020a}
 Maclean, J., Bunder, J.~E. \harvardand\ Roberts, A.~J.  \harvardyearleft
@@ -231,5 +238,16 @@ Sieber, J., Marschler, C. \harvardand\ Starke, J.  \harvardyearleft
 Svard, M. \harvardand\ Nordstrom, J.  \harvardyearleft 2006\harvardyearright ,
   `On the order of accuracy for difference approximations of initial-boundary
   value problems', {\em Journal of Computational Physics} {\bf 218},~333--352.
+
+\harvarditem{Taylor}{1953}{Taylor53}
+Taylor, G.~I.  \harvardyearleft 1953\harvardyearright , `Dispersion of soluble
+  matter in solvent flowing slowly through a tube', {\em Proc. Roy. Soc.
+  Lond.~A} {\bf 219},~186--203.
+
+\harvarditem{Watt \harvardand\ Roberts}{1995}{Watt94b}
+Watt, S.~D. \harvardand\ Roberts, A.~J.  \harvardyearleft 1995\harvardyearright
+  , `The accurate dynamic modelling of contaminant dispersion in channels',
+  {\em SIAM J.~Appl. Math.} {\bf 55}(4),~1016--1038.
+\newblock \url{http://epubs.siam.org/sam-bin/dbq/article/25797}.
 
 \end{thebibliography}

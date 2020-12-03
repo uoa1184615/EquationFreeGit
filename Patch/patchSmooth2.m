@@ -6,7 +6,6 @@
 %{
 \section{\texttt{patchSmooth2()}: interface 2D space to time integrators}
 \label{sec:patchSmooth2}
-%\localtableofcontents
 
 
 To simulate in time with 2D spatial patches we often need to
@@ -93,7 +92,7 @@ values from macroscale interpolation of centre-patch values.
 \begin{matlab}
 %}
 sizeu = size(u);
-u = patchEdgeInt2(u);
+u = patchEdgeInt2(u,patches);
 %{
 \end{matlab}
 

@@ -6,7 +6,6 @@
 %{
 \section{\texttt{patchSmooth1()}: interface 1D space to time integrators}
 \label{sec:patchSmooth1}
-%\localtableofcontents
 
 
 To simulate in time with 1D spatial patches we often need to
@@ -83,7 +82,7 @@ values from macroscale interpolation of centre-patch values.
 \begin{matlab}
 %}
 sizeu = size(u);
-u = patchEdgeInt1(u);
+u = patchEdgeInt1(u,patches);
 %{
 \end{matlab}
 
