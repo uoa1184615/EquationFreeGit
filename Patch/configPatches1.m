@@ -306,9 +306,9 @@ addRequired(p,'nSubP',@isnumeric);
 addParameter(p,'nEdge',1,@isnumeric);
 addParameter(p,'EdgyInt',false,@islogical);
 addParameter(p,'nEnsem',1,@isnumeric);
-addParameter(p,'nCore',1,@isnumeric);
 addParameter(p,'hetCoeffs',[],@isnumeric);
 addParameter(p,'parallel',false,@islogical);
+addParameter(p,'nCore',1,@isnumeric);
 parse(p,fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,varargin{:});
 %{
 \end{matlab}
@@ -565,9 +565,7 @@ exists. May not need, but safer.
 \begin{matlab}
 %}
 else% not parallel
-  if isfield(patches,'codist')
-     rmfield(patches,'codist'); 
-  end
+  if isfield(patches,'codist'), rmfield(patches,'codist'); end
 end%if-parallel
 %{
 \end{matlab}

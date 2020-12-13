@@ -738,9 +738,7 @@ May not need, but safer.
 \begin{matlab}
 %}
 else% not parallel
-  if isfield(patches,'codist')
-     rmfield(patches,'codist'); 
-  end
+  if isfield(patches,'codist'), rmfield(patches,'codist'); end
 end%if-parallel
 %{
 \end{matlab}

@@ -14,6 +14,12 @@ Bunder, J.~E., Kevrekidis, I.~G. \harvardand\ Roberts, A.~J.  \harvardyearleft
   computational homogenisation via self-adjoint coupling, Technical report,
   \url{http://arxiv.org/abs/2007.06815}.
 
+\harvarditem{Bunder \harvardand\ Roberts}{2018}{Bunder2018a}
+Bunder, J.~E. \harvardand\ Roberts, A.~J.  \harvardyearleft
+  2018\harvardyearright , Nonlinear emergent macroscale {PDEs}, with error
+  bound, for nonlinear microscale systems, Technical report,
+  [\url{https://arxiv.org/abs/1806.10297}].
+
 \harvarditem[Bunder et~al.]{Bunder, Roberts \harvardand\
   Kevrekidis}{2017}{Bunder2013b}
 Bunder, J.~E., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
@@ -57,6 +63,11 @@ Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016{\em
 Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016{\em
   b}\harvardyearright , `Multiscale modelling couples patches of nonlinear
   wave-like simulations', {\em IMA J.~Applied Maths.} {\bf 81}(2),~228--254.
+
+\harvarditem{Dellar \harvardand\ Salmon}{2005}{Dellar2005}
+Dellar, P.~J. \harvardand\ Salmon, R.  \harvardyearleft 2005\harvardyearright ,
+  `Shallow water equations with a complete coriolis force and topography', {\em
+  Phys. Fluids} {\bf 17},~106601.
 
 \harvarditem[Frewen et~al.]{Frewen, Hummer \harvardand\
   Kevrekidis}{2009}{Frewen2009}
@@ -109,6 +120,11 @@ Givon, D., Kevrekidis, I.~G. \harvardand\ Kupferman, R.  \harvardyearleft
 Gustafsson, B.  \harvardyearleft 1975\harvardyearright , `The convergence rate
   for difference approximations to mixed initial boundary value problems', {\em
   Mathematics of Computation} {\bf 29}(10),~396--406.
+
+\harvarditem{Hereman}{2009}{Hereman2009}
+Hereman, W.  \harvardyearleft 2009\harvardyearright , Shallow water waves and
+  solitary waves, {\em in} `Mathematics of Complexity and Dynamical Systems',
+  Springer, New York, pp.~8112--8125.
 
 \harvarditem{Higham}{1998}{Higham98}
 Higham, N.~J.  \harvardyearleft 1998\harvardyearright , {\em Handbook of
@@ -178,6 +194,12 @@ Marschler, C., Sieber, J., Berkemer, R., Kawamoto, A. \harvardand\ Starke, J.
   \harvardyearleft 2014\harvardyearright , `Implicit methods for equation-free
   analysis: Convergence results and analysis of emergent waves in microscopic
   traffic models', {\em SIAM J.~Appl. Dyn. Syst.} {\bf 13}(2),~1202--1238.
+
+\harvarditem[Oron et~al.]{Oron, Davis \harvardand\ Bankoff}{1997}{Oron97}
+Oron, A., Davis, S.~H. \harvardand\ Bankoff, S.~G.  \harvardyearleft
+  1997\harvardyearright , `Long-scale evolution of thin liquid films', {\em
+  Rev. Mod. Phys.} {\bf 69},~931--980.
+\newblock \url{http://link.aps.org/abstract/RMP/v69/p931}.
 
 \harvarditem{Petersik}{2019--}{Petersik2019}
 Petersik, P.  \harvardyearleft 2019--\harvardyearright , Equation-free
@@ -249,5 +271,10 @@ Watt, S.~D. \harvardand\ Roberts, A.~J.  \harvardyearleft 1995\harvardyearright
   , `The accurate dynamic modelling of contaminant dispersion in channels',
   {\em SIAM J.~Appl. Math.} {\bf 55}(4),~1016--1038.
 \newblock \url{http://epubs.siam.org/sam-bin/dbq/article/25797}.
+
+\harvarditem[Wilson et~al.]{Wilson, Hunt \harvardand\ Duffy}{2000}{Wilson00}
+Wilson, S.~K., Hunt, R. \harvardand\ Duffy, B.~R.  \harvardyearleft
+  2000\harvardyearright , `The rate of spreading in spin coating', {\em
+  J.~Fluid Mech.} {\bf 413},~65--88.
 
 \end{thebibliography}

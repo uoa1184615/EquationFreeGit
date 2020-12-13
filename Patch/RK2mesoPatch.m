@@ -120,6 +120,12 @@ Initialise first result to the given initial condition, and
 evaluate the initial time derivative into~\verb|f1|. Use
 inter-patch interpolation to ensure edge values of the
 initial condition are defined and are reasonable.
+\footnote{These \texttt{gather()} functions cause all-to-all
+interprocessor communication once every meso-step.  Maybe
+better to use distributed array instead, (although need to
+then need to put time index last instead of first??), but we
+need to do some inter-cpu communication in order to estimate
+errors.}
 \begin{matlab}
 %}
 %warning('RK2mesoPatch: x0 = patchEdgeInt3(x0)')

@@ -1,5 +1,5 @@
-% input *.m files for Matlab's Parallel Computation of the Patch scheme in 1D, 2D, and 3D. AJR,
-% Nov 2020
+% input *.m files for Matlab's Parallel Computation of the
+% Patch scheme in 1D, 2D, and 3D. AJR, Nov -- Dec 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 \chapter{Matlab parallel computation of the patch scheme}
 \label{sec:parallel}
@@ -8,16 +8,38 @@
 
 Get familiar with the patch scheme of \cref{sec:patch}.
 
-For large-scale simulations, we here assume you have a compute cluster with many independent computer processors linked by a high-speed network.
-The functions we provide here aims to distribute computations in parallel across the cluster.
-\Matlab's Parallel Computing Toolbox empowers a reasonably straightforward way to implement this.
+For large-scale simulations, we here assume you have a
+compute cluster with many independent computer processors
+linked by a high-speed network. The functions we provide
+here aims to distribute computations in parallel across the
+cluster. \Matlab's Parallel Computing Toolbox empowers a
+reasonably straightforward way to implement this.
 
-The patch scheme has a clear domain decomposition of assigning a few patches to each processor.  
+The examples listed herein are all \emph{Proof of
+Principle}: as coded they are all small enough that
+non-parallel execution is here actually much quicker that
+the parallel execution.\footnote{Although I have so far only
+tested with two parallel workers??}  One needs significantly
+larger and/or more detailed problems than these examples
+before parallel execution is effective.
 
-As in all parallel cluster computing, interprocessor communication time all to often dominates.  It is important to reduce communication as much as possible compared to computation.  Consequently, parallel computing is only effective when there is a very large amount of microscale computation done on each processor per communication.
+The patch scheme has a clear domain decomposition of
+assigning relatively few patches to each processor.
 
-To minimise communication in time-dependent problems we have drafted a special integrator \verb|RK2mesoPatch3|,  \cref{sec:RK2mesoPatch3}, that communicates between patches only on a meso-time.
+As in all parallel cluster computing, interprocessor
+communication time all to often dominates.  It is important
+to reduce communication as much as possible compared to
+computation.  Consequently, parallel computing is only
+effective when there is a very large amount of microscale
+computation done on each processor per communication.
 
+To minimise communication in time-dependent problems we have
+drafted a special integrator \verb|RK2mesoPatch|, 
+\cref{sec:RK2mesoPatch}, that communicates between patches
+only on a meso-time.
+
+
+\input{../Patch/chanDispSpmd.m}
 
 \input{../Patch/spmdHomoDiff31.m}
 
@@ -27,7 +49,8 @@ To minimise communication in time-dependent problems we have drafted a special i
 
 \begin{devMan}
 
-\input{../Patch/chanDispSpmd.m}
+
+\input{../Patch/rotFilmSpmd.m}
 
 
 \section{To do}

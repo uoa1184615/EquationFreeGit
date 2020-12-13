@@ -150,7 +150,13 @@ c = round((patches.nCore-1)/2);
 Consequently, compute centred differences of the patch core
 averages for the macro-interpolation of all fields. Assumes
 the domain is macro-periodic. Should revise to use 5D arrays
-in order to be consistent with 2D and 3D code??
+in order to be consistent with 2D and 3D code?? and to work 
+with parallel??
+%  if patches.parallel
+%    dmux = zeros([ordCC,size(uCorex)],patches.codist); % 57D
+%  else
+%    dmux = zeros([ordCC,size(uCorex)]); % 5D
+%  end
 \begin{matlab}
 %}
 if patches.ordCC>0 % then non-spectral interpolation

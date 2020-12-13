@@ -8,7 +8,6 @@ dispersion via simulation on small patches across a channel}
 \label{sec:chanDispSpmd}
 \localtableofcontents
 
-\def\Pe{\ensuremath{\operatorname{Pe}}}
 Simulate shear dispersion along 1D channel emergent from
 micro-scale dynamics in 2D space, via 1D patches as a Proof
 of Principle example of parallel computing with \verb|spmd|.

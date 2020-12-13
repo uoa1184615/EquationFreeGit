@@ -1,6 +1,6 @@
 % patchEdgeInt2() provides the interpolation across 2D space
 % for 2D patches of simulations of a smooth lattice system
-% such as PDE discretisations.  AJR, Nov 2018 -- Nov 2020
+% such as PDE discretisations.  AJR, Nov 2018 -- Dec 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeInt2()}: sets 2D patch
@@ -18,11 +18,13 @@ multi-D, interpolating patch next-to-edge values appears
 better \cite[]{Bunder2020a}. This function is primarily used
 by \verb|patchSmooth2()| but is also useful for user
 graphics. 
+
+Script \verb|patchEdgeInt2test.m| verifies this code.
  
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
-\verb|spmd|) or otherwise via the global
-struct~\verb|patches|.
+\verb|spmd|) or otherwise via the global struct
+\verb|patches|.
 \begin{matlab}
 %}
 function u = patchEdgeInt2(u,patches)
@@ -163,39 +165,58 @@ is macro-periodic.
 %}
 ordCC=patches.ordCC;
 if ordCC>0 % then finite-width polynomial interpolation
+%{
+\end{matlab}
+The patch-edge values are either interpolated from the next-to-edge values, or from the centre-cross values (not the patch-centre value itself as that seems to have worse properties in general).  Have not yet implemented core averages.
+\begin{matlab}
+%}
   if patches.EdgyInt % next-to-edge values    
-    uCorex = u([2 nx-1],2:(ny-1),:,:,I,J);
-    uCorey = u(2:(nx-1),[2 ny-1],:,:,I,J);
+    Ux = u([2 nx-1],2:(ny-1),:,:,I,J);
+    Uy = u(2:(nx-1),[2 ny-1],:,:,I,J);
   else 
-    %disp('polynomial interpolation, currently couple from the centre-cross??')
-    uCorex = u(i0,2:(ny-1),:,:,I,J);
-    uCorey = u(2:(nx-1),j0,:,:,I,J);
+    Ux = u(i0,2:(ny-1),:,:,I,J);
+    Uy = u(2:(nx-1),j0,:,:,I,J);
   end;
-  dmux = zeros([ordCC,size(uCorex)]); % 7D
-  dmuy = zeros([ordCC,size(uCorey)]); % 7D
+%{
+\end{matlab}
+Use finite difference formulas for the interpolation, so store finite differences (\(\mu\delta,\delta^2,\mu\delta^3,\delta^4,\ldots\)) in these arrays.  When parallel, in order to preserve the distributed array structure we use an index at the end for the differences.
+\begin{matlab}
+%}
+  if patches.parallel
+    dmux = zeros([size(Ux),ordCC],patches.codist); % 7D
+    dmuy = zeros([size(Uy),ordCC],patches.codist); % 7D
+  else
+    dmux = zeros([size(Ux),ordCC]); % 7D
+    dmuy = zeros([size(Uy),ordCC]); % 7D
+  end
+%{
+\end{matlab}
+First compute differences \(\mu\delta\) and \(\delta^2\) in both space directions.
+\begin{matlab}
+%}
   if patches.stag % use only odd numbered neighbours
     error('polynomial interpolation not yet for staggered patch coupling')
   else %disp('starting standard interpolation')   
-    dmux(1,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) ...
-    -uCorex(:,:,:,:,Im,:))/2; % \mu\delta 
-    dmux(2,:,:,:,:,I,:) = (uCorex(:,:,:,:,Ip,:) ...
-    -2*uCorex(:,:,:,:,I,:) +uCorex(:,:,:,:,Im,:)); % \delta^2    
-    dmuy(1,:,:,:,:,:,J) = (uCorey(:,:,:,:,:,Jp) ...
-    -uCorey(:,:,:,:,:,Jm))/2; % \mu\delta 
-    dmuy(2,:,:,:,:,:,J) = (uCorey(:,:,:,:,:,Jp) ...
-    -2*uCorey(:,:,:,:,:,J) +uCorey(:,:,:,:,:,Jm)); % \delta^2
+    dmux(:,:,:,:,I,:,1) = (Ux(:,:,:,:,Ip,:) ...
+                          -Ux(:,:,:,:,Im,:))/2; %\mu\delta 
+    dmux(:,:,:,:,I,:,2) =  Ux(:,:,:,:,Ip,:) ...
+       -2*Ux(:,:,:,:,I,:) +Ux(:,:,:,:,Im,:);    % \delta^2    
+    dmuy(:,:,:,:,:,J,1) = (Uy(:,:,:,:,:,Jp) ...
+                          -Uy(:,:,:,:,:,Jm))/2; %\mu\delta 
+    dmuy(:,:,:,:,:,J,2) =  Uy(:,:,:,:,:,Jp) ...
+       -2*Uy(:,:,:,:,:,J) +Uy(:,:,:,:,:,Jm);    % \delta^2
   end% if odd/even
 %{
 \end{matlab}
 Recursively take \(\delta^2\) of these to form higher order
-centred differences.
+centred differences in both space directions.
 \begin{matlab}
 %}
    for k = 3:ordCC    
-    dmux(k,:,:,:,:,I,:) = dmux(k-2,:,:,:,:,Ip,:) ...
-    -2*dmux(k-2,:,:,:,:,I,:) +dmux(k-2,:,:,:,:,Im,:);    
-    dmuy(k,:,:,:,:,:,J) = dmuy(k-2,:,:,:,:,:,Jp) ...
-    -2*dmuy(k-2,:,:,:,:,:,J) +dmuy(k-2,:,:,:,:,:,Jm);
+    dmux(:,:,:,:,I,:,k)   =     dmux(:,:,:,:,Ip,:,k-2) ...
+      -2*dmux(:,:,:,:,I,:,k-2) +dmux(:,:,:,:,Im,:,k-2);    
+    dmuy(:,:,:,:,:,J,k)   =     dmuy(:,:,:,:,:,Jp,k-2) ...
+      -2*dmuy(:,:,:,:,:,J,k-2) +dmuy(:,:,:,:,:,Jm,k-2);
   end
 %{
 \end{matlab}
@@ -213,17 +234,17 @@ each other, as specified by \verb|patches.le|,
 %}
 k=1+patches.EdgyInt; % use centre or two edges
 u(nx,2:(ny-1),:,patches.ri,I,:) ...
-  = uCorex(1,:,:,:,:,:)*(1-patches.stag) ...
-    +shiftdim(sum( patches.Cwtsr(:,1).*dmux(:,1,:,:,:,:,:) ),1);  
+  = Ux(1,:,:,:,:,:)*(1-patches.stag) ...
+    +sum( shiftdim(patches.Cwtsr(:,1),-6).*dmux(1,:,:,:,:,:,:) ,7);  
 u(1 ,2:(ny-1),:,patches.le,I,:) ...
-  = uCorex(k,:,:,:,:,:)*(1-patches.stag) ...      
-    +shiftdim(sum( patches.Cwtsl(:,1).*dmux(:,k,:,:,:,:,:) ),1);
+  = Ux(k,:,:,:,:,:)*(1-patches.stag) ...      
+    +sum( shiftdim(patches.Cwtsl(:,1),-6).*dmux(k,:,:,:,:,:,:) ,7);
 u(2:(nx-1),ny,:,patches.to,:,J) ...
-  = uCorey(:,1,:,:,:,:)*(1-patches.stag) ...
-    +shiftdim(sum( patches.Cwtsr(:,2).*dmuy(:,:,1,:,:,:,:) ),1);
+  = Uy(:,1,:,:,:,:)*(1-patches.stag) ...
+    +sum( shiftdim(patches.Cwtsr(:,2),-6).*dmuy(:,1,:,:,:,:,:) ,7);
 u(2:(nx-1),1 ,:,patches.bo,:,J) ...
-  = uCorey(:,k,:,:,:,:)*(1-patches.stag) ...
-    +shiftdim(sum( patches.Cwtsl(:,2).*dmuy(:,:,k,:,:,:,:) ),1);
+  = Uy(:,k,:,:,:,:)*(1-patches.stag) ...
+    +sum( shiftdim(patches.Cwtsl(:,2),-6).*dmuy(:,k,:,:,:,:,:) ,7);
 u([1 nx],[1 ny],:,:,:,:)=nan; % remove corner values
 %{
 \end{matlab}
