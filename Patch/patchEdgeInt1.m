@@ -1,11 +1,10 @@
 % patchEdgeInt1() provides the interpolation across 1D space
-% for 1D patches of simulations of a smooth lattice system
-% such as PDE discretisations. AJR & JB, Sep 2018 -- Nov
-% 2020
+% for 1D patches of simulations of a lattice system such as
+% PDE discretisations. AJR & JB, Sep 2018 -- Dec 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{patchEdgeInt1()}: sets edge values from
-interpolation over the 1D macroscale}
+\section{\texttt{patchEdgeInt1()}: sets patch-edge values
+from interpolation over the 1D macroscale}
 \label{sec:patchEdgeInt1}
 
 
@@ -15,12 +14,11 @@ value \cite[]{Roberts00a, Roberts06d}, or the patch-core
 average \cite[]{Bunder2013b}, or the opposite next-to-edge
 values---this last alternative often maintains symmetry.
 This function is primarily used by \verb|patchSmooth1()| but
-is also useful for user graphics. When using core averages
-(not yet implemented in this version??), assumes they are in
-some sense \emph{smooth} so that these averages are sensible
-macroscale variables: then patch edge values are determined
-by macroscale interpolation of the core averages
-\citep{Bunder2013b}. 
+is also useful for user graphics. When using core averages,
+assumes they are in some sense \emph{smooth} so that these
+averages are sensible macroscale variables: then patch edge
+values are determined by macroscale interpolation of the
+core averages \citep{Bunder2013b}. 
 
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
@@ -38,25 +36,25 @@ if nargin<2, global patches, end
 \begin{itemize}
 
 \item \verb|u| is a vector\slash array of length
-\(\verb|nSubP| \cdot \verb|nVars|\cdot \verb|nEnsem|\cdot
-\verb|nPatch|\) where there are \(\verb|nVars|\cdot
-\verb|nEnsem|\) field values at each of the points in the
-\(\verb|nSubP| \times \verb|nPatch|\) grid.
+$\verb|nSubP| \cdot \verb|nVars|\cdot \verb|nEnsem|\cdot
+\verb|nPatch|$ where there are $\verb|nVars|\cdot
+\verb|nEnsem|$ field values at each of the points in the
+$\verb|nSubP| \times \verb|nPatch|$ grid.
 
 \item \verb|patches| a struct largely set by
 \verb|configPatches1()|, and which includes the following.
 \begin{itemize}
 
-\item \verb|.x| is \(\verb|nSubP| \times1 \times1 \times
-\verb|nPatch|\) array of the spatial locations~\(x_{iI}\) of
+\item \verb|.x| is $\verb|nSubP| \times1 \times1 \times
+\verb|nPatch|$ array of the spatial locations~$x_{iI}$ of
 the microscale grid points in every patch. Currently it
 \emph{must} be an equi-spaced lattice on both macro- and
 microscales.
 
-\item \verb|.ordCC| is order of interpolation, integer~\(\geq
--1\).
+\item \verb|.ordCC| is order of interpolation, integer~$\geq
+-1$.
 
-\item \verb|.stag| in \(\{0,1\}\) is one for staggered grid
+\item \verb|.stag| in $\{0,1\}$ is one for staggered grid
 (alternating) interpolation.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
@@ -77,8 +75,8 @@ preserves symmetry).
 
 \paragraph{Output}
 \begin{itemize}
-\item \verb|u| is 4D array, \(\verb|nSubP| \times
-\verb|nVars| \times \verb|nEnsem| \times \verb|nPatch|\), of
+\item \verb|u| is 4D array, $\verb|nSubP| \times
+\verb|nVars| \times \verb|nEnsem| \times \verb|nPatch|$, of
 the fields with edge values set by interpolation.
 \end{itemize}
 
@@ -147,42 +145,67 @@ c = round((patches.nCore-1)/2);
 
 
 \paragraph{Lagrange interpolation gives patch-edge values}
-Consequently, compute centred differences of the patch core
-averages for the macro-interpolation of all fields. Assumes
-the domain is macro-periodic. Should revise to use 5D arrays
-in order to be consistent with 2D and 3D code?? and to work 
-with parallel??
-%  if patches.parallel
-%    dmux = zeros([ordCC,size(uCorex)],patches.codist); % 57D
-%  else
-%    dmux = zeros([ordCC,size(uCorex)]); % 5D
-%  end
+Consequently, compute centred differences of the patch
+core/edge averages/values for the macro-interpolation of all
+fields. Assumes the domain is macro-periodic. 
 \begin{matlab}
 %}
-if patches.ordCC>0 % then non-spectral interpolation
-  if patches.EdgyInt % next-to-edge as double nVars, interleaved
-    uCore = reshape(u([2 end-1],:,:,I),2*nVars,nEnsem,Nx);
-    dmu = zeros(patches.ordCC,2*nVars,nEnsem,Nx);
-  else % interpolate mid-patch values
-    uCore = reshape(sum(u((i0-c):(i0+c),:,:,I),1),nVars,nEnsem,Nx);
-    dmu = zeros(patches.ordCC,nVars,nEnsem,Nx);
+if patches.ordCC>0 % then finite-width polynomial interpolation
+%{
+\end{matlab}
+\begin{matlab}
+%}
+  if patches.EdgyInt % next-to-edge values
+    Ux = u([2 nx-1],:,:,I);
+  else % interpolate mid-patch values/sums
+    Ux = sum( u((i0-c):(i0+c),:,:,I) ,1);
   end;
+%{
+\end{matlab}
+Just in case any last array dimension(s) are one, we have to
+force a padding of the sizes, then adjoin the extra
+dimension for the subsequent array of differences.
+\begin{matlab}
+%}
+szUxO=size(Ux); 
+szUxO=[szUxO ones(1,4-length(szUxO)) patches.ordCC];
+%{
+\end{matlab}
+Use finite difference formulas for the interpolation, so
+store finite differences in these arrays.  When parallel, in
+order to preserve the distributed array structure we use an
+index at the end for the differences.
+\begin{matlab}
+%}
+  if patches.parallel
+    dmu = zeros(szUxO,patches.codist); % 5D
+  else
+    dmu = zeros(szUxO); % 5D
+  end
+%{
+\end{matlab}
+First compute differences, either $\mu$ and $\delta$, or
+$\mu\delta$ and $\delta^2$ in space.
+\begin{matlab}
+%}
   if patches.stag % use only odd numbered neighbours
-    dmu(1,:,:,I) = (uCore(:,:,Ip)+uCore(:,:,Im))/2; % \mu
-    dmu(2,:,:,I) = (uCore(:,:,Ip)-uCore(:,:,Im)); % \delta
+    dmu(:,:,:,I,1) = (Ux(:,:,:,Ip)+Ux(:,:,:,Im))/2; % \mu
+    dmu(:,:,:,I,2) = (Ux(:,:,:,Ip)-Ux(:,:,:,Im)); % \delta
     Ip = Ip(Ip); Im = Im(Im); % increase shifts to \pm2
   else % standard
-    dmu(1,:,:,I) = (uCore(:,:,Ip)-uCore(:,:,Im))/2; % \mu\delta
-    dmu(2,:,:,I) = (uCore(:,:,Ip)-2*uCore(:,:,I)+uCore(:,:,Im)); % \delta^2
+    dmu(:,:,:,I,1) = (Ux(:,:,:,Ip)-Ux(:,:,:,Im))/2; % \mu\delta
+    dmu(:,:,:,I,2) = (Ux(:,:,:,Ip)-2*Ux(:,:,:,I) ...
+                     +Ux(:,:,:,Im)); % \delta^2
   end% if odd/even
 %{
 \end{matlab}
-Recursively take \(\delta^2\) of these to form higher order
-centred differences.
+Recursively take $\delta^2$ of these to form higher order
+centred differences in space.
 \begin{matlab}
 %}
   for k = 3:patches.ordCC
-    dmu(k,:,:,:) = dmu(k-2,:,:,Ip)-2*dmu(k-2,:,:,I)+dmu(k-2,:,:,Im);
+    dmu(:,:,:,:,k) =       dmu(:,:,:,Ip,k-2) ...
+      -2*dmu(:,:,:,I,k-2) +dmu(:,:,:,Im,k-2);
   end
 %{
 \end{matlab}
@@ -199,21 +222,11 @@ other as specified by \verb|patches.le| and
 \begin{matlab}
 %}
   if patches.nCore==1
-     if patches.EdgyInt
-        u(nx,:,patches.ri,I) ...
-        = shiftdim(uCore(1:2:end,:,I),-1)*(1-patches.stag) ...
-          +sum( patches.Cwtsr.*dmu(:,1:2:end,:,I) );
-        u(  1  ,:,patches.le,I) ...
-        = shiftdim(uCore(2:2:end,:,I),-1)*(1-patches.stag) ...      
-          +sum( patches.Cwtsl.*dmu(:,2:2:end,:,I) );
-     else % mid-patch interpolation
-        u(nx,:,patches.ri,I) ...
-        = shiftdim(uCore(:,:,I),-1)*(1-patches.stag) ...
-          +sum( patches.Cwtsr.*dmu(:,:,:,I) );
-        u(  1  ,:,patches.le,I) ...
-        = shiftdim(uCore(:,:,I),-1)*(1-patches.stag) ...      
-          +sum( patches.Cwtsl.*dmu(:,:,:,I) );
-     end
+    k=1+patches.EdgyInt; % use centre/core or two edges
+    u(nx,:,patches.ri,I) = Ux(1,:,:,:)*(1-patches.stag) ...
+      +sum( shiftdim(patches.Cwtsr,-4).*dmu(1,:,:,:,:) ,5);
+    u(1 ,:,patches.le,I) = Ux(k,:,:,:)*(1-patches.stag) ...      
+      +sum( shiftdim(patches.Cwtsl,-4).*dmu(k,:,:,:,:) ,5);
 %{
 \end{matlab}
 For a non-trivial core then more needs doing: the core (one
@@ -223,11 +236,11 @@ depending upon near edge values so the average near the edge
 is correct.
 \begin{matlab}
 %}
-  else error('not yet considered, july 2020 ??')
-    u(nx,:,:,I) = uCore(:,:,I)*(1-patches.stag) ...
+  else error('not yet considered, july--dec 2020 ??')
+    u(nx,:,:,I) = Ux(:,:,I)*(1-patches.stag) ...
       + reshape(-sum(u((nx-patches.nCore+1):(nx-1),:,:,I),1) ...
       +sum( patches.Cwtsr.*dmu ),Nx,nVars);
-    u(1,:,:,I) = uCore(:,:,I)*(1-patches.stag) ...      
+    u(1,:,:,I) = Ux(:,:,I)*(1-patches.stag) ...      
       +reshape(-sum(u(2:patches.nCore,:,:,I),1)  ...
       +sum( patches.Cwtsl.*dmu ),Nx,nVars);
   end;
@@ -243,18 +256,18 @@ Assumes the domain is macro-periodic.
 else% spectral interpolation
 %{
 \end{matlab}
-As the macroscale fields are \(N\)-periodic, the macroscale
-Fourier transform writes the centre-patch values as \(U_j =
-\sum_{k}C_ke^{ik2\pi j/N}\). Then the edge-patch values
-\(U_{j\pm r} =\sum_{k}C_ke^{ik2\pi/N(j\pm r)}
-=\sum_{k}C'_ke^{ik2\pi j/N}\) where \(C'_k =
-C_ke^{ikr2\pi/N}\). For \verb|Nx|~patches we resolve
-`wavenumbers' \(|k|<\verb|Nx|/2\), so set row vector
-\(\verb|ks| = k2\pi/N\) for `wavenumbers'
-\(\mathcode`\,="213B k = (0,1, \ldots, k_{\max}, -k_{\max},
-\ldots, -1)\) for odd~\(N\), and \(\mathcode`\,="213B k =
+As the macroscale fields are $N$-periodic, the macroscale
+Fourier transform writes the centre-patch values as $U_j =
+\sum_{k}C_ke^{ik2\pi j/N}$. Then the edge-patch values
+$U_{j\pm r} =\sum_{k}C_ke^{ik2\pi/N(j\pm r)}
+=\sum_{k}C'_ke^{ik2\pi j/N}$ where $C'_k =
+C_ke^{ikr2\pi/N}$. For \verb|Nx|~patches we resolve
+`wavenumbers' $|k|<\verb|Nx|/2$, so set row vector
+$\verb|ks| = k2\pi/N$ for `wavenumbers'
+$\mathcode`\,="213B k = (0,1, \ldots, k_{\max}, -k_{\max},
+\ldots, -1)$ for odd~$N$, and $\mathcode`\,="213B k =
 (0,1, \ldots, k_{\max}, (k_{\max}+1), -k_{\max}, \ldots,
--1)\) for even~\(N\).
+-1)$ for even~$N$.
 
 Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches1()|
@@ -308,7 +321,7 @@ end
 %{
 \end{matlab}
 The inverse Fourier transform gives the edge values via a
-shift a fraction~\(r\) to the next macroscale grid point.
+shift a fraction~$r$ to the next macroscale grid point.
 \begin{matlab}
 %}
   u(nx,iV,patches.ri,:) = uclean( ifft( ...
@@ -319,7 +332,7 @@ shift a fraction~\(r\) to the next macroscale grid point.
 \end{matlab}
 Restore staggered grid when appropriate. This dimensional
 shifting appears to work.
-%Is there a better way to do this??
+Is there a better way to do this??
 \begin{matlab}
 %}
 if patches.stag

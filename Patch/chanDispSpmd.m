@@ -107,21 +107,23 @@ cHetr = shiftdim([3/2 1],-1).*(1-y.^2) ...
 
 Configure the patch scheme with some arbitrary choices of
 domain, patches, size ratios---here each patch is a unit
-cube in space.   Set \verb|patches| information to be global
-so the info can be used for Case~1 without being explicitly
-passed as arguments.  Choose the parallel option if not
-Case~1, which invokes \verb|spmd|-block internally, so that
-field variables become \emph{distributed} across cpus.
+cube in space.  Choose some random order of interpolation. 
+Set \verb|patches| information to be global so the info can
+be used for Cases~1--2 without being explicitly passed as
+arguments.  Choose the parallel option if not Case~1, which
+invokes \verb|spmd|-block internally, so that field
+variables become \emph{distributed} across cpus.
 \begin{matlab}
 %}
-if theCase==1, global patches, end
+if theCase<=2, global patches, end
 nPatch=15
 nSubP=2+mPeriod
 ratio=0.2+0.2*(theCase<4)
 Len=nPatch/ratio 
+ordCC=2*randi([0 3])
 disp('**** Setting configPatches1')
 patches = configPatches1(@chanDispMicro, [0 Len], nan ...
-    , nPatch, 0, ratio, nSubP, 'EdgyInt',true  ...
+    , nPatch, ordCC, ratio, nSubP, 'EdgyInt',true  ...
     ,'hetCoeffs',cHetr ,'parallel',(theCase>1) );
 %{
 \end{matlab}

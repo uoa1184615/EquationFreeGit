@@ -96,7 +96,7 @@ dimensions as~\verb|u|.
 
 
 \begin{devMan}
-Sets the edge values from macroscale interpolation of
+Sets the edge-face values from macroscale interpolation of
 centre-patch values, and if necessary, reshapes the
 fields~\verb|u| as a 8D-array.  \cref{sec:patchEdgeInt3}
 describes \verb|patchEdgeInt3()|.
@@ -105,6 +105,7 @@ describes \verb|patchEdgeInt3()|.
 %warning('patchSmooth3 starting interpolation')
 %assert(iscodistributed(u)|~patches.parallel,'u not codist zero')
 sizeu = size(u);
+%warning('patchSmooth3 starting patchEdgeInt')
 u = patchEdgeInt3(u,patches);
 %{
 \end{matlab}

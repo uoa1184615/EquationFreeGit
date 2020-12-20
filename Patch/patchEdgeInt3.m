@@ -1,6 +1,6 @@
 % patchEdgeInt3() provides the interpolation across 3D space
 % for 3D patches of simulations of a smooth lattice system
-% such as PDE discretisations.  AJR, Aug--Nov 2020
+% such as PDE discretisations.  AJR, Aug--Dec 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeInt3()}: sets 3D patch
@@ -16,11 +16,12 @@ Bunder2019c}, or patch next-to-face values which appears
 better \cite[]{Bunder2020a}. This function is primarily used
 by \verb|patchSmooth3()| but is also useful for user
 graphics. 
+\footnote{Script \texttt{patchEdgeInt3test.m} verifies this code.}
 
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
 \verb|spmd|) or otherwise via the global
-struct~\verb|patches|.
+struct \verb|patches|.
 \begin{matlab}
 %}
 function u = patchEdgeInt3(u,patches)
@@ -33,45 +34,45 @@ if nargin<2, global patches, end
 \begin{itemize}
 
 \item \verb|u| is a vector\slash array of length
-\(\verb|prod(nSubP)|  \cdot \verb|nVars| \cdot \verb|nEnsem|
-\cdot \verb|prod(nPatch)|\) where there are \(\verb|nVars|
-\cdot \verb|nEnsem|\) field values at each of the points in
-the \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nSubP3|
+$\verb|prod(nSubP)|  \cdot \verb|nVars| \cdot \verb|nEnsem|
+\cdot \verb|prod(nPatch)|$ where there are $\verb|nVars|
+\cdot \verb|nEnsem|$ field values at each of the points in
+the $\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nSubP3|
 \cdot \verb|nPatch1| \cdot \verb|nPatch2| \cdot
-\verb|nPatch3|\) grid on the \(\verb|nPatch1| \cdot
-\verb|nPatch2| \cdot \verb|nPatch3|\) array of patches.
+\verb|nPatch3|$ grid on the $\verb|nPatch1| \cdot
+\verb|nPatch2| \cdot \verb|nPatch3|$ array of patches.
 
 \item \verb|patches| a struct set by \verb|configPatches3()|
 which includes the following information.
 \begin{itemize}
 
-\item \verb|.x| is \(\verb|nSubP1| \times1 \times1 \times1
-\times1 \times \verb|nPatch1| \times1 \times1 \) array of
-the spatial locations~\(x_{iI}\) of the microscale grid
+\item \verb|.x| is $\verb|nSubP1| \times1 \times1 \times1
+\times1 \times \verb|nPatch1| \times1 \times1 $ array of
+the spatial locations~$x_{iI}$ of the microscale grid
 points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and micro-scales.
 
-\item \verb|.y| is similarly \(1\times \verb|nSubP2| \times1
-\times1 \times1 \times1 \times \verb|nPatch2| \times1\)
-array of the spatial locations~\(y_{jJ}\) of the microscale
+\item \verb|.y| is similarly $1\times \verb|nSubP2| \times1
+\times1 \times1 \times1 \times \verb|nPatch2| \times1$
+array of the spatial locations~$y_{jJ}$ of the microscale
 grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and micro-scales.
 
-\item \verb|.z| is similarly \(1 \times1 \times \verb|nSubP3|
-\times1 \times1 \times1 \times1 \times \verb|nPatch3|\)
-array of the spatial locations~\(z_{kK}\) of the microscale
+\item \verb|.z| is similarly $1 \times1 \times \verb|nSubP3|
+\times1 \times1 \times1 \times1 \times \verb|nPatch3|$
+array of the spatial locations~$z_{kK}$ of the microscale
 grid points in every patch. Currently it \emph{must} be an
 equi-spaced lattice on both macro- and micro-scales.
 
 \item \verb|.ordCC| is order of interpolation, currently
-(Nov 2020) only \(\{0,2,4,\ldots\}\)
+only $\{0,2,4,\ldots\}$
 
-\item \verb|.stag| in \(\{0,1\}\) is one for staggered grid
+\item \verb|.stag| in $\{0,1\}$ is one for staggered grid
 (alternating) interpolation.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
 coefficients for finite width interpolation in each of the
-\(x,y,z\)-directions.
+$x,y,z$-directions.
 
 \item \verb|.EdgyInt| true/false is true for interpolating
 patch-face values from opposite next-to-face values (often
@@ -88,10 +89,10 @@ preserves symmetry).
 
 \paragraph{Output}
 \begin{itemize}
-\item \verb|u| is 8D array, \(\verb|nSubP1| \cdot
+\item \verb|u| is 8D array, $\verb|nSubP1| \cdot
 \verb|nSubP2| \cdot \verb|nSubP3| \cdot \verb|nVars| \cdot
 \verb|nEnsem| \cdot \verb|nPatch1| \cdot \verb|nPatch2|
-\cdot \verb|nPatch3|\), of the fields with face values set
+\cdot \verb|nPatch3|$, of the fields with face values set
 by interpolation (edge and corner vales set to~\verb|NaN|).
 \end{itemize}
 
@@ -109,6 +110,7 @@ real and some are complex, or if variables are of quite
 different sizes. 
 \begin{matlab}
 %}
+%warning('patchedgeint3---one')
   if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
        uclean=@(u) real(u);
   else uclean=@(u) u; 
@@ -120,6 +122,7 @@ Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
 %}
+%warning('patchedgeint3---two')
 [~,~,nz,~,~,~,~,Nz] = size(patches.z);
 [~,ny,~,~,~,~,Ny,~] = size(patches.y);
 [nx,~,~,~,~,Nx,~,~] = size(patches.x);
@@ -134,6 +137,7 @@ u = reshape(u,[nx ny nz nVars nEnsem Nx Ny Nz]);
 Get the size ratios of the patches in each direction.
 \begin{matlab}
 %}
+%warning('patchedgeint3---three')
 rx = patches.ratio(1);
 ry = patches.ratio(2);
 rz = patches.ratio(3);
@@ -171,62 +175,99 @@ macro-interpolation, of all fields. Assumes the domain is
 macro-periodic.
 \begin{matlab}
 %}
+%warning('patchedgeint3---four')
 ordCC=patches.ordCC;
 if ordCC>0 % then finite-width polynomial interpolation
+%{
+\end{matlab}
+The patch-edge values are either interpolated from the
+next-to-edge-face values, or from the centre-cross-plane
+values (not the patch-centre value itself as that seems to
+have worse properties in general).  Have not yet implemented
+core averages??
+\begin{matlab}
+%}
   if patches.EdgyInt % next-to-face values    
     Ux = u([2 nx-1],2:(ny-1),2:(nz-1),:,:,I,J,K);
     Uy = u(2:(nx-1),[2 ny-1],2:(nz-1),:,:,I,J,K);
     Uz = u(2:(nx-1),2:(ny-1),[2 nz-1],:,:,I,J,K);
   else 
-    %warning('currently couple from the mid-planes??')
     Ux = u(i0,2:(ny-1),2:(nz-1),:,:,I,J,K);
     Uy = u(2:(nx-1),j0,2:(nz-1),:,:,I,J,K);
     Uz = u(2:(nx-1),2:(ny-1),k0,:,:,I,J,K);
   end;
+%{
+\end{matlab}
+Just in case the last array dimension(s) are one, we have to
+force a padding of the sizes, then adjoin the extra
+dimension for the subsequent array of differences.
+\begin{matlab}
+%}
+szUxO=size(Ux); szUxO=[szUxO ones(1,8-length(szUxO)) ordCC];
+szUyO=size(Uy); szUyO=[szUyO ones(1,8-length(szUyO)) ordCC];
+szUzO=size(Uz); szUzO=[szUzO ones(1,8-length(szUzO)) ordCC];
+%{
+\end{matlab}
+Use finite difference formulas for the interpolation, so
+store finite differences ($\mu\delta, \delta^2, \mu\delta^3,
+\delta^4, \ldots$) in these arrays.  When parallel, in order
+to preserve the distributed array structure we use an index
+at the end for the differences.
+\begin{matlab}
+%}
+%warning('patchedgeint3---five')
   if patches.parallel
-    dmux = zeros([ordCC,size(Ux)],patches.codist); % 9D
-    dmuy = zeros([ordCC,size(Uy)],patches.codist); % 9D
-    dmuz = zeros([ordCC,size(Uz)],patches.codist); % 9D
+    dmux = zeros(szUxO,patches.codist); % 9D
+    dmuy = zeros(szUyO,patches.codist); % 9D
+    dmuz = zeros(szUzO,patches.codist); % 9D
   else
-    dmux = zeros([ordCC,size(Ux)]); % 9D
-    dmuy = zeros([ordCC,size(Uy)]); % 9D
-    dmuz = zeros([ordCC,size(Uz)]); % 9D
+    dmux = zeros(szUxO); % 9D
+    dmuy = zeros(szUyO); % 9D
+    dmuz = zeros(szUzO); % 9D
   end
+%{
+\end{matlab}
+First compute differences $\mu\delta$ and $\delta^2$ in
+both space directions.
+\begin{matlab}
+%}
+%warning('patchedgeint3---six')
   if patches.stag % use only odd numbered neighbours
     error('polynomial interpolation not yet for staggered patch coupling')
   else %warning('starting standard interpolation')   
-    dmux(1,:,:,:,:,:,I,:,:) = (Ux(:,:,:,:,:,Ip,:,:) ...
-    -Ux(:,:,:,:,:,Im,:,:))/2; % \mu\delta 
-    dmux(2,:,:,:,:,:,I,:,:) = (Ux(:,:,:,:,:,Ip,:,:) ...
-    -2*Ux(:,:,:,:,:,I,:,:) +Ux(:,:,:,:,:,Im,:,:)); % \delta^2    
-    dmuy(1,:,:,:,:,:,:,J,:) = (Uy(:,:,:,:,:,:,Jp,:) ...
-    -Uy(:,:,:,:,:,:,Jm,:))/2; % \mu\delta 
-    dmuy(2,:,:,:,:,:,:,J,:) = (Uy(:,:,:,:,:,:,Jp,:) ...
-    -2*Uy(:,:,:,:,:,:,J,:) +Uy(:,:,:,:,:,:,Jm,:)); % \delta^2
-    dmuz(1,:,:,:,:,:,:,:,K) = (Uz(:,:,:,:,:,:,:,Kp) ...
-    -Uz(:,:,:,:,:,:,:,Km))/2; % \mu\delta 
-    dmuz(2,:,:,:,:,:,:,:,K) = (Uz(:,:,:,:,:,:,:,Kp) ...
-    -2*Uz(:,:,:,:,:,:,:,K) +Uz(:,:,:,:,:,:,:,Km)); % \delta^2
+    dmux(:,:,:,:,:,I,:,:,1) = (Ux(:,:,:,:,:,Ip,:,:) ...
+                              -Ux(:,:,:,:,:,Im,:,:))/2; %\mu\delta 
+    dmux(:,:,:,:,:,I,:,:,2) = (Ux(:,:,:,:,:,Ip,:,:) ...
+       -2*Ux(:,:,:,:,:,I,:,:) +Ux(:,:,:,:,:,Im,:,:));   %\delta^2    
+    dmuy(:,:,:,:,:,:,J,:,1) = (Uy(:,:,:,:,:,:,Jp,:) ...
+                              -Uy(:,:,:,:,:,:,Jm,:))/2; %\mu\delta 
+    dmuy(:,:,:,:,:,:,J,:,2) = (Uy(:,:,:,:,:,:,Jp,:) ...
+       -2*Uy(:,:,:,:,:,:,J,:) +Uy(:,:,:,:,:,:,Jm,:));   %\delta^2
+    dmuz(:,:,:,:,:,:,:,K,1) = (Uz(:,:,:,:,:,:,:,Kp) ...
+                              -Uz(:,:,:,:,:,:,:,Km))/2; %\mu\delta 
+    dmuz(:,:,:,:,:,:,:,K,2) = (Uz(:,:,:,:,:,:,:,Kp) ...
+       -2*Uz(:,:,:,:,:,:,:,K) +Uz(:,:,:,:,:,:,:,Km));   %\delta^2
   end% if odd/even
 %{
 \end{matlab}
-Recursively take \(\delta^2\) of these to form higher order
-centred differences.
+Recursively take $\delta^2$ of these to form higher order
+centred differences in all three space directions.
 \begin{matlab}
 %}
+%warning('patchedgeint3---seven')
    for k = 3:ordCC    
-    dmux(k,:,:,:,:,:,I,:,:) =     dmux(k-2,:,:,:,:,:,Ip,:,:) ...
-    -2*dmux(k-2,:,:,:,:,:,I,:,:) +dmux(k-2,:,:,:,:,:,Im,:,:);    
-    dmuy(k,:,:,:,:,:,:,J,:) =     dmuy(k-2,:,:,:,:,:,:,Jp,:) ...
-    -2*dmuy(k-2,:,:,:,:,:,:,J,:) +dmuy(k-2,:,:,:,:,:,:,Jm,:);
-    dmuz(k,:,:,:,:,:,:,:,K) =     dmuz(k-2,:,:,:,:,:,:,:,Kp) ...
-    -2*dmuz(k-2,:,:,:,:,:,:,:,K) +dmuz(k-2,:,:,:,:,:,:,:,Km);
+    dmux(:,:,:,:,:,I,:,:,k) =     dmux(:,:,:,:,:,Ip,:,:,k-2) ...
+    -2*dmux(:,:,:,:,:,I,:,:,k-2) +dmux(:,:,:,:,:,Im,:,:,k-2);    
+    dmuy(:,:,:,:,:,:,J,:,k) =     dmuy(:,:,:,:,:,:,Jp,:,k-2) ...
+    -2*dmuy(:,:,:,:,:,:,J,:,k-2) +dmuy(:,:,:,:,:,:,Jm,:,k-2);
+    dmuz(:,:,:,:,:,:,:,K,k) =     dmuz(:,:,:,:,:,:,:,Kp,k-2) ...
+    -2*dmuz(:,:,:,:,:,:,:,K,k-2) +dmuz(:,:,:,:,:,:,:,Km,k-2);
   end
 %{
 \end{matlab}
 Interpolate macro-values to be Dirichlet face values for
-each patch \cite[]{Roberts06d, Bunder2013b}, using weights
-computed in \verb|configPatches3()|. Here interpolate to
+each patch \cite[]{Roberts06d, Bunder2013b}, using the weights
+pre-computed by \verb|configPatches3()|. Here interpolate to
 specified order.
 
 For the case where next-to-face values interpolate to the
@@ -237,25 +278,26 @@ each other, as specified by \verb|patches.le|,
 \verb|patches.fr| and \verb|patches.ba|.
 \begin{matlab}
 %}
+%warning('patchedgeint3---eight')
 k=1+patches.EdgyInt; % use centre or two faces
 u(nx,2:(ny-1),2:(nz-1),:,patches.ri,I,:,:) ...
   = Ux(1,:,:,:,:,:,:,:)*(1-patches.stag) ...
-    +shiftdim(sum( patches.Cwtsr(:,1).*dmux(:,1,:,:,:,:,:,:,:) ),1);  
+  +sum( shiftdim(patches.Cwtsr(:,1),-8).*dmux(1,:,:,:,:,:,:,:,:) ,9);  
 u(1 ,2:(ny-1),2:(nz-1),:,patches.le,I,:,:) ...
-  = Ux(k,:,:,:,:,:,:,:)*(1-patches.stag) ...      
-    +shiftdim(sum( patches.Cwtsl(:,1).*dmux(:,k,:,:,:,:,:,:,:) ),1);
+  = Ux(k,:,:,:,:,:,:,:)*(1-patches.stag) ...
+  +sum( shiftdim(patches.Cwtsl(:,1),-8).*dmux(k,:,:,:,:,:,:,:,:) ,9);
 u(2:(nx-1),ny,2:(nz-1),:,patches.to,:,J,:) ...
   = Uy(:,1,:,:,:,:,:,:)*(1-patches.stag) ...
-    +shiftdim(sum( patches.Cwtsr(:,2).*dmuy(:,:,1,:,:,:,:,:,:) ),1);
+  +sum( shiftdim(patches.Cwtsr(:,2),-8).*dmuy(:,1,:,:,:,:,:,:,:) ,9);
 u(2:(nx-1),1 ,2:(nz-1),:,patches.bo,:,J,:) ...
   = Uy(:,k,:,:,:,:,:,:)*(1-patches.stag) ...
-    +shiftdim(sum( patches.Cwtsl(:,2).*dmuy(:,:,k,:,:,:,:,:,:) ),1);
+  +sum( shiftdim(patches.Cwtsl(:,2),-8).*dmuy(:,k,:,:,:,:,:,:,:) ,9);
 u(2:(nx-1),2:(ny-1),nz,:,patches.fr,:,:,K) ...
   = Uz(:,:,1,:,:,:,:,:)*(1-patches.stag) ...
-    +shiftdim(sum( patches.Cwtsr(:,3).*dmuz(:,:,:,1,:,:,:,:,:) ),1);
+  +sum( shiftdim(patches.Cwtsr(:,3),-8).*dmuz(:,:,1,:,:,:,:,:,:) ,9);
 u(2:(nx-1),2:(ny-1),1 ,:,patches.ba,:,:,K) ...
   = Uz(:,:,k,:,:,:,:,:)*(1-patches.stag) ...
-    +shiftdim(sum( patches.Cwtsl(:,3).*dmuz(:,:,:,k,:,:,:,:,:) ),1);
+  +sum( shiftdim(patches.Cwtsl(:,3),-8).*dmuz(:,:,k,:,:,:,:,:,:) ,9);
 %{
 \end{matlab}
 
@@ -268,20 +310,20 @@ Assumes the domain is macro-periodic.
 else% spectral interpolation
 %{
 \end{matlab}
-We interpolate in terms of the patch index, \(j\)~say, not
+We interpolate in terms of the patch index, $j$~say, not
 directly in space. As the macroscale fields are
-\(N\)-periodic in the patch index~\(j\), the macroscale
+$N$-periodic in the patch index~$j$, the macroscale
 Fourier transform writes the centre-patch values as
-\(U_j=\sum_{k}C_ke^{ik2\pi j/N}\). Then the face-patch
-values \(U_{j\pm r} =\sum_{k}C_ke^{ik2\pi/N(j\pm r)}
-=\sum_{k}C'_ke^{ik2\pi j/N}\) where
-\(C'_k=C_ke^{ikr2\pi/N}\). For \(N\)~patches we resolve
-`wavenumbers' \(|k|<N/2\), so set row vector
-\(\verb|ks|=k2\pi/N\) for `wavenumbers' \(\mathcode`\,="213B
-k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)\) for
-odd~\(N\), and \(\mathcode`\,="213B k=(0,1, \ldots,
-k_{\max}, \pm(k_{\max}+1) -k_{\max}, \ldots, -1)\) for
-even~\(N\).
+$U_j=\sum_{k}C_ke^{ik2\pi j/N}$. Then the face-patch
+values $U_{j\pm r} =\sum_{k}C_ke^{ik2\pi/N(j\pm r)}
+=\sum_{k}C'_ke^{ik2\pi j/N}$ where
+$C'_k=C_ke^{ikr2\pi/N}$. For $N$~patches we resolve
+`wavenumbers' $|k|<N/2$, so set row vector
+$\verb|ks|=k2\pi/N$ for `wavenumbers' $\mathcode`\,="213B
+k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)$ for
+odd~$N$, and $\mathcode`\,="213B k=(0,1, \ldots,
+k_{\max}, \pm(k_{\max}+1) -k_{\max}, \ldots, -1)$ for
+even~$N$.
 
 Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches3|
@@ -306,10 +348,10 @@ the middle of the gaps and swapped.
 %{
 \end{matlab}
 Now set wavenumbers in the three directions into three vectors
-at the correct dimension.  In the case of even~\(N\) these
-compute the \(+\)-case for the highest wavenumber zig-zag
-mode, \(\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
-+(k_{\max}+1) -k_{\max}, \ldots, -1)\).
+at the correct dimension.  In the case of even~$N$ these
+compute the $+$-case for the highest wavenumber zig-zag
+mode, $\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
++(k_{\max}+1) -k_{\max}, \ldots, -1)$.
 \begin{matlab}
 %}
   kMax = floor((Nx-1)/2); 
@@ -400,6 +442,7 @@ end% if spectral
 Nan the values in corners and edges, of every 3D patch.
 \begin{matlab}
 %}
+%warning('patchedgeint3---nine')
 u(:,[1 ny],[1 nz],:,:,:,:,:)=nan; 
 u([1 nx],:,[1 nz],:,:,:,:,:)=nan; 
 u([1 nx],[1 ny],:,:,:,:,:,:)=nan; 

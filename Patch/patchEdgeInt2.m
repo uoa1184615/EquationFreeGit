@@ -18,8 +18,7 @@ multi-D, interpolating patch next-to-edge values appears
 better \cite[]{Bunder2020a}. This function is primarily used
 by \verb|patchSmooth2()| but is also useful for user
 graphics. 
-
-Script \verb|patchEdgeInt2test.m| verifies this code.
+\footnote{Script \texttt{patchEdgeInt2test.m} verifies this code.}
  
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
@@ -33,42 +32,43 @@ if nargin<2, global patches, end
 \end{matlab}
 
 
+
 \paragraph{Input}
 \begin{itemize}
 
 \item \verb|u| is a vector\slash array of length
-\(\verb|prod(nSubP)|  \cdot \verb|nVars| \cdot \verb|nEnsem|
-\cdot \verb|prod(nPatch)|\) where there are \(\verb|nVars|
-\cdot \verb|nEnsem|\) field values at each of the points in
-the \(\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nPatch1|
-\cdot \verb|nPatch2|\) grid on the \(\verb|nPatch1| \cdot
-\verb|nPatch2|\) array of patches.
+$\verb|prod(nSubP)|  \cdot \verb|nVars| \cdot \verb|nEnsem|
+\cdot \verb|prod(nPatch)|$ where there are $\verb|nVars|
+\cdot \verb|nEnsem|$ field values at each of the points in
+the $\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nPatch1|
+\cdot \verb|nPatch2|$ grid on the $\verb|nPatch1| \cdot
+\verb|nPatch2|$ array of patches.
 
 \item \verb|patches| a struct set by \verb|configPatches2()|
 which includes the following information.
 \begin{itemize}
 
-\item \verb|.x| is \(\verb|nSubP1| \times1 \times1 \times1
-\times \verb|nPatch1| \times1 \) array of the spatial
-locations~\(x_{iI}\) of the microscale grid points in every
+\item \verb|.x| is $\verb|nSubP1| \times1 \times1 \times1
+\times \verb|nPatch1| \times1 $ array of the spatial
+locations~$x_{iI}$ of the microscale grid points in every
 patch. Currently it \emph{must} be an equi-spaced lattice on
 both macro- and microscales.
 
-\item \verb|.y| is similarly \(1 \times \verb|nSubP2| \times1
-\times1 \times1 \times \verb|nPatch2|\) array of the spatial
-locations~\(y_{jJ}\) of the microscale grid points in every
+\item \verb|.y| is similarly $1 \times \verb|nSubP2| \times1
+\times1 \times1 \times \verb|nPatch2|$ array of the spatial
+locations~$y_{jJ}$ of the microscale grid points in every
 patch. Currently it \emph{must} be an equi-spaced lattice on
 both macro- and microscales.
 
-\item \verb|.ordCC| is order of interpolation, currently
-(Nov 2020) only \(\{0,2,4,\ldots\}\)
+\item \verb|.ordCC| is order of interpolation, currently 
+only $\{0,2,4,\ldots\}$
 
-\item \verb|.stag| in \(\{0,1\}\) is one for staggered grid
+\item \verb|.stag| in $\{0,1\}$ is one for staggered grid
 (alternating) interpolation.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
 coefficients for finite width interpolation in both the
-\(x,y\)-directions.
+$x,y$-directions.
 
 \item \verb|.EdgyInt| true/false is true for interpolating
 patch-edge values from opposite next-to-edge values (often
@@ -85,9 +85,9 @@ preserves symmetry).
 
 \paragraph{Output}
 \begin{itemize}
-\item \verb|u| is 6D array, \(\verb|nSubP1| \cdot
+\item \verb|u| is 6D array, $\verb|nSubP1| \cdot
 \verb|nSubP2| \cdot \verb|nVars| \cdot \verb|nEnsem| \cdot
-\verb|nPatch1| \cdot \verb|nPatch2|\), of the fields with
+\verb|nPatch1| \cdot \verb|nPatch2|$, of the fields with
 edge values set by interpolation (and corner vales set
 to~\verb|NaN|).
 \end{itemize}
@@ -167,7 +167,11 @@ ordCC=patches.ordCC;
 if ordCC>0 % then finite-width polynomial interpolation
 %{
 \end{matlab}
-The patch-edge values are either interpolated from the next-to-edge values, or from the centre-cross values (not the patch-centre value itself as that seems to have worse properties in general).  Have not yet implemented core averages.
+The patch-edge values are either interpolated from the
+next-to-edge values, or from the centre-cross values (not
+the patch-centre value itself as that seems to have worse
+properties in general).  Have not yet implemented core
+averages??
 \begin{matlab}
 %}
   if patches.EdgyInt % next-to-edge values    
@@ -179,19 +183,33 @@ The patch-edge values are either interpolated from the next-to-edge values, or f
   end;
 %{
 \end{matlab}
-Use finite difference formulas for the interpolation, so store finite differences (\(\mu\delta,\delta^2,\mu\delta^3,\delta^4,\ldots\)) in these arrays.  When parallel, in order to preserve the distributed array structure we use an index at the end for the differences.
+Just in case any last array dimension(s) are one, we have to
+force a padding of the sizes, then adjoin the extra
+dimension for the subsequent array of differences.
+\begin{matlab}
+%}
+szUxO=size(Ux); szUxO=[szUxO ones(1,6-length(szUxO)) ordCC];
+szUyO=size(Uy); szUyO=[szUyO ones(1,6-length(szUyO)) ordCC];
+%{
+\end{matlab}
+Use finite difference formulas for the interpolation, so
+store finite differences ($\mu\delta, \delta^2, \mu\delta^3,
+\delta^4, \ldots$) in these arrays.  When parallel, in order
+to preserve the distributed array structure we use an index
+at the end for the differences.
 \begin{matlab}
 %}
   if patches.parallel
-    dmux = zeros([size(Ux),ordCC],patches.codist); % 7D
-    dmuy = zeros([size(Uy),ordCC],patches.codist); % 7D
+    dmux = zeros(szUxO,patches.codist); % 7D
+    dmuy = zeros(szUyO,patches.codist); % 7D
   else
-    dmux = zeros([size(Ux),ordCC]); % 7D
-    dmuy = zeros([size(Uy),ordCC]); % 7D
+    dmux = zeros(szUxO); % 7D
+    dmuy = zeros(szUyO); % 7D
   end
 %{
 \end{matlab}
-First compute differences \(\mu\delta\) and \(\delta^2\) in both space directions.
+First compute differences $\mu\delta$ and $\delta^2$ in both
+space directions.
 \begin{matlab}
 %}
   if patches.stag % use only odd numbered neighbours
@@ -208,7 +226,7 @@ First compute differences \(\mu\delta\) and \(\delta^2\) in both space direction
   end% if odd/even
 %{
 \end{matlab}
-Recursively take \(\delta^2\) of these to form higher order
+Recursively take $\delta^2$ of these to form higher order
 centred differences in both space directions.
 \begin{matlab}
 %}
@@ -258,20 +276,18 @@ Assumes the domain is macro-periodic.
 else% spectral interpolation
 %{
 \end{matlab}
-We interpolate in terms of the patch index, \(j\)~say, not
-directly in space. As the macroscale fields are
-\(N\)-periodic in the patch index~\(j\), the macroscale
-Fourier transform writes the centre-patch values as
-\(U_j=\sum_{k}C_ke^{ik2\pi j/N}\). Then the edge-patch
-values \(U_{j\pm r} =\sum_{k}C_ke^{ik2\pi/N(j\pm r)}
-=\sum_{k}C'_ke^{ik2\pi j/N}\) where
-\(C'_k=C_ke^{ikr2\pi/N}\). For \(N\)~patches we resolve
-`wavenumbers' \(|k|<N/2\), so set row vector
-\(\verb|ks|=k2\pi/N\) for `wavenumbers' \(\mathcode`\,="213B
-k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)\) for
-odd~\(N\), and \(\mathcode`\,="213B k=(0,1, \ldots,
-k_{\max}, \pm(k_{\max}+1) -k_{\max}, \ldots, -1)\) for
-even~\(N\).
+We interpolate in terms of the patch index, $j$~say, not
+directly in space. As the macroscale fields are $N$-periodic
+in the patch index~$j$, the macroscale Fourier transform
+writes the centre-patch values as $U_j=\sum_{k}C_ke^{ik2\pi
+j/N}$. Then the edge-patch values $U_{j\pm r}
+=\sum_{k}C_ke^{ik2\pi/N(j\pm r)} =\sum_{k}C'_ke^{ik2\pi
+j/N}$ where $C'_k=C_ke^{ikr2\pi/N}$. For $N$~patches we
+resolve `wavenumbers' $|k|<N/2$, so set row vector
+$\verb|ks|=k2\pi/N$ for `wavenumbers' $\mathcode`\,="213B
+k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)$ for
+odd~$N$, and $\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
+\pm(k_{\max}+1) -k_{\max}, \ldots, -1)$ for even~$N$.
 
 Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches2|
@@ -296,10 +312,10 @@ the middle of the gaps and swapped.
 %{
 \end{matlab}
 Now set wavenumbers in the two directions into two vectors
-at the correct dimension.  In the case of even~\(N\) these
-compute the \(+\)-case for the highest wavenumber zig-zag
-mode, \(\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
-+(k_{\max}+1) -k_{\max}, \ldots, -1)\).
+at the correct dimension.  In the case of even~$N$ these
+compute the $+$-case for the highest wavenumber zig-zag
+mode, $\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
++(k_{\max}+1) -k_{\max}, \ldots, -1)$.
 \begin{matlab}
 %}
   kMax = floor((Nx-1)/2); 
