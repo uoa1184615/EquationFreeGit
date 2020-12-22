@@ -1,10 +1,10 @@
 % rotFilmSpmd simulates 2D fluid film flow on a rotating
 % substrate with 2D patches as a Proof of Principle example
-% of parallel computing with spmd.    AJR, Dec 2020
+% of parallel computing with spmd.   AJR, Dec 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{rotFilmSpmd}: simulation of a 1D shear
-dispersion via simulation on small patches across a channel}
+\section{\texttt{rotFilmSpmd}: simulation of a 2D shallow
+water flow on a rotating heterogeneous substrate}
 \label{sec:rotFilmSpmd}
 \localtableofcontents
 
@@ -13,13 +13,13 @@ As an example application, consider the flow of a shallow
 layer of fluid on a solid flat rotating substrate, such as
 in spin coating \citep[\S II.K, e.g.]{Wilson00, Oron97} or
 large-scale shallow water waves \cite[e.g.]{Dellar2005,
-Hereman2009}. Let \(\xv=(x,y)\) parametrise location on the
+Hereman2009}. Let $\xv=(x,y)$ parametrise location on the
 rotating substrate, and let the fluid layer have
 thickness~$h(\xv , t)$ and move with depth-averaged
 horizontal velocity $\vv (\xv , t)=(u,v)$. We take as given
 (with its simplified physics) that the (non-dimensional)
 governing set of \pde{}s is the nonlinear system
-\cite[eq.~(1)]{Bunder2018a}
+\cite[eq.~(1), e.g.]{Bunder2018a}
 \begin{subequations}\label{eqs:spinddt}%
 \begin{align}
 \D th&=-{\nabla}\cdot (h\vv ), \label{eq:spindhdt}\\
@@ -34,18 +34,17 @@ gravity, $\nu(\xv)$~is a heterogeneous `kinematic
 viscosity', and we neglect surface tension. 
 
 The aim is to simulate the macroscale dynamics which (for
-constant~\(b\)) is approximately that of the nonlinear
-diffusion \(\D th\approx \frac{gb}{b^2+f^2}\divv(h\grad h)\)
+constant~$b$) is approximately that of the nonlinear
+diffusion $\D th\approx \frac{gb}{b^2+f^2}\divv(h\grad h)$
 \cite[eq.~(2)]{Bunder2018a}. But there is no known algebraic
 closure for the macroscale in the case of
-heterogeneous~\(b(\xv)\) and~\(\nu(\xv)\), nonetheless the
-patch scheme automatically predicts a sensible macroscale
-for such heterogeneous dynamics
-(\cref{fig:rotFilmSpmdtFin}).
+heterogeneous~$b(\xv)$ and~$\nu(\xv)$, nonetheless the patch
+scheme automatically predicts a sensible macroscale for such
+heterogeneous dynamics (\cref{fig:rotFilmSpmdtFin}).
 
 For the microscale computation, \cref{sec:rotFilmMicro}
 discretises the \pde{}s~\eqref{eqs:spinddt} in space with
-\(x,y\)-spacing~\(\delta x,\delta y\).
+$x,y$-spacing~$\delta x,\delta y$.
 
 
 
@@ -57,8 +56,8 @@ because there is no expensive communication);
 \item \verb|theCase=2| illustrates that \verb|RK2mesoPatch|
 invokes \verb|spmd| computation if parallel has been
 configured.
-\item \verb|theCase=3| shows how users explicitly
-invoke \verb|spmd|-blocks around the time integration.
+\item \verb|theCase=3| shows how users explicitly invoke
+\verb|spmd|-blocks around the time integration.
 \item \verb|theCase=4| invokes projective integration for
 long-time simulation via short bursts of the
 micro-computation, bursts done within \verb|spmd|-blocks for
@@ -77,7 +76,7 @@ Set micro-scale bed drag (array~1) and diffusivity
 (arrays~2--3) to be a heterogeneous log-normal factor with
 specified period: modify the strength of the heterogeneity
 by the coefficient of~\verb|randn| from zero to perhaps one:
-coefficient~\(0.3\) appears a good moderate value. 
+coefficient~$0.3$ appears a good moderate value. 
 \begin{matlab}
 %}
 mPeriod = 5
@@ -99,7 +98,7 @@ if theCase<=2, global patches, end
 \end{matlab}
 In Case~4, double the size of the domain and use more
 separated patches accordingly, to maintain the spatial
-microscale grid spacing to be~\(0.055\).  Here use fourth
+microscale grid spacing to be~$0.055$.  Here use fourth
 order edge-based coupling between patches.  Choose the
 parallel option if not Case~1, which invokes
 \verb|spmd|-block internally, so that field variables become
@@ -135,7 +134,7 @@ end
 \subsection{Simulate heterogeneous advection-diffusion}
 Set initial conditions of a simulation as shown in
 \cref{fig:rotFilmSpmdt0}.  Here the initial condition is a
-(periodic) Gaussian in~\(h\) and zero velocity~\vv, with
+(periodic) quasi-Gaussian in~$h$ and zero velocity~\vv, with
 additive random perturbations.
 \begin{matlab}
 %}
@@ -145,11 +144,10 @@ if theCase==1
 \end{matlab}
 When not parallel processing, invoke the usual operations.
 Here add a random noise to the velocity field, but
-keep~\(h(x,y,0)\) smooth as shown by
-\cref{fig:rotFilmSpmdt0}. The \verb|shiftdim(...,-1)| moves
-the given row-vector of coefficients into the third
-dimension to become coefficients of the fields~\((h,u,v)\),
-respectively.
+keep~$h(x,y,0)$ smooth as shown by \cref{fig:rotFilmSpmdt0}.
+The \verb|shiftdim(...,-1)| moves the given row-vector of
+coefficients into the third dimension to become coefficients
+of the fields~$(h,u,v)$, respectively.
 \begin{matlab}
 %}
     huv0 = shiftdim([0.5 0 0],-1) ...
@@ -180,13 +178,13 @@ end%if theCase
 \end{matlab}
 \begin{figure}
 \centering \caption{\label{fig:rotFilmSpmdt0}initial
-field~\(h(x,y,0)\) of the patch scheme applied to the
+field~$h(x,y,0)$ of the patch scheme applied to the
 heterogeneous, shallow water, rotating substrate,
 \pde~\eqref{eqs:spinddt}. The micro-scale sub-patch colour
-displays the initial \(y\)-direction velocity
-field~\(v(x,y,0)\). \cref{fig:rotFilmSpmdtFin} plots the
-roughly smooth field values at time \(t=6\).  In this
-example the patches are relatively large, ratio~\(0.4\), for
+displays the initial $y$-direction velocity
+field~$v(x,y,0)$. \cref{fig:rotFilmSpmdtFin} plots the
+roughly smooth field values at time $t=6$.  In this
+example the patches are relatively large, ratio~$0.4$, for
 visibility.}
 \includegraphics[scale=0.8]{rotFilmSpmdt0}
 \end{figure}
@@ -195,9 +193,9 @@ Integrate in time, either via the automatic \verb|ode23| or
 via \verb|RK2mesoPatch| which reduces communication between
 patches. By default, \verb|RK2mesoPatch| does ten
 micro-steps for each specified meso-step in~\verb|ts|.  For
-stability: with noise up to~\(0.3\), need micro-steps less
-than~\(0.0003\); with noise~\(1\), need micro-steps less
-than~\(0.0001\).
+stability: with noise up to~$0.3$, need micro-steps less
+than~$0.0003$; with noise~$1$, need micro-steps less
+than~$0.0001$.
 \begin{matlab}
 %}
 warning('Integrating system in time, wait a minute')
@@ -257,7 +255,7 @@ Currently the PI is done serially, with parallel
 \verb|spmd|-blocks only invoked inside function
 \verb|aBurst()| (\cref{secRF2BfPI}) to compute each burst of
 the micro-scale simulation. The macro-scale time-step needs
-to be less than about~\(0.1\) (which here is not much
+to be less than about~$0.1$ (which here is not much
 projection). The function \verb|microBurst()| interfaces to
 \verb|aBurst()| (\cref{secRF2BfPI}) in order to provide
 shaped initial states, and to provide the patch information.
@@ -295,9 +293,8 @@ if 0, global OurCf2eps, OurCf2eps=true, end
 figure(1), clf, colormap(0.8*jet)
 %{
 \end{matlab}
-First get the \(x\)-coordinates and omit the patch-edge
-values from the plot (because they are not here
-interpolated).
+First get the $x$-coordinates and omit the patch-edge values
+from the plot (because they are not here interpolated).
 \begin{matlab}
 %}
 if theCase==1, x = patches.x; 
@@ -321,7 +318,7 @@ for l = 1:ceil(nTimes/200):nTimes
 %{
 \end{matlab}
 At each time, squeeze sub-patch data fields into three 4D
-arrays, permute to get all the \(x/y\)-variations in the
+arrays, permute to get all the $x/y$-variations in the
 first/last two dimensions, and and then reshape to~2D.   
 \begin{matlab}
 %}
@@ -335,7 +332,7 @@ first/last two dimensions, and and then reshape to~2D.
 \end{matlab}
 Draw surface of each patch, to show both micro-scale and
 macro-scale variation in space. Colour the surface according
-to the velocity~\(v\) in the \(y\)-direction.
+to the velocity~$v$ in the $y$-direction.
 \begin{matlab}
 %}
   if l==1
@@ -358,11 +355,11 @@ to the velocity~\(v\) in the \(y\)-direction.
 \end{matlab}
 \begin{figure}
 \centering \caption{\label{fig:rotFilmSpmdtFin}final
-field~\(h(x,y,6)\), coloured by~\(v(x,y,6)\), of the patch
+field~$h(x,y,6)$, coloured by~$v(x,y,6)$, of the patch
 scheme applied to the heterogeneous, shallow water, rotating
 substrate, \pde~\eqref{eqs:spinddt} with heterogeneous
-factors log-normal, here distributed \(\exp[\mathcal
-N(0,1)]\).  }
+factors log-normal, here distributed $\exp[\mathcal
+N(0,1)]$.  }
 \includegraphics[scale=0.8]{rotFilmSpmdtFin}
 \end{figure}
 
@@ -381,11 +378,11 @@ ifOurCf2eps([mfilename 'tFin'])
 \subsection{\texttt{microBurst} function for Projective Integration}
 \label{secRF2BfPI}
 Projective Integration stability appears to require bursts
-longer than~\(0.01\).  Each burst is done in parallel
+longer than~$0.01$.  Each burst is done in parallel
 processing.  Here use \verb|RK2mesoPatch| to take take
 meso-steps, each with default ten micro-steps so the
-micro-scale step is~\(0.0003\). With macro-step~\(0.1\),
-these parameters usually give stable projective integration.
+micro-scale step is~$0.0003$. With macro-step~$0.1$, these
+parameters usually give stable projective integration.
 \begin{matlab}
 %}
 function [tbs,xbs] = aBurst(tb0,xb0,patches) 

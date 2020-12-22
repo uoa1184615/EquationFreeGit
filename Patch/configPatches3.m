@@ -37,9 +37,9 @@ micro-grid within all the 3D~patches.
 
 \item \verb|Xlim| array/vector giving the macro-space domain
 of the computation: patches are distributed equi-spaced over
-the interior of the rectangular cuboid \([\verb|Xlim(1)|,
+the interior of the rectangular cuboid $[\verb|Xlim(1)|,
 \verb|Xlim(2)|] \times [\verb|Xlim(3)|, \verb|Xlim(4)|
-\times [\verb|Xlim(5)|, \verb|Xlim(6)|]\): if \verb|Xlim| is
+\times [\verb|Xlim(5)|, \verb|Xlim(6)|]$. If \verb|Xlim| is
 of length two, then the domain is the cubic domain of the
 same interval in all three directions.
 
@@ -48,24 +48,23 @@ macroscale boundary conditions.  Currently, \verb|BCs| is
 ignored and the system is assumed macro-periodic in the
 specified rectangular domain.
 
-\item \verb|nPatch| sets the number of equi-spaced spaced
+\item \verb|nPatch| sets the number of equi-spaced spatial
 patches: if scalar, then use the same number of patches in
 all three directions, otherwise \verb|nPatch(1:3)| gives the
-number~(\(\geq1\)) of patches in each direction.
+number~($\geq1$) of patches in each direction.
 
 \item \verb|ordCC| is the `order' of interpolation for
 inter-patch coupling across empty space of the macroscale
 patch values to the edge-values of the patches: currently
-must be~\(0,2,4,\ldots\); where \(0\)~gives spectral
+must be~$0,2,4,\ldots$; where $0$~gives spectral
 interpolation.
-
 
 \item \verb|ratio| (real) is the ratio of (depending upon
 \verb|EdgyInt|) either the half-width or full-width of a
 patch to the spacing of the patch mid-points.  So either
-\(\verb|ratio|=\tfrac12\) means the patches abut and
-\(\verb|ratio|=1\) is overlapping patches as in holistic
-discretisation, or \(\verb|ratio|=1\) means the patches
+$\verb|ratio|=\tfrac12$ means the patches abut and
+$\verb|ratio|=1$ is overlapping patches as in holistic
+discretisation, or $\verb|ratio|=1$ means the patches
 abut.  Small~\verb|ratio| should greatly reduce
 computational time.  If scalar, then use the same ratio in
 all three directions, otherwise \verb|ratio(1:3)| gives the
@@ -98,28 +97,28 @@ number of realisations.
 \item \verb|'hetCoeffs'|, \emph{optional}, default empty.
 Supply a 3/4D array of microscale heterogeneous coefficients
 to be used by the given microscale \verb|fun| in each patch.
-Say the given array~\verb|cs| is of size \(m_x\times
-m_y\times m_z\times n_c\), where \(n_c\)~is the number of
+Say the given array~\verb|cs| is of size $m_x\times
+m_y\times m_z\times n_c$, where $n_c$~is the number of
 different arrays of coefficients.  For example, in
-heterogeneous diffusion, \(n_c=3\) for the diffusivities in
-the \emph{three} different spatial directions.  The
-coefficients are to be the same for each and every patch.
-However, macroscale variations are catered for by the
-\(n_c\)~coefficients being \(n_c\)~parameters in some
-macroscale formula.
+heterogeneous diffusion, $n_c=3$ for the diffusivities in
+the \emph{three} different spatial directions (or $n_c=6$
+for the diffusivity tensor).  The coefficients are to be the
+same for each and every patch. However, macroscale
+variations are catered for by the $n_c$~coefficients being
+$n_c$~parameters in some macroscale formula.
 \begin{itemize}
 
-\item If \(\verb|nEnsem|=1\), then the array of coefficients
+\item If $\verb|nEnsem|=1$, then the array of coefficients
 is just tiled across the patch size to fill up each patch,
-starting from the \((1,1,1)\)-point in each patch.
+starting from the $(1,1,1)$-point in each patch.
 
-\item If \(\verb|nEnsem|>1\) (value immaterial), then reset
-\(\verb|nEnsem|:=m_x\cdot m_y\cdot m_z\) and construct an
-ensemble of all \(m_x\cdot m_y\cdot m_z\) phase-shifts of
+\item If $\verb|nEnsem|>1$ (value immaterial), then reset
+$\verb|nEnsem|:=m_x\cdot m_y\cdot m_z$ and construct an
+ensemble of all $m_x\cdot m_y\cdot m_z$ phase-shifts of
 the coefficients.  In this scenario, the inter-patch
 coupling couples different members in the ensemble.  When
 \verb|EdgyInt| is true, and when the coefficients are
-diffusivities\slash elasticities in \(x,y,z\)-directions,
+diffusivities\slash elasticities in $x,y,z$-directions,
 respectively, then this coupling cunningly preserves
 symmetry.
 
@@ -135,9 +134,9 @@ If true, and it requires that you have \Matlab's Parallel
 Computing Toolbox, then it will distribute the patches over
 multiple \textsc{cpu}s\slash cores. In \Matlab, only one
 array dimension can be split in the distribution, so it
-chooses the one space dimension~\(x,y,z\) corresponding to
+chooses the one space dimension~$x,y,z$ corresponding to
 the highest~\verb|\nPatch| (if a tie, then chooses the
-rightmost of~\(x,y,z\)).  A user may correspondingly
+rightmost of~$x,y,z$).  A user may correspondingly
 distribute arrays with property \verb|patches.codist|, or
 simply use formulas invoking the preset distributed arrays
 \verb|patches.x|, \verb|patches.y|, and \verb|patches.z|. If
@@ -175,27 +174,27 @@ the usual case of all neighbour coupling---not yet
 implemented.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| are the
-\(\verb|ordCC|\times 3\)-array of weights for the
+$\verb|ordCC|\times 3$-array of weights for the
 inter-patch interpolation onto the right\slash top\slash
 front and left\slash bottom\slash back faces (respectively)
 with patch:macroscale ratio as specified.
 
-\item \verb|.x| (8D) is \(\verb|nSubP(1)| \times1 \times1
-\times1 \times1 \times \verb|nPatch(1)| \times1 \times1\)
-array of the regular spatial locations~\(x_{iI}\) of the
+\item \verb|.x| (8D) is $\verb|nSubP(1)| \times1 \times1
+\times1 \times1 \times \verb|nPatch(1)| \times1 \times1$
+array of the regular spatial locations~$x_{iI}$ of the
 microscale grid points in every patch.  
 
-\item \verb|.y| (8D) is \(1 \times \verb|nSubP(2)| \times1
-\times1 \times1 \times1 \times \verb|nPatch(2)| \times1\)
-array of the regular spatial locations~\(y_{jJ}\) of the
+\item \verb|.y| (8D) is $1 \times \verb|nSubP(2)| \times1
+\times1 \times1 \times1 \times \verb|nPatch(2)| \times1$
+array of the regular spatial locations~$y_{jJ}$ of the
 microscale grid points in every patch.  
 
-\item \verb|.z| (8D) is \(1 \times1 \times \verb|nSubP(3)|
-\times1 \times1 \times1 \times1 \times \verb|nPatch(3)|\)
-array of the regular spatial locations~\(z_{kK}\) of the
+\item \verb|.z| (8D) is $1 \times1 \times \verb|nSubP(3)|
+\times1 \times1 \times1 \times1 \times \verb|nPatch(3)|$
+array of the regular spatial locations~$z_{kK}$ of the
 microscale grid points in every patch.  
 
-\item \verb|.ratio| \(1\times 3\), are the size ratios of
+\item \verb|.ratio| $1\times 3$, are the size ratios of
 every patch.
 
 \item \verb|.nEdge| is, for each patch, the number of edge
@@ -210,12 +209,12 @@ length~\verb|nEnsem|.
 \item \verb|.cs| either
 \begin{itemize}
 \item \verb|[]| 0D, or 
-\item if \(\verb|nEnsem|=1\), \((\verb|nSubP(1)|-1)\times
-(\verb|nSubP(2)|-1)\times (\verb|nSubP(3)|-1)\times n_c\) 4D
+\item if $\verb|nEnsem|=1$, $(\verb|nSubP(1)|-1)\times
+(\verb|nSubP(2)|-1)\times (\verb|nSubP(3)|-1)\times n_c$ 4D
 array of microscale heterogeneous coefficients, or
-\item if \(\verb|nEnsem|>1\), \((\verb|nSubP(1)|-1)\times
+\item if $\verb|nEnsem|>1$, $(\verb|nSubP(1)|-1)\times
 (\verb|nSubP(2)|-1)\times (\verb|nSubP(3)|-1)\times
-n_c\times m_xm_ym_z\) 5D array of \(m_xm_ym_z\)~ensemble of
+n_c\times m_xm_ym_z$ 5D array of $m_xm_ym_z$~ensemble of
 phase-shifts of the microscale heterogeneous coefficients.
 \end{itemize}
 
@@ -265,10 +264,10 @@ cHetr = cHetr*mean(1./cHetr(:))
 
 Establish global patch data struct to interface with a
 function coding a nonlinear `diffusion' \pde: to be solved
-on \([-\pi,\pi]^3\)-periodic domain, with \(5^3\)~patches,
-spectral interpolation~(\(0\)) couples the patches, each
-patch of half-size ratio~\(0.4\) (relatively large for
-visualisation), and with \(4^3\)~points forming each
+on $[-\pi,\pi]^3$-periodic domain, with $5^3$~patches,
+spectral interpolation~($0$) couples the patches, each
+patch of half-size ratio~$0.4$ (relatively large for
+visualisation), and with $4^3$~points forming each
 patch. 
 \begin{matlab}
 %}
@@ -290,13 +289,13 @@ uv0 = cat(4,u0,v0);
 \end{matlab}
 \begin{figure}
 \centering \caption{\label{fig:configPatches3ic}initial
-field~\(u(x,y,z,t)\) at time \(t=0\) of the patch scheme
+field~$u(x,y,z,t)$ at time $t=0$ of the patch scheme
 applied to a heterogeneous wave~\pde:
 \cref{fig:configPatches3fin} plots the computed field at
-time \(t=6\).}
+time $t=6$.}
 \includegraphics[scale=0.9]{configPatches3ic}
 \end{figure}
-Integrate in time to \(t=6\) using standard functions. In
+Integrate in time to $t=6$ using standard functions. In
 Matlab \verb|ode15s| would be natural as the patch scheme is
 naturally stiff, but \verb|ode23| is much quicker
 \cite[Fig.~4]{Maclean2020a}.
@@ -318,7 +317,7 @@ obtain patch-face values (but not edge nor corner values,
 and even if not drawn) in order to most easily reconstruct
 the array data structure.
 
-Replicate \(x\), \(y\), and~\(z\) arrays to get individual
+Replicate $x$, $y$, and~$z$ arrays to get individual
 spatial coordinates of every data point.  Then, optionally,
 set faces to~\verb|nan| so the plot just shows
 patch-interior data. 
@@ -336,7 +335,7 @@ j=find(~isnan(xs));
 %{
 \end{matlab}
 In the scatter plot, these functions \verb|pix()| and
-\verb|col()| map the \(u\)-data values to the size of the
+\verb|col()| map the $u$-data values to the size of the
 dots and to the colour of the dots, respectively.
 \begin{matlab}
 %}
@@ -381,8 +380,8 @@ ifOurCf2eps([mfilename 'fin'])
 \end{matlab}
 \begin{figure}
 \centering
-\caption{\label{fig:configPatches3fin}field~\(u(x,y,z,t)\)
-at time \(t=6\) of the patch scheme applied to the
+\caption{\label{fig:configPatches3fin}field~$u(x,y,z,t)$
+at time $t=6$ of the patch scheme applied to the
 heterogeneous wave~\pde\ with initial condition in
 \cref{fig:configPatches3ic}.}
 \includegraphics[scale=0.9]{configPatches3fin}
@@ -479,7 +478,7 @@ patches.fun = fun;
 
 Second, store the order of interpolation that is to provide
 the values for the inter-patch coupling conditions. Spectral
-coupling is \verb|ordCC| of~\(0\) or (not yet??)~\(-1\).
+coupling is \verb|ordCC| of~$0$ or (not yet??)~$-1$.
 \begin{matlab}
 %}
 assert((ordCC>=-1) & (floor(ordCC)==ordCC), ...
@@ -535,9 +534,9 @@ Z = Z(1:nPatch(3))+diff(Z)/2;
 %{
 \end{matlab}
 Construct the microscale in each patch, assuming Dirichlet
-patch edges, and half-patch widths of~\(\verb|ratio(1)|
-\cdot \verb|DX|\), \(\verb|ratio(2)| \cdot \verb|DY|\)
-and~\(\verb|ratio(3)| \cdot \verb|DZ|\), unless
+patch edges, and half-patch widths of~$\verb|ratio(1)|
+\cdot \verb|DX|$, $\verb|ratio(2)| \cdot \verb|DY|$
+and~$\verb|ratio(3)| \cdot \verb|DZ|$, unless
 \verb|patches.EdgyInt| is true in which case every patch is
 of widths \verb|ratio*DX+dx|, \verb|ratio*DY+dy| and
 \verb|ratio*DZ+dz|.
@@ -602,11 +601,11 @@ patches.ba = 1:nE;  patches.fr = 1:nE;
 \end{matlab}
 
 However, if heterogeneous coefficients are supplied via
-\verb|hetCoeffs|, then do some non-trivial replications. 
+\verb|hetCoeffs|, then do some non-trivial replications.
 First, get microscale periods, patch size, and replicate
-many times in order to subsequently sub-sample: 
-\verb|nSubP| times should be enough.
-If \verb|cs| is more then 4D, then the higher-dimensions are reshaped into the 4th dimension.
+many times in order to subsequently sub-sample: \verb|nSubP|
+times should be enough. If \verb|cs| is more then 4D, then
+the higher-dimensions are reshaped into the 4th dimension.
 \begin{matlab}
 %}
 if ~isempty(cs)
@@ -624,7 +623,7 @@ sub-sample to patch size, and store coefficients in
 %{
 \end{matlab}
 But for $\verb|nEnsem|>1$ an ensemble of
-\(m_xm_ym_z\)~phase-shifts of the coefficients is
+$m_xm_ym_z$~phase-shifts of the coefficients is
 constructed from the over-supply.  Here code phase-shifts
 over the periods---the phase shifts are like
 Hankel-matrices.

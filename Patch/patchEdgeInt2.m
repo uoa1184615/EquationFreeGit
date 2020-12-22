@@ -22,7 +22,7 @@ graphics.
  
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
-\verb|spmd|) or otherwise via the global struct
+\verb|spmd|), or otherwise via the global struct
 \verb|patches|.
 \begin{matlab}
 %}
@@ -41,8 +41,8 @@ $\verb|prod(nSubP)|  \cdot \verb|nVars| \cdot \verb|nEnsem|
 \cdot \verb|prod(nPatch)|$ where there are $\verb|nVars|
 \cdot \verb|nEnsem|$ field values at each of the points in
 the $\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nPatch1|
-\cdot \verb|nPatch2|$ grid on the $\verb|nPatch1| \cdot
-\verb|nPatch2|$ array of patches.
+\cdot \verb|nPatch2|$ multiscale spatial grid on the
+$\verb|nPatch1| \cdot \verb|nPatch2|$ array of patches.
 
 \item \verb|patches| a struct set by \verb|configPatches2()|
 which includes the following information.
@@ -64,9 +64,9 @@ both macro- and microscales.
 only $\{0,2,4,\ldots\}$
 
 \item \verb|.stag| in $\{0,1\}$ is one for staggered grid
-(alternating) interpolation.
+(alternating) interpolation.  Currently must be zero.
 
-\item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
+\item \verb|.Cwtsr| and \verb|.Cwtsl| are the coupling
 coefficients for finite width interpolation in both the
 $x,y$-directions.
 
@@ -174,10 +174,10 @@ properties in general).  Have not yet implemented core
 averages??
 \begin{matlab}
 %}
-  if patches.EdgyInt % next-to-edge values    
+  if patches.EdgyInt % interpolate next-to-edge values    
     Ux = u([2 nx-1],2:(ny-1),:,:,I,J);
     Uy = u(2:(nx-1),[2 ny-1],:,:,I,J);
-  else 
+  else % interpolate centre-cross values
     Ux = u(i0,2:(ny-1),:,:,I,J);
     Uy = u(2:(nx-1),j0,:,:,I,J);
   end;
@@ -214,6 +214,12 @@ space directions.
 %}
   if patches.stag % use only odd numbered neighbours
     error('polynomial interpolation not yet for staggered patch coupling')
+    dmux(:,:,:,:,I,:,1) = (Ux(:,:,:,:,Ip,:)+Ux(:,:,:,:,Im,:))/2; % \mu
+    dmux(:,:,:,:,I,:,2) = (Ux(:,:,:,:,Ip,:)-Ux(:,:,:,:,Im,:)); % \delta
+    Ip = Ip(Ip); Im = Im(Im); % increase shifts to \pm2
+    dmuy(:,:,:,:,:,J,1) = (Ux(:,:,:,:,:,Jp)+Ux(:,:,:,:,:,Jm))/2; % \mu
+    dmuy(:,:,:,:,:,J,2) = (Ux(:,:,:,:,:,Jp)-Ux(:,:,:,:,:,Jm)); % \delta
+    Jp = Jp(Jp); Jm = Jm(Jm); % increase shifts to \pm2
   else %disp('starting standard interpolation')   
     dmux(:,:,:,:,I,:,1) = (Ux(:,:,:,:,Ip,:) ...
                           -Ux(:,:,:,:,Im,:))/2; %\mu\delta 
@@ -223,10 +229,10 @@ space directions.
                           -Uy(:,:,:,:,:,Jm))/2; %\mu\delta 
     dmuy(:,:,:,:,:,J,2) =  Uy(:,:,:,:,:,Jp) ...
        -2*Uy(:,:,:,:,:,J) +Uy(:,:,:,:,:,Jm);    % \delta^2
-  end% if odd/even
+  end% if stag
 %{
 \end{matlab}
-Recursively take $\delta^2$ of these to form higher order
+Recursively take $\delta^2$ of these to form successively higher order
 centred differences in both space directions.
 \begin{matlab}
 %}

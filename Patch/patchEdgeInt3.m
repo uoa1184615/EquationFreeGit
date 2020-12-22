@@ -20,7 +20,7 @@ graphics.
 
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
-\verb|spmd|) or otherwise via the global
+\verb|spmd|), or otherwise via the global
 struct \verb|patches|.
 \begin{matlab}
 %}
@@ -39,8 +39,9 @@ $\verb|prod(nSubP)|  \cdot \verb|nVars| \cdot \verb|nEnsem|
 \cdot \verb|nEnsem|$ field values at each of the points in
 the $\verb|nSubP1| \cdot \verb|nSubP2| \cdot \verb|nSubP3|
 \cdot \verb|nPatch1| \cdot \verb|nPatch2| \cdot
-\verb|nPatch3|$ grid on the $\verb|nPatch1| \cdot
-\verb|nPatch2| \cdot \verb|nPatch3|$ array of patches.
+\verb|nPatch3|$ multiscale spatial grid on the
+$\verb|nPatch1| \cdot \verb|nPatch2| \cdot \verb|nPatch3|$
+array of patches.
 
 \item \verb|patches| a struct set by \verb|configPatches3()|
 which includes the following information.
@@ -68,9 +69,9 @@ equi-spaced lattice on both macro- and micro-scales.
 only $\{0,2,4,\ldots\}$
 
 \item \verb|.stag| in $\{0,1\}$ is one for staggered grid
-(alternating) interpolation.
+(alternating) interpolation.  Currently must be zero.
 
-\item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
+\item \verb|.Cwtsr| and \verb|.Cwtsl| are the coupling
 coefficients for finite width interpolation in each of the
 $x,y,z$-directions.
 
@@ -110,7 +111,6 @@ real and some are complex, or if variables are of quite
 different sizes. 
 \begin{matlab}
 %}
-%warning('patchedgeint3---one')
   if max(abs(imag(u(:))))<1e-9*max(abs(u(:)))
        uclean=@(u) real(u);
   else uclean=@(u) u; 
@@ -122,7 +122,6 @@ Determine the sizes of things. Any error arising in the
 reshape indicates~\verb|u| has the wrong size.
 \begin{matlab}
 %}
-%warning('patchedgeint3---two')
 [~,~,nz,~,~,~,~,Nz] = size(patches.z);
 [~,ny,~,~,~,~,Ny,~] = size(patches.y);
 [nx,~,~,~,~,Nx,~,~] = size(patches.x);
@@ -137,7 +136,6 @@ u = reshape(u,[nx ny nz nVars nEnsem Nx Ny Nz]);
 Get the size ratios of the patches in each direction.
 \begin{matlab}
 %}
-%warning('patchedgeint3---three')
 rx = patches.ratio(1);
 ry = patches.ratio(2);
 rz = patches.ratio(3);
@@ -175,7 +173,6 @@ macro-interpolation, of all fields. Assumes the domain is
 macro-periodic.
 \begin{matlab}
 %}
-%warning('patchedgeint3---four')
 ordCC=patches.ordCC;
 if ordCC>0 % then finite-width polynomial interpolation
 %{
@@ -187,11 +184,11 @@ have worse properties in general).  Have not yet implemented
 core averages??
 \begin{matlab}
 %}
-  if patches.EdgyInt % next-to-face values    
+  if patches.EdgyInt % interpolate next-to-face values    
     Ux = u([2 nx-1],2:(ny-1),2:(nz-1),:,:,I,J,K);
     Uy = u(2:(nx-1),[2 ny-1],2:(nz-1),:,:,I,J,K);
     Uz = u(2:(nx-1),2:(ny-1),[2 nz-1],:,:,I,J,K);
-  else 
+  else % interpolate centre-cross values
     Ux = u(i0,2:(ny-1),2:(nz-1),:,:,I,J,K);
     Uy = u(2:(nx-1),j0,2:(nz-1),:,:,I,J,K);
     Uz = u(2:(nx-1),2:(ny-1),k0,:,:,I,J,K);
@@ -215,7 +212,6 @@ to preserve the distributed array structure we use an index
 at the end for the differences.
 \begin{matlab}
 %}
-%warning('patchedgeint3---five')
   if patches.parallel
     dmux = zeros(szUxO,patches.codist); % 9D
     dmuy = zeros(szUyO,patches.codist); % 9D
@@ -231,10 +227,18 @@ First compute differences $\mu\delta$ and $\delta^2$ in
 both space directions.
 \begin{matlab}
 %}
-%warning('patchedgeint3---six')
   if patches.stag % use only odd numbered neighbours
     error('polynomial interpolation not yet for staggered patch coupling')
-  else %warning('starting standard interpolation')   
+    dmux(:,:,:,:,:,I,:,:,1) = (Ux(:,:,:,:,:,Ip,:,:) +Ux(:,:,:,:,:,Im,:,:))/2; % \mu
+    dmux(:,:,:,:,:,I,:,:,2) = (Ux(:,:,:,:,:,Ip,:,:) -Ux(:,:,:,:,:,Im,:,:)); % \delta
+    Ip = Ip(Ip); Im = Im(Im); % increase shifts to \pm2
+    dmuy(:,:,:,:,:,:,J,:,1) = (Ux(:,:,:,:,:,:,Jp,:)+Ux(:,:,:,:,:,:,Jm,:))/2; % \mu
+    dmuy(:,:,:,:,:,:,J,:,2) = (Ux(:,:,:,:,:,:,Jp,:)-Ux(:,:,:,:,:,:,Jm,:)); % \delta
+    Jp = Jp(Jp); Jm = Jm(Jm); % increase shifts to \pm2
+    dmuz(:,:,:,:,:,:,:,K,1) = (Ux(:,:,:,:,:,:,:,Kp)+Ux(:,:,:,:,:,:,:,Km))/2; % \mu
+    dmuz(:,:,:,:,:,:,:,K,2) = (Ux(:,:,:,:,:,:,:,Kp)-Ux(:,:,:,:,:,:,:,Km)); % \delta
+    Kp = Kp(Kp); Km = Km(Km); % increase shifts to \pm2
+  else    
     dmux(:,:,:,:,:,I,:,:,1) = (Ux(:,:,:,:,:,Ip,:,:) ...
                               -Ux(:,:,:,:,:,Im,:,:))/2; %\mu\delta 
     dmux(:,:,:,:,:,I,:,:,2) = (Ux(:,:,:,:,:,Ip,:,:) ...
@@ -247,14 +251,13 @@ both space directions.
                               -Uz(:,:,:,:,:,:,:,Km))/2; %\mu\delta 
     dmuz(:,:,:,:,:,:,:,K,2) = (Uz(:,:,:,:,:,:,:,Kp) ...
        -2*Uz(:,:,:,:,:,:,:,K) +Uz(:,:,:,:,:,:,:,Km));   %\delta^2
-  end% if odd/even
+  end% if stag
 %{
 \end{matlab}
-Recursively take $\delta^2$ of these to form higher order
+Recursively take $\delta^2$ of these to form successively higher order
 centred differences in all three space directions.
 \begin{matlab}
 %}
-%warning('patchedgeint3---seven')
    for k = 3:ordCC    
     dmux(:,:,:,:,:,I,:,:,k) =     dmux(:,:,:,:,:,Ip,:,:,k-2) ...
     -2*dmux(:,:,:,:,:,I,:,:,k-2) +dmux(:,:,:,:,:,Im,:,:,k-2);    
@@ -278,7 +281,6 @@ each other, as specified by \verb|patches.le|,
 \verb|patches.fr| and \verb|patches.ba|.
 \begin{matlab}
 %}
-%warning('patchedgeint3---eight')
 k=1+patches.EdgyInt; % use centre or two faces
 u(nx,2:(ny-1),2:(nz-1),:,patches.ri,I,:,:) ...
   = Ux(1,:,:,:,:,:,:,:)*(1-patches.stag) ...
@@ -311,19 +313,17 @@ else% spectral interpolation
 %{
 \end{matlab}
 We interpolate in terms of the patch index, $j$~say, not
-directly in space. As the macroscale fields are
-$N$-periodic in the patch index~$j$, the macroscale
-Fourier transform writes the centre-patch values as
-$U_j=\sum_{k}C_ke^{ik2\pi j/N}$. Then the face-patch
-values $U_{j\pm r} =\sum_{k}C_ke^{ik2\pi/N(j\pm r)}
-=\sum_{k}C'_ke^{ik2\pi j/N}$ where
-$C'_k=C_ke^{ikr2\pi/N}$. For $N$~patches we resolve
-`wavenumbers' $|k|<N/2$, so set row vector
-$\verb|ks|=k2\pi/N$ for `wavenumbers' $\mathcode`\,="213B
+directly in space. As the macroscale fields are $N$-periodic
+in the patch index~$j$, the macroscale Fourier transform
+writes the centre-patch values as $U_j=\sum_{k}C_ke^{ik2\pi
+j/N}$. Then the face-patch values $U_{j\pm r}
+=\sum_{k}C_ke^{ik2\pi/N(j\pm r)} =\sum_{k}C'_ke^{ik2\pi
+j/N}$ where $C'_k =C_ke^{ikr2\pi/N}$. For $N$~patches we
+resolve `wavenumbers' $|k|<N/2$, so set row vector
+$\verb|ks| =k2\pi/N$ for `wavenumbers' $\mathcode`\,="213B
 k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)$ for
-odd~$N$, and $\mathcode`\,="213B k=(0,1, \ldots,
-k_{\max}, \pm(k_{\max}+1) -k_{\max}, \ldots, -1)$ for
-even~$N$.
+odd~$N$, and $\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
+\pm(k_{\max}+1) -k_{\max}, \ldots, -1)$ for even~$N$.
 
 Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches3|
@@ -400,25 +400,6 @@ else
 end     
 %{
 \end{matlab}
-%Fill in the cross of Fourier-shifted mid-values
-%\begin{matlab}
-%%}
-%if ~patches.EdgyInt 
-%  % yz-fraction of kry/z along left/right faces
-%  ks = (iy-j0)*2/(ny-1).*kry+(iz-k0)*2/(nz-1).*krz; 
-%  Cle = Cle.*exp(1i*ks); 
-%  Cri = Cle;
-%  % xz-fraction of krx/z along bottom/top faces
-%  ks = (ix-i0)*2/(nx-1).*krx+(iz-k0)*2/(nz-1).*krz;
-%  Cbo = Cbo.*exp(1i*ks); 
-%  Cto = Cbo;
-%  % xy-fraction of krx/y along back/front faces
-%  ks = (ix-i0)*2/(nx-1).*krx+(iy-j0)*2/(ny-1).*kry;
-%  Cba = Cba.*exp(1i*ks); 
-%  Cfr = Cba;
-%end
-%%{
-%\end{matlab}
 Now invert the triple Fourier transforms to complete
 interpolation.   (Should stagShift be multiplied by
 rx/ry/rz??) Enforce reality when appropriate. 
@@ -442,7 +423,6 @@ end% if spectral
 Nan the values in corners and edges, of every 3D patch.
 \begin{matlab}
 %}
-%warning('patchedgeint3---nine')
 u(:,[1 ny],[1 nz],:,:,:,:,:)=nan; 
 u([1 nx],:,[1 nz],:,:,:,:,:)=nan; 
 u([1 nx],[1 ny],:,:,:,:,:,:)=nan; 

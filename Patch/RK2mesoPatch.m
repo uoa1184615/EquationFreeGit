@@ -86,18 +86,14 @@ recursively inside \verb|spmd|. Q:~is \verb|numlabs| defined
 without the parallel computing toolbox??
 \begin{matlab}
 %}
-%warning('checking spmd status in RK2mesoPatch')
-%disp(['class-patches = ',class(patches)])
 if isequal(class(patches),'Composite') && numlabs==1
-    spmd, %warning('recursing into RK2mesoPatch')
+    spmd, 
       [xs,errs] = RK2mesoPatch(ts,x0,nMicro,patches); 
-      %warning('finished recursion into RK2mesoPatch')
     end% spmd
     assert(isequal(class(xs)  ,'Composite'),' xs  not composite')
     assert(isequal(class(errs),'Composite'),'errs not composite')
     return
 end
-%warning('bypassed start spmd in RK2mesoPatch')
 %{
 \end{matlab}
 
@@ -128,7 +124,6 @@ need to do some inter-cpu communication in order to estimate
 errors.}
 \begin{matlab}
 %}
-%warning('RK2mesoPatch: x0 = patchEdgeInt3(x0)')
 switch nD
   case 1, x0 = patchEdgeInt1(x0,patches);
           xs(1,:,:,:,:) = gather(x0);
@@ -137,9 +132,7 @@ switch nD
   case 3, x0 = patchEdgeInt3(x0,patches);
           xs(1,:,:,:,:,:,:,:,:) = gather(x0);
   end;%switch nD
-%assert(iscodistributed(x0),'x0 not codist one')
 errs(1) = 0;
-%warning('RK2mesoPatch: patches.fun one')
 f1 = patches.fun(ts(1),x0,patches);
 %{
 \end{matlab}

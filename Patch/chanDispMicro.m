@@ -1,17 +1,18 @@
 % chanDispMicro() computes the time derivatives of
-% heterogeneous advection-diffusion in 2D along a 1D channel
-% on 1D array patches. AJR, Nov 2020 
+% heterogeneous advection-diffusion in 2D along a long thin
+% channel on 1D array patches. AJR, Nov 2020 
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{chanDispMicro()}: heterogeneous 2D
-advection-diffusion along a 1D channel}
+advection-diffusion in a long thin channel}
 \label{sec:chanDispMicro}
 
 This function codes the lattice heterogeneous diffusion
-inside the patches.  For 4D input arrays~\verb|c| and
-\verb|x| (via edge-value interpolation of
-\verb|patchSmooth1|, \cref{sec:patchSmooth1}), computes the
-time derivative~\eqref{eq:ddeChanDisp} at each point in the
+inside the patches.  For 4D input arrays of
+concentration~\verb|c| and spatial lattice~\verb|x| (via
+edge-value interpolation of \verb|patchSmooth1|,
+\cref{sec:patchSmooth1}), computes the time
+derivative~\eqref{eq:ddeChanDisp} at each point in the
 interior of a patch, output in~\verb|ct|.  The heterogeneous
 advections and diffusivities,~$u_i(y_j)$
 and~$\kappa_i(y_{j+1/2})$, have previously been merged and
@@ -27,10 +28,11 @@ function ct = chanDispMicro(t,c,p)
   pcs = reshape(p.cs,nx-1,[],2);
 %{
 \end{matlab}
-Compute the flux using `ghost' nodes at ends, so that the
-flux is zero at \(y=\pm1\) either because the end values are
-replicated so the differences are zero, or because the
-diffusivities in \verb|cs| are zero at the extremities.
+Compute the cross-channel flux using `ghost' nodes at
+channel boundaries, so that the flux is zero at $y=\pm1$
+either because the boundary values are replicated so the
+differences are zero, or because the diffusivities in
+\verb|cs| are zero at the channel boundaries.
 \begin{matlab}
 %}
   ydif = pcs(ix,1:2:end,2) ...

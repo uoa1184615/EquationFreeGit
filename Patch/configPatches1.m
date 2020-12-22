@@ -36,28 +36,28 @@ micro-grid within all the 1D~patches.
 
 \item \verb|Xlim| give the macro-space spatial domain of the
 computation: patches are equi-spaced over the interior of
-the interval~\([\verb|Xlim(1)|,\verb|Xlim(2)|]\).
+the interval~$[\verb|Xlim(1)|,\verb|Xlim(2)|]$.
 
 \item \verb|BCs| somehow will define the macroscale boundary
 conditions. Currently, \verb|BCs| is ignored and the system
 is assumed macro-periodic in the spatial domain.
 
-\item \verb|nPatch| is the number of equi-spaced spaced
+\item \verb|nPatch| is the number of equi-spaced spatial
 patches.
 
-\item \verb|ordCC|, must be~\(\geq -1\), is the `order' of
+\item \verb|ordCC|, must be~$\geq -1$, is the `order' of
 interpolation across empty space of the macroscale patch
 values to the edge of the patches for inter-patch coupling:
-where \verb|ordCC| of~\(0\) or~\(-1\) gives spectral
+where \verb|ordCC| of~$0$ or~$-1$ gives spectral
 interpolation; and \verb|ordCC| being odd specifies
 staggered spatial grids.
 
 \item \verb|ratio| (real) is the ratio of (depending upon
 \verb|EdgyInt|) either the half-width or full-width of a
 patch to the spacing of the patch mid-points.  So either
-\(\verb|ratio|=\tfrac12\) means the patches abut and
-\(\verb|ratio|=1\) is overlapping patches as in holistic
-discretisation, or \(\verb|ratio|=1\) means the patches
+$\verb|ratio|=\tfrac12$ means the patches abut and
+$\verb|ratio|=1$ is overlapping patches as in holistic
+discretisation, or $\verb|ratio|=1$ means the patches
 abut.  Small~\verb|ratio| should greatly reduce
 computational time.
 
@@ -74,7 +74,7 @@ nearest neighbour interactions).
 \item \verb|EdgyInt|, true/false, \emph{optional},
 default=false.  If true, then interpolate to left\slash
 right edge-values from right\slash left next-to-edge values.
- If false or omitted, then interpolate from centre-patch
+If false or omitted, then interpolate from centre-patch
 values.
 
 \item \verb|nEnsem|,  \emph{optional-experimental},
@@ -84,20 +84,20 @@ number of realisations.
 \item \verb|hetCoeffs|, \emph{optional}, default empty.
 Supply a 1/2D array of microscale heterogeneous coefficients
 to be used by the given microscale \verb|fun| in each patch.
-Say the given array~\verb|cs| is of size \(m_x\times n_c\),
-where \(n_c\)~is the number of different sets of
-coefficients.  The coefficients are to be the same for each
-and every patch; however, macroscale variations are catered
-for by the \(n_c\)~coefficients being \(n_c\)~parameters in
-some macroscale formula.
+Say the given array~\verb|cs| is of size $m_x\times n_c$,
+where $n_c$~is the number of different sets of coefficients.
+ The coefficients are to be the same for each and every
+patch; however, macroscale variations are catered for by the
+$n_c$~coefficients being $n_c$~parameters in some macroscale
+formula.
 \begin{itemize}
-\item If \(\verb|nEnsem|=1\), then the array of coefficients
+\item If $\verb|nEnsem|=1$, then the array of coefficients
 is just tiled across the patch size to fill up each patch,
 starting from the first point in each patch.
 
-\item If \(\verb|nEnsem|>1\) (value immaterial), then reset
-\(\verb|nEnsem|:=m_x\) and construct an ensemble of all
-\(m_x\)~phase-shifts of the coefficients. In this scenario,
+\item If $\verb|nEnsem|>1$ (value immaterial), then reset
+$\verb|nEnsem|:=m_x$ and construct an ensemble of all
+$m_x$~phase-shifts of the coefficients. In this scenario,
 the inter-patch coupling couples different members in the
 ensemble.  When \verb|EdgyInt| is true, and when the
 coefficients are diffusivities\slash elasticities, then this
@@ -121,7 +121,7 @@ If true, and it requires that you have \Matlab's Parallel
 Computing Toolbox, then it will distribute the patches over
 multiple \textsc{cpu}s\slash cores. In \Matlab, only one
 array dimension can be split in the distribution, so it
-chooses the one space dimension~\(x\).  A user may
+chooses the one space dimension~$x$.  A user may
 correspondingly distribute arrays with property
 \verb|patches.codist|, or simply use formulas invoking the
 preset distributed arrays \verb|patches.x|. If a user has
@@ -158,14 +158,14 @@ neighbouring patches as for staggered grids, and false for
 the usual case of all neighbour coupling.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| are the
-\(\verb|ordCC|\)-vector of weights for the inter-patch
+$\verb|ordCC|$-vector of weights for the inter-patch
 interpolation onto the right and left edges (respectively)
 with patch:macroscale ratio as specified.
 
-\item \verb|.x| (4D) is \(\verb|nSubP| \times1 \times1
-\times \verb|nPatch|\) array of the regular spatial
-locations~\(x_{iI}\) of the \(i\)th~microscale grid point in
-the \(I\)th~patch.  
+\item \verb|.x| (4D) is $\verb|nSubP| \times1 \times1
+\times \verb|nPatch|$ array of the regular spatial
+locations~$x_{iI}$ of the $i$th~microscale grid point in
+the $I$th~patch.  
 
 \item \verb|.ratio| is the size ratio of every patch.
 
@@ -180,10 +180,10 @@ Each a column vector of length~\verb|nEnsem|.
 \item \verb|.cs| either
 \begin{itemize}
 \item \verb|[]| 0D, or 
-\item if \(\verb|nEnsem|=1\), \((\verb|nSubP(1)|-1)\times
-n_c\) 2D array of microscale heterogeneous coefficients, or
-\item if \(\verb|nEnsem|>1\), \((\verb|nSubP(1)|-1) \times
-n_c\times m_x\) 3D array of \(m_x\)~ensemble of phase-shifts
+\item if $\verb|nEnsem|=1$, $(\verb|nSubP(1)|-1)\times
+n_c$ 2D array of microscale heterogeneous coefficients, or
+\item if $\verb|nEnsem|>1$, $(\verb|nSubP(1)|-1) \times
+n_c\times m_x$ 3D array of $m_x$~ensemble of phase-shifts
 of the microscale
 heterogeneous coefficients.
 \end{itemize}
@@ -209,7 +209,6 @@ parallel pool.
 if nargin==0
 %{
 \end{matlab}
-
 The code here shows one way to get started: a user's script
 may have the following three steps (left-right arrows denote
 function recursion).
@@ -221,9 +220,9 @@ function recursion).
 
 Establish global patch data struct to point to and interface
 with a function coding Burgers' \pde: to be solved on
-\(2\pi\)-periodic domain, with eight patches, spectral
+$2\pi$-periodic domain, with eight patches, spectral
 interpolation couples the patches, each patch of half-size
-ratio~\(0.2\), and with seven microscale points forming each
+ratio~$0.2$, and with seven microscale points forming each
 patch.
 \begin{matlab}
 %}
@@ -250,8 +249,8 @@ end
 %{
 \end{matlab}
 Plot the simulation using only the microscale values
-interior to the patches: either set \(x\)-edges to
-\verb|nan| to leave the gaps; or use \verb|patchEdgyInt1| to
+interior to the patches: either set $x$-edges to \verb|nan|
+to leave the gaps; or use \verb|patchEdgyInt1| to
 re-interpolate correct patch edge values and thereby join
 the patches.  \autoref{fig:config1Burgers} illustrates an
 example simulation in time generated by the patch scheme
@@ -263,7 +262,7 @@ if 1, patches.x([1 end],:,:,:)=nan;  us=us.';
 else us=reshape(patchEdgyInt1(us.'),[],length(ts));  
 end
 surf(ts,patches.x(:),us)
-view(60,40), colormap(hsv)
+view(60,40), colormap(0.8*hsv)
 title('Burgers PDE: patches in space, continuous time')
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
 ifOurCf2eps(mfilename)
@@ -271,7 +270,7 @@ ifOurCf2eps(mfilename)
 \end{matlab}
 \begin{figure}
 \centering \caption{\label{fig:config1Burgers}field
-\(u(x,t)\) of the patch scheme applied to Burgers'~\pde.}
+$u(x,t)$ of the patch scheme applied to Burgers'~\pde.}
 \includegraphics[scale=0.85]{configPatches1}
 \end{figure}
 Upon finishing execution of the example, exit this function.
@@ -351,7 +350,7 @@ patches.fun=fun;
 
 Second, store the order of interpolation that is to provide
 the values for the inter-patch coupling conditions. Spectral
-coupling is \verb|ordCC| of~\(0\) and~\(-1\).
+coupling is \verb|ordCC| of~$0$ and~$-1$.
 \begin{matlab}
 %}
 assert((ordCC>=-1) & (floor(ordCC)==ordCC), ...
@@ -400,7 +399,7 @@ X=X(1:nPatch)+diff(X)/2;
 \end{matlab}
 Construct the microscale grid in each patch, assuming
 Dirichlet patch edges, and a half-patch length of
-\(\verb|ratio| \cdot \verb|DX|\), unless
+$\verb|ratio| \cdot \verb|DX|$, unless
 \verb|patches.EdgyInt| is true in which case the patches are
 of length \verb|ratio*DX+dx|.  Reshape the grid to be 4D to
 suit dimensions (micro,Vars,Ens,macro).
@@ -450,11 +449,11 @@ patches.ri = 1:nE;
 \end{matlab}
 
 However, if heterogeneous coefficients are supplied via
-\verb|hetCoeffs|, then do some non-trivial replications. 
+\verb|hetCoeffs|, then do some non-trivial replications.
 First, get microscale periods, patch size, and replicate
-many times in order to subsequently sub-sample: 
-\verb|nSubP| times should be enough.
-If \verb|cs| is more then 2D, then the higher-dimensions are reshaped into the 2nd dimension.
+many times in order to subsequently sub-sample: \verb|nSubP|
+times should be enough. If \verb|cs| is more then 2D, then
+the higher-dimensions are reshaped into the 2nd dimension.
 \begin{matlab}
 %}
 if ~isempty(cs)
@@ -472,7 +471,7 @@ sub-sample to patch size, and store coefficients in
 %{
 \end{matlab}
 But for $\verb|nEnsem|>1$ an ensemble of
-\(m_x\)~phase-shifts of the coefficients is constructed from
+$m_x$~phase-shifts of the coefficients is constructed from
 the over-supply.  Here code phase-shifts over the
 periods---the phase shifts are like Hankel-matrices.
 \begin{matlab}

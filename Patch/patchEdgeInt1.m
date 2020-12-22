@@ -1,6 +1,6 @@
 % patchEdgeInt1() provides the interpolation across 1D space
 % for 1D patches of simulations of a lattice system such as
-% PDE discretisations. AJR & JB, Sep 2018 -- Dec 2020
+% PDE discretisations.  AJR & JB, Sep 2018 -- Dec 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeInt1()}: sets patch-edge values
@@ -12,17 +12,18 @@ Couples 1D patches across 1D space by computing their edge
 values from macroscale interpolation of either the mid-patch
 value \cite[]{Roberts00a, Roberts06d}, or the patch-core
 average \cite[]{Bunder2013b}, or the opposite next-to-edge
-values---this last alternative often maintains symmetry.
-This function is primarily used by \verb|patchSmooth1()| but
-is also useful for user graphics. When using core averages,
-assumes they are in some sense \emph{smooth} so that these
-averages are sensible macroscale variables: then patch edge
-values are determined by macroscale interpolation of the
-core averages \citep{Bunder2013b}. 
+values \cite[]{Bunder2020a}---this last alternative often
+maintains symmetry. This function is primarily used by
+\verb|patchSmooth1()| but is also useful for user graphics.
+When using core averages, assumes the averages are sensible
+macroscale variables: then patch edge values are determined
+by macroscale interpolation of the core averages
+\citep{Bunder2013b}. 
+\footnote{Script \texttt{patchEdgeInt1test.m} verifies this code.}
 
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
-\verb|spmd|) or otherwise via the global
+\verb|spmd|), or otherwise via the global
 struct~\verb|patches|.
 \begin{matlab}
 %}
@@ -39,7 +40,7 @@ if nargin<2, global patches, end
 $\verb|nSubP| \cdot \verb|nVars|\cdot \verb|nEnsem|\cdot
 \verb|nPatch|$ where there are $\verb|nVars|\cdot
 \verb|nEnsem|$ field values at each of the points in the
-$\verb|nSubP| \times \verb|nPatch|$ grid.
+$\verb|nSubP| \times \verb|nPatch|$ multiscale spatial grid.
 
 \item \verb|patches| a struct largely set by
 \verb|configPatches1()|, and which includes the following.
@@ -55,12 +56,12 @@ microscales.
 -1$.
 
 \item \verb|.stag| in $\{0,1\}$ is one for staggered grid
-(alternating) interpolation.
+(alternating) interpolation, and zero for ordinary grid.
 
-\item \verb|.Cwtsr| and \verb|.Cwtsl| define the coupling
+\item \verb|.Cwtsr| and \verb|.Cwtsl| are the coupling
 coefficients for finite width interpolation.
 
-\item \verb|.EdgyInt| true/false is true for interpolating
+\item \verb|.EdgyInt|, true/false, is true for interpolating
 patch-edge values from opposite next-to-edge values (often
 preserves symmetry).
 
@@ -155,7 +156,7 @@ if patches.ordCC>0 % then finite-width polynomial interpolation
 \end{matlab}
 \begin{matlab}
 %}
-  if patches.EdgyInt % next-to-edge values
+  if patches.EdgyInt % interpolate next-to-edge values
     Ux = u([2 nx-1],:,:,I);
   else % interpolate mid-patch values/sums
     Ux = sum( u((i0-c):(i0+c),:,:,I) ,1);
@@ -196,11 +197,11 @@ $\mu\delta$ and $\delta^2$ in space.
     dmu(:,:,:,I,1) = (Ux(:,:,:,Ip)-Ux(:,:,:,Im))/2; % \mu\delta
     dmu(:,:,:,I,2) = (Ux(:,:,:,Ip)-2*Ux(:,:,:,I) ...
                      +Ux(:,:,:,Im)); % \delta^2
-  end% if odd/even
+  end% if stag
 %{
 \end{matlab}
-Recursively take $\delta^2$ of these to form higher order
-centred differences in space.
+Recursively take $\delta^2$ of these to form successively
+higher order centred differences in space.
 \begin{matlab}
 %}
   for k = 3:patches.ordCC
@@ -239,10 +240,10 @@ is correct.
   else error('not yet considered, july--dec 2020 ??')
     u(nx,:,:,I) = Ux(:,:,I)*(1-patches.stag) ...
       + reshape(-sum(u((nx-patches.nCore+1):(nx-1),:,:,I),1) ...
-      +sum( patches.Cwtsr.*dmu ),Nx,nVars);
+      + sum( patches.Cwtsr.*dmu ),Nx,nVars);
     u(1,:,:,I) = Ux(:,:,I)*(1-patches.stag) ...      
-      +reshape(-sum(u(2:patches.nCore,:,:,I),1)  ...
-      +sum( patches.Cwtsl.*dmu ),Nx,nVars);
+      + reshape(-sum(u(2:patches.nCore,:,:,I),1)  ...
+      + sum( patches.Cwtsl.*dmu ),Nx,nVars);
   end;
 %{
 \end{matlab}

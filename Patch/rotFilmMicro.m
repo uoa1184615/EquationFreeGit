@@ -1,21 +1,23 @@
 % rotFilmMicro() computes the time derivatives of a 2D
 % shallow water flow on a rotating heterogeneous substrate
-% on 2D  patches in space. AJR, Dec 2020 
+% on 2D  patches in space.  AJR, Dec 2020 
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{rotFilmMicro()}: 2D shallow water flow
 on a rotating heterogeneous substrate}
 \label{sec:rotFilmMicro}
 
-This function codes the lattice heterogeneous diffusion
-inside the patches.  For 6D input arrays~\verb|huv| (via
-edge-value interpolation of \verb|patchSmooth2|,
-\cref{sec:patchSmooth2}), computes the time
-derivatives~\eqref{eqs:spinddt} at each point in the
-interior of a patch, output in~\verb|huvt|.  The
+This function codes the heterogeneous shallow water
+flow~\eqref{eqs:spinddt} inside 2D patches. The \pde{}s are
+discretised on the multiscale lattice in terms of evolving
+variables~$h_{ijIJ}$, $u_{ijIJ}$ and~$v_{ijIJ}$.  For 6D
+input array~\verb|huv| (via edge-value interpolation of
+\verb|patchEdgeInt2()|, \cref{sec:patchSmooth2}), computes
+the time derivatives~\eqref{eqs:spinddt} at each point in
+the interior of a patch, output in~\verb|huvt|.  The
 heterogeneous bed drag and diffusivities,~$b_{ij}$
 and~$\nu_{ij}$, have previously been merged and stored in
-the array~\verb|patches.cs| (2D\({}\times3\)): herein
+the array~\verb|patches.cs| (2D${}\times3$): herein
 \verb|patches| is named~\verb|p|. 
 \begin{matlab}
 %}
@@ -29,7 +31,7 @@ function huvt = rotFilmMicro(t,huv,p)
 %{
 \end{matlab}
 Set indices of fields in the arrays. Need to store different
-diffusivity values for the \(x,y\)-directions as they are
+diffusivity values for the $x,y$-directions as they are
 evaluated at different points in space.
 \begin{matlab}
 %}
@@ -37,13 +39,13 @@ evaluated at different points in space.
   b=1; nux=2; nuy=3;
 %{
 \end{matlab}
-Use a staggered grid so that \(\verb|h(i,j)|=h_{ij}\),
-\(\verb|u(i,j)|=u_{i+1/2,j}\), and
-\(\verb|v(i,j)|=v_{i,j+1/2}\). We need these averages in
-order to interpolate some quantities to other points on the
-staggered grid. But the first two statements fill-in two
-needed corner values because they are not (currently)
-interpolated.
+Use a staggered micro-grid so that $\verb|h(i,j)| =h_{ij}$,
+$\verb|u(i,j)| =u_{i+1/2,j}$, and $\verb|v(i,j)|
+=v_{i,j+1/2}$.  We need the following to interpolate some
+quantities to other points on the staggered micro-grid. But
+the first two statements fill-in two needed corner values
+because they are not (currently) interpolated by
+\verb|patchEdgeInt2()|.
 \begin{matlab}
 %}
 huv(1,ny,u,:,:,:) = huv(2,ny,u,:,:,:)+huv(1,ny-1,u,:,:,:) ...
@@ -59,7 +61,7 @@ h2v = (huv(:,2:ny,h,:,:,:)+huv(:,1:ny-1,h,:,:,:))/2;
 %{
 \end{matlab}
 Evaluate conservation of mass \pde~\eqref{eq:spindhdt}
-(needing averages of~\(h\) at half-grid points):
+(needing averages of~$h$ at half-grid points):
 \begin{matlab}
 %}
   huvt(i,j,h,:,:,:) = ...
@@ -69,9 +71,9 @@ Evaluate conservation of mass \pde~\eqref{eq:spindhdt}
       -h2v(i,j-1,:,:,:,:).*huv(i,j-1,v,:,:,:))/dy ;
 %{
 \end{matlab}
-Evaluate the \(x\)-direction momentum
+Evaluate the $x$-direction momentum
 \pde~\eqref{eq:spindvdt} (needing to interpolate
-component~\(v\) to \(u\)-points):
+component~$v$ to $u$-points):
 \begin{matlab}
 %}
   huvt(i,j,u,:,:,:) = ...
@@ -83,9 +85,9 @@ component~\(v\) to \(u\)-points):
     + diff(p.cs(i,:,nuy).*diff(huv(i,:,u,:,:,:),[],2),[],2)/dy^2 ;
 %{
 \end{matlab}
-Evaluate the \(y\)-direction momentum
+Evaluate the $y$-direction momentum
 \pde~\eqref{eq:spindvdt} (needing to interpolate
-component~\(u\) to \(v\)-points):
+component~$u$ to $v$-points):
 \begin{matlab}
 %}
   huvt(i,j,v,:,:,:) = ...

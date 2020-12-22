@@ -64,6 +64,9 @@ Often the detailed computational simulation is too expensive over all the desire
 In this case, the toolbox functions of \cref{sec:patch} empower you to simulate on only small, well-separated, patches of space by appropriately coupling between patches your simulation code, as a `black box', executing on each small patch. 
 The computational savings may be enormous, especially if combined with projective integration.
 
+\cref{sec:parallel} provides small examples of how to parallelise the patch computations over multiple processors.  
+But such parallelisation may be only useful for scenarios where the microscale code has many millions of operations per time-step.
+
 
 
 \paragraph{Contributors}

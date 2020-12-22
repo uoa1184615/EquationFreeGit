@@ -1,25 +1,28 @@
-% spmdHomoDiff31 simulates heterogeneous diffusion in 1D
+% homoDiff31spmd simulates heterogeneous diffusion in 1D
 % space on 3D patches as a Proof of Principle example of
 % parallel computing with spmd.  The interest here is on
 % using spmd and comparing it with code not using spmd. The
 % discussion here only addresses issues with spmd and
-% parallel computing. For discussion on the 3D patch scheme
+% parallel computing.  For discussion on the 3D patch scheme
 % with heterogeneous diffusion, see code and documentation
-% for homoDiffEdgy3.  AJR, Aug--Sep 2020
+% for homoDiffEdgy3.  AJR, Aug--Dec 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{spmdHomoDiff31}: computational
+\section{\texttt{homoDiff31spmd}: computational
 homogenisation of a 1D dispersion via parallel simulation on
-small 3D patches of diffusion}
-\label{sec:spmdHomoDiff31}
+small 3D patches of heterogeneous diffusion}
+\label{sec:homoDiff31spmd}
 \localtableofcontents
 
-Simulate heterogeneous dispersion along 1D space on 3D
-patches as a Proof of Principle example of parallel
-computing with \verb|spmd|.  The discussion here only
-addresses issues with \verb|spmd| parallel computing.  For
-discussion on the 3D patch scheme with heterogeneous
-diffusion, see code and documentation for
+Simulate effective dispersion along 1D space on 3D patches
+of heterogeneous diffusion as a Proof of Principle example
+of parallel computing with \verb|spmd|.  With only one patch
+in each of the $y,z$-directions, the solution simulated is
+strictly periodic in~$y,z$ with period~\verb|ratio|:  there
+are only macro-scale variations in the $x$-direction.  The
+discussion here only addresses issues with \verb|spmd|
+parallel computing.  For discussion on the 3D patch scheme
+with heterogeneous diffusion, see code and documentation for
 \verb|homoDiffEdgy3| in \cref{sec:homoDiffEdgy3}.
 
 
@@ -43,11 +46,12 @@ Then choose the case.
 \begin{matlab}
 %}
 clear all
-theCase = 2
+theCase = 1
 %{
 \end{matlab}
 
-Set micro-scale heterogeneity with various periods.
+Set micro-scale heterogeneity with various spatial periods
+in the three directions.
 \begin{matlab}
 %}
 mPeriod = [4 3 2] %1+randperm(3) 
@@ -58,7 +62,7 @@ cHetr = cHetr*mean(1./cHetr(:))
 
 Configure the patch scheme with some arbitrary choices of
 domain, patches, size ratios---here each patch is a unit
-cube in space. Choose some random order of interpolation.  
+cube in space.  Choose some random order of interpolation.
 Set \verb|patches| information to be global so the info can
 be used for Case~1 without being explicitly passed as
 arguments.  Choose the parallel option if not Case~1, which
@@ -70,10 +74,10 @@ if any(theCase==[1 2]), global patches, end
 nSubP=mPeriod+2
 nPatch=[9 1 1]
 ratio=0.3
-xLim=[0 nPatch(1)/ratio 0 1 0 1] 
+Len=nPatch(1)/ratio 
 ordCC=2*randi([0 3])
 disp('**** Setting configPatches3')
-patches = configPatches3(@heteroDiff3, xLim, nan ...
+patches = configPatches3(@heteroDiff3,[0 Len 0 1 0 1], nan ...
     , nPatch, ordCC, [ratio 1 1], nSubP, 'EdgyInt',true  ...
     ,'hetCoeffs',cHetr ,'parallel',(theCase>1) );
 %{
@@ -82,7 +86,7 @@ patches = configPatches3(@heteroDiff3, xLim, nan ...
 
 \subsection{Simulate heterogeneous diffusion}
 Set initial conditions of a simulation as shown in
-\cref{fig:spmdHomoDiff31t0}.
+\cref{fig:homoDiff31spmdt0}.
 \begin{matlab}
 %}
 disp('**** Set initial condition and testing du0dt =')
@@ -92,7 +96,7 @@ if theCase==1
 Without parallel processing, invoke the usual operations.
 \begin{matlab}
 %}
-    u0 = exp( -(patches.x-xLim(2)/2).^2/xLim(2) ...
+    u0 = exp( -(patches.x-Len/2).^2/Len ...
                -patches.y.^2/2-patches.z.^2 );
     u0 = u0.*(1+0.2*rand(size(u0)));
     du0dt = patchSmooth3(0,u0);
@@ -109,7 +113,7 @@ we must pass it explicitly as a parameter to
 \begin{matlab}
 %}
 else, spmd
-    u0 = exp( -(patches.x-xLim(2)/2).^2/xLim(2) ...
+    u0 = exp( -(patches.x-Len/2).^2/Len ...
                -patches.y.^2/2-patches.z.^2/4 );
     u0 = u0.*(1+0.2*rand(size(u0),patches.codist));
     du0dt = patchSmooth3(0,u0,patches);
@@ -118,13 +122,13 @@ end%if theCase
 %{
 \end{matlab}
 \begin{figure}
-\centering \caption{\label{fig:spmdHomoDiff31t0}initial
-field~\(u(x,y,z,0)\) of the patch scheme applied to a
+\centering \caption{\label{fig:homoDiff31spmdt0}initial
+field~$u(x,y,z,0)$ of the patch scheme applied to a
 heterogeneous diffusion~\pde. The vertical spread indicates 
-the extent of the structure in~\(u\) in the cross-section 
-variables~\(y,z\).  \cref{fig:spmdHomoDiff31tFin}
-plots the nearly smooth field values at time \(t=0.4\). }
-\includegraphics[scale=0.8]{spmdHomoDiff31t0}
+the extent of the structure in~$u$ in the cross-section 
+variables~$y,z$.  \cref{fig:homoDiff31spmdtFin}
+plots the nearly smooth field values at time $t=0.4$. }
+\includegraphics[scale=0.8]{homoDiff31spmdt0}
 \end{figure}
 
 Integrate in time.  Use non-uniform time-steps for
@@ -134,7 +138,7 @@ Alternatively, use \verb|RK2mesoPatch| which reduces
 communication between patches, recalling that, by default,
 \verb|RK2mesoPatch| does ten micro-steps for each specified
 step in~\verb|ts|. For unit cube patches, need micro-steps
-less than about~\(0.004\) for stability.
+less than about~$0.004$ for stability.
 \begin{matlab}
 %}
 warning('Integrating system in time, wait patiently')
@@ -194,8 +198,8 @@ over long times (\verb|PIRK4| also works). Currently the PI
 is done serially, with parallel \verb|spmd|-blocks only
 invoked inside function \verb|aBurst()| (\cref{secmBfPI}) to
 compute each burst of the micro-scale simulation. A
-macro-scale time-step of about~\(3\) seems good to resolve
-the decay of the macro-scale `homogenised' diffusion.
+macro-scale time-step of about~$3$ seems good to resolve the
+decay of the macro-scale `homogenised' diffusion.
 \footnote{Curiously, \texttt{PIG()} appears to suffer
 unrecoverable instabilities with its variable step size!}
 The function \verb|microBurst()| here interfaces to
@@ -230,8 +234,8 @@ if 0, global OurCf2eps, OurCf2eps=true, end
 %{
 \end{matlab}
 Animate the solution field over time. Since the spatial
-domain is long in~\(x\) and thin in~\(y,z\), just plot field
-values as a function of~\(x\).
+domain is long in~$x$ and thin in~$y,z$, just plot field
+values as a function of~$x$.
 \begin{matlab}
 %}
 figure(1), clf
@@ -253,9 +257,9 @@ for l = 1:length(ts)
 %{
 \end{matlab}
 At each time, squeeze interior point data into a 4D array,
-permute to get all the \(x\)-variation in the first two
-dimensions, and reshape into \(x\)-variation for each and
-every~\((y,z)\). 
+permute to get all the $x$-variation in the first two
+dimensions, and reshape into $x$-variation for each and
+every~$(y,z)$. 
 \begin{matlab}
 %}
   u = reshape( permute( squeeze( ...
@@ -268,7 +272,7 @@ well as macro-scale variation in the long space direction.
 %}
   if l==1
     hp = plot(x,u,'.');
-    axis([xLim(1:2) 0 max(u(:))])
+    axis([0 Len 0 max(u(:))])
     xlabel('space x'), ylabel('u(x,y,z,t)')
     ifOurCf2eps([mfilename 't0'])
     legend(['time = ' num2str(ts(l),'%4.2f')])
@@ -282,13 +286,13 @@ well as macro-scale variation in the long space direction.
 %{
 \end{matlab}
 \begin{figure}
-\centering \caption{\label{fig:spmdHomoDiff31tFin}final
-field~\(u(x,y,z,0.4)\) of the patch scheme applied to a
+\centering \caption{\label{fig:homoDiff31spmdtFin}final
+field~$u(x,y,z,0.4)$ of the patch scheme applied to a
 heterogeneous diffusion~\pde.  }
-\includegraphics[scale=0.8]{spmdHomoDiff31tFin}
+\includegraphics[scale=0.8]{homoDiff31spmdtFin}
 \end{figure}
 Finish the animation loop, and optionally output the final
-plot, \cref{fig:spmdHomoDiff31tFin}.
+plot, \cref{fig:homoDiff31spmdtFin}.
 \begin{matlab}
 %}
 end%for over time
@@ -302,9 +306,9 @@ ifOurCf2eps([mfilename 'tFin'])
 \subsection{\texttt{microBurst} function for Projective Integration}
 \label{secmBfPI}
 Projective Integration stability seems to need bursts longer
-than~\(0.2\). Here take ten meso-steps, each with default
-ten micro-steps so the micro-scale step is~\(0.002\). With
-macro-step~\(3\), these parameters usually give stable
+than~$0.2$. Here take ten meso-steps, each with default ten
+micro-steps so the micro-scale step is~$0.002$. With
+macro-step~$3$, these parameters usually give stable
 projective integration (but not always).
 \begin{matlab}
 %}
