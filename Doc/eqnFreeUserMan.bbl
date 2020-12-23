@@ -1,5 +1,12 @@
 \begin{thebibliography}{xx}
 
+\harvarditem[Bunder et~al.]{Bunder, Divahar, Kevrekidis, Mattner \harvardand\
+  Roberts}{2019}{Bunder2019c}
+Bunder, J., Divahar, J., Kevrekidis, I.~G., Mattner, T.~W. \harvardand\
+  Roberts, A.  \harvardyearleft 2019\harvardyearright , Large-scale simulation
+  of shallow water waves with computation only on small staggered patches,
+  Technical report, \url{https://arxiv.org/abs/1912.07815}.
+
 \harvarditem[Bunder et~al.]{Bunder, Kevrekidis \harvardand\
   Roberts}{2020}{Bunder2020a}
 Bunder, J.~E., Kevrekidis, I.~G. \harvardand\ Roberts, A.~J.  \harvardyearleft
@@ -102,6 +109,13 @@ Liu, P., Samaey, G., Gear, C.~W. \harvardand\ Kevrekidis, I.~G.
 \newline\harvardurl{http://www.sciencedirect.com/science/article/pii/
   S0168927414002086}
 
+\harvarditem[Maclean et~al.]{Maclean, Bunder \harvardand\
+  Roberts}{2020}{Maclean2020a}
+Maclean, J., Bunder, J.~E. \harvardand\ Roberts, A.~J.  \harvardyearleft
+  2020\harvardyearright , `A toolbox of equation-free functions in
+  matlab/octave for efficient system level simulation', {\em Numerical
+  Algorithms} .
+
 \harvarditem{Maclean \harvardand\ Gottwald}{2015}{Maclean2015}
 Maclean, J. \harvardand\ Gottwald, G.~A.  \harvardyearleft
   2015\harvardyearright , `On convergence of higher order schemes for the
@@ -120,6 +134,12 @@ Marschler, C., Sieber, J., Berkemer, R., Kawamoto, A. \harvardand\ Starke, J.
 \harvarditem{Petersik}{2019--}{Petersik2019}
 Petersik, P.  \harvardyearleft 2019--\harvardyearright , Equation-free
   modeling, Technical report, [\url{https://github.com/pjpetersik/eqnfree}].
+
+\harvarditem{Roberts}{2003}{Roberts00a}
+Roberts, A.~J.  \harvardyearleft 2003\harvardyearright , `A holistic finite
+  difference approach models linear dynamics consistently', {\em Mathematics of
+  Computation} {\bf 72},~247--262.
+\newline\harvardurl{http://www.ams.org/mcom/2003-72-241/S0025-5718-02-01448-5}
 
 \harvarditem{Roberts \harvardand\ Kevrekidis}{2007}{Roberts06d}
 Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft

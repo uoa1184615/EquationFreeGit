@@ -3,7 +3,7 @@
 % microscale is of known period so we interpolate
 % next-to-edge values to get opposite edge values. Then
 % explore the Jacobian and eigenvalues.  
-% JEB & AJR, May 2020 -- Aug 2020
+% JEB & AJR, May 2020 -- Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoDiffEdgy2}: computational
@@ -34,7 +34,7 @@ happens for non-edgy interpolation is unknown.
 \begin{matlab}
 %}
 edgyInt = true; 
-nEnsem = prod(mPeriod) % or just set one
+nEnsem = 1 %prod(mPeriod) % or just set one
 if nEnsem==1% use more patches
     nPatch = [9 9]
     nSubP = (2-edgyInt)*mPeriod+1+edgyInt

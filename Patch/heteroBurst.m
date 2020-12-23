@@ -1,6 +1,6 @@
 % Simulates a burst of the system linked to by the
 % configuration of patches. Used by homogenisationExample.m,
-% ensembleAverageExample.m
+% homoDiffEdgy1.m
 % AJR, 4 Apr 2019
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{

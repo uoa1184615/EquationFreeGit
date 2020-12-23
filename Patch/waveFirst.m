@@ -1,6 +1,6 @@
 % Computes the time derivatives of a 1D, heterogeneous,
 % first-order, wave PDE in 1D on patches. AJR, 17 Dec 2019
-% -- Aug 2020
+% -- Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{waveFirst()}: first-order wave PDE}
@@ -14,12 +14,11 @@ derivative~\cref{eq:waveEdgy1} at each point in the interior
 of a patch, output in~\verb|ut|.  
 \begin{matlab}
 %}
-function ut = waveFirst(t,u,x)
-  global patches
+function ut = waveFirst(t,u,patches)
   u=squeeze(u);
-  dx = diff(x(2:3)); % space step
+  dx = diff(patches.x(2:3)); % space step
   i = 2:size(u,1)-1; % interior points in a patch
-  ut = nan(size(u)); % preallocate output array
+  ut = nan+u;        % preallocate output array
   ut(i,:) = -(patches.cs(i).*u(i+1,:) ...
              -patches.cs(i-1).*u(i-1,:))/(2*dx) ...
             +patches.nu*diff(u,2)/dx^2; 

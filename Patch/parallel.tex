@@ -1,0 +1,64 @@
+% input *.m files for Matlab's Parallel Computation of the
+% Patch scheme in 1D, 2D, and 3D. AJR, Nov -- Dec 2020
+%!TEX root = ../Doc/eqnFreeDevMan.tex
+\chapter{Matlab parallel computation of the patch scheme}
+\label{sec:parallel}
+\localtableofcontents
+
+
+For large-scale simulations, we here assume you have a
+compute cluster with many independent computer processors
+linked by a high-speed network. The functions we provide in
+our toolbox aim to distribute computations in parallel
+across the cluster. \emph{\Matlab's Parallel Computing
+Toolbox} empowers a reasonably straightforward way to
+implement this parallelisation.\footnote{This
+parallelisation is not written for, nor tested for, Octave.}
+The reason is that the patch scheme (\cref{sec:patch}) has a
+clear domain decomposition of assigning relatively few
+patches to each processor.
+
+The examples listed herein are all \emph{Proof of
+Principle}: as coded they are all small enough that
+non-parallel execution is here much quicker that the
+parallel execution.  One needs significantly larger and/or
+more detailed problems than these examples before parallel
+execution is effective.  
+
+As in all parallel cluster computing, interprocessor
+communication time all to often dominates.  It is important
+to reduce communication as much as possible compared to
+computation.  Consequently, parallel computing is only
+effective when there is a very large amount of microscale
+computation done on each processor per communication---all
+of the examples listed herein are quite small and so the
+parallel computation of these is much slower than serial
+computation.  We guesstimate that the microscale code may
+need, per time-step, of the order of many millions of
+operations per processor in order for the parallelisation to
+be useful.
+
+To help minimise communication in time-dependent problems we
+have drafted a special integrator \verb|RK2mesoPatch|,
+\cref{sec:RK2mesoPatch}, that communicates between patches
+only on a meso-time \cite[]{Bunder2015a}.
+
+
+\input{../Patch/chanDispSpmd.m}
+
+\input{../Patch/rotFilmSpmd.m}
+
+\input{../Patch/homoDiff31spmd.m}
+
+\input{../Patch/RK2mesoPatch.m}
+
+
+
+\begin{devMan}
+
+\section{To do}
+\begin{itemize}
+\item Detailed profiling of the spmd communication to seek better parallelisation.
+\end{itemize}
+
+\end{devMan}
