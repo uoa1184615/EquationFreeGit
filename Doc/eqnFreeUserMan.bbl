@@ -154,6 +154,11 @@ Maclean, J. \harvardand\ Gottwald, G.~A.  \harvardyearleft
 \newline\harvardurl{http://www.sciencedirect.com/science/article/pii/
   S0377042715002149}
 
+\harvarditem{Maier \harvardand\ Verf{\"u}rth}{2021}{Maier2021}
+Maier, B. \harvardand\ Verf{\"u}rth, B.  \harvardyearleft 2021\harvardyearright
+  , Numerical upscaling for wave equations with time-dependent multiscale
+  coefficients, Technical report, \url{http://arxiv.org/abs/2107.14069}.
+
 \harvarditem[Marschler et~al.]{Marschler, Sieber, Berkemer, Kawamoto
   \harvardand\ Starke}{2014}{Marschler2014b}
 Marschler, C., Sieber, J., Berkemer, R., Kawamoto, A. \harvardand\ Starke, J.
