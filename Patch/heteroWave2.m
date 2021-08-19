@@ -94,5 +94,7 @@ In the last line above, the slight damping of~\(10^{-4}\)
 causes microscale modes to decay at rate~\(e^{-28t}\), with
 frequencies~\(2000\)--\(5000\), whereas macroscale modes
 decay with rates roughly~\(0.0005\)--\(0.05\) with
-frequencies~\(10\)--\(100\).
+frequencies~\(10\)--\(100\).  This slight damping term may
+correspond to the weak damping of the backward Euler scheme
+adopted by \cite{Maier2021} for time integration.
 %}

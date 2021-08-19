@@ -1,0 +1,20 @@
+\begin{thebibliography}{xx}
+
+\harvarditem[Budd et~al.]{Budd, Huang \harvardand\ Russell}{2009}{Budd2009}
+Budd, C.~J., Huang, W. \harvardand\ Russell, R.~D.  \harvardyearleft
+  2009\harvardyearright , `Adaptivity with moving grids', {\em Acta Numerica}
+  {\bf 18},~111--241.
+
+\harvarditem{Huang \harvardand\ Russell}{2010}{Huang10}
+Huang, W. \harvardand\ Russell, R.~D.  \harvardyearleft 2010\harvardyearright ,
+  {\em Adaptive moving mesh methods}, Vol. 174, Springer Science \& Business
+  Media.
+
+\harvarditem[Maclean et~al.]{Maclean, Bunder, Kevrekidis \harvardand\
+  Roberts}{2021}{Maclean2021a}
+Maclean, J., Bunder, J.~E., Kevrekidis, I.~G. \harvardand\ Roberts, A.~J.
+  \harvardyearleft 2021\harvardyearright , Adaptively detect and accurately
+  resolve macro-scale shocks in an efficient equation-free multiscale
+  simulation, Technical report, University of Adelaide.
+
+\end{thebibliography}

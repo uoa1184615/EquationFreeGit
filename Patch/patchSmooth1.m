@@ -50,10 +50,10 @@ with the following information  used here.
 \item \verb|.fun| is the name of the user's function
 \verb|fun(t,u,patches)| that computes the time derivatives
 on the patchy lattice. The array~\verb|u| has size
-$\verb|nSubP| \times \verb|nVars| \times \times
-\verb|nEnsem| \verb|nPatch|$. Time derivatives must be
-computed into the same sized array, although herein the
-patch edge values are overwritten by zeros.
+$\verb|nSubP| \times \verb|nVars| \times \verb|nEnsem|
+\times \verb|nPatch|$.  Time derivatives should be computed
+into the same sized array, then herein the patch edge
+values are overwritten by zeros.
 
 \item \verb|.x| is $\verb|nSubP| \times1 \times1 \times
 \verb|nPatch|$ array of the spatial locations~$x_{i}$ of
