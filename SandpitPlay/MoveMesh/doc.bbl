@@ -10,11 +10,25 @@ Huang, W. \harvardand\ Russell, R.~D.  \harvardyearleft 2010\harvardyearright ,
   {\em Adaptive moving mesh methods}, Vol. 174, Springer Science \& Business
   Media.
 
-\harvarditem[Maclean et~al.]{Maclean, Bunder, Kevrekidis \harvardand\
+\harvarditem{Maclean, Bunder, Kevrekidis \harvardand\
   Roberts}{2021}{Maclean2021a}
 Maclean, J., Bunder, J.~E., Kevrekidis, I.~G. \harvardand\ Roberts, A.~J.
   \harvardyearleft 2021\harvardyearright , Adaptively detect and accurately
   resolve macro-scale shocks in an efficient equation-free multiscale
   simulation, Technical report, University of Adelaide.
+
+\harvarditem{Maclean, Bunder \harvardand\ Roberts}{2021}{Maclean2020a}
+Maclean, J., Bunder, J.~E. \harvardand\ Roberts, A.~J.  \harvardyearleft
+  2021\harvardyearright , `A toolbox of equation-free functions in
+  matlab/octave for efficient system level simulation', {\em Numerical
+  Algorithms} {\bf 87},~1729--1748.
+
+\harvarditem[Roberts et~al.]{Roberts, MacKenzie \harvardand\
+  Bunder}{2014}{Roberts2011a}
+Roberts, A.~J., MacKenzie, T. \harvardand\ Bunder, J.  \harvardyearleft
+  2014\harvardyearright , `A dynamical systems approach to simulating
+  macroscale spatial dynamics in multiple dimensions', {\em J.~Engineering
+  Mathematics} {\bf 86}(1),~175--207.
+\newline\harvardurl{http://arxiv.org/abs/1103.1187}
 
 \end{thebibliography}

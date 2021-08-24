@@ -12,7 +12,7 @@ patches of microscale lattice move with various
 velocities~\(V\).  
 \begin{matlab}
 %}
-function ut = mmBurgersPDE(t,u,V,D,patches)
+function ut = mmBurgersPDE(t,u,M,patches)
 epsilon = 0.02;
 %{
 \end{matlab}
@@ -23,12 +23,15 @@ epsilon = 0.02;
 \pde\ has no explicit time dependence (autonomous).
 \item \verb|u| (\(n\times1\times1\times N\)) field values on
 the patches of microscale lattice.
+\item \verb|M| a struct of the following components.
+\begin{itemize}
 \item \verb|V| (\(1\times1\times1\times N\)) moving velocity of
 the \(j\)th~patch.
 \item \verb|D| (\(1\times1\times1\times N\)) displacement of
 the \(j\)th~patch from the fixed spatial positions stored in
 \verb|patches.x|---not used here as the \pde\ has no
 explicit space dependence (homogeneous).
+\end{itemize}
 \item \verb|patches| struct of patch configuration
 information.
 \item \verb|ut| (\(n\times1\times1\times N\)) output
@@ -38,11 +41,11 @@ patches of microscale lattice.
 
 Here there is only one field variable, and one in the
 ensemble, so for simpler coding of the \pde\ we squeeze them
-out (no need to reshape when via \verb|mmPatchSmooth1|).
+out (no need to reshape when via \verb|mmPatchSys1|).
 \begin{matlab}
 %}
-  u=squeeze(u);     % omit singleton dimensions
-  V=shiftdim(V,2);  % omit two singleton dimens
+  u=squeeze(u);      % omit singleton dimensions
+  V=shiftdim(M.V,2); % omit two singleton dimens
 %{
 \end{matlab}
 

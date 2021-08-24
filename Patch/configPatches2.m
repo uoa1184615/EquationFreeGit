@@ -293,10 +293,10 @@ to a nonlinear `diffusion'~\pde: \cref{fig:configPatches2t3}
 plots the computed field at time $t=3$.}
 \includegraphics[scale=0.9]{configPatches2ic}
 \end{figure}
-Integrate in time to $t=2$ using standard functions. In
+Integrate in time to $t=4$ using standard functions. In
 \Matlab\ \verb|ode15s| would be natural as the patch scheme
-is naturally stiff, but \verb|ode23| is quicker
-\cite[Fig.~4]{Maclean2020a}.  Ask for output at non-uniform
+is naturally stiff, but \verb|ode23| is quicker \cite
+[Fig.~4] {Maclean2020a}.  Ask for output at non-uniform
 times because the diffusion slows.
 \begin{matlab}
 %}

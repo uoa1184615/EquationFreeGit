@@ -1,19 +1,19 @@
-% mmPatchSmooth1() provides an interface to time integrators
+% mmPatchSys1() provides an interface to time integrators
 % for the dynamics on moving patches coupled across space. The
-% system must be a smooth lattice system such as a PDE
+% system must be a lattice system such as a PDE
 % discretisation.  AJR, Aug 2021
 %!TEX root = doc.tex
 %{
-\section{\texttt{mmPatchSmooth1()}: interface 1D space of
+\section{\texttt{mmPatchSys1()}: interface 1D space of
 moving patches to time integrators}
-\label{sec:mmPatchSmooth1}
+\label{sec:mmPatchSys1}
 
 
 To simulate in time with moving 1D spatial patches we need
 to interface a user's time derivative function with time
 integration routines such as \verb|ode23| or~\verb|PIRK2|.
-This function \verb|mmPatchSmooth1()| provides an interface.
- Patch edge values are determined by macroscale
+This function \verb|mmPatchSys1()| provides an interface.
+Patch edge values are determined by macroscale
 interpolation of the patch-centre or edge values. 
 Microscale heterogeneous systems may be accurately simulated
 with this function via appropriate interpolation. 
@@ -25,7 +25,7 @@ struct~\verb|patches| or via an optional third argument
 
 \begin{matlab}
 %}
-function dudt = mmPatchSmooth1(t,u,patches)
+function dudt = mmPatchSys1(t,u,patches)
 if nargin<3, global patches, end
 %{
 \end{matlab}
@@ -50,10 +50,10 @@ with the following information  used here.
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,V,D,patches)| that computes the time
-derivatives on the patchy lattice, where the \(j\)th~patch
-moves at velocity~\(V_j\) and at current time is
-displaced~\(D_j\) from the fixed reference position
+\verb|fun(t,u,M,patches)| that computes the time derivatives
+on the patchy lattice, where the \(j\)th~patch moves at
+velocity~\(M.V_j\) and at current time is
+displaced~\(M.D_j\) from the fixed reference position
 in~\verb|.x|\,.  The array~\verb|u| has size $\verb|nSubP|
 \times \verb|nVars| \times \verb|nEnsem| \times
 \verb|nPatch|$.  Time derivatives should be computed into
@@ -71,11 +71,10 @@ microscales ??
 
 \paragraph{Output}
 \begin{itemize}
-\item \verb|dudt| is a vector\slash array of of time
+\item \verb|dudt| is a vector of of time
 derivatives, but with patch edge-values set to zero.  It is
 of total length $\verb|nPatch| + \verb|nSubP| \cdot
-\verb|nVars| \cdot \verb|nEnsem| \cdot \verb|nPatch|$ and
-the same dimensions as~\verb|u|.
+\verb|nVars| \cdot \verb|nEnsem| \cdot \verb|nPatch|$.
 \end{itemize}
 
 
@@ -89,7 +88,7 @@ from macroscale interpolation of centre-patch values.
 \begin{matlab}
 %}
 N = size(patches.x,4);
-D = reshape(u(1:N),[1 1 1 N]);
+M.D = reshape(u(1:N),[1 1 1 N]);
 u = patchEdgeInt1(u(N+1:end),patches);
 %{
 \end{matlab}
@@ -104,7 +103,7 @@ with associated field values, say
 $U_j(t):=\overline{u_{ij}(t)}$.
 \begin{matlab}
 %}
-X = mean(patches.x,1)+D;
+X = mean(patches.x,1)+M.D;
 U = mean(u,1);
 %{
 \end{matlab}
@@ -143,9 +142,11 @@ coefficient
 H_{j-1} \frac12 \left({U''_{j}}^{2/3} +
 {U''_{j-1}}^{2/3}\right)\right]^3 \right\}
 \end{equation}
+Rather than \(\max(1,\cdot)\) surely better to use something 
+smooth like~\(\tanh(\cdot)\)??
 \begin{matlab}
 %}
-alpha = sum( H(jm).*( U2(j).^(1/3)+U2(jm).^(1/3) ))/sum(H);
+alpha = sum( H(jm).*( U2(j).^(1/3)+U2(jm).^(1/3) ))/2/sum(H);
 alpha = max(1,alpha^3);
 %{
 \end{matlab}
@@ -170,9 +171,9 @@ V_j:= \de t{X_j} = \frac{(N-1)^2}{2\rho_j \tau } \left[
 \end{equation}
 \begin{matlab}
 %}
-V = nan+D; % allocate storage
-V(:) = ( (rho(jp)+rho(j)).*H(j) -(rho(j)+rho(jm)).*H(jm) ) ...
-    ./rho(j) *((N-1)^2/2/patches.mmtime);
+M.V = nan+M.D; % allocate storage
+M.V(:) = ( (rho(jp)+rho(j)).*H(j) -(rho(j)+rho(jm)).*H(jm) ) ...
+    ./rho(j) *((N-1)^2/2/patches.mmTime);
 %{
 \end{matlab}
 \end{subequations}
@@ -185,9 +186,9 @@ value of zero (since \verb|ode15s| chokes on NaNs), then
 return to the user\slash integrator as a vector.
 \begin{matlab}
 %}
-dudt=patches.fun(t,u,V,D,patches);
+dudt=patches.fun(t,u,M,patches);
 dudt([1 end],:,:,:) = 0;
-dudt=[V(:); dudt(:)];
+dudt=[M.V(:); dudt(:)];
 %{
 \end{matlab}
 Fin.

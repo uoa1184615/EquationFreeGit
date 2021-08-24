@@ -5,7 +5,7 @@
 \date{\today}
 
 \usepackage{draftwatermark}\SetWatermarkScale{4}
-\usepackage[a5paper,margin=9mm]{geometry}
+\usepackage[a5paper,margin=9mm,bmargin=13mm]{geometry}
 \usepackage[dvipsnames]{xcolor}
 \def\figurename{\em Figure}
 % fancyvrb does code listing, including line numbers
@@ -50,18 +50,27 @@
 \renewcommand{\floatpagefraction}{0.7}
 
 \def\into{$\leftrightarrow$}
+\Vec V
 
 
 \begin{document}
 
 \maketitle
 
+\tableofcontents
+
 \fancyvrbStartStop 
 
-\input{mmBurgersExample.m}
-
-\input{mmPatchSmooth1.m}
+\input{mm1dBurgersExample.m}
 
 \input{mmBurgersPDE.m}
+
+\input{mmPatchSys1.m}
+
+
+\input{mm2dExample.m}
+\input{mmNonDiffPDE.m}
+
+\input{mmPatchSys2.m}
 
 \end{document}
