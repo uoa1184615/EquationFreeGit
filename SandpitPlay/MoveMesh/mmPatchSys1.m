@@ -143,7 +143,7 @@ H_{j-1} \frac12 \left({U''_{j}}^{2/3} +
 {U''_{j-1}}^{2/3}\right)\right]^3 \right\}
 \end{equation}
 Rather than \(\max(1,\cdot)\) surely better to use something 
-smooth like~\(\tanh(\cdot)\)??
+smooth like~\(\sqrt(1+\cdot^2)\)??
 \begin{matlab}
 %}
 alpha = sum( H(jm).*( U2(j).^(1/3)+U2(jm).^(1/3) ))/2/sum(H);

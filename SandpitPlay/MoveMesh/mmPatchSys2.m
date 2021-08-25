@@ -104,7 +104,7 @@ centre-patch values. \cref{sec:patchEdgeInt2} describes
 Nx = size(patches.x,5);
 Ny = size(patches.y,6);
 nM = Nx*Ny;
-M.Dx = reshape(u(   1:nM  ),[1 1 1 1 Nx Ny]);
+M.Dx = reshape(u(   1:nM  ),[1 1 1 1 Nx Ny]); 
 M.Dy = reshape(u(nM+1:2*nM),[1 1 1 1 Nx Ny]);
 u = patchEdgeInt2(u(2*nM+1:end),patches);
 %{
@@ -139,10 +139,10 @@ indices~\((I,J)\),
 %}
 I=1:Nx; Ip=[2:Nx 1]; Im=[Nx 1:Nx-1];
 J=1:Ny; Jp=[2:Ny 1]; Jm=[Ny 1:Ny-1];
-Hix = X(:,:,Ip,J)-X(:,:,I,J);  
-Hiy = Y(:,:,Ip,J)-Y(:,:,I,J);  
-Hjx = X(:,:,I,Jp)-X(:,:,I,J);  
-Hjy = Y(:,:,I,Jp)-Y(:,:,I,J);  
+Hix = X(:,:,Ip,J)-X(:,:,I,J);
+Hiy = Y(:,:,Ip,J)-Y(:,:,I,J);
+Hjx = X(:,:,I,Jp)-X(:,:,I,J);
+Hjy = Y(:,:,I,Jp)-Y(:,:,I,J);
 Hix(:,:,Nx,:) = Hix(:,:,Nx,:)+diff(patches.Xlim(1:2));
 Hjy(:,:,:,Ny) = Hjy(:,:,:,Ny)+diff(patches.Xlim(3:4));
 %{
@@ -159,8 +159,8 @@ First, compute first derivatives at \((I+\tfrac12,J)\) and
 \((I,J+\tfrac12)\) respectively.
 \begin{matlab}
 %}
-Ux = (U(:,:,Ip,J)-U(:,:,I,J))./Hix(:,:,I,J);
-Uy = (U(:,:,I,Jp)-U(:,:,I,J))./Hjy(:,:,I,J);
+Ux = (U(:,:,Ip,J)-U(:,:,I,J))./Hix(:,:,I,J); %ux=squeeze(Ux)
+Uy = (U(:,:,I,Jp)-U(:,:,I,J))./Hjy(:,:,I,J); %uy=squeeze(Uy)
 %{
 \end{matlab}
 Second, compute second derivative matrix, without assuming
@@ -176,6 +176,7 @@ Uyx = ( Uy(:,:,Ip,J)-Uy(:,:,I,J) )./Hix(:,:,I,J);
 Uxy = ( Ux(:,:,I,Jp)-Ux(:,:,I,J) )./Hjy(:,:,I,J);
 Uyx = (Uyx(:,:,I,J)+Uyx(:,:,Im,J)+Uyx(:,:,I,Jm)+Uyx(:,:,Im,Jm))/4;
 Uxy = (Uxy(:,:,I,J)+Uxy(:,:,Im,J)+Uxy(:,:,I,Jm)+Uxy(:,:,Im,Jm))/4;
+%uxx=squeeze(Uxx),uyy=squeeze(Uyy),uxy=squeeze(Uxy),uyx=squeeze(Uyx),
 %{
 \end{matlab}
 And compute its norm over all variables and ensembles
@@ -190,8 +191,8 @@ patches, as in channel dispersion).
 U2 = shiftdim( mean(mean( ...
          abs(Uxx).^2+abs(Uyy).^2+abs(Uxy).^2+abs(Uyx).^2 ...
       ,1),2) ,2);
-Hix = shiftdim(Hix,2); Hiy = shiftdim(Hiy,2);
-Hjx = shiftdim(Hjx,2); Hjy = shiftdim(Hjy,2);
+Hix = shiftdim(Hix,2);  Hiy = shiftdim(Hiy,2);
+Hjx = shiftdim(Hjx,2);  Hjy = shiftdim(Hjy,2);
 %{
 \end{matlab}
 Having squeezed out all microscale information, the
@@ -205,7 +206,7 @@ H_{j-1} \frac12 \left({U''_{j}}^{2/3} +
 generalises to an integral over \emph{approximate}
 parallelograms in~2D?? (area approximately?? determined by
 cross-product). Rather than \(\max(1,\cdot)\) surely better
-to use something smooth like~\(\tanh(\cdot)\)??
+to use something smooth like~\(\sqrt(1+\cdot^2)\)??
 \begin{matlab}
 %}
 U23 = U2.^(1/3);
@@ -213,7 +214,7 @@ alpha = sum(sum( ...
     abs( Hix(Im,Jm).*Hjy(Im,Jm)-Hiy(Im,Jm).*Hjx(Im,Jm) ) ...
     .*( U23(I,J)+U23(Im,J)+U23(I,Jm)+U23(Im,Jm) )/4 ...
     ))/diff(patches.Xlim(1:2))/diff(patches.Xlim(3:4));
-alpha = tanh(alpha^3);
+alpha = sqrt(1+alpha^6);
 %{
 \end{matlab}
 Then the importance function at each patch is the 2D array 
