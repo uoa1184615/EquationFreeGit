@@ -109,21 +109,34 @@ global OurCf2eps
 OurCf2eps = true;
 %{
 \end{matlab}
-
-Plot the movement of the mesh, and the field vertical, at the centre of each patch.
+Extract data from time simulation.  Be wary that the patch-edge values do not change from initial, so either set to~\verb|NaN|, or set via interpolation.
 \begin{matlab}
 %}
 nTime=length(ts);
-Ds=reshape(us(:,1:2*Npts).',Nx,Ny,2,nTime);
+Ds=reshape(us(:,1:2*Npts).',1,1,Nx,Ny,2,nTime);
 us=reshape(us(:,2*Npts+1:end).',nxy,nxy,Nx,Ny,nTime);
-Us=shiftdim( mean(mean(us,1),2) ,2);
-%% section marker for plot execution
+us([1 end],:,:,:)=nan; us(:,[1 end],:,:)=nan; % nan edges
+%{
+\end{matlab}
+
+Choose macro-mesh plot or micro-surf-patch plots. 
+\begin{matlab}
+%}
+if 1
+%{
+\end{matlab}
+Plot the movement of the mesh, with the field vertical, at
+the centre of each patch.  
+\begin{matlab}
+%}
+%% section marker for macro-mesh plot execution
 figure(1),clf, colormap(0.8*hsv)
+Us=shiftdim( mean(mean(us,1,'omitnan'),2,'omitnan') ,2);
 Xs=shiftdim(mean(patches.x),4);
 Ys=shiftdim(mean(patches.y),4);
 for k=1:nTime
-  Xk=Xs+Ds(:,:,1,k);
-  Yk=Ys+Ds(:,:,2,k);
+  Xk=Xs+shiftdim(Ds(:,:,:,:,1,k),2);
+  Yk=Ys+shiftdim(Ds(:,:,:,:,2,k),2);
   if k==1,
     hand=mesh(Xk,Yk,Us(:,:,k));
     ylabel('space y'),xlabel('space x'),zlabel('mean field U')
@@ -139,7 +152,38 @@ for k=1:nTime
   legend(['time =' num2str(ts(k),4)],'Location','north')
   if rem(k,31)==1, ifOurCf2eps([mfilename num2str(k)]), end
   pause(0.05)
-end
+end% for each time
+else%if macro-mesh or micro-surf
+%{
+\end{matlab}
+Plot the movement of the patches, with the field vertical in 
+each patch.
+\begin{matlab}
+%}
+%% section marker for patch-surf plot execution
+figure(2),clf, colormap(0.8*hsv)
+xs=reshape(patches.x,nxy,1,Nx,1);
+ys=reshape(patches.y,1,nxy,1,Ny);
+for k=1:nTime
+  xk=xs+0*ys+Ds(:,:,:,:,1,k);
+  yk=ys+0*xs+Ds(:,:,:,:,2,k);
+  uk=reshape(permute(us(:,:,:,:,k),[1 3 2 4]),nxy*Nx,nxy*Ny);
+  xk=reshape(permute(xk,[1 3 2 4]),nxy*Nx,nxy*Ny);
+  yk=reshape(permute(yk,[1 3 2 4]),nxy*Nx,nxy*Ny);
+  if k==1,
+    hand=surf(xk,yk,uk);
+    ylabel('space y'),xlabel('space x'),zlabel('field u(x,y,t)')
+    axis([patches.Xlim 0 1]), caxis([0 1])
+    colorbar
+  else
+    set(hand,'XData',xk,'YData',yk,'ZData',uk,'CData',uk)
+  end
+  legend(['time =' num2str(ts(k),4)],'Location','north')
+%  if rem(k,31)==1, ifOurCf2eps([mfilename num2str(k)]), end
+  pause(0.05)
+end% for each time
+%%
+end%if macro-mesh or micro-surf
 %{
 \end{matlab}
 \begin{figure}
@@ -195,7 +239,7 @@ end
 %{
 \end{matlab}
 Compute and plot the spectrum with non-linear axis scaling
-(\cref{fig:mm2dExample}).
+(\cref{fig:mm2dExampleSpec}).
 \begin{matlab}
 %}
 eval=eig(Jac);
@@ -222,7 +266,7 @@ ifOurCf2eps([mfilename 'Spec'])
 %{
 \end{matlab}
 \begin{figure}
-\centering \caption{\label{fig:mm2dExample}spectrum
+\centering \caption{\label{fig:mm2dExampleSpec}spectrum
 of the moving mesh 2D diffusion system (about \(u=0.1\)).  The
 clusters are: right real, macroscale diffusion modes with some neutral mesh deformations;
 left real, moving mesh and sub-patch modes.}
