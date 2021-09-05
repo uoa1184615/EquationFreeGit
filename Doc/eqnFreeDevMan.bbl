@@ -44,7 +44,8 @@ Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2012\harvardyearright ,
   Modelling 3d turbulent floods based upon the smagorinski large eddy closure,
   {\em in} P.~A. Brandner \harvardand\ B.~W. Pearce, eds, `18th Australasian
   Fluid Mechanics Conference'.
-\newline\harvardurl{http://people.eng.unimelb.edu.au/imarusic/proceedings/18/70%20-%20Cao.pdf}
+\newline\harvardurl{http://people.eng.unimelb.edu.au/imarusic/proceedings/18/
+  70%20-%20Cao.pdf}
 
 \harvarditem{Cao \harvardand\ Roberts}{2013}{Cao2013}
 Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2013\harvardyearright ,
@@ -155,6 +156,12 @@ Kevrekidis, I.~G., Gear, C.~W., Hyman, J.~M., Kevrekidis, P.~G., Runborg, O.
 Kevrekidis, I.~G. \harvardand\ Samaey, G.  \harvardyearleft
   2009\harvardyearright , `Equation-free multiscale computation: Algorithms and
   applications', {\em Annu. Rev. Phys. Chem.} {\bf 60},~321---44.
+
+\harvarditem{Leitenmaier \harvardand\ Runborg}{2021}{Leitenmaier2021}
+Leitenmaier, L. \harvardand\ Runborg, O.  \harvardyearleft
+  2021\harvardyearright , Heterogeneous multiscale methods for the
+  landau-lifshitz equation, Technical report,
+  \url{http://arxiv.org/abs/2108.09463}.
 
 \harvarditem[Liu et~al.]{Liu, Samaey, Gear \harvardand\
   Kevrekidis}{2015}{Liu2015}

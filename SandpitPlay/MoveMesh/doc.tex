@@ -5,7 +5,7 @@
 \date{\today}
 
 \usepackage{draftwatermark}\SetWatermarkScale{4}
-\usepackage[a5paper,margin=9mm,bmargin=13mm]{geometry}
+\usepackage[a5paper,margin=9mm,tmargin=15mm]{geometry}
 \usepackage[dvipsnames]{xcolor}
 \def\figurename{\em Figure}
 % fancyvrb does code listing, including line numbers
@@ -48,6 +48,9 @@
 \renewcommand{\bottomfraction}{0.85}
 \renewcommand{\textfraction}{0.15}
 \renewcommand{\floatpagefraction}{0.7}
+% page headers in sf
+\pagestyle{headings}
+\let\MakeUppercase\textsf
 
 \def\into{$\leftrightarrow$}
 \Vec V\Vec U

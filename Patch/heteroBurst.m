@@ -1,7 +1,7 @@
 % Simulates a burst of the system linked to by the
 % configuration of patches. Used by homogenisationExample.m,
-% homoDiffEdgy1.m
-% AJR, 4 Apr 2019
+% homoDiffEdgy1.m, and maybe homoLanLif1D.m
+% AJR, 4 Apr 2019 -- Sep 2021
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{heteroBurst()}: a burst of heterogeneous diffusion}

@@ -161,6 +161,7 @@ from macroscale interpolation of centre-patch values.
 \cref{sec:patchEdgeInt1} describes \verb|patchEdgeInt1()|.
 \begin{matlab}
 %}
+nx= size(patches.x,1);
 N = size(patches.x,4);
 M.D = reshape(u(1:N),[1 1 1 N]);
 u = patchEdgeInt1(u(N+1:end),patches);
@@ -225,7 +226,6 @@ micro-scale periods.
 \begin{matlab}
 %}
 case 2
-  nx=size(patches.x,1);
   idel=floor((nx-1)/2); 
   dx=diff(patches.x([1 idel+1]));
   U2=diff(u(1:idel:nx,:,:,:),2,1)/dx^2;
@@ -244,7 +244,6 @@ directly from the patch interpolation scheme.
 \begin{matlab}
 %}
 case 1
-  nx = size(patches.x,1);
   dx = diff(patches.x([1 nx]));
   U2 = diff(u([1 nx],:,:,:),1)/dx;
   U2 = (U2(:,:,:,jp)-U2(:,:,:,j))./H(:,:,:,j);
@@ -315,6 +314,16 @@ end%if
 %{
 \end{matlab}
 \end{subequations}
+
+
+
+\paragraph{Control overlapping of patches?} Surely cannot
+yet be done because the interpolation is in index space, so
+that adjoining patches generally have different field values
+interpolated to their edges.  Need to interpolate in
+physical space in order to get the interpolated field to
+`merge' adjoining patches.
+
 
 
 \paragraph{Evaluate system differential equation}
