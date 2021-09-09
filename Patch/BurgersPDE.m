@@ -9,7 +9,7 @@ As a microscale discretisation of Burgers' \pde\
 -30u_{ij} \frac1{2\delta x}(u_{i+1,j}-u_{i-1,j})\).
 Here there is only one field variable, and one in the
 ensemble, so for simpler coding of the PDE we squeeze them
-out (with no need to reshape when via patchSmooth1()).
+out (with no need to reshape when via patchSys1()).
 \begin{matlab}
 %}
 function ut=BurgersPDE(t,u,patches)

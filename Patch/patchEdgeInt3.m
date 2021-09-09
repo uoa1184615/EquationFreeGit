@@ -14,7 +14,7 @@ face values are determined by macroscale interpolation of
 the patch centre-plane values \cite[]{Roberts2011a,
 Bunder2019c}, or patch next-to-face values which appears
 better \cite[]{Bunder2020a}. This function is primarily used
-by \verb|patchSmooth3()| but is also useful for user
+by \verb|patchSys3()| but is also useful for user
 graphics. 
 \footnote{Script \texttt{patchEdgeInt3test.m} verifies this code.}
 

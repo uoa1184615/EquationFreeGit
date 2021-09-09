@@ -9,7 +9,7 @@
 This function codes the lattice heterogeneous diffusion
 inside the patches.  For 8D input array~\verb|u| (via
 edge-value interpolation of \verb|patchEdgeInt3|, such as by
-\verb|patchSmooth3|, \cref{sec:patchSmooth3}), computes the
+\verb|patchSys3|, \cref{sec:patchSys3}), computes the
 time derivative~\cref{eq:HomogenisationExample} at each
 point in the interior of a patch, output in~\verb|ut|.  The
 three 3D array of diffusivities,~$c^x_{ijk}$, $c^y_{ijk}$

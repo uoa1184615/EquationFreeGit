@@ -12,7 +12,7 @@ flow~\eqref{eqs:spinddt} inside 2D patches. The \pde{}s are
 discretised on the multiscale lattice in terms of evolving
 variables~$h_{ijIJ}$, $u_{ijIJ}$ and~$v_{ijIJ}$.  For 6D
 input array~\verb|huv| (via edge-value interpolation of
-\verb|patchEdgeInt2()|, \cref{sec:patchSmooth2}), computes
+\verb|patchEdgeInt2()|, \cref{sec:patchSys2}), computes
 the time derivatives~\eqref{eqs:spinddt} at each point in
 the interior of a patch, output in~\verb|huvt|.  The
 heterogeneous bed drag and diffusivities,~$b_{ij}$

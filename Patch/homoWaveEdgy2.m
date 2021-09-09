@@ -181,7 +181,7 @@ full domain \verb|nPatch=2*128|.
 %}
 disp('Now simulate over time')
 tic
-[ts,us] = ode23(@patchSmooth2, linspace(0,1,11), uv0(:));
+[ts,us] = ode23(@patchSys2, linspace(0,1,11), uv0(:));
 if iPat==0,  odeTime0=toc
 else relOdeTime(iPat)=toc/odeTime0
 end
@@ -371,7 +371,7 @@ unit vectors (as the system is linear).
     sizeJacobian = size(jac)
     for j = 1:length(i)
       uv = uv0(:)+(i(j)==(1:numel(uv0))');
-      tmp = patchSmooth2(0,uv);
+      tmp = patchSys2(0,uv);
       jac(:,j) = tmp(i);
     end
 %{

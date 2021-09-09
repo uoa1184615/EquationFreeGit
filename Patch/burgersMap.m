@@ -6,7 +6,7 @@
 \label{sec:burgersMap}
 This function codes the microscale Euler integration map of
 the lattice differential equations inside the patches.  Only
-the patch-interior values are mapped (\verb|patchSmooth1()|
+the patch-interior values are mapped (\verb|patchSys1()|
 overrides the edge-values anyway).
 \begin{matlab}
 %}

@@ -11,7 +11,7 @@ This function codes the lattice  heterogeneous
 Landau--Lifshitz PDE \cite[(1.1)]{Leitenmaier2021} inside
 patches in 1D space.  For 4D input array~\verb|M| storing
 the three components of~\Mv\ (via edge-value interpolation
-of \verb|patchSmooth1|, \cref{sec:patchSmooth1}), computes
+of \verb|patchSys1|, \cref{sec:patchSys1}), computes
 the time derivative at each point in the interior of a
 patch, output in~\verb|Mt|.  The column vector of
 coefficients \(c_i=1+\tfrac12\sin(2\pi x_i/\epsilon)\) have

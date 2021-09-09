@@ -19,9 +19,9 @@ First find and set the number of microscale time-steps.
   ts = ti+(0:ndt)'*dt;
 %{
 \end{matlab}
-Use \verb|patchSmooth1()| (\cref{sec:patchSmooth1}) to apply
+Use \verb|patchSys1()| (\cref{sec:patchSys1}) to apply
 the microscale map over all time-steps in the burst. The
-\verb|patchSmooth1()| interface provides the interpolated
+\verb|patchSys1()| interface provides the interpolated
 edge-values of each patch.  Store the results in rows to be
 consistent with \ode\ and projective integrators.
 \begin{matlab}
@@ -29,7 +29,7 @@ consistent with \ode\ and projective integrators.
   us = nan(ndt+1,numel(ui)); 
   us(1,:) = reshape(ui,1,[]);
   for j = 1:ndt
-    ui = patchSmooth1(ts(j),ui);
+    ui = patchSys1(ts(j),ui);
     us(j+1,:) = reshape(ui,1,[]);
   end
 %{

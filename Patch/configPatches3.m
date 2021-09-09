@@ -1,6 +1,6 @@
 % configPatches3() creates a data struct of the design of 3D
 % patches for later use by the patch functions such as
-% patchSmooth3() AJR, Aug--Nov 2020
+% patchSys3() AJR, Aug--Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches3()}: configures spatial
@@ -12,7 +12,7 @@ patches in 3D}
 
 Makes the struct~\verb|patches| for use by the patch\slash
 gap-tooth time derivative\slash step function
-\verb|patchSmooth3()|, and possibly other patch functions.
+\verb|patchSys3()|, and possibly other patch functions.
 \cref{sec:configPatches3eg,sec:homoDiffEdgy3} list examples
 of its use.
 \begin{matlab}
@@ -239,6 +239,7 @@ parallel pool.
 \begin{matlab}
 %}
 if nargin==0
+disp('With no arguments, simulate example of heterogeneous wave')
 %{
 \end{matlab}
 The code here shows one way to get started: a user's script
@@ -246,7 +247,7 @@ may have the following three steps (arrows indicate function
 recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches3 
-\item ode23 integrator \into patchSmooth3 \into user's PDE
+\item ode23 integrator \into patchSys3 \into user's PDE
 \item process results
 \end{enumerate}
 
@@ -303,11 +304,11 @@ naturally stiff, but \verb|ode23| is much quicker
 %}
 disp('Simulate heterogeneous wave u_tt=div[C*grad(u)]')
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode23(@patchSmooth3,linspace(0,6),uv0(:));
+    [ts,us] = ode23(@patchSys3,linspace(0,6),uv0(:));
 else %disp('octave version is very slow for me')
     lsode_options('absolute tolerance',1e-4);
     lsode_options('relative tolerance',1e-4);
-    [ts,us] = odeOcts(@patchSmooth3,[0 1 2],uv0(:));
+    [ts,us] = odeOcts(@patchSys3,[0 1 2],uv0(:));
 end
 %{
 \end{matlab}

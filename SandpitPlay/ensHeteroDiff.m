@@ -9,7 +9,7 @@
 This function codes the lattice heterogeneous diffusion
 inside the patches.  For 2D input arrays~\verb|u|
 and~\verb|x| (via edge-value interpolation of
-\verb|patchSmooth1|, \cref{sec:patchSmooth1}), computes the
+\verb|patchSys1|, \cref{sec:patchSys1}), computes the
 time derivative~\cref{eq:HomogenisationExample} at each
 point in the interior of a patch, output in~\verb|ut|.  The
 column vector (or possibly array) of diffusion

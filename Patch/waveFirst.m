@@ -8,8 +8,8 @@
 This function codes a lattice, first-order, heterogeneous,
 wave \pde\ inside patches.  Optionally adds some viscous
 dissipation.  For 2D input arrays~\verb|u| and~\verb|x| (via
-edge-value interpolation of \verb|patchSmooth1|,
-\cref{sec:patchSmooth1}), computes the time
+edge-value interpolation of \verb|patchSys1|,
+\cref{sec:patchSys1}), computes the time
 derivative~\cref{eq:waveEdgy1} at each point in the interior
 of a patch, output in~\verb|ut|.  
 \begin{matlab}

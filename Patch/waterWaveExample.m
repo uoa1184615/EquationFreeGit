@@ -102,9 +102,9 @@ gap-tooth scheme (left-right arrows denote function
 recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches1, and add micro-information 
-\item ode15s \into patchSmooth1 \into idealWavePDE
+\item ode15s \into patchSys1 \into idealWavePDE
 \item process results
-\item ode15s \into patchSmooth1 \into waterWavePDE
+\item ode15s \into patchSys1 \into waterWavePDE
 \item process results
 \end{enumerate}
 Establish the global data struct~\verb|patches| for the
@@ -167,11 +167,11 @@ so the integrator takes very small time-steps for all time.
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,Ucts] = ode15s( @patchSmooth1,[0 4],U0(:));
+    [ts,Ucts] = ode15s( @patchSys1,[0 4],U0(:));
     ts = ts(1:5:end);
     Ucts = Ucts(1:5:end,:);
 else % octave version is slower
-    [ts,Ucts] = odeOcts(@patchSmooth1,[0 4],U0(:));
+    [ts,Ucts] = odeOcts(@patchSys1,[0 4],U0(:));
 end
 %{
 \end{matlab}

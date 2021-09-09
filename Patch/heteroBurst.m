@@ -8,15 +8,15 @@
 \label{sec:heteroBurst}
 This code integrates in time the derivatives computed by
 \verb|heteroDiff| from within the patch coupling of
-\verb|patchSmooth1|.  Try~\verb|ode23| or \verb|rk2Int|,
+\verb|patchSys1|.  Try~\verb|ode23| or \verb|rk2Int|,
 although \verb|ode45| may give smoother results.
 \begin{matlab}
 %}
 function [ts, ucts] = heteroBurst(ti, ui, bT) 
 	if ~exist('OCTAVE_VERSION','builtin')
-	[ts,ucts] = ode23( @patchSmooth1,[ti ti+bT],ui(:));
+	[ts,ucts] = ode23( @patchSys1,[ti ti+bT],ui(:));
 	else % octave version
-	[ts,ucts] = rk2Int(@patchSmooth1,[ti ti+bT],ui(:));
+	[ts,ucts] = rk2Int(@patchSys1,[ti ti+bT],ui(:));
 	end
 end
 %{

@@ -1,6 +1,6 @@
 % configPatches1() creates a data struct of the design of
 % patches for later use by the patch functions such as
-% smoothPatch1(). AJR, Nov 2017 -- Nov 2020
+% patchSys1(). AJR, Nov 2017 -- Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches1()}: configures spatial
@@ -12,7 +12,7 @@ patches in 1D}
 
 Makes the struct~\verb|patches| for use by the patch\slash
 gap-tooth time derivative\slash step function
-\verb|patchSmooth1()|. \cref{sec:configPatches1eg} lists an
+\verb|patchSys1()|. \cref{sec:configPatches1eg} lists an
 example of its use.
 \begin{matlab}
 %}
@@ -207,6 +207,7 @@ parallel pool.
 \begin{matlab}
 %}
 if nargin==0
+disp('With no arguments, simulate example of Burgers PDE')
 %{
 \end{matlab}
 The code here shows one way to get started: a user's script
@@ -214,7 +215,7 @@ may have the following three steps (left-right arrows denote
 function recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches1 
-\item ode15s integrator \into patchSmooth1 \into user's PDE
+\item ode15s integrator \into patchSys1 \into user's PDE
 \item process results
 \end{enumerate}
 
@@ -238,13 +239,13 @@ u0=0.3*(1+sin(patches.x))+0.1*randn(size(patches.x));
 \end{matlab}
 Simulate in time using a standard stiff integrator and the
 interface function \verb|patchsmooth1()|
-(\cref{sec:patchSmooth1}).
+(\cref{sec:patchSys1}).
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-[ts,us] = ode15s( @patchSmooth1,[0 0.5],u0(:));
+[ts,us] = ode15s( @patchSys1,[0 0.5],u0(:));
 else % octave version
-[ts,us] = odeOcts(@patchSmooth1,[0 0.5],u0(:));
+[ts,us] = odeOcts(@patchSys1,[0 0.5],u0(:));
 end
 %{
 \end{matlab}

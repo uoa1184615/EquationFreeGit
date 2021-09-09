@@ -70,25 +70,25 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
     
     Generally invoke a \textsc{pde} integrator to simulate the multiscale system of a user's microscale code within spatially separated patches. This integrator may be \script\ defined (e.g., \texttt{ode23\slash ode45}) or user defined (e.g., a projective integrator).
     
-    Input to the integrator is the function \texttt{patchSmooth1} (for 1D) or \texttt{patchSmooth2} (for 2D) or \texttt{patchSmooth3} (for 3D) which  interfaces to the microscale's code. Other inputs are the macro-time span and initial conditions. Output from the integrator is the solution field over the given time span, but only within the defined patches.};
+    Input to the integrator is the function \texttt{patchSys1} (for 1D) or \texttt{patchSys2} (for 2D) or \texttt{patchSys3} (for 3D) which  interfaces to the microscale's code. Other inputs are the macro-time span and initial conditions. Output from the integrator is the solution field over the given time span, but only within the defined patches.};
     
-    \node [smallblock, above right=-3\WD and 2\WD of microPDE] (patchSmooth1) {\textbf{Interface to microscale}
+    \node [smallblock, above right=-3\WD and 2\WD of microPDE] (patchSys1) {\textbf{Interface to microscale}
     
-    \texttt{patchSmooth1\slash2\slash3} interfaces with the microscale \textsc{pde}\slash lattice system and invokes the patch coupling conditions. Input is the field in every patch at one time-step, and output is time-derivatives of the field, or values at the next time-step, as appropriate.};
+    \texttt{patchSys1\slash2\slash3} interfaces with the microscale \textsc{pde}\slash lattice system and invokes the patch coupling conditions. Input is the field in every patch at one time-step, and output is time-derivatives of the field, or values at the next time-step, as appropriate.};
     
-    \node [tinyblock, below left=4ex and -3\WD of patchSmooth1] (coupling) {\textbf{Coupling conditions}
+    \node [tinyblock, below left=4ex and -3\WD of patchSys1] (coupling) {\textbf{Coupling conditions}
     
     \texttt{patchEdgeInt1\slash2\slash3} (for 1D, 2D, or 3D respectively) couple patches together by setting edge-values via macroscale interpolation of order in global \texttt{patches.ordCC}.};
-    \node [tinyblock, below right=4ex and -3\WD of patchSmooth1] (micropde) {\textbf{Microscale system}
+    \node [tinyblock, below right=4ex and -3\WD of patchSys1] (micropde) {\textbf{Microscale system}
     
     A user's microscale code, pointed to by \texttt{patches.fun}, codes the microscale dynamics on the interior of the patch microgrids, \texttt{patches.x}, to compute either a micro-step or time-derivatives.
     };
 %    \node [block,draw=red!80!black,fill=red!10, below=of microPDE] (pi) {\hyperref[fig:constructPI]{\textbf{\textbf{Projective integration scheme (if needed)}}}
 %    };    
     \path [lined,very thick,-latex] (configPatches) -- (microPDE);
-    \path [lined,very thick] (microPDE) to[out=0,in=180] (patchSmooth1);
-    \path [lined,very thick] (patchSmooth1) to[out=270,in=90] (coupling);
-    \path [lined,very thick] (patchSmooth1) to[out=270,in=90] (micropde);
+    \path [lined,very thick] (microPDE) to[out=0,in=180] (patchSys1);
+    \path [lined,very thick] (patchSys1) to[out=270,in=90] (coupling);
+    \path [lined,very thick] (patchSys1) to[out=270,in=90] (micropde);
 %    \path [lined,very thick,latex-latex] (microPDE) -- (pi);
     \end{tikzpicture}
     };   
@@ -101,7 +101,7 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 
 
 \input{../Patch/configPatches1.m}
-\input{../Patch/patchSmooth1.m}
+\input{../Patch/patchSys1.m}
 \input{../Patch/patchEdgeInt1.m}
 \input{../Patch/homogenisationExample.m}
 \input{../Patch/homoDiffEdgy1.m}
@@ -112,12 +112,12 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 \input{../Patch/waterWaveExample.m}
 \input{../Patch/homoWaveEdgy1.m}
 \input{../Patch/waveEdgy1.m}
-\input{../Patch/homoLanLif1D.m}
 \end{devMan}
+\input{../Patch/homoLanLif1D.m}
 
 % 2D stuff
 \input{../Patch/configPatches2.m}
-\input{../Patch/patchSmooth2.m}
+\input{../Patch/patchSys2.m}
 \input{../Patch/patchEdgeInt2.m}
 \begin{devMan}
 \input{../Patch/wave2D.m}
@@ -127,7 +127,7 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 
 % 3D stuff
 \input{../Patch/configPatches3.m}
-\input{../Patch/patchSmooth3.m}
+\input{../Patch/patchSys3.m}
 \input{../Patch/patchEdgeInt3.m}
 \input{../Patch/homoDiffEdgy3.m}
 

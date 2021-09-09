@@ -10,8 +10,8 @@ advection-diffusion in a long thin channel}
 This function codes the lattice heterogeneous diffusion
 inside the patches.  For 4D input arrays of
 concentration~\verb|c| and spatial lattice~\verb|x| (via
-edge-value interpolation of \verb|patchSmooth1|,
-\cref{sec:patchSmooth1}), computes the time
+edge-value interpolation of \verb|patchSys1|,
+\cref{sec:patchSys1}), computes the time
 derivative~\eqref{eq:ddeChanDisp} at each point in the
 interior of a patch, output in~\verb|ct|.  The heterogeneous
 advections and diffusivities,~$u_i(y_j)$

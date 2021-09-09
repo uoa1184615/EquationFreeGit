@@ -97,7 +97,7 @@ Construct the Jacobian column-wise from the transform of a complete set of unit 
 Jac=nan(nJac);
 for j=1:nJac
   cj=c0; cj(i(j))=1;
-  dcjdt=patchSmooth1(0,cj);
+  dcjdt=patchSys1(0,cj);
   Jac(:,j)=dcjdt(i);
 end
 %{
@@ -130,7 +130,7 @@ Set random initial conditions of a simulation.
 \begin{matlab}
 %}
     c0 = rand(size(patches.x+0*yj));
-    dc0dt = patchSmooth1(0,c0);
+    dc0dt = patchSys1(0,c0);
 %{
 \end{matlab}
 
@@ -145,7 +145,7 @@ than~\(0.0015\).
 %}
 ts=linspace(0,2); 
 %    [cs,uerrs] = RK2mesoPatch(ts,c0);
-[ts,cs] = ode15s(@patchSmooth1,ts,c0(:));
+[ts,cs] = ode15s(@patchSys1,ts,c0(:));
 cs=reshape(cs,[length(ts) size(c0)]);
 cs=cs(:,2:end-1,:);
 %finalCs=squeeze(cs(end,:,:))

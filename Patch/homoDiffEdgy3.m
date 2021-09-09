@@ -74,9 +74,9 @@ time to better display transients.
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode23(@patchSmooth3, 0.3*linspace(0,1,50).^2, u0(:));
+    [ts,us] = ode23(@patchSys3, 0.3*linspace(0,1,50).^2, u0(:));
 else % octave version
-    [ts,us] = odeOcts(@patchSmooth3, 0.3*linspace(0,1).^2, u0(:));
+    [ts,us] = odeOcts(@patchSys3, 0.3*linspace(0,1).^2, u0(:));
 end
 %{
 \end{matlab}
@@ -246,7 +246,7 @@ unit vectors.
     jac = nan(length(i));
     for j = 1:length(i)
       u = u0(:)+(i(j)==(1:numel(u0))');
-      tmp = patchSmooth3(0,u);
+      tmp = patchSys3(0,u);
       jac(:,j) = tmp(i);
     end
 %{

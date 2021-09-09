@@ -112,7 +112,7 @@ This example script implements the following patch\slash
 gap-tooth scheme.
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches1 
-\item ode15s \into patchSmooth1 \into heteroLanLif1D
+\item ode15s \into patchSys1 \into heteroLanLif1D
 \item plot the simulation 
 \end{enumerate}
 
@@ -164,14 +164,14 @@ u0 = 0.5+exp(-0.1*cos(2*pi*(patches.x-0.32)));
 v0 = 0.5+exp(-0.2*cos(2*pi*patches.x)) +0*randn(size(patches.x));
 w0 = 0.5+exp(-0.1*cos(2*pi*(patches.x-0.75)));
 M0 = [ u0 v0 w0 ]./sqrt(u0.^2+v0.^2+w0.^2); 
-dM0dt = patchSmooth1(0,M0(:)); 
+dM0dt = patchSys1(0,M0(:)); 
 %{
 \end{matlab}
 Integrate using standard integrators.
 \begin{matlab}
 %}
 tic
-[ts,Ms] = ode15s(@patchSmooth1, [0 0.1], M0(:));
+[ts,Ms] = ode15s(@patchSys1, [0 0.1], M0(:));
 cpuTime=toc
 sizeMs=size(Ms)
 %{
@@ -278,7 +278,7 @@ Me = Me./sqrt(sum(Me.^2,2))
 Me = Me +0*patches.x; 
 Me([1 end],:,:,:)=nan;
 i=find(~isnan(Me));
-f0 = patchSmooth1(0,Me(:)); 
+f0 = patchSys1(0,Me(:)); 
 assert(abs( norm(f0(:)) )<1e-8,'not equilibrium')
 %{
 \end{matlab}
@@ -290,7 +290,7 @@ nJac=length(i);
 Jac=nan(nJac);
 for j=1:nJac
   M=Me; M(i(j))=M(i(j))+delta;
-  fj=patchSmooth1(0,M(:));
+  fj=patchSys1(0,M(:));
   Jac(:,j)=(fj(i)-f0(i))/delta;
 end
 %{

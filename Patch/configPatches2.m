@@ -1,6 +1,6 @@
 % configPatches2() creates a data struct of the design of 2D
 % patches for later use by the patch functions such as
-% smoothPatch2() AJR, Nov 2018 -- Nov 2020
+% patchSys2() AJR, Nov 2018 -- Nov 2020
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches2()}: configures spatial
@@ -12,7 +12,7 @@ patches in 2D}
 
 Makes the struct~\verb|patches| for use by the patch\slash
 gap-tooth time derivative\slash step function
-\verb|patchSmooth2()|. \cref{sec:configPatches2eg} lists an
+\verb|patchSys2()|. \cref{sec:configPatches2eg} lists an
 example of its use.
 \begin{matlab}
 %}
@@ -228,6 +228,7 @@ parallel pool.
 \begin{matlab}
 %}
 if nargin==0
+disp('With no arguments, simulate example of nonlinear diffusion')
 %{
 \end{matlab}
 The code here shows one way to get started: a user's script
@@ -235,7 +236,7 @@ may have the following three steps (arrows indicate function
 recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches2 
-\item ode23 integrator \into patchSmooth2 \into user's PDE
+\item ode23 integrator \into patchSys2 \into user's PDE
 \item process results
 \end{enumerate}
 
@@ -303,11 +304,11 @@ times because the diffusion slows.
 disp('Wait to simulate nonlinear diffusion h_t=(h^3)_xx+(h^3)_yy')
 drawnow
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode23(@patchSmooth2,linspace(0,2).^2,u0(:));
+    [ts,us] = ode23(@patchSys2,linspace(0,2).^2,u0(:));
 else % octave version is quite slow for me
     lsode_options('absolute tolerance',1e-4);
     lsode_options('relative tolerance',1e-4);
-    [ts,us] = odeOcts(@patchSmooth2,[0 1],u0(:));
+    [ts,us] = odeOcts(@patchSys2,[0 1],u0(:));
 end
 %{
 \end{matlab}

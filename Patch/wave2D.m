@@ -17,7 +17,7 @@ may have the following three steps (left-right arrows denote
 function recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches2 
-\item ode15s integrator \into patchSmooth2 \into wavePDE
+\item ode15s integrator \into patchSys2 \into wavePDE
 \item process results
 \end{enumerate}
 
@@ -65,7 +65,7 @@ sizeJacobian = size(jac)
 for j = 1:length(i)
   uv = uv0(:);
   uv(i(j)) = uv(i(j))+small;
-  tmp = patchSmooth2(0,uv)/small;
+  tmp = patchSys2(0,uv)/small;
   jac(:,j) = tmp(i);
 end
 %{
@@ -144,9 +144,9 @@ Integrate in time using standard functions.
 disp('Wait while we simulate u_t=v, v_t=u_xx+u_yy')
 uv0 = cat(3,u0,v0);
 if ~exist('OCTAVE_VERSION','builtin')
-[ts,uvs] = ode23( @patchSmooth2,[0 6],uv0(:));
+[ts,uvs] = ode23( @patchSys2,[0 6],uv0(:));
 else % octave version is slower
-[ts,uvs] = odeOcts(@patchSmooth2,linspace(0,6),uv0(:));
+[ts,uvs] = odeOcts(@patchSys2,linspace(0,6),uv0(:));
 end
 %{
 \end{matlab}

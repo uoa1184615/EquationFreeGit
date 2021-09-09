@@ -13,7 +13,7 @@ u_t=v,\quad v_t=\grad(C\divv u)
 for diagonal matrix~\(C\) which has microscale variations.
 For 8D input arrays~\verb|u|, \verb|x|, \verb|y|,
 and~\verb|z| (via edge-value interpolation of
-\verb|patchSmooth3|, \cref{sec:patchSmooth3}), computes the
+\verb|patchSys3|, \cref{sec:patchSys3}), computes the
 time derivative at each point in the interior of a patch,
 output in~\verb|ut|.  The three 3D array of heterogeneous
 coefficients,~$c^x_{ijk}$, $c^y_{ijk}$ and~$c^z_{ijk}$, have

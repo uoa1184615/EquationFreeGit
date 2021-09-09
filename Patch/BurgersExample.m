@@ -36,7 +36,7 @@ patch\slash gap-tooth scheme (left-right arrows denote
 function recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches1 
-\item burgerBurst \into patchSmooth1 \into burgersMap
+\item burgerBurst \into patchSys1 \into burgersMap
 \item process results
 \end{enumerate}
 
@@ -103,7 +103,7 @@ macroscale time-steps.
 This second part of the script implements the following design.
 \begin{enumerate} \def\itemsep{-1.5ex}
 \item configPatches1 (done in \cref{sec:bescsmsts})
-\item PIRK2 \into burgerBurst \into patchSmooth1 \into burgersMap
+\item PIRK2 \into burgerBurst \into patchSys1 \into burgersMap
 \item process results
 \end{enumerate}
 

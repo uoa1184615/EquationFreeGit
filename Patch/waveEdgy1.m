@@ -71,9 +71,9 @@ gap-tooth scheme (left-right arrows denote function
 recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches1, and add micro-information 
-\item ode15s \into patchSmooth1 \into waveFirst
+\item ode15s \into patchSys1 \into waveFirst
 \item plot the simulation 
-\item use patchSmooth1 to explore the Jacobian
+\item use patchSys1 to explore the Jacobian
 \end{enumerate}
 
 First establish the microscale heterogeneity has
@@ -150,9 +150,9 @@ Integrate using standard stiff integrators.
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode23(@patchSmooth1, [0 3.5], u0(:));
+    [ts,us] = ode23(@patchSys1, [0 3.5], u0(:));
 else % octave version
-    [ts,us] = odeOcts(@patchSmooth1, [0 0.5], u0(:));
+    [ts,us] = odeOcts(@patchSys1, [0 0.5], u0(:));
 end
 %{
 \end{matlab}
@@ -218,7 +218,7 @@ patches and hence are the system variables.
     Jac=nan(nJ);
     for j=1:nJ
        u0(i)=((1:nJ)==j);
-       dudt=patchSmooth1(0,u0);
+       dudt=patchSys1(0,u0);
        Jac(:,j)=dudt(i);
     end
     nonSkewSymmetric=norm(Jac+Jac')

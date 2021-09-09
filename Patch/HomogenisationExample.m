@@ -24,7 +24,7 @@ gap-tooth scheme (left-right arrows denote function
 recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches1 
-\item ode15s \into patchSmooth1 \into heteroDiff
+\item ode15s \into patchSys1 \into heteroDiff
 \item process results
 \end{enumerate}
 \begin{figure}
@@ -81,15 +81,15 @@ Set an initial condition, and here integrate forward in time
 using a standard method for stiff systems---because of the
 simplicity of linear problems this method works quite
 efficiently here.  Integrate the interface
-\verb|patchSmooth1| (\cref{sec:patchSmooth1}) to the
+\verb|patchSys1| (\cref{sec:patchSys1}) to the
 microscale differential equations.
 \begin{matlab}
 %}
 u0 = sin(patches.x)+0.3*randn(nSubP,1,1,nPatch);
 if ~exist('OCTAVE_VERSION','builtin')
-[ts,ucts] = ode15s(@patchSmooth1, [0 2/cHomo], u0(:));
+[ts,ucts] = ode15s(@patchSys1, [0 2/cHomo], u0(:));
 else % octave version
-[ts,ucts] = odeOcts(@patchSmooth1, [0 2/cHomo], u0(:));
+[ts,ucts] = odeOcts(@patchSys1, [0 2/cHomo], u0(:));
 end
 ucts = reshape(ucts,length(ts),length(patches.x(:)),[]);
 %{
@@ -119,7 +119,7 @@ times in the legend. This field solution displays some fine
 scale heterogeneity due to the heterogeneous diffusion.}
 \includegraphics[scale=0.9]{homogenisationExampleU}
 \end{figure}%
-Now take \verb|patchSmooth1|, the interface to the time
+Now take \verb|patchSys1|, the interface to the time
 derivatives, and wrap around it the projective integration
 \verb|PIRK2| (\cref{sec:PIRK2}), of bursts of simulation
 from \verb|heteroBurst| (\cref{sec:heteroBurst}), as
@@ -131,7 +131,7 @@ design, where the micro-integrator could be, for example,
 \begin{enumerate} \def\itemsep{-1.5ex}
 \item configPatches1 (done in first part)
 \item PIRK2 \into heteroBurst \into micro-integrator \into
-patchSmooth1 \into heteroDiff
+patchSys1 \into heteroDiff
 \item process results
 \end{enumerate}
 Mark that edge of patches are not to be used in the

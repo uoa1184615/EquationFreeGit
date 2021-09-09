@@ -123,6 +123,12 @@ Kevrekidis, I.~G. \harvardand\ Samaey, G.  \harvardyearleft
   2009\harvardyearright , `Equation-free multiscale computation: Algorithms and
   applications', {\em Annu. Rev. Phys. Chem.} {\bf 60},~321---44.
 
+\harvarditem{Leitenmaier \harvardand\ Runborg}{2021}{Leitenmaier2021}
+Leitenmaier, L. \harvardand\ Runborg, O.  \harvardyearleft
+  2021\harvardyearright , Heterogeneous multiscale methods for the
+  landau-lifshitz equation, Technical report,
+  \url{http://arxiv.org/abs/2108.09463}.
+
 \harvarditem[Liu et~al.]{Liu, Samaey, Gear \harvardand\
   Kevrekidis}{2015}{Liu2015}
 Liu, P., Samaey, G., Gear, C.~W. \harvardand\ Kevrekidis, I.~G.

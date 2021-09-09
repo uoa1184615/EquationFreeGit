@@ -14,7 +14,7 @@ value \cite[]{Roberts00a, Roberts06d}, or the patch-core
 average \cite[]{Bunder2013b}, or the opposite next-to-edge
 values \cite[]{Bunder2020a}---this last alternative often
 maintains symmetry. This function is primarily used by
-\verb|patchSmooth1()| but is also useful for user graphics.
+\verb|patchSys1()| but is also useful for user graphics.
 When using core averages, assumes the averages are sensible
 macroscale variables: then patch edge values are determined
 by macroscale interpolation of the core averages

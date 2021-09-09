@@ -11,8 +11,8 @@ This function codes the lattice heterogeneous wave equation,
 with weak viscosity, inside the patches.  For 3D input
 array~\verb|u| (\(u_{ij} = \verb|u(i,1,j)|\) and \(v_{ij} =
 \verb|u(i,2,j)|\)) and 2D array~\verb|x| (obtained in full
-via edge-value interpolation of \verb|patchSmooth1|,
-\cref{sec:patchSmooth1}), computes the time derivatives at
+via edge-value interpolation of \verb|patchSys1|,
+\cref{sec:patchSys1}), computes the time derivatives at
 each point in the interior of a patch, output in~\verb|ut|:
 \begin{equation*}
 \D t{u_{ij}}=v_{ij}\,,\quad

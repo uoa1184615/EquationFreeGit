@@ -155,23 +155,23 @@ Without parallel processing, invoke the usual operations.
 %}
     c0 = 10*exp(-(ratio*patches.x-2.5).^2/2) +0*yj;
     c0 = c0.*(1+0.2*rand(size(c0)));
-    dc0dt = patchSmooth1(0,c0);
+    dc0dt = patchSys1(0,c0);
 %{
 \end{matlab}
 With parallel, we must use an \verb|spmd|-block for
 computations: there is no difference in cases~2--4 here.
 Also, we must sometimes use \verb|patches.codist| to
 explicitly code how to distribute new arrays over the cpus.
-Now \verb|patchSmooth1| does not invoke \verb|spmd| so
+Now \verb|patchSys1| does not invoke \verb|spmd| so
 higher level code must, as here. Even if \verb|patches| is
 global, inside \verb|spmd|-block we \emph{must} pass it
-explicitly as a parameter to \verb|patchSmooth1|.
+explicitly as a parameter to \verb|patchSys1|.
 \begin{matlab}
 %}
 else, spmd
     c0 = 10*exp(-(ratio*patches.x-2.5).^2/2) +0*yj;
     c0 = c0.*(1+0.2*rand(size(c0),patches.codist));
-    dc0dt = patchSmooth1(0,c0,patches)
+    dc0dt = patchSys1(0,c0,patches)
     end%spmd
 end%if theCase
 %{
@@ -208,7 +208,7 @@ switch theCase
 \begin{enumerate}
 \item For non-parallel, we could use \verb|RK2mesoPatch| as
 indicated below, but instead choose to use standard
-\verb|ode23| as here \verb|patchSmooth1| accesses patch
+\verb|ode23| as here \verb|patchSys1| accesses patch
 information via global \verb|patches|. For post-processing,
 reshape each and every row of the computed solution to the
 correct array size---namely that of the initial condition. 
@@ -216,7 +216,7 @@ correct array size---namely that of the initial condition.
 %}
 case 1
 %    [cs,uerrs] = RK2mesoPatch(ts,c0);
-    [ts,cs] = ode23(@patchSmooth1,ts,c0(:));
+    [ts,cs] = ode23(@patchSys1,ts,c0(:));
     cs=reshape(cs,[length(ts) size(c0)]);
 %{
 \end{matlab}

@@ -9,7 +9,7 @@
 This function codes the lattice heterogeneous diffusion
 inside the patches.  For 6D input arrays~\verb|u|, \verb|x|,
 and~\verb|y| (via edge-value interpolation of
-\verb|patchSmooth2|, \cref{sec:patchSmooth2}), computes the
+\verb|patchSys2|, \cref{sec:patchSys2}), computes the
 time derivative~\cref{eq:HomogenisationExample} at each
 point in the interior of a patch, output in~\verb|ut|.  The
 two 2D array of diffusivities,~$c^x_{ij}$ and~$c^y_{ij}$,

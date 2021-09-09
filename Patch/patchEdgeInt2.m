@@ -16,7 +16,7 @@ macroscale interpolation of these determine patch-edge
 values. However, for computational homogenisation in
 multi-D, interpolating patch next-to-edge values appears
 better \cite[]{Bunder2020a}. This function is primarily used
-by \verb|patchSmooth2()| but is also useful for user
+by \verb|patchSys2()| but is also useful for user
 graphics. 
 \footnote{Script \texttt{patchEdgeInt2test.m} verifies this code.}
  
