@@ -192,7 +192,8 @@ H(N) = H(N)+diff(patches.Xlim);
 %{
 \end{matlab}
 we discretise a moving mesh \pde\ for node locations~$X_j$
-with field values~$U_j$ via the second derivative estimate
+with field values~$U_j$ via the second derivative w.r.t.~\(x\),
+estimated by
 \begin{subequations} \label{mmDisc}
 \begin{equation}
 U''_{j} := \frac2{H_j+H_{j-1}}\left[ \frac{U_{j+1} -

@@ -5,6 +5,11 @@ Budd, C.~J., Huang, W. \harvardand\ Russell, R.~D.  \harvardyearleft
   2009\harvardyearright , `Adaptivity with moving grids', {\em Acta Numerica}
   {\bf 18},~111--241.
 
+\harvarditem{Huang \harvardand\ Russell}{1998}{Huang98}
+Huang, W. \harvardand\ Russell, R.~D.  \harvardyearleft 1998\harvardyearright ,
+  `Moving mesh strategy based on a gradient flow equation for two-dimensional
+  problems', {\em SIAM Journal on Scientific Computing} {\bf 20}(3),~998--1015.
+
 \harvarditem{Huang \harvardand\ Russell}{2010}{Huang10}
 Huang, W. \harvardand\ Russell, R.~D.  \harvardyearleft 2010\harvardyearright ,
   {\em Adaptive moving mesh methods}, Vol. 174, Springer Science \& Business
@@ -14,8 +19,8 @@ Huang, W. \harvardand\ Russell, R.~D.  \harvardyearleft 2010\harvardyearright ,
   Roberts}{2021}{Maclean2021a}
 Maclean, J., Bunder, J.~E., Kevrekidis, I.~G. \harvardand\ Roberts, A.~J.
   \harvardyearleft 2021\harvardyearright , Adaptively detect and accurately
-  resolve macro-scale shocks in an efficient equation-free multiscale
-  simulation, Technical report, University of Adelaide.
+  resolve macro-scale shocks in an efficient {Equation}-{Free} multiscale
+  simulation, Technical report, \url{http://arxiv.org/abs/2108.11568}.
 
 \harvarditem{Maclean, Bunder \harvardand\ Roberts}{2021}{Maclean2020a}
 Maclean, J., Bunder, J.~E. \harvardand\ Roberts, A.~J.  \harvardyearleft

@@ -7,32 +7,36 @@ patches in 2D for nonlinear diffusion}
 
 
 
-The code here shows one way to use moving patches in 2D.
-However, \verb|mmPatchSys2()| has far too many ad hoc assumptions, 
-so fix those before exploring predictions here.
-%The simulation seems perfectly happy for the patches to move
-%so that they overlap in the shock! and then separate again
-%as the shock decays.
-
-Establish global patch data struct to interface with a
-function coding a nonlinear `diffusion' \pde: to be solved
-on $6\times4$-periodic domain, with $9\times7$ patches,
-spectral interpolation~($0$) couples the patches, each
-patch of half-size ratio~$0.4$?? (relatively large for
-visualisation), and with $5\times5$ points forming each
-patch.  \cite{Roberts2011a} established that this scheme is
-consistent with the \pde\ (as the patch spacing decreases).
-Prefer EdgyInt as we suspect it performs better
-for moving meshes.
+The code here shows two ways to use moving patches in 2D.
+Plausible generalisations from the 1D code to this 2D code is the case \verb|adhoc|.
+The alternative \verb|Huang98| aims to implement the method of \cite{Huang98}.
 \begin{matlab}
 %}
 clear all
+global theMethod
+if 0, theMethod = 'adhoc',
+else  theMethod = 'Huang98', end
+%{
+\end{matlab}
+However, \verb|mmPatchSys2()| has far too many ad hoc assumptions, 
+so fix those before exploring predictions here.
+
+Establish global patch data struct to interface with a
+function coding the microscale.
+Prefer EdgyInt as we suspect it performs better
+for moving meshes.
+Using \verb|nxy=3| means that there are no sub-patch modes, all modes are those of the macro-diffusion and the macro-mesh movement.  
+There are \(N_x+N_y\) zero eigenvalues associated with the mesh movement.  
+And there are \(N_xN_y\) slow eigenvalues of the diffusion (one of them looks like zero badly affected by round-off to be as big as \(10^{-4}\) or so).  
+So far we generally see the macro-diffusion is poorly perturbed by the mesh movement in that there are some diffusion modes with imaginary part up to five.  
+\begin{matlab}
+%}
 global patches
-nxy=5
-Nx=9, Ny=7
+nxy=3 % =3 means no sub-patch dynamics
+Nx=7, Ny=5
 patches = configPatches2(@mmNonDiffPDE,[-3 3 -2 2], nan ...
-    , [Nx Ny], 0, 0.2, nxy ,'EdgyInt',true);
-patches.mmTime=1;
+    , [Nx Ny], 0, 0.1, nxy ,'EdgyInt',true);
+patches.mmTime=0.03;
 patches.Xlim=[-3 3 -2 2];
 Npts = Nx*Ny;
 %{
@@ -76,13 +80,108 @@ part of the configuration function.
 %\end{itemize}
 
 
+
+
+\paragraph{Spectrum of the moving patch system}
+Compute the spectrum based upon the linearisation about some
+state: \(u={}\)constant with \(D=0\) are equilibria;
+otherwise the computation is about a 'quasi-equilibrium' on
+the `fast-time'.
+\begin{matlab}
+%}
+global ind, ind=2
+evals=[];
+patches.mmTime = patches.mmTime/0.95;
+for iv=1:4
+  patches.mmTime = 0.95*patches.mmTime;
+%
+u00 = 0.1
+u0 = u00+sin(0*patches.x*pi/3+0*patches.y*pi/2);
+u0([1 end],:,:)=nan;  u0(:,[1 end],:)=nan;
+u0 = [zeros(2*Npts,1); u0(:)];
+f0 = mmPatchSys2(0,u0);
+normf0 = norm(f0)
+%if normf0>1e-9, error('Jacobian: u0 is not equilibrium'),end
+%{
+\end{matlab}
+But we must only use the dynamic variables, so let's find
+where they are. 
+\begin{matlab}
+%}
+i=find(~isnan( u0(:) )); 
+nJac=length(i)
+%{
+\end{matlab}
+Construct Jacobian with numerical differentiation.
+\begin{matlab}
+%}
+deltau=1e-7;
+Jac=nan(nJac);
+for j=1:nJac
+    uj=u0; uj(i(j))=uj(i(j))+deltau;
+    fj = mmPatchSys2(0,uj);
+    Jac(:,j)=(fj(i)-f0(i))/deltau;
+end
+%{
+\end{matlab}
+Compute and plot the spectrum with non-linear axis scaling
+(\cref{fig:mm2dExampleSpec}).
+\begin{matlab}
+%}
+eval=eig(Jac);
+[~,k]=sort(-real(eval));
+eval=eval(k);
+nZero = sum(abs(real(eval))<1e-3)
+nSlow = sum(-100<real(eval))-nZero
+%eSlowest = eval(1:30) %(0+(1:2:nSlow))
+%eFast = eval([nZero+nSlow+1 end])
+evals=[evals eval];
+end%iv-loop
+%{
+\end{matlab}
+
+\paragraph{Plot spectrum}
+Choose whether to save some plots, or not.
+\begin{matlab}
+%}
+global OurCf2eps
+OurCf2eps = false;
+%{
+\end{matlab}
+Draw spectrum on quasi-log axes.
+\begin{matlab}
+%}
+figure(3),clf
+hp = plot(real(evals),imag(evals),'.');
+xlabel('Re\lambda'), ylabel('Im\lambda')
+quasiLogAxes(hp,1,1);
+ifOurCf2eps([mfilename theMethod 'Spec'])
+return%%%%%%%%%%%%%%
+%{
+\end{matlab}
+\begin{figure}
+\centering \caption{\label{fig:mm2dExampleadhocSpec}spectrum
+of the \emph{adhoc} moving mesh 2D diffusion system (about \(u=0.1\)).  The
+clusters are: right real, macroscale diffusion modes with some neutral mesh deformations;
+left real, moving mesh and sub-patch modes.  Coloured dots are `trails' for \(\tau\)~reducing by~5\% between each, starting from blue dots.}
+\includegraphics[scale=0.85]{Figs/mm2dExampleadhocSpec}
+\end{figure}
+\begin{figure}
+\centering \caption{\label{fig:mm2dExampleHuang98Spec}spectrum
+of the \emph{Huang98} moving mesh 2D diffusion system (about \(u=0.1\)). 
+Currently there are badly unstable modes. The
+clusters are: \dotfill\ confused.}
+\includegraphics[scale=0.85]{Figs/mm2dExampleHuang98Spec}
+\end{figure}
+
+
 \paragraph{Simulate in time}
 Set an  initial condition of a perturbed-Gaussian using
 auto-replication of the spatial grid.
 \begin{matlab}
 %}
 u0 = exp(-patches.x.^2-patches.y.^2);
-u0 = u0.*(0.9+0.0*rand(size(u0))) +0.001;
+u0 = 1+0*u0.*(0.9+0.0*rand(size(u0)));
 D0 = zeros(2*Npts,1);
 %{
 \end{matlab}
@@ -102,13 +201,6 @@ cpuTime = toc
 \end{matlab}
 
 \paragraph{Plots}
-Choose whether to save some plots, or not.
-\begin{matlab}
-%}
-global OurCf2eps
-OurCf2eps = true;
-%{
-\end{matlab}
 Extract data from time simulation.  Be wary that the patch-edge values do not change from initial, so either set to~\verb|NaN|, or set via interpolation.
 \begin{matlab}
 %}
@@ -150,7 +242,7 @@ for k=1:nTime
        ,'ZData',Us(:,:,k),'CData',Us(:,:,k))
   end
   legend(['time =' num2str(ts(k),4)],'Location','north')
-  if rem(k,31)==1, ifOurCf2eps([mfilename num2str(k)]), end
+  if rem(k,31)==1, ifOurCf2eps([mfilename theMethod num2str(k)]), end
   pause(0.05)
 end% for each time
 else%if macro-mesh or micro-surf
@@ -179,7 +271,7 @@ for k=1:nTime
     set(hand,'XData',xk,'YData',yk,'ZData',uk,'CData',uk)
   end
   legend(['time =' num2str(ts(k),4)],'Location','north')
-%  if rem(k,31)==1, ifOurCf2eps([mfilename num2str(k)]), end
+%  if rem(k,31)==1, ifOurCf2eps([mfilename theMethod num2str(k)]), end
   pause(0.05)
 end% for each time
 %%
@@ -202,76 +294,6 @@ $u(x,t)$ of the moving patch scheme applied to nonlinear diffusion~\pde.}
 
 
 
-
-\paragraph{Spectrum of the moving patch system}
-Compute the spectrum based upon the linearisation about some
-state: \(u={}\)constant with \(D=0\) are equilibria;
-otherwise the computation is about a 'quasi-equilibrium' on
-the `fast-time'.
-\begin{matlab}
-%}
-u00 = 0.1
-u0 = u00+0.1*exp(-patches.x.^2-patches.y.^2);
-u0([1 end],:,:,:)=nan;  u0(:,[1 end],:,:)=nan;
-u0 = [zeros(2*Npts,1); u0(:)];
-f0 = mmPatchSys2(0,u0);
-normf0=norm(f0)
-%{
-\end{matlab}
-But we must only use the dynamic variables, so let's find
-where they are. 
-\begin{matlab}
-%}
-i=find(~isnan( u0(:) )); 
-nJac=length(i)
-%{
-\end{matlab}
-Construct Jacobian with numerical differentiation.
-\begin{matlab}
-%}
-deltau=1e-7;
-Jac=nan(nJac);
-for j=1:nJac
-    uj=u0; uj(i(j))=uj(i(j))+deltau;
-    fj = mmPatchSys2(0,uj);
-    Jac(:,j)=(fj(i)-f0(i))/deltau;
-end
-%{
-\end{matlab}
-Compute and plot the spectrum with non-linear axis scaling
-(\cref{fig:mm2dExampleSpec}).
-\begin{matlab}
-%}
-eval=eig(Jac);
-k=find(abs(imag(eval))<1e-6);
-eval(k)=real(eval(k));
-[~,k]=sort(-real(eval));
-eval=eval(k);
-nZero = sum(abs(real(eval))<1e-6)
-nSlow = sum(-3*u00^2*300<real(eval))-nZero
-eSlow = eval(nZero+(1:2:nSlow))
-eFast = eval([nZero+nSlow+1 end])
-figure(3),clf
-plot(asinh(real(eval)),asinh(imag(eval)),'.')
-xlabel('Re\lambda'), ylabel('Im\lambda')
-ticks=[1;2;5]*10.^(0:6);
-ticks=sort([0;ticks(:);-ticks(:)]);
-set(gca,'Xtick',asinh(ticks) ...
-    ,'XtickLabel',cellstr(num2str(ticks,4)) ...
-    ,'XTickLabelRotation',30)
-set(gca,'Ytick',asinh(ticks) ...
-    ,'YtickLabel',cellstr(num2str(ticks,4)))
-grid
-ifOurCf2eps([mfilename 'Spec'])
-%{
-\end{matlab}
-\begin{figure}
-\centering \caption{\label{fig:mm2dExampleSpec}spectrum
-of the moving mesh 2D diffusion system (about \(u=0.1\)).  The
-clusters are: right real, macroscale diffusion modes with some neutral mesh deformations;
-left real, moving mesh and sub-patch modes.}
-\includegraphics[scale=0.85]{Figs/mm2dExampleSpec}
-\end{figure}
 
 Fin.
 %}

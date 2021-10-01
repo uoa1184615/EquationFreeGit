@@ -198,31 +198,24 @@ end
 %{
 \end{matlab}
 Compute and plot the spectrum with non-linear axis scaling
-(\cref{fig:mmBurgersExampleSpec}).
+(\cref{fig:mm1dBurgersExampleSpec}).
 \begin{matlab}
 %}
 eval=-sort(-eig(Jac))
 figure(3),clf
-plot(asinh(real(eval)),asinh(imag(eval)),'.')
+hp=plot(real(eval),imag(eval),'.');
 xlabel('Re\lambda'), ylabel('Im\lambda')
-ticks=[1;2;5]*10.^(0:4);
-ticks=sort([0;ticks(:);-ticks(:)]);
-set(gca,'Xtick',asinh(ticks) ...
-    ,'XtickLabel',cellstr(num2str(ticks,4)) ...
-    ,'XTickLabelRotation',30)
-set(gca,'Ytick',asinh(ticks) ...
-    ,'YtickLabel',cellstr(num2str(ticks,4)))
-grid
+quasiLogAxes(hp,10,1)
 ifOurCf2eps([mfilename 'Spec'])
 %{
 \end{matlab}
 \begin{figure}
-\centering \caption{\label{fig:mmBurgersExampleSpec}spectrum
+\centering \caption{\label{fig:mm1dBurgersExampleSpec}spectrum
 of the moving mesh Burgers' system (about \(u=0.1\)).  The
 four clusters are: right, macroscale Burgers' \pde\ (complex
 conjugate pairs); left complex pairs, sub-patch \pde\ modes;
 left real, moving mesh modes.}
-\includegraphics[scale=0.85]{Figs/mmBurgersExampleSpec}
+\includegraphics[scale=0.85]{Figs/mm1dBurgersExampleSpec}
 \end{figure}
 
 Fin.
