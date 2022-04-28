@@ -1,5 +1,12 @@
 \begin{thebibliography}{xx}
 
+\harvarditem[Biezemans et~al.]{Biezemans, {Le Bris}, Legoll \harvardand\
+  Lozinski}{2022}{Biezemans2022}
+Biezemans, R.~A., {Le Bris}, C., Legoll, F. \harvardand\ Lozinski, A.
+  \harvardyearleft 2022\harvardyearright , Non-intrusive implementation of
+  multiscale finite element methods: an illustrative example, Technical report,
+  \url{https://arxiv.org/abs/2204.06852}.
+
 \harvarditem[Bunder et~al.]{Bunder, Divahar, Kevrekidis, Mattner \harvardand\
   Roberts}{2019}{Bunder2019c}
 Bunder, J., Divahar, J., Kevrekidis, I.~G., Mattner, T.~W. \harvardand\
