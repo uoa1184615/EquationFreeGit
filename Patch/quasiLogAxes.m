@@ -1,5 +1,6 @@
 % quasiLogAxes() transforms the current 2D plot to a
-% quasi-log axes (via asinh).  AJR, 25 Sep 2021
+% quasi-log axes (via asinh).  
+% AJR, 25 Sep 2021 -- 20 May 2022
 %!TEX root = doc.tex
 %{
 \section{\texttt{quasiLogAxes()}: transforms plot to quasi-log axes}
@@ -35,6 +36,10 @@ axis scaling is approximately signed-logarithmic.
 \end{itemize}
 \item \verb|yScale| (optional, default~1): corresponds to
 \verb|xScale| for the vertical axis scaling.
+\item axis limits (optional): if the axis limits of the plot
+do not 'fit' the plot data, then we assume you have set the
+axis limits, in which case these limits are used (horizontal
+and vertical are considered separately).
 \end{itemize}
 
 \paragraph{Example}
@@ -66,6 +71,14 @@ if nargin<2, xScale=1; end
 \paragraph{Output} None, just the transformed plot.
 
 \begin{devMan}
+Get current limits of the plot so we can attempt to detect 
+if a user has set some limits that we should keep.
+\begin{matlab}
+%}
+lims0=axis;
+%{
+\end{matlab}
+
 Scale the plot data in the 2D~plot \verb|handle|. Give an
 error if it appears that the plot-data has already been
 transformed.
@@ -78,16 +91,26 @@ for k=1:length(handle)
     handle(k).YData = asinh(handle(k).YData/yScale);
     handle(k).UserData = 'quasiLogAxes';
 end%for
+lims0=asinh([ lims0(1:2)/xScale lims0(3:4)/yScale ]);
 %{
 \end{matlab}
 Get limits of nonlinearly transformed data, and reset with
 4\%~padding around all margins---crude but serviceable.
-But if the range is too small, then set to plus/minus one.
 \begin{matlab}
 %}
-axis tight; lims=axis; dl=0.04*diff(lims); 
-dl(abs(dl)<4e-5) = 1;
+axis tight; lims=axis; 
+dl=0.04*diff(lims);  %dl(abs(dl)<4e-5) = 1;
 lims = lims+[-dl(1) +dl(1) -dl(3) +dl(3)];
+%{
+\end{matlab}
+But if the range is too different from the original, then
+restore the original.  Then set the limits.
+\begin{matlab}
+%}
+dl=diff(lims); dl0=diff(lims0);
+for k=[1 3], if dl(k)<0.5*dl0(k) | dl(k)>2*dl0(k), 
+    lims(k:k+1)=lims0(k:k+1);
+end, end
 axis(lims)
 %{
 \end{matlab}
@@ -100,27 +123,19 @@ hmax=max(abs(lims(1:2)));
 hmag=floor(log10(xScale*sinh(hmax)));
 %{
 \end{matlab}
-The following decision affecting the number of ticks plotted
-more-or-less assumes that the plot should include relatively
-near-zero data, or the data crosses zero.  It assumes that
-because, if not, then surely a user should use a standard
-log-plot.
-\begin{matlab}
-%}
-if hmag<3, ticks=[1;2;5];
-  elseif hmag<7, ticks=[1;3];
-  else ticks=[1]; 
-  end
-%{
-\end{matlab}
 Form a range of ticks, geometrically spaced, trim off the
 small values that would be too dense near zero (omit those
 within 6\% of \verb|hmax|).
 \begin{matlab}
 %}
-ticks=ticks*10.^(hmag+(-7:0));
+ticks=10.^(hmag+(-7:0));
 j=find(ticks>xScale*sinh(0.06*hmax));
-ticks=sort([0;ticks(j);-ticks(j)]);
+nj=length(j);
+if nj<3,     ticks=[1;2;5]*ticks(j);
+elseif nj<5, ticks=[1;3]*ticks(j);
+else         ticks=ticks(j);
+end
+ticks=sort([0;ticks(:);-ticks(:)]);
 %{
 \end{matlab}
 Set the ticks in place according to the transformation.
@@ -130,7 +145,7 @@ Getting the `parent' gives the axes of the plot~(gca).
 theaxes = get(handle(1),'parent');
 set(theaxes,'Xtick',asinh(ticks/xScale) ...
     ,'XtickLabel',cellstr(num2str(ticks,4)) ...
-    ,'XTickLabelRotation',30)
+    ,'XTickLabelRotation',40)
 %{
 \end{matlab}
 
@@ -140,13 +155,14 @@ Do the same for the vertical axis.
 %}
 vmax=max(abs(lims(3:4)));
 vmag=floor(log10(yScale*sinh(vmax)));
-if vmag<3, ticks=[1;2;5];
-  elseif vmag<7, ticks=[1;3];
-  else ticks=[1]; 
-  end
-ticks=ticks*10.^(vmag+(-7:0));
+ticks=10.^(vmag+(-7:0));
 j=find(ticks>yScale*sinh(0.06*vmax));
-ticks=sort([0;ticks(j);-ticks(j)]);
+nj=length(j);
+if nj<3,     ticks=[1;2;5]*ticks(j);
+elseif nj<5, ticks=[1;3]*ticks(j);
+else         ticks=ticks(j);
+end
+ticks=sort([0;ticks(:);-ticks(:)]);
 set(theaxes,'Ytick',asinh(ticks/yScale) ...
     ,'YtickLabel',cellstr(num2str(ticks,4)))
 %{
