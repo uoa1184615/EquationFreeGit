@@ -1,0 +1,63 @@
+\documentclass[11pt,a5paper]{article}
+\usepackage[a5paper,margin=9mm]{geometry}
+
+\title{Equation-free computational homogenisation with Dirichlet boundaries}
+
+\author{A.~J.~Roberts%
+\thanks{School of Mathematical Sciences, University of Adelaide, South Australia.
+\url{https://profajroberts.github.io},
+\url{http://orcid.org/0000-0001-8930-1552}}
+}
+
+
+% fancyvrb does code listing, including line numbers
+\usepackage{fancyvrb}
+\newenvironment{matlab}%
+    {\Verbatim[numbers=left,firstnumber=\the\inputlineno]}%
+    {\endVerbatim}
+% Also get fancyvrb to omit %{ and %} pairs, 
+% although this requires they always be used
+\makeatletter
+\def\fancyvrbStartStop{%
+  \edef\FancyVerbStartString{\@percentchar\@charrb} 
+  \edef\FancyVerbStopString{\@percentchar\@charlb} }
+\makeatother
+% could change appearance with e.g. \renewcommand{\theFancyVerbLine}{%
+%  \textcolor{red}{\small 8.\alph{FancyVerbLine}}}
+
+
+
+\usepackage{url,microtype,amsmath,amssymb,defns,graphicx,hyperref,doi}
+\hypersetup{colorlinks
+    ,linkcolor=blue,citecolor=blue,pagecolor=blue%
+    ,urlcolor=magenta,filecolor=magenta,breaklinks%
+    ,dvips,bookmarks,bookmarksopen}
+\usepackage[capitalise,nameinlink,noabbrev]{cleveref}
+\crefname{equation}{}{}
+% Default "Item" useless, use enumitem and ref=
+\crefname{enumi}{}{}
+\crefname{enumii}{}{}
+\crefname{enumiii}{}{}
+\crefname{enumiv}{}{}
+
+% These are recommended by Rob J Hyndman (2011)
+% \footnote{\url{http://robjhyndman.com/researchtips/latex-floats/}}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
+
+\def\figurename{\sf Figure}
+
+
+\begin{document}
+\fancyvrbStartStop
+
+\maketitle
+
+\input{Eckhardt221004536.m}
+
+\end{document}
