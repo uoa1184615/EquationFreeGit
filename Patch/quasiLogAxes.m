@@ -1,18 +1,17 @@
-% quasiLogAxes() transforms the current 2D plot to a
-% quasi-log axes (via asinh).  
-% AJR, 25 Sep 2021 -- 20 May 2022
+% quasiLogAxes() transforms the given 2D plot to a quasi-log
+% axes (via asinh).  AJR, 25 Sep 2021 -- 25 Nov 2022
 %!TEX root = doc.tex
 %{
 \section{\texttt{quasiLogAxes()}: transforms plot to quasi-log axes}
 \label{sec:quasiLogAxes}
-%\localtableofcontents
 
-This function rescales and labels the axes of the current
-2D~plot.  The aim is to effectively show the complex
-spectrum of multiscale systems such as the patch scheme. 
-The eigenvalues are over a wide rab=nge of magnitudes, but
-are signed.  So we use a nonlinear asinh transformation of
-the axes, and then label the axes with reasonable ticks.
+This function rescales and labels the axes of the given
+2D~plot.  The original aim was to effectively show the
+complex spectrum of multiscale systems such as the patch
+scheme. The eigenvalues are over a wide range of magnitudes,
+but are signed.  So we use a nonlinear asinh transformation
+of the axes, and then label the axes with reasonable ticks. 
+The nonlinear rescaling is useful in other scenarios also.
 
 Herein \verb|x,y| denotes the original data scale, and
 \verb|h,v| denotes nonlinearly transformed quantities.
@@ -71,11 +70,27 @@ if nargin<2, xScale=1; end
 \paragraph{Output} None, just the transformed plot.
 
 \begin{devMan}
-Get current limits of the plot so we can attempt to detect 
+Get current limits of the plot so we can attempt to detect
 if a user has set some limits that we should keep.
 \begin{matlab}
 %}
 lims0=axis;
+%{
+\end{matlab}
+
+Find overall factors so the data is nonlinearly mapped to
+order oneish---so that then pgfplots et al.\ do not think
+there is an overall scaling factor on the axes.
+\begin{matlab}
+%}
+xFac=0; yFac=0;
+for k=1:length(handle)
+    temp = asinh(handle(k).XData/xScale);
+    xFac = max(xFac, max(abs(temp(:)),[],'omitnan') );
+    temp = asinh(handle(k).YData/yScale);
+    yFac = max(yFac, max(abs(temp(:)),[],'omitnan') );
+end%for
+xFac=9/xFac; yFac=9/yFac;
 %{
 \end{matlab}
 
@@ -87,11 +102,11 @@ transformed.
 for k=1:length(handle)
     assert(~strcmp(handle(k).UserData,'quasiLogAxes'), ...
        'Replot graph, as it appears plot data is already transformed')
-    handle(k).XData = asinh(handle(k).XData/xScale);
-    handle(k).YData = asinh(handle(k).YData/yScale);
+    handle(k).XData = xFac*asinh(handle(k).XData/xScale);
+    handle(k).YData = yFac*asinh(handle(k).YData/yScale);
     handle(k).UserData = 'quasiLogAxes';
 end%for
-lims0=asinh([ lims0(1:2)/xScale lims0(3:4)/yScale ]);
+lims0=[xFac*asinh(lims0(1:2)/xScale) yFac*asinh(lims0(3:4)/yScale) ];
 %{
 \end{matlab}
 Get limits of nonlinearly transformed data, and reset with
@@ -120,7 +135,7 @@ Get the order of magnitude of the horizontal data.
 \begin{matlab}
 %}
 hmax=max(abs(lims(1:2)));
-hmag=floor(log10(xScale*sinh(hmax)));
+hmag=floor(log10(xScale*sinh(hmax/xFac)));
 %{
 \end{matlab}
 Form a range of ticks, geometrically spaced, trim off the
@@ -129,7 +144,7 @@ within 6\% of \verb|hmax|).
 \begin{matlab}
 %}
 ticks=10.^(hmag+(-7:0));
-j=find(ticks>xScale*sinh(0.06*hmax));
+j=find(ticks>xScale*sinh(0.06*hmax/xFac));
 nj=length(j);
 if nj<3,     ticks=[1;2;5]*ticks(j);
 elseif nj<5, ticks=[1;3]*ticks(j);
@@ -143,7 +158,7 @@ Getting the `parent' gives the axes of the plot~(gca).
 \begin{matlab}
 %}
 theaxes = get(handle(1),'parent');
-set(theaxes,'Xtick',asinh(ticks/xScale) ...
+set(theaxes,'Xtick',xFac*asinh(ticks/xScale) ...
     ,'XtickLabel',cellstr(num2str(ticks,4)) ...
     ,'XTickLabelRotation',40)
 %{
@@ -154,16 +169,16 @@ Do the same for the vertical axis.
 \begin{matlab}
 %}
 vmax=max(abs(lims(3:4)));
-vmag=floor(log10(yScale*sinh(vmax)));
+vmag=floor(log10(yScale*sinh(vmax/yFac)));
 ticks=10.^(vmag+(-7:0));
-j=find(ticks>yScale*sinh(0.06*vmax));
+j=find(ticks>yScale*sinh(0.06*vmax/yFac));
 nj=length(j);
 if nj<3,     ticks=[1;2;5]*ticks(j);
 elseif nj<5, ticks=[1;3]*ticks(j);
 else         ticks=ticks(j);
 end
 ticks=sort([0;ticks(:);-ticks(:)]);
-set(theaxes,'Ytick',asinh(ticks/yScale) ...
+set(theaxes,'Ytick',yFac*asinh(ticks/yScale) ...
     ,'YtickLabel',cellstr(num2str(ticks,4)))
 %{
 \end{matlab}
