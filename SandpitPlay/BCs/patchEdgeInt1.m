@@ -15,11 +15,11 @@ average \cite[]{Bunder2013b}, or the opposite next-to-edge
 values \cite[]{Bunder2020a}---this last alternative often
 maintains symmetry.  This function is primarily used by
 \verb|patchSys1()| but is also useful for user graphics.
-When using core averages (not fully implemented), assumes the averages are sensible
-macroscale variables: then patch edge values are determined
-by macroscale interpolation of the core averages
-\citep{Bunder2013b}. 
-\footnote{Script \texttt{patchEdgeInt1test.m} verifies this code, but not yet the non-periodic code.}
+When using core averages (not fully implemented), assumes
+the averages are sensible macroscale variables: then patch
+edge values are determined by macroscale interpolation of
+the core averages \citep{Bunder2013b}. \footnote{Script
+\texttt{patchEdgeInt1test.m} verifies this code.}
 
 
 Communicate patch-design variables via a second argument
@@ -57,13 +57,17 @@ microscales.
 \item \verb|.ordCC| is order of interpolation, integer~$\geq
 -1$.
 
-\item \verb|periodic| indicates whether macroscale is periodic domain, or alternatively that the macroscale has left and right boundaries so interpolation is via divided differences. 
+\item \verb|periodic| indicates whether macroscale is
+periodic domain, or alternatively that the macroscale has
+left and right boundaries so interpolation is via divided
+differences. 
 
 \item \verb|.stag| in $\{0,1\}$ is one for staggered grid
 (alternating) interpolation, and zero for ordinary grid.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| are the coupling
-coefficients for finite width interpolation---when invoking a periodic domain.
+coefficients for finite width interpolation---when invoking
+a periodic domain.
 
 \item \verb|.EdgyInt|, true/false, for determining
 patch-edge values by interpolation: 
@@ -75,7 +79,8 @@ false, from centre-patch values (original scheme).
 
 \item \verb|.parallel| whether serial or parallel.
 
-\item \verb|.nCore| \todo{introduced sometime but not fully implemented yet, because prefer ensemble}
+\item \verb|.nCore| \todo{introduced sometime but not fully
+implemented yet, because prefer ensemble}
 
 \item \todo{additional macros bdry info}
 
@@ -380,7 +385,11 @@ p=min(patches.ordCC,Nx-1);
 F=nan(patches.EdgyInt+1,nVars,nEnsem,Nx,p+1);
 %{
 \end{matlab}
-Set function values in first `column' of the table for every variable and across ensemble.  For~\verb|EdgyInt|, the `reversal' of the next-to-edge values are because their values are to interpolate to the opposite edge of each patch.
+Set function values in first `column' of the table for every
+variable and across ensemble.  For~\verb|EdgyInt|, the
+`reversal' of the next-to-edge values are because their
+values are to interpolate to the opposite edge of each
+patch.
 \begin{matlab}
 %}
   if patches.EdgyInt % interpolate next-to-edge values
@@ -392,7 +401,9 @@ Set function values in first `column' of the table for every variable and across
   end;
 %{
 \end{matlab}
-Compute table of (forward) divided differences \cite[e.g.,][]{DividedDifferences} for every variable and across ensemble.
+Compute table of (forward) divided differences
+\cite[e.g.,][]{DividedDifferences} for every variable and
+across ensemble.
 \begin{matlab}
 %}
 for q=1:p
@@ -408,7 +419,10 @@ Now interpolate to the edge-values at locations~\verb|Xs|.
 Xedge = patches.x([1 nx],:,:,:);
 %{
 \end{matlab}
-Indices~\verb|i| are those of the left end of each interpolation stencil because the table is of forward differences.  Code Horner's evaluation of the interpolation polynomials.
+Indices~\verb|i| are those of the left end of each
+interpolation stencil because the table is of forward
+differences.  Code Horner's evaluation of the interpolation
+polynomials.
 \begin{matlab}
 %}
 i=max(1,min(1:Nx,Nx-ceil(p/2))-floor(p/2));
@@ -418,14 +432,18 @@ for q=p:-1:1
 end
 %{
 \end{matlab}
-Insert edge values into the array of field values, using the required ensemble shifts.
+Insert edge values into the array of field values, using the
+required ensemble shifts.
 \begin{matlab}
 %}
 u(1 ,:,patches.le,I) = Uedge(1,:,:,I);
 u(nx,:,patches.ri,I) = Uedge(2,:,:,I);
 %{
 \end{matlab}
-We want a user to set the extreme patch edge values according to the microscale boundary conditions that hold at the extremes of the domain.  Consequently, override their computed interpolation values with~\verb|NaN|.
+We want a user to set the extreme patch edge values
+according to the microscale boundary conditions that hold at
+the extremes of the domain.  Consequently, may override
+their computed interpolation values with~\verb|NaN|.
 \begin{matlab}
 %}
 %u(1,:,:,1)  = nan;

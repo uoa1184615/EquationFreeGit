@@ -1,9 +1,9 @@
-% Test the spectral, finite-width, and divided difference 1D interpolation of
-% patchEdgeInt1(), for one or several variables, including
-% normal grid and staggered grid, and also edgy
-% interpolation. All tests passed in 2019--2020, except not
-% testing the zig-zag modes.
-% AJR, 26 Sep 2018 -- Jan 2022
+% Test the spectral, finite-width, and divided difference 1D
+% interpolation of patchEdgeInt1(), for one or several
+% variables, including normal grid and staggered grid, and
+% also edgy interpolation. All tests passed in 2019--2020,
+% except not testing the zig-zag modes.
+% AJR, 26 Sep 2018 -- Jan 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt1test}: test the 1D patch coupling}
@@ -13,7 +13,7 @@ A script to test the spectral and finite-order polynomial
 interpolation of function \verb|patchEdgeInt1()|. Tests one
 or several variables,  normal and staggered grids, and also
 tests centre and edge interpolation.  But does not yet test
-core averaging, etc.
+core averaging, nor divided differences on staggered, etc.
 
 Start by establishing global data struct for the range of
 various cases.
@@ -31,10 +31,11 @@ nSubP=5
 
 
 \subsubsection{Check divided difference interpolation}
-But not yet implemented staggered grid version?? 
-Check over various types and orders of interpolation,
-numbers of patches, random domain lengths, random ratios, and randomised distribution of patches.
-(The \verb|@sin| is a dummy.)
+But not yet implemented staggered grid version?? Check over
+various types and orders of interpolation, numbers of
+patches, random domain lengths, random ratios, and
+randomised distribution of patches. (The \verb|@sin| is a
+dummy.)
 \begin{matlab}
 %}
 for edgyInt=[mod(nSubP,2)==0 true]
@@ -49,7 +50,8 @@ for nPatch=ordCC+(2:4)
         ,'EdgyInt',edgyInt);
 %{
 \end{matlab}
-Until \verb|configPatches1| updated, change the data structure here: first, specify general divided differences.
+Until \verb|configPatches1| updated, change the data
+structure here: first, specify general divided differences.
 \begin{matlab}
 %}
 patches.periodic=false;
@@ -84,7 +86,11 @@ dimension of an `ensemble'.
     ui=squeeze(ui);
 %{
 \end{matlab}
-All patches should have zero error.  High-order interpolation seems to be more affected by round-off so relax error size.
+All patches should have zero error: but need to either in
+\verb|patchEdgeInt1| comment out \verb|NaN| assignment of
+boundary values, or not test the two extreme patches here,
+or add code to omit NaNs here.  High-order interpolation
+seems to be more affected by round-off so relax error size.
 \begin{matlab}
 %}
     j=1:nPatch;
@@ -102,7 +108,7 @@ End the for-loops over various parameters.
 %}
 end,end,end
 disp('Passed all divided difference interpolation')
-%error('Not testing any further')
+%error('Not testing any further')% temporary halt
 %{
 \end{matlab}
 
