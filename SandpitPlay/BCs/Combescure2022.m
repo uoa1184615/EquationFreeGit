@@ -80,7 +80,7 @@ different functions~\(w'_p(\epsilon):=\epsilon-M_p\epsilon^3+\epsilon^5\) \cite[
 
 
 \subsection{Configure heterogeneous toy elasticity systems}
-\label{sec:sc2heterodiff}
+%\label{sec:sc2heterodiff}
 
 
 Set some physical parameters.

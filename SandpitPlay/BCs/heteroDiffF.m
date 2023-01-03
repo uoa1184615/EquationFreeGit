@@ -6,11 +6,12 @@
 \label{sec:heteroDiffF}
 
 This function codes the lattice heterogeneous diffusion
-inside the patches with forcing and with microscale boundary conditions on the macroscale boundaries.  Computes the time derivative at each
-point in the interior of a patch, output in~\verb|ut|.  The
-column vector of diffusivities~\(a_i\) has been stored in
-struct~\verb|patches.cs|, as has the array of forcing
-coefficients.
+inside the patches with forcing and with microscale boundary
+conditions on the macroscale boundaries.  Computes the time
+derivative at each point in the interior of a patch, output
+in~\verb|ut|.  The column vector of diffusivities~\(a_i\)
+has been stored in struct~\verb|patches.cs|, as has the
+array of forcing coefficients.
 \begin{matlab}
 %}
 function ut = heteroDiffF(t,u,patches)

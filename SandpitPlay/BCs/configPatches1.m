@@ -1,6 +1,6 @@
 % configPatches1() creates a data struct of the design of
 % patches for later use by the patch functions such as
-% patchSys1(). AJR, Nov 2017 -- Jan 2023
+% patchSys1(). AJR, Nov 2017 -- 4 Jan 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches1()}: configures spatial
@@ -42,14 +42,16 @@ the interval~$[\verb|Xlim(1)|,\verb|Xlim(2)|]$.
 the patches, and reflects the type of microscale boundary
 conditions of the problem.   If \verb|Dom| is \verb|NaN| or
 \verb|[]|, then the field~\verb|u| is macro-periodic in the
-1D spatial domain, and resolved on equi-spaced patches.  
-Otherwise \verb|Dom| is a structure with the following
-components.
+1D spatial domain, and resolved on equi-spaced patches. If
+\verb|Dom| is a character string, then that specifies the
+\verb|.type| of the following structure, with
+\verb|.bcOffset| set to the default zero. Otherwise
+\verb|Dom| is a structure with the following components.
 \begin{itemize}
 
 \item \verb|.type|, string, of either \verb|'periodic'| (the
 default), \verb|'equispaced'|, \verb|'chebyshev'|,
-\verb|'given'|. For all cases except \verb|'periodic'|,
+\verb|'given'|.  For all cases except \verb|'periodic'|,
 users \emph{must} code into \verb|fun| the micro-grid
 boundary conditions that apply at the left(right) edge of
 the leftmost(rightmost) patches.
@@ -401,7 +403,9 @@ if isempty(Dom), Dom=struct('type','periodic'); end
 if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic'); end
 %{
 \end{matlab}
-If \verb|Dom| is a string, then just set type to that string, and then get corresponding defaults for others fields.
+If \verb|Dom| is a string, then just set type to that
+string, and then get corresponding defaults for others
+fields.
 \begin{matlab}
 %}
 if ischar(Dom), Dom=struct('type',Dom); end
@@ -521,7 +525,8 @@ The Chebyshev case is spaced according to the Chebyshev
 distribution in order to reduce macro-interpolation errors,
 \(X_i \propto -cos(i\pi/N)\),  but with the extreme edges
 aligned with the spatial domain boundaries, modified by the
-offset.
+offset.  Should change the following so edgyInt does not
+overlap, and other wise only overlaps halfway??
 \begin{matlab}
 %}
 case 'chebyshev'

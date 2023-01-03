@@ -65,5 +65,51 @@
     \field{month}{11}
     \field{year}{2022}
   \endentry
+
+  \entry{Eckhardt2022}{report}{}
+    \name{author}{2}{}{%
+      {{hash=ED}{%
+         family={Eckhardt},
+         familyi={E\bibinitperiod},
+         given={Daniel},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=VB}{%
+         family={Verf{\"u}rth},
+         familyi={V\bibinitperiod},
+         given={Barbara},
+         giveni={B\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{EDVB1}
+    \strng{fullhash}{EDVB1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2022}
+    \field{labeldatesource}{year}
+    \field{sortinit}{E}
+    \field{sortinithash}{E}
+    \field{abstract}{%
+    The aim of this work is the numerical homogenization of a parabolic problem
+  with several time and spatial scales using the heterogeneous multiscale
+  method. We replace the actual cell problem with an alternate one, using
+  Dirichlet boundary and initial values instead of periodic boundary and time
+  conditions. Further, we give a detailed a priori error analysis of the fully
+  discretized, i.e., in space and time for both the macroscopic and the cell
+  problem, method. Numerical experiments illustrate the theoretical convergence
+  rates.%
+    }
+    \field{title}{Fully discrete Heterogeneous Multiscale Method for parabolic
+  problems with multiple spatial and temporal scales}
+    \list{institution}{1}{%
+      {\url{http://arxiv.org/abs/2210.04536}}%
+    }
+    \field{type}{techreport}
+    \field{annotation}{%
+    Comment: 46 pages, 4 figures%
+    }
+    \field{month}{10}
+    \field{year}{2022}
+  \endentry
 \enddatalist
 \endinput
