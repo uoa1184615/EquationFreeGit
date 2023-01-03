@@ -132,12 +132,6 @@ u = reshape(u,nx,nVars,nEnsem,Nx);
 If the user has not defined the patch core, then we assume
 it to be a single point in the middle of the patch, unless
 we are interpolating from next-to-edge values. 
-Get the size ratios of the patches.
-\begin{matlab}
-%}
-r = patches.ratio(1);
-%{
-\end{matlab}
 
 For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
@@ -164,6 +158,12 @@ c = round((patches.nCore-1)/2);
 \begin{matlab}
 %}
 if patches.periodic
+%{
+\end{matlab}
+Get the size ratios of the patches, then use finite width stencils or spectral.
+\begin{matlab}
+%}
+r = patches.ratio(1);
 if patches.ordCC>0 % then finite-width polynomial interpolation
 %{
 \end{matlab}

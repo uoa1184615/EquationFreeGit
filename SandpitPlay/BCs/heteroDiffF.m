@@ -1,12 +1,12 @@
 % Computes the time derivatives of forced heterogeneous
-% diffusion in 1D on patches.  AJR, Apr 2019 -- 20 Oct 2022
+% diffusion in 1D on patches.  AJR, Apr 2019 -- 3 Jan 2023
 %!TEX root = doc.tex
 %{
 \subsection{\texttt{heteroDiffF()}: forced heterogeneous diffusion}
 \label{sec:heteroDiffF}
 
 This function codes the lattice heterogeneous diffusion
-inside the patches.  Computes the time derivative at each
+inside the patches with forcing and with microscale boundary conditions on the macroscale boundaries.  Computes the time derivative at each
 point in the interior of a patch, output in~\verb|ut|.  The
 column vector of diffusivities~\(a_i\) has been stored in
 struct~\verb|patches.cs|, as has the array of forcing
@@ -15,6 +15,10 @@ coefficients.
 %}
 function ut = heteroDiffF(t,u,patches)
   global microTimePeriod
+  % macroscale Dirichlet BCs
+  u( 1 ,:,:, 1 )=0; % left-edge of leftmost is zero
+  u(end,:,:,end)=0; % right-edge of rightmost is zero
+  % interior forced diffusion
   dx = diff(patches.x(2:3));   % space step
   i = 2:size(u,1)-1;   % interior points in a patch
   ut = nan+u;          % preallocate output array

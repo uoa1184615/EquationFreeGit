@@ -1,10 +1,8 @@
 % Simulate forced heterogeneous diffusion in 1D on patches
 % as an example application of patches in space. Adapted for
 % the second example of Eckhardt2210.04536 (section 6.2.1).
-% Here implement Dirichlet BCs on the macroscale by placing
-% patches centred on the boundaries and requiring
-% odd-periodic extensions of fields and forcing.   AJR, Nov
-% 2019 -- 20 Oct 2022
+% Implement Dirichlet BCs using new facilities in the patch
+% toolbox.   AJR, Nov 2019 -- 3 Jan 2023
 %!TEX root = doc.tex
 %{
 \section{\texttt{Eckhardt221004536}: example of a 1D
@@ -38,29 +36,39 @@ simulation \(r=1\).}
 \includegraphics[width=12cm]{Figs/Eckhardt221004536.png}
 \end{figure}
 
-Here use period \(\epsilon=1/200\) (so that computation
+Here use period \(\epsilon=1/130\) (so that computation
 completes in seconds).  The patch scheme computes only on a
-fraction~\(r\) of the spatial domain, see
+fraction of the spatial domain, see
 \cref{fig:Eckhardt221004536}.  Compute \emph{errors} as the
 maximum difference (at time $t=1$) between the patch scheme
-prediction and a full domain simulation of the same
+prediction and a full-domain simulation of the same
 underlying spatial discretisation (which here has space
-step~\(1/1200\)). 
+step~\(0.00128\)). 
 \begin{equation*}
 \begin{array}{lrrrr}
-\text{patch ratio }r& 0.5& 0.2& 0.1& 0.05\\
-\text{sine-forcing error}& 0.5e{-}8& 1.4e{-8}& 1.8e{-8}& 2.1e{-}8\\
-\text{Eckhardt-forcing error}& 0.0018&  0.0038&  0.0046&  0.0051
+\text{patch spacing }H& 0.25& 0.12& 0.06& 0.03\\
+\text{sine-forcing error}& 0.0018& 0.0009& 0.0002& 1.6e{-}5\\
+\text{parabolic-forcing error}& 9.0e{-}9&  3.7e{-}9&  0.9e{-}9&  0.06e{-}9
 \end{array}
 \end{equation*}
 The smooth sine-forcing leads to errors that appear due to
-the integration tolerance of \verb|ode15s|. The
-Eckhardt-forcing errors are then viewed as either due to
-boundary layers next to the Dirichlet boundaries, or
-equivalently due to the lack of smoothness in the
-odd-periodic extensions of the forcing required to preserve
-the Dirichlet conditions.
+patch scheme and its interpolation. The parabolic-forcing
+errors appear to be due to the integration errors of
+\verb|ode15s| and not at all due to the patches.
 
+With Chebyshev distribution the following errors look a bit
+odd?? But then errors are a bit weird anyway as the
+microscale heterogeneity is phase shifted in each patch, and
+because the patches overlap, and because the putative
+`full-domain' solution is not actually full-domain due to
+its gaps and over-laps.
+\begin{equation*}
+\begin{array}{lrrrr}
+\text{mean spacing }H& 0.25& 0.12& 0.06& 0.03\\
+\text{sine-forcing error}& 0.0011& 0.0064& 0.0019& 0.0001\\
+\text{parabolic-forcing error}& 4.6e{-}9&  22.4e{-}9&  7.9e{-}9&  0.5e{-}9
+\end{array}
+\end{equation*}
 
 
 
@@ -73,12 +81,10 @@ micro-period~\verb|mPeriod| on the lattice, and coefficients
 to match Eckhardt2210.04536 \S6.2.1. Set the phase of the
 heterogeneity so that each patch centre is a point of
 symmetry of the diffusivity. Then the heterogeneity is
-repeated to fill each patch. If an odd number of odd-periods
-in a patch, then the centre patch is a grid point of the
-field~\(u\), otherwise the centre patch is at a half-grid
-point.
+repeated to fill each patch. 
 \begin{matlab}
 %}
+clear all
 mPeriod = 6
 y = linspace(0,1,mPeriod+1)';
 a = 1./(2-cos(2*pi*y(1:mPeriod)))
@@ -86,70 +92,69 @@ global microTimePeriod; microTimePeriod=0;
 %{
 \end{matlab}
 
-Set the periodicity, via integer~\(1/\epsilon\), and other
-parameters.
+Set the spatial period~\(\epsilon\), via
+integer~\(1/\epsilon\), and other parameters.
 \begin{matlab}
 %}
-rEpsilon = 200
-dx = 1/(mPeriod*rEpsilon)
-nP = 5 % the number of patches on [0 1]
-maxPeriodsPatch = rEpsilon/nP
-tol=1e-9;
+maxLog2Nx = 6
+nPeriodsPatch = 2 % any integer
+rEpsilon = nPeriodsPatch*(2^maxLog2Nx+1) % up to 200 say
+dx = 1/(mPeriod*rEpsilon+1)
+nSubP = nPeriodsPatch*mPeriod+2
+tol=1e-9
 %{
 \end{matlab}
 Loop to explore errors on various sized patches.
 \begin{matlab}
 %}
-nPPs = maxPeriodsPatch./[1 2 5 10 20 50 100];
-nPPs = nPPs(nPPs>1)
-Us=[]; Uerr=0;% for storing results to compare
-for iPP = 1:length(nPPs)
-nPeriodsPatch = nPPs(iPP)
+Us=[]; DXs=[]; % for storing results to compare
+iPP=0; I=nan;
+for log2Nx = 2:maxLog2Nx
+nP = 2^log2Nx+1
+%{
+\end{matlab}
+Determine indices of patches that are common in various resolutions
+\begin{matlab}
+%}
+if isnan(I), I=1:nP; else I=2*I-1; end
 %{
 \end{matlab}
 
 
 Establish the global data struct~\verb|patches| for the
 microscale heterogeneous lattice diffusion
-system~\cref{eq:hetroDiffF} solved on \(2\)-periodic domain,
-with \verb|2*nP| patches,  and spectral interpolation to
-provide the edge-values of the inter-patch coupling
-conditions\footnote{Curiously, for low-order
-interpolation---less than order~8---the error for large
-patches is larger than that for small patches}. Setting
-\verb|patches.EdgyInt| true means the edge-values come from
-interpolating the opposite next-to-edge values of the
-patches (not the mid-patch values).  
+system~\cref{eq:hetroDiffF} solved on domain~\([0,1]\), with
+\verb|nP| patches,  and say fourth order interpolation to
+provide the edge-values.  Setting \verb|patches.EdgyInt|
+true means the edge-values come from interpolating the
+opposite next-to-edge values of the patches (not the
+mid-patch values).  
 \begin{matlab}
 %}
-ratio = nPeriodsPatch/maxPeriodsPatch
-nSubP = nPeriodsPatch*mPeriod+2
 global patches
-configPatches1(@heteroDiffF,[0 2],nan,2*nP ...
-    ,0,ratio,nSubP,'EdgyInt',true,'hetCoeffs',a);
-patches.x = patches.x-1+1/(2*nP);% shift so [0,1] is 2nd half of patches
-%x=squeeze(patches.x) % optionally disp the spatial grid
+ordCC = 4
+configPatches1(@heteroDiffF,[0 1],'equispaced',nP ...
+    ,ordCC,dx,nSubP,'EdgyInt',true,'hetCoeffs',a);
 assert(abs(dx-diff(patches.x(1:2)))<tol,'sub-patch-grid config error')
+DX = mean(diff(squeeze(patches.x(1,1,1,:))))
+DXs=[DXs;DX];
 %{
 \end{matlab}
 
-Set the forcing coefficients as the odd-periodic extensions,
-accounting for roundoff error in~\verb|f2|.
+Set the forcing coefficients, either the original parabolic,
+or sinusoidal.
 \begin{matlab}
 %}
-if 1 % odd-periodic extension of given forcing
-patches.f1=2*( patches.x-sign(patches.x).*patches.x.^2 ...
-              +(patches.x>1).*(patches.x-1).^2*2 );
-patches.f2=2*0.5*sign(patches.x.*(1-patches.x)) ...
-    .*(abs(patches.x.*(1-patches.x))>tol);
-else% simple sine forcing give errors less than 2e-8
+if 1 % given forcing
+patches.f1=2*( patches.x-patches.x.^2 );
+patches.f2=2*0.5+0*patches.x;
+else% simple sine forcing 
 patches.f1=sin(pi*patches.x);
 patches.f2=pi/2*sin(pi*patches.x);
 end%if
-%f1=squeeze(patches.f1)% optionally disp spatial pattern f1
-%f2=squeeze(patches.f2)% optionally disp spatial pattern f2
 %{
 \end{matlab}
+
 
 
 \paragraph{Simulate}
@@ -158,7 +163,9 @@ Integrate to time~1 using standard integrators.
 \begin{matlab}
 %}
 u0 = 0*patches.x;
+tic
 [ts,us] = ode15s(@patchSys1, [0 1], u0(:));
+cpuTime=toc
 %{
 \end{matlab}
 
@@ -171,24 +178,12 @@ interpolate to get edge values, pad with \verb|nan|s, and
 reshape again. 
 \begin{matlab}
 %}
-xs = squeeze(patches.x);  
+xs = squeeze(patches.x);
 us = patchEdgeInt1( permute( reshape(us ...
-    ,length(ts),nSubP,1,nPatch) ,[2 1 3 4]) );
+    ,length(ts),nSubP,1,nP) ,[2 1 3 4]) );
 us = squeeze(us);
 xs(end+1,:) = nan;  us(end+1,:,:) = nan;
 uss=reshape(permute(us,[1 3 2]),[],length(ts));
-%{
-\end{matlab}
-
-Test the error in BC is negligible, for both when micro-grid
-point on boundary and when micro-grid points straddle
-boundary.
-\begin{matlab}
-%}
-i=[ max(find(xs<+tol)) min(find(xs>1-tol)) ];
-j=[ min(find(xs>-tol)) max(find(xs<1+tol)) ];
-maxBCerror=max(max( abs(uss(i,:)+uss(j,:))/2 ));
-assert(maxBCerror<tol,'BC failure')
 %{
 \end{matlab}
 
@@ -196,33 +191,43 @@ Plot a space-time surface of field values over the
 macroscale duration of the simulation.
 \begin{matlab}
 %}
+iPP=iPP+1;
 if iPP<=4 % only draw four subplots
-  i=j(1):j(2);
   figure(1), if iPP==1, clf(), end
   subplot(2,2,iPP)
-  mesh(ts,xs(i),uss(i,:)) 
-  view(60,40), colormap(0.8*hsv)
+  mesh(ts,xs(:),uss) 
+  if iPP==1, uMax=ceil(max(uss(:))*100)/100, end
+  view(60,40), colormap(0.8*hsv), zlim([0 uMax])
   xlabel('time t'), ylabel('space x'), zlabel('u(x,t)') 
-  title(['patch ratio r = ' num2str(ratio)])
+%  title(['patch ratio r = ' num2str(ratio)])
   drawnow
 end%if 
 %{
 \end{matlab}
 
-At the end of the \verb|iPP|-loop, store field from centre
-region of each patch for comparison.
+At the end of the \verb|log2Nx|-loop, store field at the
+end-time from centre region of each patch for comparison.
 \begin{matlab}
 %}
 i=nPeriodsPatch/2*mPeriod+1+(-mPeriod/2+1:mPeriod/2);
-Us(:,:,iPP)=squeeze(us(i,end,:));
-Xs=squeeze(patches.x(i,1,1,:));
+Us(:,:,iPP)=squeeze(us(i,end,I));
+Xs=squeeze(patches.x(i,1,1,I));
 if iPP>1
    assert(norm(Xs-Xsp)<tol,'sampling error in space')
-   Uerr(iPP)=max(max(abs(squeeze(Us(:,:,iPP)-Us(:,:,1)))))
    end
 Xsp=Xs; 
-end%for iPP
+end%for log2Nx
 ifOurCf2eps(mfilename) %optionally save figure
+%{
+\end{matlab}
+Assess errors by comparing to the full-domain solution
+\begin{matlab}
+%}
+DXs=DXs
+Uerr=squeeze(max(max(abs(Us-Us(:,:,end)))))
+figure(2),clf,
+loglog(DXs,Uerr,'o:')
+xlabel('H'),ylabel('error')
 %{
 \end{matlab}
 

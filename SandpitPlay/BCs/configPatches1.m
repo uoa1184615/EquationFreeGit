@@ -307,19 +307,22 @@ surf(ts,patches.x(:),us)
 view(60,40), colormap(0.8*hsv)
 title('Burgers PDE: patches in space, continuous time')
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-ifOurCf2eps(mfilename)
 %{
 \end{matlab}
+
 \begin{figure}
 \centering \caption{\label{fig:config1Burgers}field
 $u(x,t)$ of the patch scheme applied to Burgers'~\pde.}
 \includegraphics[scale=0.85]{configPatches1}
 \end{figure}
-Upon finishing execution of the example, exit this function.
+Upon finishing execution of the example, optionally save 
+the graph to be shown in \cref{fig:config1Burgers}, then 
+exit this function.
 \begin{matlab}
 %}
+ifOurCf2eps(mfilename)
 return
-end%if no arguments
+end%if nargin==0
 %{
 \end{matlab}
 
@@ -384,7 +387,8 @@ For compatibility with pre-2023 functions, if parameter
 be the value of the so-called \verb|dx| parameter.
 \begin{matlab}
 %}
-pre2023=isnan(Dom);
+if ~isstruct(Dom), pre2023=isnan(Dom);
+else pre2023=false; end
 if pre2023, ratio=dx; dx=nan; end
 %{
 \end{matlab}
@@ -395,6 +399,12 @@ spaced patches.
 %}
 if isempty(Dom), Dom=struct('type','periodic'); end
 if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic'); end
+%{
+\end{matlab}
+If \verb|Dom| is a string, then just set type to that string, and then get corresponding defaults for others fields.
+\begin{matlab}
+%}
+if ischar(Dom), Dom=struct('type',Dom); end
 %{
 \end{matlab}
 Check what is and is not specified, and provide default of
@@ -503,8 +513,8 @@ modified by the offset.
 \begin{matlab}
 %}
 case 'equispaced'
-  X=linspace(Xlim(1)+(nSubP-1-Dom.bcOffset(1))*dx ...
-            ,Xlim(2)-(nSubP-1-Dom.bcOffset(2))*dx ,nPatch);
+  X=linspace(Xlim(1)+((nSubP-1)/2-Dom.bcOffset(1))*dx ...
+            ,Xlim(2)-((nSubP-1)/2-Dom.bcOffset(2))*dx ,nPatch);
 %{
 \end{matlab}
 The Chebyshev case is spaced according to the Chebyshev
@@ -515,8 +525,8 @@ offset.
 \begin{matlab}
 %}
 case 'chebyshev'
-  X1 = Xlim(1)+(nSubP-1-Dom.bcOffset(1))*dx;
-  X2 = Xlim(2)-(nSubP-1-Dom.bcOffset(2))*dx;
+  X1 = Xlim(1)+((nSubP-1)/2-Dom.bcOffset(1))*dx;
+  X2 = Xlim(2)-((nSubP-1)/2-Dom.bcOffset(2))*dx;
   X = (X1+X2)/2-(X2-X1)/2*cos(linspace(0,pi,nPatch));
 %{
 \end{matlab}
