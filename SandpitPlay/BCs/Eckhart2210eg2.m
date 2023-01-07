@@ -140,7 +140,6 @@ global patches
 ordCC = 4
 configPatches1(@heteroDiffF,[0 1],'equispaced',nP ...
     ,ordCC,dx,nSubP,'EdgyInt',true,'hetCoeffs',a);
-assert(abs(dx-diff(patches.x(1:2)))<tol,'sub-patch-grid config error')
 DX = mean(diff(squeeze(patches.x(1,1,1,:))))
 DXs=[DXs;DX];
 %{
@@ -204,7 +203,6 @@ if iPP<=4 % only draw four subplots
   if iPP==1, uMax=ceil(max(uss(:))*100)/100, end
   view(60,40), colormap(0.8*hsv), zlim([0 uMax])
   xlabel('time t'), ylabel('space x'), zlabel('u(x,t)') 
-%  title(['patch ratio r = ' num2str(ratio)])
   drawnow
 end%if 
 %{

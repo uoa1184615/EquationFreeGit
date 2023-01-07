@@ -373,6 +373,8 @@ patches.nCore = p.Results.nCore;
 Check parameters.
 \begin{matlab}
 %}
+assert(Xlim(1)<Xlim(2) ...
+      ,'two entries of Xlim must be ordered increasing')
 assert(patches.nEdge==1 ...
       ,'multi-edge-value interp not yet implemented')
 assert(2*patches.nEdge+1<=nSubP ...
@@ -486,6 +488,7 @@ of patches, depending upon \verb|Dom.type|.
 switch Dom.type
 %{
 \end{matlab}
+%: case periodic
 The periodic case is evenly spaced within the spatial domain.
 Store the size ratio in \verb|patches|.
 \begin{matlab}
@@ -511,6 +514,7 @@ extend to coupling via derivative values.)
   end
 %{
 \end{matlab}
+%: case equispaced
 The equi-spaced case is also evenly spaced but with the
 extreme edges aligned with the spatial domain boundaries,
 modified by the offset.
@@ -519,22 +523,54 @@ modified by the offset.
 case 'equispaced'
   X=linspace(Xlim(1)+((nSubP-1)/2-Dom.bcOffset(1))*dx ...
             ,Xlim(2)-((nSubP-1)/2-Dom.bcOffset(2))*dx ,nPatch);
+  DX=diff(X(1:2));
+  width=(1+patches.EdgyInt)/2*(nSubP-1-patches.EdgyInt)*dx;
+  if DX<width*0.999999
+     warning('too many equispaced patches (double overlapping)')
+     end
 %{
 \end{matlab}
+%: case chebyshev
 The Chebyshev case is spaced according to the Chebyshev
 distribution in order to reduce macro-interpolation errors,
 \(X_i \propto -cos(i\pi/N)\),  but with the extreme edges
 aligned with the spatial domain boundaries, modified by the
-offset.  Should change the following so edgyInt does not
-overlap, and other wise only overlaps halfway??
+offset, and modified by possible `boundary layers'.  
 \begin{matlab}
 %}
 case 'chebyshev'
-  X1 = Xlim(1)+((nSubP-1)/2-Dom.bcOffset(1))*dx;
-  X2 = Xlim(2)-((nSubP-1)/2-Dom.bcOffset(2))*dx;
-  X = (X1+X2)/2-(X2-X1)/2*cos(linspace(0,pi,nPatch));
+  halfWidth=dx*(nSubP-1)/2;
+  X1 = Xlim(1)+halfWidth-Dom.bcOffset(1)*dx;
+  X2 = Xlim(2)-halfWidth+Dom.bcOffset(2)*dx;
+%  X = (X1+X2)/2-(X2-X1)/2*cos(linspace(0,pi,nPatch));
 %{
 \end{matlab}
+Search for total width of `boundary layers' so that in the
+interior the patches are non-overlapping Chebyshev.   But
+the width for assessing overlap of patches is the following
+variable \verb|width|.
+\begin{matlab}
+%}
+  width=(1+patches.EdgyInt)/2*(nSubP-1-patches.EdgyInt)*dx;
+  for b=0:2:nPatch-2
+    DXmin=(X2-X1-b*width)/2*( 1-cos(pi/(nPatch-b-1)) );
+    if DXmin>width, break, end
+  end
+  if DXmin<width*0.999999
+     warning('too many Chebyshev patches (mid-domain overlap)')
+     end
+%{
+\end{matlab}
+Assign the centre-patch coordinates.
+\begin{matlab}
+%}
+  X = [ X1+(0:b/2-1)*width ...
+        (X1+X2)/2-(X2-X1-b*width)/2*cos(linspace(0,pi,nPatch-b)) ...
+        X2+(1-b/2:0)*width ];
+%{
+\end{matlab}
+
+%: case given
 The given case is entirely up to a user to specify, we just
 ensure it has the correct shape of a row.
 \begin{matlab}

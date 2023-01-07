@@ -146,7 +146,6 @@ Dom = 'chebyshev'
 global patches
 configPatches1(@heteroDiffF,[0 1],Dom,nPatch ...
     ,ordCC,dx,nSubP,'EdgyInt',true,'hetCoeffs',a);
-assert(abs(dx-diff(patches.x(1:2)))<tol,'sub-patch-grid config error')
 DX = mean(diff(squeeze(patches.x(1,1,1,:))))
 %{
 \end{matlab}

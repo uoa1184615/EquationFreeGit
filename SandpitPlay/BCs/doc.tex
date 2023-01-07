@@ -10,6 +10,10 @@
 }
 
 
+\usepackage{pgfplots} 
+\pgfplotsset{compat=newest} % AJR: changed to newest aiming for flexible
+\usepgfplotslibrary{external} %exports an external pdf for each tikz 
+
 % fancyvrb does code listing, including line numbers
 \usepackage{fancyvrb}
 \newenvironment{matlab}%
@@ -60,9 +64,11 @@
 
 \tableofcontents
 
-\input{Combescure2022.m}
+%\input{Combescure2022.m}
 
 \input{Eckhart2210eg2.m}
+
+\input{EckhartEquilib.m}
 
 \input{Eckhart2210eg1.m}
 

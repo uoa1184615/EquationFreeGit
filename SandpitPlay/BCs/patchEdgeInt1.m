@@ -52,7 +52,7 @@ $\verb|nSubP| \times \verb|nPatch|$ multiscale spatial grid.
 the microscale grid points in every patch. Currently it
 \emph{must} be an equi-spaced lattice on both macro- and
 microscales. 
-\todo{revise??}
+\footnote{revise??}
 
 \item \verb|.ordCC| is order of interpolation, integer~$\geq
 -1$.
@@ -422,7 +422,8 @@ Xedge = patches.x([1 nx],:,:,:);
 Indices~\verb|i| are those of the left end of each
 interpolation stencil because the table is of forward
 differences.  Code Horner's evaluation of the interpolation
-polynomials.
+polynomials.  
+\footnote{Here we should also code and investigate the option of lowering the order of interpolation as the boundary is approached---the aim would be to preserve symmetry?? Does it??  It might be essential for multi-D.}
 \begin{matlab}
 %}
 i=max(1,min(1:Nx,Nx-ceil(p/2))-floor(p/2));
