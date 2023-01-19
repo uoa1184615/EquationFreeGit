@@ -380,9 +380,9 @@ Determine the order of interpolation~\verb|p|, and hence size of
 the (forward) divided difference table in~\verb|F|.
 \begin{matlab}
 %}
-if patches.ordCC<1, patches.ordCC=Nx-1; end
-p=min(patches.ordCC,Nx-1);
-F=nan(patches.EdgyInt+1,nVars,nEnsem,Nx,p+1);
+if patches.ordCC<1, patches.ordCC = Nx-1; end
+p = min(patches.ordCC,Nx-1);
+F = nan(patches.EdgyInt+1,nVars,nEnsem,Nx,p+1);
 %{
 \end{matlab}
 Set function values in first `column' of the table for every
@@ -406,34 +406,70 @@ Compute table of (forward) divided differences
 across ensemble.
 \begin{matlab}
 %}
-for q=1:p
-  i=1:Nx-q;
+for q = 1:p
+  i = 1:Nx-q;
   F(:,:,:,i,q+1) = (F(:,:,:,i+1,q)-F(:,:,:,i,q)) ...
                  ./(X(:,:,:,i+q)  -X(:,:,:,i));
 end
 %{
 \end{matlab}
-Now interpolate to the edge-values at locations~\verb|Xs|.
+Now interpolate to the edge-values at locations~\verb|Xedge|.
 \begin{matlab}
 %}
 Xedge = patches.x([1 nx],:,:,:);
 %{
 \end{matlab}
-Indices~\verb|i| are those of the left end of each
+Code Horner's evaluation of the interpolation
+polynomials.  Indices~\verb|i| are those of the left end of each
 interpolation stencil because the table is of forward
-differences.  Code Horner's evaluation of the interpolation
-polynomials.  
-\footnote{Here we should also code and investigate the option of lowering the order of interpolation as the boundary is approached---the aim would be to preserve symmetry?? Does it??  It might be essential for multi-D.}
+differences.  First alternative: the case of order~\(p\) 
+interpolation across the domain, asymmetric near the boundary.
 \begin{matlab}
 %}
-i=max(1,min(1:Nx,Nx-ceil(p/2))-floor(p/2));
-Uedge=F(:,:,:,i,p+1);
-for q=p:-1:1
-  Uedge=F(:,:,:,i,q)+(Xedge-X(:,:,:,i+q-1)).*Uedge;
-end
+if true
+  i = max(1,min(1:Nx,Nx-ceil(p/2))-floor(p/2));
+  Uedge = F(:,:,:,i,p+1);
+  for q = p:-1:1
+    Uedge = F(:,:,:,i,q)+(Xedge-X(:,:,:,i+q-1)).*Uedge;
+  end
 %{
 \end{matlab}
-Insert edge values into the array of field values, using the
+Second alternative: lower the degree of interpolation near the boundary to maintain the band-width of the interpolation.  The aim is to preserve symmetry?? Does it??  Symmetry might be essential for multi-D.
+\begin{matlab}
+%}
+else%if false
+  i = max(1,I-floor(p/2));
+%{
+\end{matlab}
+For the tapering order of interpolation, form the interior mask~\verb|Q|
+(logical) that signifies which interpolations are to be done at order~\verb|q|.
+This logical mask spreads by two as each order~\verb|q| decreases. 
+\begin{matlab}
+%}
+  Q = (I-1>=floor(p/2)) & (Nx-I>=p/2);
+  Imid = floor(Nx/2);
+%{
+\end{matlab}
+Initialise to highest divide difference, surrounded by zeros.
+\begin{matlab}
+%}
+  Uedge = zeros(patches.EdgyInt+1,nVars,nEnsem,Nx);
+  Uedge(:,:,:,Q) = F(:,:,:,i(Q),p+1);
+%{
+\end{matlab}
+Complete Horner evaluation of the relevant polynomials.
+\begin{matlab}
+%}
+  for q = p:-1:1
+    Q = [Q(2:Imid) true(1,2) Q(Imid+1:end-1)]; % spread mask
+    Uedge(:,:,:,Q) = F(:,:,:,i(Q),q) ...
+        +(Xedge(:,:,:,Q)-X(:,:,:,i(Q)+q-1)).*Uedge(:,:,:,Q);
+  end%for q
+end%if
+%{
+\end{matlab}
+
+Finally, insert edge values into the array of field values, using the
 required ensemble shifts.
 \begin{matlab}
 %}

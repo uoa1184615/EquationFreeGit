@@ -14,7 +14,7 @@ function uvt = heteroToyE(t,uv,patches)
   global b M vis i0 iN
 %{
 \end{matlab}
-Separate state vector into displacement and velocity fields.
+Separate state vector into displacement and velocity fields: \(u_{ijI}\)~is the displacement at the \(j\)th~point in the \(i\)th 2-cell in the \(I\)th~patch; similarly for velocity~\(v_{ijI}\).  That is, physically neighbouring points have different~\(j\), whereas physical next-to-neighbours have \(i\)~different by one.
 \begin{matlab}
 %}
   u=uv(:,1:2,:,:); v=uv(:,3:4,:,:); % separate u and v=du/dt

@@ -25,7 +25,7 @@ Set the spatial period~\(\epsilon\), via
 integer~\(1/\epsilon\), and other parameters.
 \begin{matlab}
 %}
-nPatch = 7
+nPatch = 11
 nPeriodsPatch = 1 % any integer
 rEpsilon = 200 % up to 2000 say
 dx = 1/(mPeriod*rEpsilon+1)
@@ -45,7 +45,7 @@ mid-patch values).
 %}
 global patches
 ordCC = 4
-configPatches1(@heteroDiffF,[0 1],'chebyshev',nPatch ...
+configPatches1(@heteroDiffF,[0 1],'equispaced',nPatch ...
     ,ordCC,dx,nSubP,'EdgyInt',true,'hetCoeffs',a);
 %{
 \end{matlab}
@@ -92,7 +92,9 @@ for j=1:nJac
   dujdt=(patchSys1(1,uj)-f0)/deltau;
   Jac(:,j)=dujdt(i);
 end
-semilogy(svd(Jac),'.'),ylabel('singular values')
+figure(1),semilogy(svd(Jac),'.'),ylabel('singular values')
+Jacs=Jac-Jac'; Jacs(abs(Jacs)<1e-9)=0;
+figure(2),spy(Jac,'o'),hold on,spy(Jacs,'rx'),hold off
 assert(rcond(Jac)>1e-9,'Jacobian seems too ill-conditioned')
 %{
 \end{matlab}
