@@ -17,6 +17,7 @@ heterogeneity is repeated to fill each patch.
 mPeriod = 6
 y = linspace(0,1,mPeriod+1)';
 a = 1./(2-cos(2*pi*y(1:mPeriod)))
+%a=ones(mPeriod,1) % try constant diffusivity??
 global microTimePeriod; microTimePeriod=0;
 %{
 \end{matlab}
@@ -44,7 +45,7 @@ mid-patch values).
 \begin{matlab}
 %}
 global patches
-ordCC = 4
+ordCC = 2
 configPatches1(@heteroDiffF,[0 1],'equispaced',nPatch ...
     ,ordCC,dx,nSubP,'EdgyInt',true,'hetCoeffs',a);
 %{

@@ -50,14 +50,14 @@ $\verb|nSubP| \times \verb|nPatch|$ multiscale spatial grid.
 \item \verb|.x| is $\verb|nSubP| \times1 \times1 \times
 \verb|nPatch|$ array of the spatial locations~$x_{iI}$ of
 the microscale grid points in every patch. Currently it
-\emph{must} be an equi-spaced lattice on both macro- and
-microscales. 
-\footnote{revise??}
+\emph{must} be an equi-spaced lattice on the
+microscale index~$i$, but may be variable spaced in 
+macroscale index~$I$. 
 
 \item \verb|.ordCC| is order of interpolation, integer~$\geq
 -1$.
 
-\item \verb|periodic| indicates whether macroscale is
+\item \verb|.periodic| indicates whether macroscale is
 periodic domain, or alternatively that the macroscale has
 left and right boundaries so interpolation is via divided
 differences. 
@@ -133,6 +133,7 @@ If the user has not defined the patch core, then we assume
 it to be a single point in the middle of the patch, unless
 we are interpolating from next-to-edge values. 
 
+\todo{Revise??}
 For the moment assume the physical domain is macroscale
 periodic so that the coupling formulas are simplest. Should
 eventually cater for periodic, odd-mid-gap, even-mid-gap,
@@ -160,7 +161,8 @@ c = round((patches.nCore-1)/2);
 if patches.periodic
 %{
 \end{matlab}
-Get the size ratios of the patches, then use finite width stencils or spectral.
+Get the size ratios of the patches, then use finite width 
+stencils or spectral.
 \begin{matlab}
 %}
 r = patches.ratio(1);
@@ -171,7 +173,7 @@ if patches.ordCC>0 % then finite-width polynomial interpolation
 \paragraph{Lagrange interpolation gives patch-edge values}
 Consequently, compute centred differences of the patch
 core/edge averages/values for the macro-interpolation of all
-fields. Assumes the domain is macro-periodic. 
+fields.  Here the domain is macro-periodic. 
 \begin{matlab}
 %}
   if patches.EdgyInt % interpolate next-to-edge values
@@ -424,6 +426,7 @@ polynomials.  Indices~\verb|i| are those of the left end of each
 interpolation stencil because the table is of forward
 differences.  First alternative: the case of order~\(p\) 
 interpolation across the domain, asymmetric near the boundary.
+Use this first alternative for the moment (Jan 2023).
 \begin{matlab}
 %}
 if true
@@ -434,7 +437,10 @@ if true
   end
 %{
 \end{matlab}
-Second alternative: lower the degree of interpolation near the boundary to maintain the band-width of the interpolation.  The aim is to preserve symmetry?? Does it??  Symmetry might be essential for multi-D.
+Second alternative: lower the degree of interpolation near 
+the boundary to maintain the band-width of the interpolation.   
+Such symmetry might be essential for multi-D.
+The aim is to preserve symmetry?? Does it??  As of Jan 2023 it only partially does---fails near boundaries, and maybe with uneven spacing.
 \begin{matlab}
 %}
 else%if false
@@ -483,8 +489,8 @@ the extremes of the domain.  Consequently, may override
 their computed interpolation values with~\verb|NaN|.
 \begin{matlab}
 %}
-%u(1,:,:,1)  = nan;
-%u(nx,:,:,Nx)= nan;
+%u( 1,:,:, 1) = nan;
+%u(nx,:,:,Nx) = nan;
 %{
 \end{matlab}
 End of the non-periodic interpolation code.
