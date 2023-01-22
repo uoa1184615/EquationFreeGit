@@ -18,7 +18,7 @@ multi-D, interpolating patch next-to-edge values appears
 better \cite[]{Bunder2020a}.  This function is primarily used
 by \verb|patchSys2()| but is also useful for user
 graphics. 
-\footnote{Script \texttt{patchEdgeInt2test.m} verifies this code??}
+\footnote{Script \texttt{patchEdgeInt2test.m} verifies this code.}
  
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
@@ -70,7 +70,7 @@ only $\{0,2,4,\ldots\}$
 
 \item \verb|.periodic| indicates whether macroscale is
 periodic domain, or alternatively that the macroscale has
-left and right boundaries so interpolation is via divided
+left, right, top and bottom boundaries so interpolation is via divided
 differences. 
 
 \item \verb|.stag| in $\{0,1\}$ is one for staggered grid
@@ -85,7 +85,7 @@ a periodic domain.
 patch-edge values by interpolation: 
 true, from opposite-edge next-to-edge values (often
 preserves symmetry); 
-false, from centre-patch values (original scheme).
+false, from centre cross-patch values (near original scheme).
 
 \item \verb|.nEnsem| the number of realisations in the ensemble.
 
@@ -142,11 +142,8 @@ u = reshape(u,[nx ny nVars nEnsem Nx Ny ]);
 %{
 \end{matlab}
 
-\todo{Revise??}
-For the moment assume the physical domain is macroscale
-periodic so that the coupling formulas are simplest. Should
-eventually cater for periodic, odd-mid-gap, even-mid-gap,
-even-mid-patch, Dirichlet, Neumann, Robin?? These index
+For the moment assume the physical domain is either macroscale
+periodic or macroscale rectangle so that the coupling formulas are simplest.  These index
 vectors point to patches and their four immediate
 neighbours. 
 \begin{matlab}
@@ -377,7 +374,7 @@ else % edgyInt uses next-to-edge values
      Cri = fft(fft(u(nx-1,iy ,:,patches.ri,:,:),[],5),[],6);
      Cbo = fft(fft(u(ix,2    ,:,patches.bo,:,:),[],5),[],6);
      Cto = fft(fft(u(ix,ny-1 ,:,patches.to,:,:),[],5),[],6);
-end     
+end%if ~patches.EdgyInt
 %{
 \end{matlab}
 Now invert the double Fourier transforms to complete
@@ -432,17 +429,16 @@ patch. (Have no plans to implement core averaging as yet.)
 \begin{matlab}
 %}
   ix=2:nx-1;  iy=2:ny-1; % indices of edge 'interior'
-  % these I and J seem gratuitous, better to omit??
   if patches.EdgyInt % interpolate next-to-edge values
-    Fx(:,:,:,:,:,:,1) = u([nx-1 2],iy,:,:,I,J);
-    Fy(:,:,:,:,:,:,1) = u(ix,[ny-1 2],:,:,I,J);
-    X(:,:,:,:,:,:) = patches.x([nx-1 2],:,:,:,I,:);
-    Y(:,:,:,:,:,:) = patches.y(:,[ny-1 2],:,:,:,J);
+    Fx(:,:,:,:,:,:,1) = u([nx-1 2],iy,:,:,:,:);
+    Fy(:,:,:,:,:,:,1) = u(ix,[ny-1 2],:,:,:,:);
+    X(:,:,:,:,:,:) = patches.x([nx-1 2],:,:,:,:,:);
+    Y(:,:,:,:,:,:) = patches.y(:,[ny-1 2],:,:,:,:);
   else % interpolate mid-patch cross-patch values 
-    Fx(:,:,:,:,:,:,1) = u(i0,iy,:,:,I,J);
-    Fy(:,:,:,:,:,:,1) = u(ix,j0,:,:,I,J);
-    X(:,:,:,:,:,:) = patches.x(i0,:,:,:,I,:);
-    Y(:,:,:,:,:,:) = patches.y(:,j0,:,:,:,J);
+    Fx(:,:,:,:,:,:,1) = u(i0,iy,:,:,:,:);
+    Fy(:,:,:,:,:,:,1) = u(ix,j0,:,:,:,:);
+    X(:,:,:,:,:,:) = patches.x(i0,:,:,:,:,:);
+    Y(:,:,:,:,:,:) = patches.y(:,j0,:,:,:,:);
   end;
 %{
 \end{matlab}
@@ -501,13 +497,13 @@ interpolation across the domain, asymmetric near the boundaries of the rectangul
 
 
 Finally, insert edge values into the array of field values, using the
-required ensemble shifts.  Are these \verb|I,J| redundant??
+required ensemble shifts.  
 \begin{matlab}
 %}
-u(1 ,iy,:,patches.le,I,J) = UXedge(1,:,:,:,I,J);
-u(nx,iy,:,patches.ri,I,J) = UXedge(2,:,:,:,I,J);
-u(ix,1 ,:,patches.bo,I,J) = UYedge(:,1,:,:,I,J);
-u(ix,ny,:,patches.to,I,J) = UYedge(:,2,:,:,I,J);
+u(1 ,iy,:,patches.le,:,:) = UXedge(1,:,:,:,:,:);
+u(nx,iy,:,patches.ri,:,:) = UXedge(2,:,:,:,:,:);
+u(ix,1 ,:,patches.bo,:,:) = UYedge(:,1,:,:,:,:);
+u(ix,ny,:,patches.to,:,:) = UYedge(:,2,:,:,:,:);
 %{
 \end{matlab}
 We want a user to set outer edge values on the extreme patches 

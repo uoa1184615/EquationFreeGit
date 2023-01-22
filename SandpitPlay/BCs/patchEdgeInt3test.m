@@ -1,12 +1,12 @@
-% Test spectral, finite-width, and divided difference interpolation in 2D with many random parameters.  Including edgy interpolation.
-% AJR, Nov 2018 -- Jan 2023
+% Test inter-patch spectral, finite-width, and divided difference interpolation in 3D with many random parameters
+% AJR, Aug 2020 -- Jan 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\subsection{\texttt{patchEdgeInt2test}: tests 2D patch coupling}
-\label{sec:patchEdgeInt2test}
+\subsection{\texttt{patchEdgeInt3test}: tests 3D patch coupling}
+\label{sec:patchEdgeInt3test}
 
 A script to test the spectral, finite-order, and divided difference, polynomial
-interpolation of function \verb|patchEdgeInt2()|. Tests one
+interpolation of function \verb|patchEdgeInt3()|. Tests one
 or several variables, normal grids, and also tests centre
 and edge interpolation.  But does not yet test staggered
 grids, core averaging, etc as they are not yet implemented.
@@ -35,19 +35,19 @@ dummy.)
 \begin{matlab}
 %}
 maxErrors=[];
-for realisation = 1:19
-    Lx = 1+3*rand; Ly = 1+3*rand;
-    Domain = [0 Lx 0 Ly]-[rand*[1 1] rand*[1 1]]
-    nSubP = 1+2*randi(3,1,2)
-    ratios = rand(1,2)/2
-    nPatch = randi([3 8],1,2)
+for realisation = 1:29
+    Lx = 1+3*rand; Ly = 1+3*rand; Lz = 1+3*rand;
+    Domain = [0 Lx 0 Ly 0 Lz]-[rand*[1 1] rand*[1 1] rand*[1 1]]
+    nSubP = 1+2*randi(3,1,3)
+    ratios = 0.5*rand(1,3)
+    nPatch = randi([3 8],1,3)
     ordCC = 2*randi([1 4])
     edgyInt = (rand>0.5)
-    configPatches2(@sin,Domain,nan,nPatch,ordCC,ratios,nSubP ...
+    configPatches3(@sin,Domain,nan,nPatch,ordCC,ratios,nSubP ...
         ,'EdgyInt',edgyInt);
 %{
 \end{matlab}
-Until \verb|configPatches2| updated, change the data
+Until \verb|configPatches3| updated, change the data
 structure here: first, specify general divided differences.
 \begin{matlab}
 %}
@@ -57,44 +57,49 @@ patches.periodic = false;
 Second, displace patches to a random non-uniform spacing.
 \begin{matlab}
 %}
-Hx = diff(patches.x(1,1,:,:,1:2,1));
-patches.x = patches.x+0.8*Hx*(rand(1,1,1,1,nPatch(1),1)-0.5);
-Hx = squeeze( diff(patches.x(1,1,:,:,:,1)) );% for information only
-Hy = diff(patches.y(1,1,:,:,:,1:2));
-patches.y = patches.y+0.8*Hy*(rand(1,1,1,1,1,nPatch(2))-0.5);
-Hy = squeeze( diff(patches.y(1,1,:,:,1,:)) );% for information only
+Hx = diff(patches.x(1,1,1,:,:,1:2,1,1));
+patches.x = patches.x+0.8*Hx*(rand(1,1,1,1,1,nPatch(1),1,1)-0.5);
+Hx = squeeze( diff(patches.x(1,1,1,:,:,:,1,1)) )';% for information only
+Hy = diff(patches.y(1,1,1,:,:,1,1:2,1));
+patches.y = patches.y+0.8*Hy*(rand(1,1,1,1,1,1,nPatch(2),1)-0.5);
+Hy = squeeze( diff(patches.y(1,1,1,:,:,1,:,1)) )';% for information only
+Hz = diff(patches.z(1,1,1,:,:,1,1,1:2));
+patches.z = patches.z+0.8*Hz*(rand(1,1,1,1,1,1,1,nPatch(3))-0.5);
+Hz = squeeze( diff(patches.z(1,1,1,:,:,1,1,:)) )';% for information only
 %{
 \end{matlab}
 
 
 
 \paragraph{Check multiple fields simultaneously}
-Set profiles to be various powers of~\(x\) and~\(y\), 
-\verb|ps| and~\verb|qs|, and
+Set profiles to be various powers of~\(x\), \(y\) and~\(z\), 
+\verb|ps|, \verb|qs| and~\verb|rs|, and
 store as different `variables' at each point.  
 First, limit the order of test polynomials by the order of interpolation and by the number of patches.
 \begin{matlab}
 %}
     ox=min(ordCC,nPatch(1)-1); 
     oy=min(ordCC,nPatch(2)-1);
-    [ps,qs]=ndgrid(0:ox,0:oy);
-    ps=reshape(ps,1,1,[]);
-    qs=reshape(qs,1,1,[]);
-    cs=randn(size(ps));
-    u0=cs.*patches.x.^ps.*patches.y.^qs;
+    oz=min(ordCC,nPatch(3)-1);
+    [ps,qs,rs]=ndgrid(0:ox,0:oy,0:oz);
+    ps=reshape(ps,1,1,1,[]);
+    qs=reshape(qs,1,1,1,[]);
+    rs=reshape(rs,1,1,1,[]);
+    cs=2*rand(size(ps))-1;
+    u0=cs.*patches.x.^ps.*patches.y.^qs.*patches.z.^rs;
 %    sizeu0=size(u0)
 %{
 \end{matlab}
-Then evaluate the interpolation
+Then evaluate the interpolation, setting faces to \verb|inf| for error checking.
 \begin{matlab}
 %}
-    u=u0; u([1 end],:)=inf; u(:,[1 end],:)=inf;
-    ui=patchEdgeInt2(u(:));
+    u=u0; u([1 end],:)=inf; u(:,[1 end],:)=inf; u(:,:,[1 end],:)=inf;
+    ui=patchEdgeInt3(u(:));
 %    sizeui=size(ui)
 %{
 \end{matlab}
 All patches should have zero error: but need to either in
-\verb|patchEdgeInt2| comment out \verb|NaN| assignment of
+\verb|patchEdgeInt3| comment out \verb|NaN| assignment of
 boundary values, or not test the two extreme patches here,
 or add code to omit NaNs here.  High-order interpolation
 seems to be more affected by round-off so relax error size.
@@ -105,7 +110,7 @@ seems to be more affected by round-off so relax error size.
     xlabel('log10 iError')
     maxError=max(abs(iError(:)))
     maxErrors=[maxErrors maxError];
-    assert(maxError<1e-9 ...
+    assert(maxError<1e-8 ...
     ,'failed divided difference interpolation')
     pause(0.5)%??
 %{
@@ -125,9 +130,6 @@ error('Choosing to not test any further')% temporary halt
 
 
 
-
-
-
 \subsubsection{Test standard spectral interpolation}
 Test over various numbers of patches, random domain lengths
 and random ratios.  Try 99 realisations of random tests.
@@ -141,12 +143,12 @@ resolution, random size-ratios, random number of
 periodic-patches, randomly edge or mid-patch interpolation.
 \begin{matlab}
 %}
-Lx = 1+3*rand, Ly = 1+3*rand
-nSubP = 1+2*randi(3,1,2)
-ratios = rand(1,2)/2
-nPatch = randi([3 6],1,2)
+Lx = 1+3*rand, Ly = 1+3*rand, Lz = 1+3*rand
+nSubP = 1+2*randi(3,1,3)
+ratios = 0.5*rand(1,3)
+nPatch = randi([3 6],1,3)
 edgyInt = (rand>0.5)
-configPatches2(@sin,[0 Lx 0 Ly],nan,nPatch,0,ratios,nSubP ...
+configPatches3(@sin,[0 Lx 0 Ly 0 Lz],nan,nPatch,0,ratios,nSubP ...
     ,'EdgyInt',edgyInt)
 patches.periodic=true; % temporary
 %{
@@ -161,23 +163,24 @@ of aliasing problem.
 nV=randi(3)
 [nx,Nx]=size(squeeze(patches.x));
 [ny,Ny]=size(squeeze(patches.y));
-u0=nan(nx,ny,nV,1,Nx,Ny);
+[nz,Nz]=size(squeeze(patches.z));
+u0=nan(nx,ny,nz,nV,1,Nx,Ny,Nz);
 for iV=1:nV
-  kx=randi([0 floor((nPatch(1)-1)/2)])
-  ky=randi([0 floor((nPatch(2)-1)/2)])
-  phix=pi*rand*(2*kx~=nPatch(1))
-  phiy=pi*rand*(2*ky~=nPatch(2))
-  % generate 6D array via auto-replication
-  u0(:,:,iV,1,:,:)=sin(2*pi*kx*patches.x/Lx+phix) ...
-                 .*sin(2*pi*ky*patches.y/Ly+phiy);
+  ks=floor( rand(1,3).*floor(([Nx Ny Nz]+1)/2) )
+  phis = pi*rand(1,3).*(2*ks~=[Nx Ny Nz])
+  % generate 8D array via auto-replication
+  u0(:,:,:,iV,1,:,:,:)=sin(2*pi*ks(1)*patches.x/Lx+phis(1)) ...
+                     .*sin(2*pi*ks(2)*patches.y/Ly+phis(2)) ...
+                     .*sin(2*pi*ks(3)*patches.z/Lz+phis(3));
 end
 %{
 \end{matlab}
 Copy and NaN the edges, then interpolate
 \begin{matlab}
 %}
-u=u0; u([1 end],:,:)=nan; u(:,[1 end],:)=nan;
-u=patchEdgeInt2(u(:));
+u=u0; 
+u([1 end],:,:,:)=nan; u(:,[1 end],:,:)=nan; u(:,:,[1 end],:)=nan;
+u=patchEdgeInt3(u(:));
 %{
 \end{matlab}
 Compute difference, ignoring the nans which should only be
@@ -188,7 +191,7 @@ values and inform us.
 %}
 err=u-u0;
 normerr=norm(err(~isnan(err)))
-assert(normerr<1e-12, '2D interpolation failed')
+assert(normerr<1e-12, '3D interpolation failed')
 %{
 \end{matlab}
 
@@ -197,6 +200,7 @@ End the for-loop over realisations
 %}
 disp('***** This test passed')
 end
+disp('If you read this, then all spectral tests passed')
 %{
 \end{matlab}
 
@@ -208,40 +212,44 @@ end
 
 
 
-\subsubsection{Check standard finite width interpolation}
+\subsubsection{Check polynomial finite width interpolation}
 Check over various types and orders of interpolation,
 numbers of patches, random domain lengths and random ratios.
 (The \verb|@sin| is a dummy.)
 \begin{matlab}
 %}
-for ordCC=2:2:8
+for ordCC=2:2:6
 for realisations=1:9
     ordCC=ordCC
-    nPatch=ordCC+randi([2 4],1,2)
+    nPatch=ordCC+randi([1 4],1,3)
     edgyInt = (rand>0.5)
-    nSubP = 1+2*randi(3,1,2)
-    Domain=5*[-rand rand -rand rand]
-    ratios=0.5*rand(1,2)
-    configPatches2(@sin,Domain,nan,nPatch,ordCC,ratios,nSubP ...
+    nSubP = 1+2*randi(3,1,3)
+    Domain=5*[-rand rand -rand rand -rand rand]
+    ratios=0.5*rand(1,3)
+    configPatches3(@sin,Domain,nan,nPatch,ordCC,ratios,nSubP ...
         ,'EdgyInt',edgyInt);
 patches.periodic=true; % temporary
 %{
 \end{matlab}
 
 \paragraph{Check multiple fields simultaneously}
-Set profiles to be various powers of~\(x\), \verb|ps|, and
-store as different `variables' at each point.  
+Set profiles to be various powers of~\(x,y,z\), namely
+\verb|ps|, \verb|qs|, \verb|rs|, and store as different
+`variables' at each point.  
 \begin{matlab}
 %}
-    [ps,qs]=meshgrid(0:ordCC);
-    ps=reshape(ps,1,1,[]); qs=reshape(qs,1,1,[]);
-    u0=ones(size(ps)).*patches.x.^ps.*patches.y.^qs;
+    [ps,qs,rs]=meshgrid(0:ordCC);
+    ps=reshape(ps,1,1,1,[]); 
+    qs=reshape(qs,1,1,1,[]);
+    rs=reshape(rs,1,1,1,[]);
+    u0=ones(size(ps)).*patches.x.^ps ...
+        .*patches.y.^qs.*patches.z.^rs;
 %{
 \end{matlab}
 Then evaluate the interpolation.
 \begin{matlab}
 %}
-    ui=patchEdgeInt2(u0(:));
+    ui=patchEdgeInt3(u0(:));
 %{
 \end{matlab}
 The interior patches should have zero error. Appear to need
@@ -251,10 +259,11 @@ domain and the high order of interpolation.
 %}
     I=ordCC/2+1:nPatch(1)-ordCC/2;
     J=ordCC/2+1:nPatch(2)-ordCC/2;
-    iError=ui(:,:,:,:,I,J)-u0(:,:,:,:,I,J);
+    K=ordCC/2+1:nPatch(3)-ordCC/2;
+    iError=ui(:,:,:,:,:,I,J,K)-u0(:,:,:,:,:,I,J,K);
     normError=norm(iError(~isnan(iError)))
     assert(normError<5e-8 ...
-    ,'failed finite stencil interpolation')
+    ,'failed finite stencil polynomial interpolation')
 %{
 \end{matlab}
 
@@ -262,7 +271,7 @@ End the for-loops over various parameters.
 \begin{matlab}
 %}
 end,end %order and realisations
-disp('Passed all standard polynomial interpolation')
+disp('Passed all polynomial interpolation tests')
 %{
 \end{matlab}
 
