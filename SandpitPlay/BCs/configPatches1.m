@@ -1,5 +1,5 @@
 % configPatches1() creates a data struct of the design of
-% patches for later use by the patch functions such as
+% 1D patches for later use by the patch functions such as
 % patchSys1(). AJR, Nov 2017 -- 4 Jan 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
@@ -50,14 +50,14 @@ conditions of the problem.   If \verb|Dom| is \verb|NaN| or
 \begin{itemize}
 
 \item \verb|.type|, string, of either \verb|'periodic'| (the
-default), \verb|'equispaced'|, \verb|'chebyshev'|,
-\verb|'given'|.  For all cases except \verb|'periodic'|,
+default), \verb|'equispace'|, \verb|'chebyshev'|,
+\verb|'usergiven'|.  For all cases except \verb|'periodic'|,
 users \emph{must} code into \verb|fun| the micro-grid
 boundary conditions that apply at the left(right) edge of
 the leftmost(rightmost) patches.
 
 \item \verb|.bcOffset|, optional one or two element array,
-in the cases of \verb|'equispaced'| or \verb|'chebyshev'|
+in the cases of \verb|'equispace'| or \verb|'chebyshev'|
 the patches are placed so the left\slash right macroscale
 boundaries are aligned to the left\slash right edges of the
 corresponding extreme patches, but offset by \verb|bcOffset|
@@ -67,7 +67,7 @@ the extreme edge micro-grid points, whereas use
 \verb|bcOffset=0.5| when applying Neumann boundary conditions
 halfway between the extreme edge micro-grid points.
 
-\item \verb|.X|, optional array, in the case~\verb|'given'|
+\item \verb|.X|, optional array, in the case~\verb|'usergiven'|
 it specifies the locations of the centres of the
 \verb|nPatch| patches---the user is responsible it makes
 sense.
@@ -202,7 +202,7 @@ the usual case of all neighbour coupling.
 macro-periodic conditions, are the $\verb|ordCC|$-vector of
 weights for the inter-patch interpolation onto the right and
 left edges (respectively) with patch:macroscale ratio as
-specified or derived from~\verb|dx|.
+specified or as derived from~\verb|dx|.
 
 \item \verb|.x| (4D) is $\verb|nSubP| \times1 \times1
 \times \verb|nPatch|$ array of the regular spatial
@@ -426,20 +426,20 @@ case 'periodic'
     warning('bcOffset not available for Dom.type = periodic'), end
     if isfield(Dom,'X')
     warning('X not available for Dom.type = periodic'), end
-case {'equispaced','chebyshev'}
+case {'equispace','chebyshev'}
     if ~isfield(Dom,'bcOffset'), Dom.bcOffset=[0;0]; end
     if length(Dom.bcOffset)==1
         Dom.bcOffset=repmat(Dom.bcOffset,2,1); end
     if isfield(Dom,'X')
-    warning('X not available for Dom.type = equispaced or chebyshev')
+    warning('X not available for Dom.type = equispace or chebyshev')
     end
-case 'given'
+case 'usergiven'
     if isfield(Dom,'bcOffset')
-    warning('bcOffset not available for given Dom.type'), end
-    assert(isfield(Dom,'X'),'X required for Dom.type = given')
+    warning('bcOffset not available for usergiven Dom.type'), end
+    assert(isfield(Dom,'X'),'X required for Dom.type = usergiven')
 otherwise 
     error([Dom.type 'is unknown Dom.type'])
-end%switch
+end%switch Dom.type
 %{
 \end{matlab}
 
@@ -516,19 +516,19 @@ extend to coupling via derivative values.)
   end
 %{
 \end{matlab}
-%: case equispaced
+%: case equispace
 The equi-spaced case is also evenly spaced but with the
 extreme edges aligned with the spatial domain boundaries,
 modified by the offset.
 \begin{matlab}
 %}
-case 'equispaced'
+case 'equispace'
   X=linspace(Xlim(1)+((nSubP-1)/2-Dom.bcOffset(1))*dx ...
             ,Xlim(2)-((nSubP-1)/2-Dom.bcOffset(2))*dx ,nPatch);
   DX=diff(X(1:2));
   width=(1+patches.EdgyInt)/2*(nSubP-1-patches.EdgyInt)*dx;
   if DX<width*0.999999
-     warning('too many equispaced patches (double overlapping)')
+     warning('too many equispace patches (double overlapping)')
      end
 %{
 \end{matlab}
@@ -572,12 +572,12 @@ Assign the centre-patch coordinates.
 %{
 \end{matlab}
 
-%: case given
-The given case is entirely up to a user to specify, we just
+%: case usergiven
+The user-given case is entirely up to a user to specify, we just
 ensure it has the correct shape of a row.
 \begin{matlab}
 %}
-case 'given'
+case 'usergiven'
   X = reshape(Dom.X,1,[]);
 end%switch Dom.type
 %{

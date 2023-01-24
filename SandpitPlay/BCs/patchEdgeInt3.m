@@ -7,9 +7,9 @@
 face values from 3D macroscale interpolation}
 \label{sec:patchEdgeInt3}
 
+
 Couples 3D patches across 3D space by computing their face
-values via macroscale interpolation.  Assumes that the patch
-centre-values are sensible macroscale variables, and patch
+values via macroscale interpolation.  Assumes patch
 face values are determined by macroscale interpolation of
 the patch centre-plane values \cite[]{Roberts2011a,
 Bunder2019c}, or patch next-to-face values which appears
@@ -468,11 +468,13 @@ else px = min(patches.ordCC,Nx-1);
      py = min(patches.ordCC,Ny-1); 
      pz = min(patches.ordCC,Nz-1); 
 end
-Fx = nan(patches.EdgyInt+1,ny-2,nz-2,nVars,nEnsem,Nx,Ny,Nz,px+1);
-Fy = nan(nx-2,patches.EdgyInt+1,nz-2,nVars,nEnsem,Nx,Ny,Nz,py+1);
-Fz = nan(nx-2,ny-2,patches.EdgyInt+1,nVars,nEnsem,Nx,Ny,Nz,pz+1);
+% interior indices of faces  (ix n/a)
+ix=2:nx-1;  iy=2:ny-1;  iz=2:nz-1; 
 %{
 \end{matlab}
+
+
+\subsubsection{\(x\)-direction values}
 Set function values in first `column' of the tables for every
 variable and across ensemble.  For~\verb|EdgyInt|, the
 `reversal' of the next-to-face values are because their
@@ -480,22 +482,13 @@ values are to interpolate to the opposite face of each
 patch. (Have no plans to implement core averaging as yet.)
 \begin{matlab}
 %}
-  % indices of face 'interior'
-  ix=2:nx-1;  iy=2:ny-1;  iz=shiftdim(2:nz-1,-1); 
+  F = nan(patches.EdgyInt+1,ny-2,nz-2,nVars,nEnsem,Nx,Ny,Nz,px+1);
   if patches.EdgyInt % interpolate next-to-face values
-    Fx(:,:,:,:,:,:,:,:,1) = u([nx-1 2],iy,iz,:,:,:,:,:);
-    Fy(:,:,:,:,:,:,:,:,1) = u(ix,[ny-1 2],iz,:,:,:,:,:);
-    Fz(:,:,:,:,:,:,:,:,1) = u(ix,iy,[nz-1 2],:,:,:,:,:);
-    X(:,:,:,:,:,:,:,:) = patches.x([nx-1 2],:,:,:,:,:,:,:);
-    Y(:,:,:,:,:,:,:,:) = patches.y(:,[ny-1 2],:,:,:,:,:,:);
-    Z(:,:,:,:,:,:,:,:) = patches.z(:,:,[nz-1 2],:,:,:,:,:);
+    F(:,:,:,:,:,:,:,:,1) = u([nx-1 2],iy,iz,:,:,:,:,:);
+    X = patches.x([nx-1 2],:,:,:,:,:,:,:);
   else % interpolate mid-patch cross-patch values 
-    Fx(:,:,:,:,:,:,:,:,1) = u(i0,iy,iz,:,:,:,:,:);
-    Fy(:,:,:,:,:,:,:,:,1) = u(ix,j0,iz,:,:,:,:,:);
-    Fz(:,:,:,:,:,:,:,:,1) = u(ix,iy,k0,:,:,:,:,:);
-    X(:,:,:,:,:,:,:,:) = patches.x(i0,:,:,:,:,:,:,:);
-    Y(:,:,:,:,:,:,:,:) = patches.y(:,j0,:,:,:,:,:,:);
-    Z(:,:,:,:,:,:,:,:) = patches.z(:,:,k0,:,:,:,:,:);
+    F(:,:,:,:,:,:,:,:,1) = u(i0,iy,iz,:,:,:,:,:);
+    X = patches.x(i0,:,:,:,:,:,:,:);
   end%if patches.EdgyInt
 %{
 \end{matlab}
@@ -510,78 +503,161 @@ Recursively find all divided differences in the respective direction.
 %}
 for q = 1:px
   i = 1:Nx-q;
-  Fx(:,:,:,:,:,i,:,:,q+1) ...
-  = (Fx(:,:,:,:,:,i+1,:,:,q)-Fx(:,:,:,:,:,i,:,:,q)) ...
-   ./(X(:,:,:,:,:,i+q,:,:)   -X(:,:,:,:,:,i,:,:));
-end
-for q = 1:py
-  j = 1:Ny-q;
-  Fy(:,:,:,:,:,:,j,:,q+1) ...
-  = (Fy(:,:,:,:,:,:,j+1,:,q)-Fy(:,:,:,:,:,:,j,:,q)) ...
-   ./(Y(:,:,:,:,:,:,j+q,:)   -Y(:,:,:,:,:,:,j,:));
-end
-for q = 1:pz
-  k = 1:Nz-q;
-  Fz(:,:,:,:,:,:,:,k,q+1) ...
-  = (Fz(:,:,:,:,:,:,:,k+1,q)-Fz(:,:,:,:,:,:,:,k,q)) ...
-   ./(Z(:,:,:,:,:,:,:,k+q)   -Z(:,:,:,:,:,:,:,k));
+  F(:,:,:,:,:,i,:,:,q+1) ...
+  = ( F(:,:,:,:,:,i+1,:,:,q)-F(:,:,:,:,:,i,:,:,q)) ...
+   ./(X(:,:,:,:,:,i+q,:,:)  -X(:,:,:,:,:,i,:,:));
 end
 %{
 \end{matlab}
 
-
 \paragraph{Interpolate with divided differences}
-Now interpolate to find the face-values on left/right faces at~\verb|Xface| for every~\verb|Y,Z|, and top/bottom faces~\verb|Yface| for every~\verb|X,Z|, and front/back faces~\verb|Zface| for every~\verb|X,Y|.
+Now interpolate to find the face-values on left/right faces at~\verb|Xface| for every interior~\verb|Y,Z|.
 \begin{matlab}
 %}
 Xface = patches.x([1 nx],:,:,:,:,:,:,:);
-Yface = patches.y(:,[1 ny],:,:,:,:,:,:);
-Zface = patches.z(:,:,[1 nz],:,:,:,:,:);
 %{
 \end{matlab}
 Code Horner's recursive evaluation of the interpolation
 polynomials.  Indices~\verb|i| are those of the left face of each
-interpolation stencil, indices~\verb|j| are those of the bottom face of each
-interpolation stencil, and indices~\verb|k| are those of the bottom face of each
 interpolation stencil, because the table is of forward
 differences.  This alternative: the case of order~\(p_x\), \(p_y\) and~\(p_z\) 
 interpolation across the domain, asymmetric near the boundaries of the rectangular domain.
 \begin{matlab}
 %}
   i = max(1,min(1:Nx,Nx-ceil(px/2))-floor(px/2));
-  UXface = Fx(:,:,:,:,:,i,:,:,px+1);
+  Uface = F(:,:,:,:,:,i,:,:,px+1);
   for q = px:-1:1
-    UXface = Fx(:,:,:,:,:,i,:,:,q) ...
-    +(Xface-X(:,:,:,:,:,i+q-1,:,:)).*UXface;
-  end
-  j = max(1,min(1:Ny,Ny-ceil(py/2))-floor(py/2));
-  UYface = Fy(:,:,:,:,:,:,j,:,py+1);
-  for q = py:-1:1
-    UYface = Fy(:,:,:,:,:,:,j,:,q) ...
-    +(Yface-Y(:,:,:,:,:,:,j+q-1,:)).*UYface;
-  end
-  k = max(1,min(1:Nz,Nz-ceil(pz/2))-floor(pz/2));
-  UZface = Fz(:,:,:,:,:,:,:,k,pz+1);
-  for q = pz:-1:1
-    UZface = Fz(:,:,:,:,:,:,:,k,q) ...
-    +(Zface-Z(:,:,:,:,:,:,:,k+q-1)).*UZface;
+    Uface = F(:,:,:,:,:,i,:,:,q) ...
+    +(Xface-X(:,:,:,:,:,i+q-1,:,:)).*Uface;
   end
 %{
 \end{matlab}
-
 
 Finally, insert face values into the array of field values, using the
 required ensemble shifts.  
 \begin{matlab}
 %}
-u(1 ,iy,iz,:,patches.le,:,:,:) = UXface(1,:,:,:,:,:,:,:);
-u(nx,iy,iz,:,patches.ri,:,:,:) = UXface(2,:,:,:,:,:,:,:);
-u(ix,1 ,iz,:,patches.bo,:,:,:) = UYface(:,1,:,:,:,:,:,:);
-u(ix,ny,iz,:,patches.to,:,:,:) = UYface(:,2,:,:,:,:,:,:);
-u(ix,iy,1 ,:,patches.fr,:,:,:) = UZface(:,:,1,:,:,:,:,:);
-u(ix,iy,nz,:,patches.ba,:,:,:) = UZface(:,:,2,:,:,:,:,:);
+u(1 ,iy,iz,:,patches.le,:,:,:) = Uface(1,:,:,:,:,:,:,:);
+u(nx,iy,iz,:,patches.ri,:,:,:) = Uface(2,:,:,:,:,:,:,:);
 %{
 \end{matlab}
+
+
+\subsubsection{\(y\)-direction values}
+Set function values in first `column' of the tables for every
+variable and across ensemble.
+\begin{matlab}
+%}
+  F = nan(nx,patches.EdgyInt+1,nz-2,nVars,nEnsem,Nx,Ny,Nz,px+1);
+  if patches.EdgyInt % interpolate next-to-face values
+    F(:,:,:,:,:,:,:,:,1) = u(:,[ny-1 2],iz,:,:,:,:,:);
+    Y = patches.y(:,[ny-1 2],:,:,:,:,:,:);
+  else % interpolate mid-patch cross-patch values 
+    F(:,:,:,:,:,:,:,:,1) = u(:,j0,iz,:,:,:,:,:);
+    Y = patches.y(:,j0,:,:,:,:,:,:);
+  end%if patches.EdgyInt
+%{
+\end{matlab}
+Form tables of divided differences.
+\begin{matlab}
+%}
+for q = 1:py
+  j = 1:Ny-q;
+  F(:,:,:,:,:,:,j,:,q+1) ...
+  = ( F(:,:,:,:,:,:,j+1,:,q)-F(:,:,:,:,:,:,j,:,q)) ...
+   ./(Y(:,:,:,:,:,:,j+q,:)  -Y(:,:,:,:,:,:,j,:));
+end
+%{
+\end{matlab}
+Interpolate to find the top/bottom faces~\verb|Yface| for every~\(x\) and interior~\(z\).
+\begin{matlab}
+%}
+Yface = patches.y(:,[1 ny],:,:,:,:,:,:);
+%{
+\end{matlab}
+Code Horner's recursive evaluation of the interpolation
+polynomials.  Indices~\verb|j| are those of the bottom face of each
+interpolation stencil, because the table is of forward
+differences.  
+\begin{matlab}
+%}
+  j = max(1,min(1:Ny,Ny-ceil(py/2))-floor(py/2));
+  Uface = F(:,:,:,:,:,:,j,:,py+1);
+  for q = py:-1:1
+    Uface = F(:,:,:,:,:,:,j,:,q) ...
+    +(Yface-Y(:,:,:,:,:,:,j+q-1,:)).*Uface;
+  end
+%{
+\end{matlab}
+
+Finally, insert face values into the array of field values, using the
+required ensemble shifts.  
+\begin{matlab}
+%}
+u(:,1 ,iz,:,patches.bo,:,:,:) = Uface(:,1,:,:,:,:,:,:);
+u(:,ny,iz,:,patches.to,:,:,:) = Uface(:,2,:,:,:,:,:,:);
+%{
+\end{matlab}
+
+
+\subsubsection{\(z\)-direction values}
+Set function values in first `column' of the tables for every
+variable and across ensemble.  
+\begin{matlab}
+%}
+  F = nan(nx,ny,patches.EdgyInt+1,nVars,nEnsem,Nx,Ny,Nz,px+1);
+  if patches.EdgyInt % interpolate next-to-face values
+    F(:,:,:,:,:,:,:,:,1) = u(:,:,[nz-1 2],:,:,:,:,:);
+    Z = patches.z(:,:,[nz-1 2],:,:,:,:,:);
+  else % interpolate mid-patch cross-patch values 
+    F(:,:,:,:,:,:,:,:,1) = u(:,:,k0,:,:,:,:,:);
+    Z = patches.z(:,:,k0,:,:,:,:,:);
+  end%if patches.EdgyInt
+%{
+\end{matlab}
+Form tables of divided differences.
+\begin{matlab}
+%}
+for q = 1:pz
+  k = 1:Nz-q;
+  F(:,:,:,:,:,:,:,k,q+1) ...
+  = ( F(:,:,:,:,:,:,:,k+1,q)-F(:,:,:,:,:,:,:,k,q)) ...
+   ./(Z(:,:,:,:,:,:,:,k+q)  -Z(:,:,:,:,:,:,:,k));
+end
+%{
+\end{matlab}
+Interpolate to find the face-values on front/back faces~\verb|Zface| for every~\(x,y\).
+\begin{matlab}
+%}
+Zface = patches.z(:,:,[1 nz],:,:,:,:,:);
+%{
+\end{matlab}
+Code Horner's recursive evaluation of the interpolation
+polynomials.  Indices~\verb|k| are those of the bottom face of each
+interpolation stencil, because the table is of forward
+differences.  
+\begin{matlab}
+%}
+  k = max(1,min(1:Nz,Nz-ceil(pz/2))-floor(pz/2));
+  Uface = F(:,:,:,:,:,:,:,k,pz+1);
+  for q = pz:-1:1
+    Uface = F(:,:,:,:,:,:,:,k,q) ...
+    +(Zface-Z(:,:,:,:,:,:,:,k+q-1)).*Uface;
+  end
+%{
+\end{matlab}
+
+Finally, insert face values into the array of field values, using the
+required ensemble shifts.  
+\begin{matlab}
+%}
+u(:,:,1 ,:,patches.fr,:,:,:) = Uface(:,:,1,:,:,:,:,:);
+u(:,:,nz,:,patches.ba,:,:,:) = Uface(:,:,2,:,:,:,:,:);
+%{
+\end{matlab}
+
+
+\subsubsection{Optional NaNs for safety}
 We want a user to set outer face values on the extreme patches 
 according to the microscale boundary conditions that hold at
 the extremes of the domain.  Consequently, may override
@@ -596,6 +672,7 @@ their computed interpolation values with~\verb|NaN|.
 %u(:,:,ny,:,:,:,:,Nz) = nan;
 %{
 \end{matlab}
+
 End of the non-periodic interpolation code.
 \begin{matlab}
 %}
@@ -607,19 +684,12 @@ end%if patches.periodic else
 
 
 
-
-Finally, Nan the corner-edge values of faces of every 3D patch (they would 
-arise from interpolation of values we do not know, 
-so they are unknown).
+Fin, returning the 8D array of field values with
+interpolated faces. 
 \begin{matlab}
 %}
-u(:,[1 ny],[1 nz],:,:,:,:,:)=nan; 
-u([1 nx],:,[1 nz],:,:,:,:,:)=nan; 
-u([1 nx],[1 ny],:,:,:,:,:,:)=nan; 
 end% function patchEdgeInt3
 %{
 \end{matlab}
-Fin, returning the 8D array of field values with
-interpolated faces. 
 \end{devMan} 
 %}

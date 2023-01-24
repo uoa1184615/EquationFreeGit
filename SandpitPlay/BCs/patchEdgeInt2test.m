@@ -80,7 +80,7 @@ First, limit the order of test polynomials by the order of interpolation and by 
     [ps,qs]=ndgrid(0:ox,0:oy);
     ps=reshape(ps,1,1,[]);
     qs=reshape(qs,1,1,[]);
-    cs=randn(size(ps));
+    cs=2*rand(size(ps))-1;
     u0=cs.*patches.x.^ps.*patches.y.^qs;
 %    sizeu0=size(u0)
 %{

@@ -17,6 +17,69 @@
 \endgroup
 
 \datalist[entry]{nyt/global//global/global}
+  \entry{Abdulle2020b}{report}{}
+    \name{author}{3}{}{%
+      {{hash=AA}{%
+         family={Abdulle},
+         familyi={A\bibinitperiod},
+         given={Assyr},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=AD}{%
+         family={Arjmand},
+         familyi={A\bibinitperiod},
+         given={Doghonay},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=PE}{%
+         family={Paganoni},
+         familyi={P\bibinitperiod},
+         given={Edoardo},
+         giveni={E\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{AAADPE1}
+    \strng{fullhash}{AAADPE1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2020}
+    \field{labeldatesource}{year}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \field{abstract}{%
+    This paper aims at an accurate and efficient computation of effective
+  quantities, e.g., the homogenized coefficients for approximating the
+  solutions to partial differential equations with oscillatory coefficients.
+  Typical multiscale methods are based on a micro-macro coupling, where the
+  macro model describes the coarse scale behaviour, and the micro model is
+  solved only locally to upscale the effective quantities, which are missing in
+  the macro model. The fact that the micro problems are solved over small
+  domains within the entire macroscopic domain, implies imposing artificial
+  boundary conditions on the boundary of the microscopic domains. A naive
+  treatment of these artificial boundary conditions leads to a first order
+  error in */*, where * < * represents the characteristic length of the small
+  scale oscillations and *d is the size of micro domain. This error dominates
+  all other errors originating from the discretization of the macro and the
+  micro problems, and its reduction is a main issue in today*s engineering
+  multiscale computations. The objective of the present work is to analyse a
+  parabolic approach, first announced in [A. Abdulle, D. Arjmand, E. Paganoni,
+  C. R. Acad. Sci. Paris, Ser. I, 2019], for computing the homogenized
+  coefficients with arbitrarily high convergence rates in */*. The analysis
+  covers the setting of periodic microstructure, and numerical simulations are
+  provided to verify the theoretical findings for more general settings, e.g.
+  random stationary micro structures.%
+    }
+    \field{title}{A parabolic local problem with exponential decay of the
+  resonance error for numerical homogenization}
+    \list{institution}{1}{%
+      {Institute of Mathematics, \'Ecole Polytechnique F\'ed\'erale de
+  Lausanne}%
+    }
+    \field{type}{techreport}
+    \field{year}{2020}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
   \entry{Combescure2022}{article}{}
     \name{author}{1}{}{%
       {{hash=CC}{%

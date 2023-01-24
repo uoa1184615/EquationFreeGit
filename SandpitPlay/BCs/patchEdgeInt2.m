@@ -91,8 +91,6 @@ false, from centre cross-patch values (near original scheme).
 
 \item \verb|.parallel| whether serial or parallel.
 
-\item \todo{additional macros bdry info??}
-
 \end{itemize}
 \end{itemize}
 
@@ -417,10 +415,11 @@ if patches.ordCC<1
 else px = min(patches.ordCC,Nx-1); 
      py = min(patches.ordCC,Ny-1); 
 end
-Fx = nan(patches.EdgyInt+1,ny-2,nVars,nEnsem,Nx,Ny,px+1);
-Fy = nan(nx-2,patches.EdgyInt+1,nVars,nEnsem,Nx,Ny,py+1);
+ix=2:nx-1;  iy=2:ny-1; % indices of edge 'interior' (ix n/a)
 %{
 \end{matlab}
+
+\subsubsection{\(x\)-direction values}
 Set function values in first `column' of the tables for every
 variable and across ensemble.  For~\verb|EdgyInt|, the
 `reversal' of the next-to-edge values are because their
@@ -428,84 +427,120 @@ values are to interpolate to the opposite edge of each
 patch. (Have no plans to implement core averaging as yet.)
 \begin{matlab}
 %}
-  ix=2:nx-1;  iy=2:ny-1; % indices of edge 'interior'
+  F = nan(patches.EdgyInt+1,ny-2,nVars,nEnsem,Nx,Ny,px+1);
   if patches.EdgyInt % interpolate next-to-edge values
-    Fx(:,:,:,:,:,:,1) = u([nx-1 2],iy,:,:,:,:);
-    Fy(:,:,:,:,:,:,1) = u(ix,[ny-1 2],:,:,:,:);
-    X(:,:,:,:,:,:) = patches.x([nx-1 2],:,:,:,:,:);
-    Y(:,:,:,:,:,:) = patches.y(:,[ny-1 2],:,:,:,:);
+    F(:,:,:,:,:,:,1) = u([nx-1 2],iy,:,:,:,:);
+    X = patches.x([nx-1 2],:,:,:,:,:);
   else % interpolate mid-patch cross-patch values 
-    Fx(:,:,:,:,:,:,1) = u(i0,iy,:,:,:,:);
-    Fy(:,:,:,:,:,:,1) = u(ix,j0,:,:,:,:);
-    X(:,:,:,:,:,:) = patches.x(i0,:,:,:,:,:);
-    Y(:,:,:,:,:,:) = patches.y(:,j0,:,:,:,:);
-  end;
+    F(:,:,:,:,:,:,1) = u(i0,iy,:,:,:,:);
+    X = patches.x(i0,:,:,:,:,:);
+  end%if patches.EdgyInt
 %{
 \end{matlab}
 
 \paragraph{Form tables of divided differences}
 Compute tables of (forward) divided differences
 \cite[e.g.,][]{DividedDifferences} for every variable, and
-across ensemble, and in both directions, and for both types 
-of edges (left/right and top/bottom).  
-Recursively find all divided differences in the respective direction.
+across ensemble, and for left/right edges.  
+Recursively find all divided differences.
 \begin{matlab}
 %}
 for q = 1:px
   i = 1:Nx-q;
-  Fx(:,:,:,:,i,:,q+1) ...
-  = (Fx(:,:,:,:,i+1 ,:,q)-Fx(:,:,:,:,i,:,q)) ...
-   ./(X(:,:,:,:,i+q,:)    -X(:,:,:,:,i,:));
-end
-for q = 1:py
-  j = 1:Ny-q;
-  Fy(:,:,:,:,:,j,q+1) ...
-  = (Fy(:,:,:,:,:,j+1 ,q)-Fy(:,:,:,:,:,j,q)) ...
-   ./(Y(:,:,:,:,:,j+q)    -Y(:,:,:,:,:,j));
+  F(:,:,:,:,i,:,q+1) ...
+  = (F(:,:,:,:,i+1 ,:,q)-F(:,:,:,:,i,:,q)) ...
+  ./(X(:,:,:,:,i+q,:)   -X(:,:,:,:,i,:));
 end
 %{
 \end{matlab}
 
 \paragraph{Interpolate with divided differences}
-Now interpolate to find the edge-values on left/right edges at~\verb|Xedge| for every~\verb|Y|, and top/bottom edges~\verb|Yedge| for every~\verb|X|.
+Now interpolate to find the edge-values on left/right edges at~\verb|Xedge| for every interior~\verb|Y|.
 \begin{matlab}
 %}
 Xedge = patches.x([1 nx],:,:,:,:,:);
-Yedge = patches.y(:,[1 ny],:,:,:,:);
 %{
 \end{matlab}
 Code Horner's recursive evaluation of the interpolation
 polynomials.  Indices~\verb|i| are those of the left edge of each
-interpolation stencil, and indices~\verb|j| are those of the bottom edge of each
 interpolation stencil, because the table is of forward
 differences.  This alternative: the case of order~\(p_x\) and~\(p_y\) 
 interpolation across the domain, asymmetric near the boundaries of the rectangular domain.
 \begin{matlab}
 %}
   i = max(1,min(1:Nx,Nx-ceil(px/2))-floor(px/2));
-  UXedge = Fx(:,:,:,:,i,:,px+1);
+  Uedge = F(:,:,:,:,i,:,px+1);
   for q = px:-1:1
-    UXedge = Fx(:,:,:,:,i,:,q)+(Xedge-X(:,:,:,:,i+q-1,:)).*UXedge;
-  end
-  j = max(1,min(1:Ny,Ny-ceil(py/2))-floor(py/2));
-  UYedge = Fy(:,:,:,:,:,j,py+1);
-  for q = py:-1:1
-    UYedge = Fy(:,:,:,:,:,j,q)+(Yedge-Y(:,:,:,:,:,j+q-1)).*UYedge;
+    Uedge = F(:,:,:,:,i,:,q)+(Xedge-X(:,:,:,:,i+q-1,:)).*Uedge;
   end
 %{
 \end{matlab}
-
 
 Finally, insert edge values into the array of field values, using the
 required ensemble shifts.  
 \begin{matlab}
 %}
-u(1 ,iy,:,patches.le,:,:) = UXedge(1,:,:,:,:,:);
-u(nx,iy,:,patches.ri,:,:) = UXedge(2,:,:,:,:,:);
-u(ix,1 ,:,patches.bo,:,:) = UYedge(:,1,:,:,:,:);
-u(ix,ny,:,patches.to,:,:) = UYedge(:,2,:,:,:,:);
+u(1 ,iy,:,patches.le,:,:) = Uedge(1,:,:,:,:,:);
+u(nx,iy,:,patches.ri,:,:) = Uedge(2,:,:,:,:,:);
 %{
 \end{matlab}
+
+\subsubsection{\(y\)-direction values}
+Set function values in first `column' of the tables for every
+variable and across ensemble.
+\begin{matlab}
+%}
+  F = nan(nx,patches.EdgyInt+1,nVars,nEnsem,Nx,Ny,py+1);
+  if patches.EdgyInt % interpolate next-to-edge values
+    F(:,:,:,:,:,:,1) = u(:,[ny-1 2],:,:,:,:);
+    Y = patches.y(:,[ny-1 2],:,:,:,:);
+  else % interpolate mid-patch cross-patch values 
+    F(:,:,:,:,:,:,1) = u(:,j0,:,:,:,:);
+    Y = patches.y(:,j0,:,:,:,:);
+  end;
+%{
+\end{matlab}
+Form tables of divided differences.
+\begin{matlab}
+%}
+for q = 1:py
+  j = 1:Ny-q;
+  F(:,:,:,:,:,j,q+1) ...
+  = (F(:,:,:,:,:,j+1 ,q)-F(:,:,:,:,:,j,q)) ...
+  ./(Y(:,:,:,:,:,j+q)   -Y(:,:,:,:,:,j));
+end
+%{
+\end{matlab}
+Interpolate to find the edge-values on top/bottom edges~\verb|Yedge| for every~\(x\).
+\begin{matlab}
+%}
+Yedge = patches.y(:,[1 ny],:,:,:,:);
+%{
+\end{matlab}
+Code Horner's recursive evaluation of the interpolation
+polynomials.  Indices~\verb|j| are those of the bottom edge of each
+interpolation stencil, because the table is of forward
+differences.
+\begin{matlab}
+%}
+  j = max(1,min(1:Ny,Ny-ceil(py/2))-floor(py/2));
+  Uedge = F(:,:,:,:,:,j,py+1);
+  for q = py:-1:1
+    Uedge = F(:,:,:,:,:,j,q)+(Yedge-Y(:,:,:,:,:,j+q-1)).*Uedge;
+  end
+%{
+\end{matlab}
+Finally, insert edge values into the array of field values, using the
+required ensemble shifts.  
+\begin{matlab}
+%}
+u(:,1 ,:,patches.bo,:,:) = Uedge(:,1,:,:,:,:);
+u(:,ny,:,patches.to,:,:) = Uedge(:,2,:,:,:,:);
+%{
+\end{matlab}
+
+
+\subsubsection{Optional NaNs for safety}
 We want a user to set outer edge values on the extreme patches 
 according to the microscale boundary conditions that hold at
 the extremes of the domain.  Consequently, may override
@@ -518,6 +553,7 @@ their computed interpolation values with~\verb|NaN|.
 %u(:,ny,:,:,:,Ny) = nan;
 %{
 \end{matlab}
+
 End of the non-periodic interpolation code.
 \begin{matlab}
 %}
@@ -527,18 +563,12 @@ end%if patches.periodic else
 \end{matlab}
 
 
-
-
-Finally, Nan the corner values of every 2D patch (they would 
-arise from interpolation of values we do not know, 
-so they are unknown).
+Fin, returning the 6D array of field values with
+interpolated edges. 
 \begin{matlab}
 %}
-u([1 nx],[1 ny],:,:,:,:)=nan; 
 end% function patchEdgeInt2
 %{
 \end{matlab}
-Fin, returning the 6D array of field values with
-interpolated edges. 
 \end{devMan} 
 %}
