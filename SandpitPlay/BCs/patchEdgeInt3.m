@@ -463,7 +463,7 @@ Because of the product-form of the patch grid, and because we are doing \emph{on
 \begin{matlab}
 %}
 if patches.ordCC<1
-     px = Nx-1; py = Ny-1; py = Nz-1;
+     px = Nx-1;  py = Ny-1;  pz = Nz-1;
 else px = min(patches.ordCC,Nx-1); 
      py = min(patches.ordCC,Ny-1); 
      pz = min(patches.ordCC,Nz-1); 
@@ -548,7 +548,7 @@ Set function values in first `column' of the tables for every
 variable and across ensemble.
 \begin{matlab}
 %}
-  F = nan(nx,patches.EdgyInt+1,nz-2,nVars,nEnsem,Nx,Ny,Nz,px+1);
+  F = nan(nx,patches.EdgyInt+1,nz-2,nVars,nEnsem,Nx,Ny,Nz,py+1);
   if patches.EdgyInt % interpolate next-to-face values
     F(:,:,:,:,:,:,:,:,1) = u(:,[ny-1 2],iz,:,:,:,:,:);
     Y = patches.y(:,[ny-1 2],:,:,:,:,:,:);
@@ -605,7 +605,7 @@ Set function values in first `column' of the tables for every
 variable and across ensemble.  
 \begin{matlab}
 %}
-  F = nan(nx,ny,patches.EdgyInt+1,nVars,nEnsem,Nx,Ny,Nz,px+1);
+  F = nan(nx,ny,patches.EdgyInt+1,nVars,nEnsem,Nx,Ny,Nz,pz+1);
   if patches.EdgyInt % interpolate next-to-face values
     F(:,:,:,:,:,:,:,:,1) = u(:,:,[nz-1 2],:,:,:,:,:);
     Z = patches.z(:,:,[nz-1 2],:,:,:,:,:);

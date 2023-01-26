@@ -70,22 +70,20 @@ only $\{0,2,4,\ldots\}$
 
 \item \verb|.periodic| indicates whether macroscale is
 periodic domain, or alternatively that the macroscale has
-left, right, top and bottom boundaries so interpolation is via divided
-differences. 
+left, right, top and bottom boundaries so interpolation is
+via divided differences. 
 
 \item \verb|.stag| in $\{0,1\}$ is one for staggered grid
 (alternating) interpolation.  Currently must be zero.
 
 \item \verb|.Cwtsr| and \verb|.Cwtsl| are the coupling
 coefficients for finite width interpolation in both the
-$x,y$-directions---when invoking
-a periodic domain.
+$x,y$-directions---when invoking a periodic domain.
 
 \item \verb|.EdgyInt|, true/false, for determining
-patch-edge values by interpolation: 
-true, from opposite-edge next-to-edge values (often
-preserves symmetry); 
-false, from centre cross-patch values (near original scheme).
+patch-edge values by interpolation: true, from opposite-edge
+next-to-edge values (often preserves symmetry); false, from
+centre cross-patch values (near original scheme).
 
 \item \verb|.nEnsem| the number of realisations in the ensemble.
 
@@ -140,10 +138,10 @@ u = reshape(u,[nx ny nVars nEnsem Nx Ny ]);
 %{
 \end{matlab}
 
-For the moment assume the physical domain is either macroscale
-periodic or macroscale rectangle so that the coupling formulas are simplest.  These index
-vectors point to patches and their four immediate
-neighbours. 
+For the moment assume the physical domain is either
+macroscale periodic or macroscale rectangle so that the
+coupling formulas are simplest.  These index vectors point
+to patches and their four immediate neighbours. 
 \begin{matlab}
 %}
 I=1:Nx; Ip=mod(I,Nx)+1; Im=mod(I-2,Nx)+1;
@@ -404,10 +402,15 @@ assert(~patches.stag, ...
 'not yet implemented staggered grids for non-periodic')
 %{
 \end{matlab}
-Determine the order of interpolation~\verb|px| and~\verb|py| 
-(potentially different in the different directions!), and hence size of 
-the (forward) divided difference tables in~\verb|Fx| and~\verb|Fy|~(7D) for interpolating to left/right edges and top/bottom edges, respectively.
-Because of the product-form of the patch grid, and because we are doing \emph{only} either edgy interpolation or cross-patch interpolation (\emph{not} just the centre patch value), the interpolations are all 1D interpolations.
+Determine the order of interpolation~\verb|px| and~\verb|py|
+(potentially different in the different directions!), and
+hence size of the (forward) divided difference tables
+in~\verb|Fx| and~\verb|Fy|~(7D) for interpolating to
+left/right edges and top/bottom edges, respectively. Because
+of the product-form of the patch grid, and because we are
+doing \emph{only} either edgy interpolation or cross-patch
+interpolation (\emph{not} just the centre patch value), the
+interpolations are all 1D interpolations.
 \begin{matlab}
 %}
 if patches.ordCC<1
@@ -455,17 +458,19 @@ end
 \end{matlab}
 
 \paragraph{Interpolate with divided differences}
-Now interpolate to find the edge-values on left/right edges at~\verb|Xedge| for every interior~\verb|Y|.
+Now interpolate to find the edge-values on left/right edges
+at~\verb|Xedge| for every interior~\verb|Y|.
 \begin{matlab}
 %}
 Xedge = patches.x([1 nx],:,:,:,:,:);
 %{
 \end{matlab}
 Code Horner's recursive evaluation of the interpolation
-polynomials.  Indices~\verb|i| are those of the left edge of each
-interpolation stencil, because the table is of forward
-differences.  This alternative: the case of order~\(p_x\) and~\(p_y\) 
-interpolation across the domain, asymmetric near the boundaries of the rectangular domain.
+polynomials.  Indices~\verb|i| are those of the left edge of
+each interpolation stencil, because the table is of forward
+differences.  This alternative: the case of order~\(p_x\)
+and~\(p_y\) interpolation across the domain, asymmetric near
+the boundaries of the rectangular domain.
 \begin{matlab}
 %}
   i = max(1,min(1:Nx,Nx-ceil(px/2))-floor(px/2));
@@ -476,8 +481,8 @@ interpolation across the domain, asymmetric near the boundaries of the rectangul
 %{
 \end{matlab}
 
-Finally, insert edge values into the array of field values, using the
-required ensemble shifts.  
+Finally, insert edge values into the array of field values,
+using the required ensemble shifts.  
 \begin{matlab}
 %}
 u(1 ,iy,:,patches.le,:,:) = Uedge(1,:,:,:,:,:);
@@ -486,8 +491,8 @@ u(nx,iy,:,patches.ri,:,:) = Uedge(2,:,:,:,:,:);
 \end{matlab}
 
 \subsubsection{\(y\)-direction values}
-Set function values in first `column' of the tables for every
-variable and across ensemble.
+Set function values in first `column' of the tables for
+every variable and across ensemble.
 \begin{matlab}
 %}
   F = nan(nx,patches.EdgyInt+1,nVars,nEnsem,Nx,Ny,py+1);
@@ -511,16 +516,17 @@ for q = 1:py
 end
 %{
 \end{matlab}
-Interpolate to find the edge-values on top/bottom edges~\verb|Yedge| for every~\(x\).
+Interpolate to find the edge-values on top/bottom
+edges~\verb|Yedge| for every~\(x\).
 \begin{matlab}
 %}
 Yedge = patches.y(:,[1 ny],:,:,:,:);
 %{
 \end{matlab}
 Code Horner's recursive evaluation of the interpolation
-polynomials.  Indices~\verb|j| are those of the bottom edge of each
-interpolation stencil, because the table is of forward
-differences.
+polynomials.  Indices~\verb|j| are those of the bottom edge
+of each interpolation stencil, because the table is of
+forward differences.
 \begin{matlab}
 %}
   j = max(1,min(1:Ny,Ny-ceil(py/2))-floor(py/2));
@@ -541,10 +547,11 @@ u(:,ny,:,patches.to,:,:) = Uedge(:,2,:,:,:,:);
 
 
 \subsubsection{Optional NaNs for safety}
-We want a user to set outer edge values on the extreme patches 
-according to the microscale boundary conditions that hold at
-the extremes of the domain.  Consequently, may override
-their computed interpolation values with~\verb|NaN|.
+We want a user to set outer edge values on the extreme
+patches according to the microscale boundary conditions that
+hold at the extremes of the domain.  Consequently, may
+override their computed interpolation values
+with~\verb|NaN|.
 \begin{matlab}
 %}
 %u( 1,:,:,:, 1,:) = nan;

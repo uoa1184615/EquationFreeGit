@@ -35,8 +35,8 @@ time derivatives (or time-steps) of quantities on the 1D
 micro-grid within all the 1D~patches.
 
 \item \verb|Xlim| give the macro-space spatial domain of the
-computation: patches are equi-spaced over the interior of
-the interval~$[\verb|Xlim(1)|,\verb|Xlim(2)|]$.
+computation, namely the interval $[ \verb|Xlim(1)|,
+\verb|Xlim(2)|]$.
 
 \item \verb|Dom| sets the type of macroscale conditions for
 the patches, and reflects the type of microscale boundary
@@ -328,9 +328,8 @@ end%if nargin==0
 %{
 \end{matlab}
 
-\input{../Patch/BurgersPDE.m}
-\input{../Patch/odeOcts.m}
-
+\IfFileExists{../Patch/BurgersPDE.m}{\input{../Patch/BurgersPDE.m}}{}
+\IfFileExists{../Patch/odeOcts.m}{\input{../Patch/odeOcts.m}}{}
 
 
 
@@ -537,7 +536,13 @@ The Chebyshev case is spaced according to the Chebyshev
 distribution in order to reduce macro-interpolation errors,
 \(X_i \propto -cos(i\pi/N)\),  but with the extreme edges
 aligned with the spatial domain boundaries, modified by the
-offset, and modified by possible `boundary layers'.  
+offset, and modified by possible `boundary
+layers'.\footnote{ However, maybe overlapping patches near a
+boundary should be viewed as some sort of spatial analogue
+of the `christmas tree' of projective integration and its
+projection to a slow manifold.   Here maybe the overlapping
+patches allow for a `christmas tree' approach to the
+boundary layers.   Needs to be explored??}
 \begin{matlab}
 %}
 case 'chebyshev'

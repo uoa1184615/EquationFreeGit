@@ -1,13 +1,14 @@
 \documentclass[11pt,a5paper]{article}
 \usepackage[a5paper,margin=9mm,bmargin=15mm]{geometry}
 
-\title{Equation-free computational homogenisation with Dirichlet boundaries}
+\title{Equation-free computational homogenisation with various boundaries and various patch spacing}
 
 \author{A.~J.~Roberts%
 \thanks{School of Mathematical Sciences, University of Adelaide, South Australia.
 \url{https://profajroberts.github.io},
 \url{http://orcid.org/0000-0001-8930-1552}}
 }
+
 
 
 \usepackage{pgfplots} 
@@ -57,6 +58,11 @@
 \def\figurename{\sl Figure}
 
 \def\sign{\operatorname{sign}}
+\newenvironment{devMan}{}{}
+\newcommand{\todo}[1]{\footnote{\textbf{ToDo:}\quad #1}}
+\def\localtableofcontents{}
+\def\into{${}\mapsto{}$}
+\graphicspath{{../../Patch/Figs/}}
 
 
 \begin{document}
@@ -65,6 +71,9 @@
 \maketitle
 
 \tableofcontents
+
+\section*{Examples}
+\addcontentsline{toc}{section}{Examples}
 
 \input{Eckhart2210eg2.m}
 
@@ -81,6 +90,24 @@
 \input{abdulleDiffEquil2.m}
 
 \input{randAdvecDiffEquil2.m}
+
+\input{homoDiffBdryEquil3.m}
+
+
+\section*{New configuration and interpolation}
+\addcontentsline{toc}{section}{New configuration and interpolation}
+
+\input{patchEdgeInt1.m}
+
+\input{configPatches1.m}
+
+\input{patchEdgeInt2.m}
+
+\input{configPatches2.m}
+
+\input{patchEdgeInt3.m}
+
+\input{configPatches3.m}
 
 
 \end{document}

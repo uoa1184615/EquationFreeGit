@@ -1,6 +1,6 @@
-% Solve for steady state of two-scale heterogeneous diffusion
-% in 2D on patches as an example application, from section
-% 6.2 of Bonizzoni, 2211.15221.  AJR, Jan 2023
+% Solve for steady state of two-scale heterogeneous
+% diffusion in 2D on patches as an example application, from
+% section 6.2 of Bonizzoni, 2211.15221.  AJR, Jan 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{randAdvecDiffEquil2}: equilibrium of a 2D
@@ -13,19 +13,23 @@ heterogeneous \pde\ (inspired by Bonizzoni et al.\footnote{
 \begin{equation*}
 u_t=\mu_1\delsq u -(\cos\mu_2,\sin\mu_2)\cdot\grad u -u +f\,,
 \end{equation*}
-on domain \([0,1]^2\) with Neumann BCs, for microscale random diffusion and advection coefficients, \(\mu_1\in[0.01,0.1]\) and \(\mu_2\in[0,2\pi)\),
-and for forcing
+on domain \([0,1]^2\) with Neumann BCs, for microscale
+random diffusion and advection coefficients,
+\(\mu_1\in[0.01,0.1]\) and \(\mu_2\in[0,2\pi)\), and for
+forcing
 \begin{equation*}
 f:=\exp\left[-\frac{(x-\mu_3)^2+(x-\mu_4)^2}{\mu_5^2}\right],
 \end{equation*}
-smoothly varying in space for fixed \(\mu_3,\mu_4\in[0.25,0.75]\) and \(\mu_5\in[0.1,0.25]\).
-The above system is dominantly diffusive for lengths scales \(\ell<0.01=\min\mu_1\).
+smoothly varying in space for fixed \(\mu_3, \mu_4 \in
+[0.25,0.75]\) and \(\mu_5 \in [0.1,0.25]\). The above system
+is dominantly diffusive for lengths scales \(\ell<0.01 =
+\min\mu_1\).
 
 Clear, and initiate globals. 
 \begin{matlab}
 %}
 clear all
-global patches i
+global patches
 %{
 \end{matlab}
 
@@ -58,7 +62,8 @@ nSubP = nPeriodsPatch*mPeriod+2 % for edgy int
 
 \paragraph{Patch configuration}
 Say use \(7\times7\) patches in \((0,1)^2\), fourth order
-interpolation, either `equispace' or `chebyshev', and the offset for Neumann boundary conditions:
+interpolation, either `equispace' or `chebyshev', and the
+offset for Neumann boundary conditions:
 \begin{matlab}
 %}
 nPatch = 7 
@@ -84,14 +89,15 @@ patches.fu = exp(-((patches.x-mu(1)).^2+(patches.y-mu(2)).^2)/mu(3)^2);
 \paragraph{Solve for steady state}
 Set initial guess of zero, with \verb|NaN| to indicate
 patch-edge values.  Index~\verb|i| are the indices of
-patch-interior points, and the number of unknowns is then
-its length.
+patch-interior points, store in global patches for access by
+\verb|theRes|, and the number of unknowns is then its number
+of elements.
 \begin{matlab}
 %}
 u0 = zeros(nSubP,nSubP,1,1,nPatch,nPatch);
 u0([1 end],:,:) = nan;  u0(:,[1 end],:) = nan;
-i = find(~isnan(u0));
-nVariables = numel(i)
+patches.i = find(~isnan(u0));
+nVariables = numel(patches.i)
 %{
 \end{matlab}
 Solve by iteration.  Use \verb|fsolve| for simplicity and
@@ -100,7 +106,7 @@ information).
 \begin{matlab}
 %}
 tic;
-uSoln = fsolve(@theRes,u0(i) ...
+uSoln = fsolve(@theRes,u0(patches.i) ...
         ,optimoptions('fsolve','Display','off')); 
 solnTime = toc
 %{
@@ -108,7 +114,7 @@ solnTime = toc
 Store the solution into the patches, and give magnitudes.
 \begin{matlab}
 %}
-u0(i) = uSoln;
+u0(patches.i) = uSoln;
 normSoln = norm(uSoln)
 normResidual = norm(theRes(uSoln))
 %{
@@ -192,11 +198,11 @@ derivatives.
 \begin{matlab}
 %}
 function f=theRes(u)
-  global patches i
+  global patches
   v=nan(size(patches.x+patches.y));
-  v(i)=u;
+  v(patches.i)=u;
   f=patchSys2(0,v(:),patches);
-  f=f(i);
+  f=f(patches.i);
 end%function theRes
 %{
 \end{matlab}
