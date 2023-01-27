@@ -27,7 +27,7 @@ Clear, and initiate globals.
 \begin{matlab}
 %}
 clear all
-global patches i
+global patches 
 %{
 \end{matlab}
 
@@ -89,8 +89,8 @@ its length.
 %}
 u0 = zeros(nSubP,nSubP,1,1,nPatch,nPatch);
 u0([1 end],:,:) = nan;  u0(:,[1 end],:) = nan;
-i = find(~isnan(u0));
-nVariables = numel(i)
+patches.i = find(~isnan(u0));
+nVariables = numel(patches.i)
 %{
 \end{matlab}
 Solve by iteration.  Use \verb|fsolve| for simplicity and
@@ -101,13 +101,13 @@ information).
 tic;
 uSoln = fsolve(@theRes,u0(i) ...
         ,optimoptions('fsolve','Display','off')); 
-solnTime = toc
+solveTime = toc
 %{
 \end{matlab}
 Store the solution into the patches, and give magnitudes.
 \begin{matlab}
 %}
-u0(i) = uSoln;
+u0(patches.i) = uSoln;
 normSoln = norm(uSoln)
 normResidual = norm(theRes(uSoln))
 %{
@@ -190,11 +190,11 @@ derivatives.
 \begin{matlab}
 %}
 function f=theRes(u)
-  global patches i
+  global patches 
   v=nan(size(patches.x+patches.y));
-  v(i)=u;
+  v(patches.i)=u;
   f=patchSys2(0,v(:),patches);
-  f=f(i);
+  f=f(patches.i);
 end%function theRes
 %{
 \end{matlab}

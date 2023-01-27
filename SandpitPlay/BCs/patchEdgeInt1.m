@@ -424,7 +424,7 @@ Xedge = patches.x([1 nx],:,:,:);
 Code Horner's evaluation of the interpolation
 polynomials.  Indices~\verb|i| are those of the left end of each
 interpolation stencil because the table is of forward
-differences.  First alternative: the case of order~\(p\) 
+differences.\footnote{For EdgyInt, perhaps interpret odd order interpolation in such a way that first-order interpolations reduces to appropriate linear interpolation so that as patches abut the scheme is `full-domain'.  May mean left-edge and right-edge have different indices.  Explore sometime??}  First alternative: the case of order~\(p\) 
 interpolation across the domain, asymmetric near the boundary.
 Use this first alternative for the moment (Jan 2023).
 \begin{matlab}

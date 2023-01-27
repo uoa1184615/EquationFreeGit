@@ -125,7 +125,10 @@ xlabel('space $x$'),ylabel('equilibrium $u(x)$')
 %%{
 %\end{matlab}
 
-\paragraph{Code to execute fsolve}
+
+
+
+\subsection{One way to execute fsolve}
 We code the function \verb|execFsolve| to execute
 \verb|fsolve| because easiest if a sub-function that
 computes the time derivatives has access to variables
