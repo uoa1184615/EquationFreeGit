@@ -14,6 +14,7 @@
 \usepackage{pgfplots} 
 \pgfplotsset{compat=newest} % AJR: changed to newest aiming for flexible
 \usepgfplotslibrary{external} %exports an external pdf for each tikz 
+% have not externalized yet though
 
 % fancyvrb does code listing, including line numbers
 \usepackage{fancyvrb}
@@ -64,6 +65,8 @@
 \def\into{${}\mapsto{}$}
 \graphicspath{{../../Patch/Figs/}}
 
+\def\E#1{\textsc{e}{-}#1}
+
 
 \begin{document}
 \fancyvrbStartStop
@@ -75,15 +78,15 @@
 \section*{Examples}
 \addcontentsline{toc}{section}{Examples}
 
-\input{Eckhart2210eg2.m}
+\input{Eckhardt2210eg2.m}
 
-\input{EckhartEquilib.m}
+\input{EckhardtEquilib.m}
 
-\input{EckhartEquilibErrs.m}
+\input{EckhardtEquilibErrs.m}
 
-\input{Eckhart2210eg1.m}
+\input{Eckhardt2210eg1.m}
 
-\input{Combescure2022.m}
+%\input{Combescure2022.m}
 
 \input{monoscaleDiffEquil2.m}
 

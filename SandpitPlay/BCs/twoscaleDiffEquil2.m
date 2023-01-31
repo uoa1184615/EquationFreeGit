@@ -1,7 +1,7 @@
 % Solve for steady state of twoscale heterogeneous diffusion
 % in 2D on patches as an example application, from section
-% 5.3.1 of Freese, 2211.13731.  AJR, Jan 2023
-%!TEX root = ../Doc/eqnFreeDevMan.tex
+% 5.3.1 of Freese, 2211.13731.  AJR, 31 Jan 2023
+%!TEX root = doc.tex
 %{
 \section{\texttt{twoscaleDiffEquil2}: equilibrium of a 2D
 twoscale heterogeneous diffusion via small patches}
@@ -21,6 +21,18 @@ A:=\begin{bmatrix} 2& a\\a & 2 \end{bmatrix}
 \quad \text{with } a:=\sin(\pi x/\epsilon)\sin(\pi y/\epsilon),
 \end{equation*}
 and for forcing \(f:=(x+\cos3\pi x)y^3\).
+\begin{figure}
+\centering\begin{tabular}{@{}c@{\ }c@{}}
+\parbox[t]{10em}{\caption{\label{fig:twoscaleDiffEquil2}%
+Equilibrium of the multiscale diffusion problem of Freese
+with Dirichlet zero-value boundary conditions
+(\cref{sec:twoscaleDiffEquil2}).  The patch size is not
+small so we can see the patches and the sub-patch grid. The
+solution~\(u(x,y)\) is boringly smooth.}} &
+\def\extraAxisOptions{label shift={-1.5ex}}
+\raisebox{-\height}{\input{Figs/twoscaleDiffEquil2}}
+\end{tabular}
+\end{figure}
 
 
 Clear, and initiate globals. 
@@ -28,12 +40,13 @@ Clear, and initiate globals.
 %}
 clear all
 global patches 
+%global OurCf2eps, OurCf2eps=true %option to save plot
 %{
 \end{matlab}
 
 
 First establish the microscale heterogeneity has
-micro-period~\verb|mPeriod| on the spatial lattice. Set the
+micro-period \verb|mPeriod| on the spatial lattice. Set the
 phase of the heterogeneity so that each patch centre is a
 point of symmetry of the diffusivity.  Then
 \verb|configPatches2| replicates the heterogeneity to fill
@@ -50,7 +63,7 @@ parameters.
 \begin{matlab}
 %}
 nPeriodsPatch = 1 % any integer
-epsilon = 2^(-5) % so we can see patches
+epsilon = 2^(-6) % 4 or 5 to see the patches
 dx = (2*epsilon)/mPeriod
 nSubP = nPeriodsPatch*mPeriod+2 % for edgy int
 %{
@@ -73,7 +86,8 @@ Compute the time-constant forcing, and store in struct
 \cref{sec:twoscaleDiffForce2}.
 \begin{matlab}
 %}
-patches.fu = 100*(patches.x+cos(3*pi*patches.x)).*patches.y.^3;
+x = patches.x;  y = patches.y;
+patches.fu = 100*(x+cos(3*pi*x)).*y.^3;
 %{
 \end{matlab}
 
@@ -95,42 +109,47 @@ nVariables = numel(patches.i)
 \end{matlab}
 Solve by iteration.  Use \verb|fsolve| for simplicity and
 robustness (and using \verb|optimoptions| to omit trace
-information).
+information), and give magnitudes.
 \begin{matlab}
 %}
 tic;
-uSoln = fsolve(@theRes,u0(i) ...
+uSoln = fsolve(@theRes2,u0(patches.i) ...
         ,optimoptions('fsolve','Display','off')); 
 solveTime = toc
+normResidual = norm(theRes2(uSoln))
+normSoln = norm(uSoln)
 %{
 \end{matlab}
-Store the solution into the patches, and give magnitudes.
+Store the solution vector into the patches, and interpolate,
+but have not bothered to set boundary values so they stay
+NaN from the interpolation.
 \begin{matlab}
 %}
 u0(patches.i) = uSoln;
-normSoln = norm(uSoln)
-normResidual = norm(theRes(uSoln))
+u0 = patchEdgeInt2(u0);
 %{
 \end{matlab}
 
 
 
 
-\paragraph{Draw solution profile}
-First reshape arrays to suit 2D space surface plots.
+\paragraph{Draw solution profile} Separate patches with
+NaNs, then reshape arrays to suit 2D space surface plots.
 \begin{matlab}
 %}
-figure(1), clf, colormap(hsv)
-x = squeeze(patches.x); y = squeeze(patches.y);
+figure(1), clf, colormap(0.8*hsv)
+x(end+1,:,:)=nan;  u0(end+1,:,:)=nan;  
+y(:,end+1,:)=nan;  u0(:,end+1,:)=nan;
 u = reshape(permute(squeeze(u0),[1 3 2 4]), [numel(x) numel(y)]);
 %{
 \end{matlab}
-Draw the patch solution surface, with edge-values omitted as
-already~\verb|NaN| by not bothering to interpolate them.
+Draw the patch solution surface, with boundary-values omitted as
+already~\verb|NaN| by not bothering to set them.
 \begin{matlab}
 %}
-surf(x(:),y(:),u'); view(60,55) 
-xlabel('x'), ylabel('y'), zlabel('u(x,y)')
+mesh(x(:),y(:),u'); view(60,55) 
+xlabel('space $x$'), ylabel('space $y$'), zlabel('$u(x,y)$')
+ifOurCf2tex(mfilename)%optionally save
 %{
 \end{matlab}
 
@@ -152,8 +171,8 @@ point in the interior of a patch, output in~\verb|ut|.
 function ut = twoscaleDiffForce2(t,u,patches)
   dx = diff(patches.x(2:3));  % x space step
   dy = diff(patches.y(2:3));  % y space step
-  ix = 2:size(u,1)-1; % x interior points in a patch
-  iy = 2:size(u,2)-1; % y interior points in a patch
+  i = 2:size(u,1)-1; % x interior points in a patch
+  j = 2:size(u,2)-1; % y interior points in a patch
   ut = nan+u;         % preallocate output array
 %{
 \end{matlab}
@@ -172,32 +191,30 @@ coefficients.  Easier to code by conflating the last four
 dimensions into the one~\verb|,:|. 
 \begin{matlab}
 %}
-  ut(ix,iy,:) ...
-  = 2*diff(u(:,iy,:),2,1)/dx^2 +2*diff(u(ix,:,:),2,2)/dy^2 ...
-   +2*patches.cs(ix,iy).*( u(ix+1,iy+1,:) -u(ix-1,iy+1,:) ...
-     -u(ix+1,iy-1,:) +u(ix-1,iy-1,:) )/(4*dx*dy) ...
-   -patches.fu(ix,iy,:); 
+  ut(i,j,:) ...
+  = 2*diff(u(:,j,:),2,1)/dx^2 +2*diff(u(i,:,:),2,2)/dy^2 ...
+   +2*patches.cs(i,j).*( u(i+1,j+1,:) -u(i-1,j+1,:) ...
+     -u(i+1,j-1,:) +u(i-1,j-1,:) )/(4*dx*dy) ...
+   -patches.fu(i,j,:); 
 end%function twoscaleDiffForce2
 %{
 \end{matlab}
 
 
-\subsection{\texttt{theRes()}: function to zero}
+\subsection{\texttt{theRes2()}: function to zero}
 This functions converts a vector of values into the interior
 values of the patches, then evaluates the time derivative of
 the system, and returns the vector of patch-interior time
 derivatives.
 \begin{matlab}
 %}
-function f=theRes(u)
+function f=theRes2(u)
   global patches 
   v=nan(size(patches.x+patches.y));
   v(patches.i)=u;
   f=patchSys2(0,v(:),patches);
   f=f(patches.i);
-end%function theRes
+end%function theRes2
 %{
 \end{matlab}
-
-Fin.
 %}

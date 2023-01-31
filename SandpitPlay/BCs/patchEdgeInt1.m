@@ -378,8 +378,8 @@ assert(~patches.stag, ...
 'not yet implemented staggered grids for non-periodic')
 %{
 \end{matlab}
-Determine the order of interpolation~\verb|p|, and hence size of 
-the (forward) divided difference table in~\verb|F|.
+Determine the order of interpolation~\verb|p|, and hence
+size of the (forward) divided difference table in~\verb|F|.
 \begin{matlab}
 %}
 if patches.ordCC<1, patches.ordCC = Nx-1; end
@@ -421,12 +421,17 @@ Now interpolate to the edge-values at locations~\verb|Xedge|.
 Xedge = patches.x([1 nx],:,:,:);
 %{
 \end{matlab}
-Code Horner's evaluation of the interpolation
-polynomials.  Indices~\verb|i| are those of the left end of each
+Code Horner's evaluation of the interpolation polynomials. 
+Indices~\verb|i| are those of the left end of each
 interpolation stencil because the table is of forward
-differences.\footnote{For EdgyInt, perhaps interpret odd order interpolation in such a way that first-order interpolations reduces to appropriate linear interpolation so that as patches abut the scheme is `full-domain'.  May mean left-edge and right-edge have different indices.  Explore sometime??}  First alternative: the case of order~\(p\) 
-interpolation across the domain, asymmetric near the boundary.
-Use this first alternative for the moment (Jan 2023).
+differences.\footnote{For EdgyInt, perhaps interpret odd
+order interpolation in such a way that first-order
+interpolations reduces to appropriate linear interpolation
+so that as patches abut the scheme is `full-domain'.  May
+mean left-edge and right-edge have different indices. 
+Explore sometime??}  First alternative: the case of
+order~\(p\) interpolation across the domain, asymmetric near
+the boundary.  Use this first alternative for now.
 \begin{matlab}
 %}
 if true
@@ -437,19 +442,22 @@ if true
   end
 %{
 \end{matlab}
-Second alternative: lower the degree of interpolation near 
-the boundary to maintain the band-width of the interpolation.   
-Such symmetry might be essential for multi-D.
-The aim is to preserve symmetry?? Does it??  As of Jan 2023 it only partially does---fails near boundaries, and maybe with uneven spacing.
+Second alternative: lower the degree of interpolation near
+the boundary to maintain the band-width of the
+interpolation. Such symmetry might be essential for multi-D.
+\footnote{The aim is to preserve symmetry?? Does it??  As of
+Jan 2023 it only partially does---fails near boundaries, and
+maybe fails with uneven spacing.}
 \begin{matlab}
 %}
 else%if false
   i = max(1,I-floor(p/2));
 %{
 \end{matlab}
-For the tapering order of interpolation, form the interior mask~\verb|Q|
-(logical) that signifies which interpolations are to be done at order~\verb|q|.
-This logical mask spreads by two as each order~\verb|q| decreases. 
+For the tapering order of interpolation, form the interior
+mask~\verb|Q| (logical) that signifies which interpolations
+are to be done at order~\verb|q|. This logical mask spreads
+by two as each order~\verb|q| decreases. 
 \begin{matlab}
 %}
   Q = (I-1>=floor(p/2)) & (Nx-I>=p/2);
@@ -475,8 +483,8 @@ end%if
 %{
 \end{matlab}
 
-Finally, insert edge values into the array of field values, using the
-required ensemble shifts.
+Finally, insert edge values into the array of field values,
+using the required ensemble shifts.
 \begin{matlab}
 %}
 u(1 ,:,patches.le,I) = Uedge(1,:,:,I);
@@ -489,8 +497,8 @@ the extremes of the domain.  Consequently, may override
 their computed interpolation values with~\verb|NaN|.
 \begin{matlab}
 %}
-%u( 1,:,:, 1) = nan;
-%u(nx,:,:,Nx) = nan;
+u( 1,:,:, 1) = nan;
+u(nx,:,:,Nx) = nan;
 %{
 \end{matlab}
 End of the non-periodic interpolation code.

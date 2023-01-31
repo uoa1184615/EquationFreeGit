@@ -1,7 +1,8 @@
 % Solve for steady state of two-scale heterogeneous
-% diffusion in 2D on patches as an example application, from
-% section 6.2 of Bonizzoni, 2211.15221.  AJR, Jan 2023
-%!TEX root = ../Doc/eqnFreeDevMan.tex
+% diffusion in 2D on patches as an example application
+% involving Neumann boundary conditions, from section 6.2 of
+% Bonizzoni, 2211.15221.  AJR, 1 Feb 2023
+%!TEX root = doc.tex
 %{
 \section{\texttt{randAdvecDiffEquil2}: equilibrium of a 2D
 random heterogeneous advection-diffusion via small patches}
@@ -13,47 +14,66 @@ heterogeneous \pde\ (inspired by Bonizzoni et al.\footnote{
 \begin{equation*}
 u_t=\mu_1\delsq u -(\cos\mu_2,\sin\mu_2)\cdot\grad u -u +f\,,
 \end{equation*}
-on domain \([0,1]^2\) with Neumann BCs, for microscale
-random diffusion and advection coefficients,
-\(\mu_1\in[0.01,0.1]\) and \(\mu_2\in[0,2\pi)\), and for
-forcing
+on domain \([0,1]^2\) with Neumann boundary conditions, for
+microscale random pseudo-diffusion and pseudo-advection
+coefficients, \(\mu_1(x,y)\in[0.01,0.1]\)\footnote{More
+interesting microscale structure arises here for~\(\mu_1\) a
+factor of three smaller.} and \(\mu_2(x,y)\in[0,2\pi)\), and
+for forcing
 \begin{equation*}
-f:=\exp\left[-\frac{(x-\mu_3)^2+(x-\mu_4)^2}{\mu_5^2}\right],
+f(x,y):=\exp\left[-\frac{(x-\mu_3)^2+(y-\mu_4)^2}{\mu_5^2}\right],
 \end{equation*}
 smoothly varying in space for fixed \(\mu_3, \mu_4 \in
-[0.25,0.75]\) and \(\mu_5 \in [0.1,0.25]\). The above system
-is dominantly diffusive for lengths scales \(\ell<0.01 =
-\min\mu_1\).
+[0.25,0.75]\) and \(\mu_5 \in [0.1,0.25]\).  The above
+system is dominantly diffusive for lengths scales
+\(\ell<0.01 = \min\mu_1\).  Due to the randomness, we get
+different solutions each execution of this code. 
+\cref{fig:randAdvecDiffEquil2} plots one example.  A
+physical interpretation of the solution field is confounded
+because the problem is pseudo-advection-diffusion due to the
+varying coefficients being outside the \(\grad\)~operator.
+\begin{figure}
+\centering\caption{\label{fig:randAdvecDiffEquil2}%
+Equilibrium of the macroscale diffusion problem of Bonizzoni
+et al.\ with Neumann boundary conditions of zero
+(\cref{sec:randAdvecDiffEquil2}). Here the patches have a
+equispaced spatial distribution. The microscale periodicity,
+and hence the patch size, is chosen large enough to see
+within.}
+\includegraphics[scale=0.8]{Figs/randAdvecDiffEquil2}
+\end{figure}
+
 
 Clear, and initiate globals. 
 \begin{matlab}
 %}
 clear all
 global patches
+%global OurCf2eps, OurCf2eps=true %option to save plot
 %{
 \end{matlab}
 
 
 First establish the microscale heterogeneity has
-micro-period~\verb|mPeriod| on the spatial lattice.  Then
+micro-period \verb|mPeriod| on the spatial lattice.  Then
 \verb|configPatches2| replicates the heterogeneity to fill
 each patch. 
 \begin{matlab}
 %}
 mPeriod = 4
-mu1 = 10.^(-1-rand(mPeriod))
+mu1 = 0.01*10.^rand(mPeriod)
 mu2 = 2*pi*rand(mPeriod)
 cs = cat(3,mu1,cos(mu2),sin(mu2));
 meanDiffAdvec=squeeze(mean(mean(cs)))
 %{
 \end{matlab}
-Set the periodicity,~\(\epsilon\), and other microscale
-parameters.
+Set the periodicity~\(\epsilon\), here big enough so we can
+see the patches, and other microscale parameters.
 \begin{matlab}
 %}
-nPeriodsPatch = 1 % any integer
-epsilon = 2^(-4) % so we can see patches
+epsilon = 0.04
 dx = epsilon/mPeriod
+nPeriodsPatch = 1 % any integer
 nSubP = nPeriodsPatch*mPeriod+2 % for edgy int
 %{
 \end{matlab}
@@ -79,7 +99,8 @@ Compute the time-constant forcing, and store in struct
 \begin{matlab}
 %}
 mu = [ 0.25+0.5*rand(1,2) 0.1+0.15*rand ]
-patches.fu = exp(-((patches.x-mu(1)).^2+(patches.y-mu(2)).^2)/mu(3)^2);
+patches.fu = exp(-((patches.x-mu(1)).^2 ...
+                  +(patches.y-mu(2)).^2)/mu(3)^2);
 %{
 \end{matlab}
 
@@ -90,8 +111,8 @@ patches.fu = exp(-((patches.x-mu(1)).^2+(patches.y-mu(2)).^2)/mu(3)^2);
 Set initial guess of zero, with \verb|NaN| to indicate
 patch-edge values.  Index~\verb|i| are the indices of
 patch-interior points, store in global patches for access by
-\verb|theRes|, and the number of unknowns is then its number
-of elements.
+\verb|theRes2|, and the number of unknowns is then its
+number of elements.
 \begin{matlab}
 %}
 u0 = zeros(nSubP,nSubP,1,1,nPatch,nPatch);
@@ -106,38 +127,44 @@ information).
 \begin{matlab}
 %}
 tic;
-uSoln = fsolve(@theRes,u0(patches.i) ...
+uSoln = fsolve(@theRes2,u0(patches.i) ...
         ,optimoptions('fsolve','Display','off')); 
 solnTime = toc
+normResidual = norm(theRes2(uSoln))
+normSoln = norm(uSoln)
 %{
 \end{matlab}
-Store the solution into the patches, and give magnitudes.
+Store the solution vector into the patches, and interpolate,
+but have not bothered to set boundary values so they stay
+NaN from the interpolation.
 \begin{matlab}
 %}
 u0(patches.i) = uSoln;
-normSoln = norm(uSoln)
-normResidual = norm(theRes(uSoln))
+u0 = patchEdgeInt2(u0);
 %{
 \end{matlab}
 
 
 
 
-\paragraph{Draw solution profile}
-First reshape arrays to suit 2D space surface plots.
+\paragraph{Draw solution profile} Separate patches with
+NaNs, then reshape arrays to suit 2D space surface plots.
 \begin{matlab}
 %}
-figure(1), clf, colormap(hsv)
-x = squeeze(patches.x); y = squeeze(patches.y);
-u = reshape(permute(squeeze(u0),[1 3 2 4]), [numel(x) numel(y)]);
+figure(1), clf, colormap(0.8*hsv)
+patches.x(end+1,:,:)=nan;  u0(end+1,:,:)=nan;  
+patches.y(:,end+1,:)=nan;  u0(:,end+1,:)=nan;
+u = reshape(permute(squeeze(u0),[1 3 2 4]) ...
+    , [numel(patches.x) numel(patches.y)]);
 %{
 \end{matlab}
-Draw the patch solution surface, with edge-values omitted as
-already~\verb|NaN| by not bothering to interpolate them.
+Draw the patch solution surface, with boundary-values
+omitted as already~\verb|NaN| by not bothering to set them.
 \begin{matlab}
 %}
-surf(x(:),y(:),u'); view(60,55) 
-xlabel('x'), ylabel('y'), zlabel('u(x,y)')
+mesh(patches.x(:),patches.y(:),u'); view(60,55) 
+xlabel('space $x$'), ylabel('space $y$'), zlabel('$u(x,y)$')
+ifOurCf2eps(mfilename) %optionally save plot
 %{
 \end{matlab}
 
@@ -159,13 +186,14 @@ point in the interior of a patch, output in~\verb|ut|.
 function ut = randAdvecDiffForce2(t,u,patches)
   dx = diff(patches.x(2:3));  % x space step
   dy = diff(patches.y(2:3));  % y space step
-  ix = 2:size(u,1)-1; % x interior points in a patch
-  iy = 2:size(u,2)-1; % y interior points in a patch
+  i = 2:size(u,1)-1; % x interior points in a patch
+  j = 2:size(u,2)-1; % y interior points in a patch
   ut = nan+u;         % preallocate output array
 %{
 \end{matlab}
-Set Neumann boundary condition of zero derivative around the square
-domain.
+Set Neumann boundary condition of zero derivative around the
+square domain: that is, the edge value equals the
+next-to-edge value.
 \begin{matlab}
 %}
   u( 1 ,:,:,:, 1 ,:)=u(  2  ,:,:,:, 1 ,:); % left edge of left patches
@@ -179,33 +207,31 @@ coefficients.  Easier to code by conflating the last four
 dimensions into the one~\verb|,:|. 
 \begin{matlab}
 %}
-  ut(ix,iy,:) ...
-  = patches.cs(ix,iy,1).*(diff(u(:,iy,:),2,1)/dx^2 ...
-                         +diff(u(ix,:,:),2,2)/dy^2)...
-   -patches.cs(ix,iy,2).*(u(ix+1,iy,:)-u(ix-1,iy,:))/(2*dx) ...
-   -patches.cs(ix,iy,3).*(u(ix,iy+1,:)-u(ix,iy-1,:))/(2*dy) ...
-   -u(ix,iy,:) +patches.fu(ix,iy,:); 
+  ut(i,j,:) ...
+  = patches.cs(i,j,1).*(diff(u(:,j,:),2,1)/dx^2 ...
+                         +diff(u(i,:,:),2,2)/dy^2)...
+   -patches.cs(i,j,2).*(u(i+1,j,:)-u(i-1,j,:))/(2*dx) ...
+   -patches.cs(i,j,3).*(u(i,j+1,:)-u(i,j-1,:))/(2*dy) ...
+   -u(i,j,:) +patches.fu(i,j,:); 
 end%function randAdvecDiffForce2
 %{
 \end{matlab}
 
 
-\subsection{\texttt{theRes()}: function to zero}
+\subsection{\texttt{theRes2()}: function to zero}
 This functions converts a vector of values into the interior
 values of the patches, then evaluates the time derivative of
 the system, and returns the vector of patch-interior time
 derivatives.
 \begin{matlab}
 %}
-function f=theRes(u)
+function f=theRes2(u)
   global patches
   v=nan(size(patches.x+patches.y));
   v(patches.i)=u;
   f=patchSys2(0,v(:),patches);
   f=f(patches.i);
-end%function theRes
+end%function theRes2
 %{
 \end{matlab}
-
-Fin.
 %}

@@ -664,12 +664,12 @@ the extremes of the domain.  Consequently, may override
 their computed interpolation values with~\verb|NaN|.
 \begin{matlab}
 %}
-%u( 1,:,:,:,:, 1,:,:) = nan;
-%u(nx,:,:,:,:,Nx,:,:) = nan;
-%u(:, 1,:,:,:,:, 1,:) = nan;
-%u(:,ny,:,:,:,:,Ny,:) = nan;
-%u(:,:, 1,:,:,:,:, 1) = nan;
-%u(:,:,ny,:,:,:,:,Nz) = nan;
+u( 1,:,:,:,:, 1,:,:) = nan;
+u(nx,:,:,:,:,Nx,:,:) = nan;
+u(:, 1,:,:,:,:, 1,:) = nan;
+u(:,ny,:,:,:,:,Ny,:) = nan;
+u(:,:, 1,:,:,:,:, 1) = nan;
+u(:,:,nz,:,:,:,:,Nz) = nan;
 %{
 \end{matlab}
 

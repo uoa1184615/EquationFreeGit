@@ -554,10 +554,10 @@ override their computed interpolation values
 with~\verb|NaN|.
 \begin{matlab}
 %}
-%u( 1,:,:,:, 1,:) = nan;
-%u(nx,:,:,:,Nx,:) = nan;
-%u(:, 1,:,:,:, 1) = nan;
-%u(:,ny,:,:,:,Ny) = nan;
+u( 1,:,:,:, 1,:) = nan;
+u(nx,:,:,:,Nx,:) = nan;
+u(:, 1,:,:,:, 1) = nan;
+u(:,ny,:,:,:,Ny) = nan;
 %{
 \end{matlab}
 

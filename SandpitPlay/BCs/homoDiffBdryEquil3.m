@@ -1,25 +1,43 @@
 % Finds equilibrium of forced heterogeneous diffusion in 3D
-% space on 3D patches as an example application. Here the
-% microscale is of known period so we interpolate
-% next-to-edge values to get opposite edge values.  
-% AJR, Jan 2023
-%!TEX root = ../Doc/eqnFreeDevMan.tex
+% cube on 3D patches as an example application.  Boundary
+% conditions are Neumann on the right face of the cube, and
+% Dirichlet on the other faces.  The microscale is of known
+% period so we interpolate next-to-edge values to get
+% opposite edge values.  AJR, 1 Feb 2023
+%!TEX root = doc.tex
 %{
 \section{\texttt{homoDiffBdryEquil3}: equilibrium via
-computational homogenisation of a 3D diffusion on small
-patches}
+computational homogenisation of a 3D heterogeneous diffusion
+on small patches}
 \label{sec:homoDiffBdryEquil3}
 
 Find the equilibrium of a forced heterogeneous diffusion in
-3D space on 3D patches as an example application. 
+3D space on 3D patches as an example application. Boundary
+conditions are Neumann on the right face of the cube, and
+Dirichlet on the other faces.  \cref{fig:homoDiffBdryEquil3}
+shows five isosurfaces of the 3D solution field.
+\begin{figure}\centering
+\caption{\label{fig:homoDiffBdryEquil3}% Equilibrium of the
+macroscale of the random heterogeneous diffusion in 3D with
+boundary conditions of zero on all faces except for the
+Neumann condition on \(x=1\)
+(\cref{sec:homoDiffBdryEquil3}). The small patches are
+equispaced in space. }
+\includegraphics[scale=0.8]{Figs/homoDiffBdryEquil3.png}
+\end{figure}
+
+
+Clear variables, and establish globals.
 \begin{matlab}
 %}
 clear all
 global patches
+%global OurCf2eps, OurCf2eps=true %option to save plots
 %{
 \end{matlab}
 
-First set random heterogeneous diffusivities of random
+
+Set random heterogeneous diffusivities of random
 (small) period in each of the three directions. Crudely
 normalise by the harmonic mean so the decay time scale is
 roughly one. 
@@ -32,17 +50,17 @@ cDiff = cDiff*mean(1./cDiff(:))
 \end{matlab}
 
 Configure the patch scheme with some arbitrary choices of
-square domain, patches, and micro-grid spacing~\(0.05\). 
+cubic domain, patches, and micro-grid spacing~\(0.05\). 
 Use high order interpolation as few patches in each
 direction.  Configure for Dirichlet boundaries except for
 Neumann on the right \(x\)-face.
 \begin{matlab}
 %}
-nSubP=mPeriod+2;
-nPatch=5;
-Dom.type='equispace';
-Dom.bcOffset=zeros(2,3); Dom.bcOffset(2)=0.5;
-configPatches3(@microDiffBdry3, [-1-0*rand 1+0*rand], Dom ...
+nSubP = mPeriod+2;
+nPatch = 5;
+Dom.type = 'equispace';
+Dom.bcOffset = zeros(2,3);  Dom.bcOffset(2) = 0.5;
+configPatches3(@microDiffBdry3, [-1 1], Dom ...
     , nPatch, 0, 0.05, nSubP, 'EdgyInt',true  ...
     ,'hetCoeffs',cDiff );
 %{
@@ -80,17 +98,18 @@ information).
 \begin{matlab}
 %}
 tic;
-uSoln = fsolve(@theRes3,u0(patches.i));% ...
-%        ,optimoptions('fsolve','Display','off')); 
+uSoln = fsolve(@theRes3,u0(patches.i) ...
+        ,optimoptions('fsolve','Display','off')); 
 solveTime = toc
+normResidual = norm(theRes3(uSoln))
+normSoln = norm(uSoln)
 %{
 \end{matlab}
 Store the solution into the patches, and give magnitudes.
 \begin{matlab}
 %}
 u0(patches.i) = uSoln;
-normSoln = norm(uSoln)
-normResidual = norm(theRes3(uSoln))
+u0 = patchEdgeInt3(u0);
 %{
 \end{matlab}
 
@@ -106,9 +125,7 @@ rgb=get(gca,'defaultAxesColorOrder');
 Reshape spatial coordinates of patches.
 \begin{matlab}
 %}
-x = patches.x(:); 
-y = patches.y(:);
-z = patches.z(:);
+x = patches.x(:);  y = patches.y(:);  z = patches.z(:);
 %{
 \end{matlab}
 Draw  isosurfaces.  Get the solution with interpolated
@@ -116,10 +133,9 @@ faces, form into a 6D array, and reshape and transpose~\(x\)
 and~\(y\) to suit the isosurface function. 
 \begin{matlab}
 %}
-  u = squeeze( patchEdgeInt3(u0) );
-  u = reshape( permute(u,[2 5 1 4 3 6]) ...
-      , [numel(y) numel(x) numel(z)]);
-  maxu=max(u(:)),  minu=min(u(:))
+u = reshape( permute(squeeze(u0),[2 5 1 4 3 6]) ...
+           , [numel(y) numel(x) numel(z)]);
+maxu=max(u(:)),  minu=min(u(:))
 %{
 \end{matlab}
 Optionally cut-out the front corner so we can see inside.
@@ -128,26 +144,24 @@ Optionally cut-out the front corner so we can see inside.
   u( (x'>0) & (y<0) & (shiftdim(z,-2)>0) ) = nan;
 %{
 \end{matlab}
-Draw cross-eyed stereo view of some isosurfaces. 
+Draw some isosurfaces. 
 \begin{matlab}
 %}
-  clf;
-  for p=1:2
-    subplot(1,2,p)
-    for iso=5:-1:1
-       isov=(iso-0.5)/5*(maxu-minu)+minu;
-       hsurf(iso) = patch(isosurface(x,y,z,u,isov));  
-       isonormals(x,y,z,u,hsurf(iso))
-       set(hsurf(iso) ,'FaceColor',rgb(iso,:) ...
-           ,'EdgeColor','none' ...
-           ,'FaceAlpha',iso/5); 
-       hold on
-    end
-    axis tight, axis equal, view(45-7*p,25)
-    xlabel('x'), ylabel('y'), zlabel('z')
-    camlight, lighting gouraud
-    hold off
-  end% each p
+clf;
+for iso=5:-1:1
+   isov=(iso-0.5)/5*(maxu-minu)+minu;
+   hsurf(iso) = patch(isosurface(x,y,z,u,isov));  
+   isonormals(x,y,z,u,hsurf(iso))
+   set(hsurf(iso) ,'FaceColor',rgb(iso,:) ...
+       ,'EdgeColor','none' ,'FaceAlpha',iso/5); 
+   hold on
+end
+hold off
+axis equal, axis([-1 1 -1 1 -1 1]), view(35,25)
+xlabel('$x$'), ylabel('$y$'), zlabel('$z$')
+camlight, lighting gouraud
+ifOurCf2eps(mfilename) %optionally save plot
+if exist('OurCf2eps') && OurCf2eps,  print('-dpng',['Figs/' mfilename]), end
 %{
 \end{matlab}
 
@@ -155,7 +169,8 @@ Draw cross-eyed stereo view of some isosurfaces.
 
 
 
-\subsection{\texttt{microDiffBdry3()}: 3D forced heterogeneous diffusion with boundaries}
+\subsection{\texttt{microDiffBdry3()}: 3D forced
+heterogeneous diffusion with boundaries}
 \label{sec:microDiffBdry3}
 
 This function codes the lattice forced heterogeneous
@@ -177,7 +192,6 @@ function ut = microDiffBdry3(t,u,patches)
 %{
 \end{matlab}
 Microscale space-steps.  
-%Q: is using \verb|i,j,k| slower than \verb|2:end-1|??
 \begin{matlab}
 %}
   dx = diff(patches.x(2:3));  % x micro-scale step
@@ -193,12 +207,12 @@ and Dirichlet on left, top, bottom, front, and back (viewed
 along the \(z\)-axis).
 \begin{matlab}
 %}
-u( 1 ,:,:,:,:, 1 ,:,:)=0; %left face of leftmost patch
-u(end,:,:,:,:,end,:,:)=u(end-1,:,:,:,:,end,:,:); %right face of rightmost
-u(:, 1 ,:,:,:,:, 1 ,:)=0; %bottom face of bottommost 
-u(:,end,:,:,:,:,end,:)=0; %top face of topmost
-u(:,:, 1 ,:,:,:,:, 1 )=0; %front face of frontmost 
-u(:,:,end,:,:,:,:,end)=0; %back face of backmost
+  u( 1 ,:,:,:,:, 1 ,:,:)=0; %left face of leftmost patch
+  u(end,:,:,:,:,end,:,:)=u(end-1,:,:,:,:,end,:,:); %right face of rightmost
+  u(:, 1 ,:,:,:,:, 1 ,:)=0; %bottom face of bottommost 
+  u(:,end,:,:,:,:,end,:)=0; %top face of topmost
+  u(:,:, 1 ,:,:,:,:, 1 )=0; %front face of frontmost 
+  u(:,:,end,:,:,:,:,end)=0; %back face of backmost
 %{
 \end{matlab}
 Reserve storage and then assign interior patch values to the
@@ -232,10 +246,7 @@ function f=theRes3(u)
   v(patches.i)=u;
   f=patchSys3(0,v(:),patches);
   f=f(patches.i);
-end%function theRes
+end%function theRes3
 %{
 \end{matlab}
-
-
-Fin.
 %}
