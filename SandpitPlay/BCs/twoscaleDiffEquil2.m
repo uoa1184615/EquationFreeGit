@@ -109,14 +109,15 @@ nVariables = numel(patches.i)
 \end{matlab}
 Solve by iteration.  Use \verb|fsolve| for simplicity and
 robustness (and using \verb|optimoptions| to omit trace
-information), and give magnitudes.
+information), via the generic patch system wrapper
+\verb|theRes| (\cref{sec:theRes}), and give magnitudes.
 \begin{matlab}
 %}
 tic;
-uSoln = fsolve(@theRes2,u0(patches.i) ...
+uSoln = fsolve(@theRes,u0(patches.i) ...
         ,optimoptions('fsolve','Display','off')); 
 solveTime = toc
-normResidual = norm(theRes2(uSoln))
+normResidual = norm(theRes(uSoln))
 normSoln = norm(uSoln)
 %{
 \end{matlab}
@@ -197,24 +198,6 @@ dimensions into the one~\verb|,:|.
      -u(i+1,j-1,:) +u(i-1,j-1,:) )/(4*dx*dy) ...
    -patches.fu(i,j,:); 
 end%function twoscaleDiffForce2
-%{
-\end{matlab}
-
-
-\subsection{\texttt{theRes2()}: function to zero}
-This functions converts a vector of values into the interior
-values of the patches, then evaluates the time derivative of
-the system, and returns the vector of patch-interior time
-derivatives.
-\begin{matlab}
-%}
-function f=theRes2(u)
-  global patches 
-  v=nan(size(patches.x+patches.y));
-  v(patches.i)=u;
-  f=patchSys2(0,v(:),patches);
-  f=f(patches.i);
-end%function theRes2
 %{
 \end{matlab}
 %}

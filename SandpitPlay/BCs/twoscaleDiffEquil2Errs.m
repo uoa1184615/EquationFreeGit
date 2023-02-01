@@ -199,13 +199,15 @@ the number of unknowns is then its length.
     nVariables = numel(patches.i)
 %{
 \end{matlab}
-First try to solve via iterative solver \verb|bicgstab|.
+First try to solve via iterative solver \verb|bicgstab|, via
+the generic patch system wrapper \verb|theRes|
+(\cref{sec:theRes}).
 \begin{matlab}
 %}
     tic;
     maxIt = ceil(nVariables/10);
-    rhsb = theRes2( zeros(size(patches.i)) );
-    [uSoln,flag] = bicgstab(@(u) rhsb-theRes2(u),rhsb ...
+    rhsb = theRes( zeros(size(patches.i)) );
+    [uSoln,flag] = bicgstab(@(u) rhsb-theRes(u),rhsb ...
                    ,1e-9,maxIt,[],[],u0(patches.i));
     bicgTime = toc
 %{
@@ -223,7 +225,7 @@ Jacobian which is expensive to find (four minutes for
         tic  
         Jac=sparse(nVariables,nVariables);
         for j=1:nVariables
-            Jac(:,j)=sparse( rhsb-theRes2((1:nVariables)'==j) );
+            Jac(:,j)=sparse( rhsb-theRes((1:nVariables)'==j) );
         end
         formJacTime=toc
 %{
@@ -235,7 +237,7 @@ preconditioner to \verb|bicgstab|.
         tic
         [L,U] = ilu(Jac,struct('type','ilutp','droptol',1e-4));
         LUfillFactor = (nnz(L)+nnz(U))/nnz(Jac)
-        [uSoln,flag] = bicgstab(@(u) rhsb-theRes2(u),rhsb ...
+        [uSoln,flag] = bicgstab(@(u) rhsb-theRes(u),rhsb ...
                    ,1e-9,maxIt,L,U,u0(patches.i));
         precondSolveTime=toc
         assert(flag==0,'preconditioner fails bicgstab. Lower droptol?')
@@ -246,7 +248,7 @@ Store the solution into the patches, and give
 magnitudes---Inf norm is max(abs()).
 \begin{matlab}
 %}
-    normResidual = norm(theRes2(uSoln),Inf)
+    normResidual = norm(theRes(uSoln),Inf)
     normSoln = norm(uSoln,Inf)
     u0(patches.i) = uSoln;
     u0 = patchEdgeInt2(u0);
@@ -381,25 +383,6 @@ dimensions into the one~\verb|,:|.
      -u(i+1,j-1,:) +u(i-1,j-1,:) )/(4*dx*dy) ...
    +patches.fu(i,j,:); 
 end%function twoscaleDiffForce2
-%{
-\end{matlab}
-
-
-
-\subsection{\texttt{theRes2()}: function to zero}
-This functions converts a vector of values into the interior
-values of the patches, then evaluates the time derivative of
-the system, and returns the vector of patch-interior time
-derivatives.
-\begin{matlab}
-%}
-function f=theRes2(u)
-  global patches 
-  v=nan(size(patches.x+patches.y));
-  v(patches.i)=u;
-  f=patchSys2(0,v(:),patches);
-  f=f(patches.i);
-end%function theRes2
 %{
 \end{matlab}
 %}

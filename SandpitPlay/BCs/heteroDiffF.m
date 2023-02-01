@@ -15,17 +15,39 @@ array of forcing coefficients.
 \begin{matlab}
 %}
 function ut = heteroDiffF(t,u,patches)
+%{
+\end{matlab}
+Cater for the two cases: one of a non-autonomous forcing
+oscillating in time when \(\verb|microTimePeriod|>0\), or
+otherwise the case of an autonomous diffusion constant in
+time.
+\begin{matlab}
+%}
   global microTimePeriod
-  % macroscale Dirichlet BCs
-  u( 1 ,:,:, 1 )=0; % left-edge of leftmost is zero
-  u(end,:,:,end)=0; % right-edge of rightmost is zero
-  % interior forced diffusion
-  dx = diff(patches.x(2:3));   % space step
-  i = 2:size(u,1)-1;   % interior points in a patch
-  ut = nan+u;          % preallocate output array
   if microTimePeriod>0 % optional time fluctuations
      at = cos(2*pi*t/microTimePeriod)/30; 
   else at=0; end
+%{
+\end{matlab}
+Two basic parameters, and initialise result array to NaNs.
+\begin{matlab}
+%}
+  dx = diff(patches.x(2:3));   % space step
+  i = 2:size(u,1)-1;   % interior points in a patch
+  ut = nan+u;          % preallocate output array
+%{
+\end{matlab}
+The macroscale Dirichlet boundary conditions are zero at the
+extreme edges of the two extreme patches.
+\begin{matlab}
+%}
+  u( 1 ,:,:, 1 )=0; % left-edge of leftmost is zero
+  u(end,:,:,end)=0; % right-edge of rightmost is zero
+%{
+\end{matlab}
+Code the microscale forced diffusion.
+\begin{matlab}
+%}
   ut(i,:,:,:) = diff((patches.cs(:,1,:)+at).*diff(u))/dx^2 ...
       +patches.f2(i,:,:,:)*t^2+patches.f1(i,:,:,:)*t; 
 end% function

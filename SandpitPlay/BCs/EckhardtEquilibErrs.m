@@ -8,30 +8,31 @@
 % AJR, 29 Jan 2023
 %!TEX root = doc.tex
 %{
-\section{\texttt{EckhartEquilibErrs}: explore errors in
+\section{\texttt{EckhardtEquilibErrs}: explore errors in
 equilibria of a 1D heterogeneous diffusion on small patches}
-\label{sec:EckhartEquilibErrs}
+\label{sec:EckhardtEquilibErrs}
 
 
+\cref{sec:EckhardtEquilib} finds the equilibrium, of the
+forced heterogeneous system with a forcing corresponding to
+that applied at time \(t=1\).  Computational efficiency
+comes from only computing the microscale heterogeneity on
+small spatially sparse patches. Here we explore the errors
+as the number~\(N\) of patches increases, see \cref{fig:EckhardtEquilibErrsus,fig:EckhardtEquilibErrs}. 
 \begin{figure}
 \centering\begin{tabular}{@{}c@{\ }c@{}}
 \parbox[t]{10em}{\caption{\label{fig:EckhardtEquilibErrsus}%
 Equilibrium of the heterogeneous diffusion problem for
 relatively large \(\epsilon=0.03\) so we can see the
-patches.  The solution is obtained with various numbers of patches, but  we only compare solutions in these five common patches.
+patches.  The solution is obtained with various numbers of
+patches, but  we only compare solutions in these five common
+patches.
 }} &
-\def\extraAxisOptions{}
+\def\extraAxisOptions{mark size=1pt}
 \raisebox{-\height}{\input{Figs/EckhardtEquilibErrsus}}
 \end{tabular}
-\end{figure}
-
-\cref{fig:EckhardtEquilib} finds the equilibrium, of the
-forced heterogeneous system with a forcing corresponding to
-that applied at time \(t=1\).  Computational efficiency
-comes from only computing the microscale heterogeneity on
-small spatially sparse patches. Here we explore the errors
-as the number~\(N\) of patches increases. Find mean-abs
-errors to be the following:
+\end{figure}%
+Find mean-abs errors to be the following:
 \begin{equation*}
 \begin{array}{ccccccc}
 &\qquad N=&5&9&17&33&65\\\hline
@@ -64,21 +65,32 @@ errors to be the following:
 \\\hline
 \end{array}
 \end{equation*}
-For `chebyshev' this assessment of errors is a bit dodgy as it is based only on the centre and boundary patches.
-The `usergiven' distribution is for overlapping patches with Chebyshev distribution of centres---a spatial `christmas tree'\footnote{But the error assessment is with respect to finest patch-grid, no longer with a full domain solution}.
-Curiously, and with above caveats, here my `smart' chebyshev is the worst, the overlapping Chebyshev is good, but equispace is usually the best.
+For `chebyshev' this assessment of errors is a bit dodgy as
+it is based only on the centre and boundary patches. The
+`usergiven' distribution is for overlapping patches with
+Chebyshev distribution of centres---a spatial `christmas
+tree'\footnote{But the error assessment is with respect to
+finest patch-grid, no longer with a full domain solution}.
+Curiously, and with above caveats, here my `smart' chebyshev
+is the worst, the overlapping Chebyshev is good, but
+\emph{equispace appears usually the best.}
 
 \begin{figure}
 \centering\begin{tabular}{@{}c@{\ }c@{}}
 \parbox[t]{9em}{\caption{\label{fig:EckhardtEquilibErrs}%
-Errors in the equilibrium of the heterogeneous diffusion problem for
-relatively large \(\epsilon=0.03\).  The solution is obtained with various numbers of patches, but we only plot the errors within these five common patches.  
+Errors in the equilibrium of the heterogeneous diffusion
+problem for relatively large \(\epsilon=0.03\).  The
+solution is obtained with various numbers of patches, but we
+only plot the errors within these five common patches.  
 }} &
-\def\extraAxisOptions{}
+\def\extraAxisOptions{mark size=1pt}
 \raisebox{-\height}{\input{Figs/EckhardtEquilibErrs}}
 \end{tabular}
 \end{figure}
-The above errors are for simple sin forcing.   What if we make not so simple with exp modification of the forcing?  The errors shown below are very little different (despite the magnitude of the solution being a little larger).
+The above errors are for simple sin forcing.   What if we
+make not so simple with exp modification of the forcing? 
+The errors shown below are very little different (despite
+the magnitude of the solution being a little larger).
 \begin{equation*}
 \begin{array}{ccccccc}
 &\qquad N=&5&9&17&33&65
@@ -115,9 +127,10 @@ The above errors are for simple sin forcing.   What if we make not so simple wit
 
 
 
-Clear, and initiate global patches.  Choose the type of 
-patch distribution to be either 'equispace', 'chebyshev', or `usergiven'.
-Also set order of interpolation (fourth-order is good start).
+Clear, and initiate global patches.  Choose the type of
+patch distribution to be either 'equispace', 'chebyshev', or
+`usergiven'. Also set order of interpolation (fourth-order
+is good start).
 \begin{matlab}
 %}
 clear all
@@ -169,9 +182,12 @@ dx = epsilon/mPeriod
 \end{matlab}
 
 \paragraph{For various numbers of patches}
-Choose five to be the coarsest number of patches.  Want place to
-store common results for the solutions.  Assign \verb|Ps| to
-be the indices of the common patches: for equispace set to the five common patches, but for chebyshev the only common ones are the three centre and boundary-adjacent patches.
+Choose five to be the coarsest number of patches.  Want
+place to store common results for the solutions.  Assign
+\verb|Ps| to be the indices of the common patches: for
+equispace set to the five common patches, but for chebyshev
+the only common ones are the three centre and
+boundary-adjacent patches.
 \begin{matlab}
 %}
 us=[]; xs=[]; nPs=[];
@@ -189,7 +205,12 @@ Set the number of patches in \((0,1)\):
     nPatch = 2^log2N+1
 %{
 \end{matlab}
-In the case of `usergiven', we choose standard Chebyshev distribution of the centre of the patches, which involves overlapping of patches near the boundaries! (instead of the coded chebyshev which has a boundary layer of non-overlapping patches and a Chebyshev within the interior). 
+In the case of `usergiven', we choose standard Chebyshev
+distribution of the centre of the patches, which involves
+overlapping of patches near the boundaries! (instead of the
+coded chebyshev which has a boundary layer of
+non-overlapping patches and a Chebyshev within the
+interior). 
 \begin{matlab}
 %}
     if all(Dom.type=='usergiven')
@@ -240,11 +261,13 @@ points, and the number of unknowns is then its length.
 %{
 \end{matlab}
 Solve via \verb|fsolve| for simplicity and robustness (and
-using \verb|optimoptions| to omit trace information).
+using \verb|optimoptions| to omit trace information), via
+the generic patch system wrapper \verb|theRes|
+(\cref{sec:theRes}).
 \begin{matlab}
 %}
     tic;
-    uSoln = fsolve(@theRes1,u0(patches.i) ...
+    uSoln = fsolve(@theRes,u0(patches.i) ...
         ,optimoptions('fsolve','Display','off'));
     fsolveTime = toc
 %{
@@ -254,7 +277,7 @@ magnitudes---Inf norm is max(abs()).
 \begin{matlab}
 %}
     normSoln = norm(uSoln,Inf)
-    normResidual = norm(theRes1(uSoln),Inf)
+    normResidual = norm(theRes(uSoln),Inf)
     u0(patches.i) = uSoln;
     u0 = patchEdgeInt1(u0);
     u0( 1 ,:,:, 1 ) = 0;
@@ -313,28 +336,6 @@ h=plot(x(:),err,'.-'); legend(num2str(nPs))
 quasiLogAxes(h,10,sqrt(prod(meanAbsErrs(2:3))))
 xlabel('space $x$'), ylabel('errors in $u(x)$')
 ifOurCf2tex(mfilename)%optionally save
-%{
-\end{matlab}
-
-
-
-
-
-
-\subsection{\texttt{theRes1()}: function to zero}
-This functions converts a vector of values into the interior
-values of the patches, then evaluates the time derivative of
-the system, and returns the vector of patch-interior time
-derivatives.
-\begin{matlab}
-%}
-function f=theRes1(u)
-  global patches 
-  v=nan(size(patches.x));
-  v(patches.i)=u;
-  f=patchSys1(1,v(:),patches);
-  f=f(patches.i);
-end%function theRes1
 %{
 \end{matlab}
 %}

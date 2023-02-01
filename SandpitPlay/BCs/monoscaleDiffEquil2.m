@@ -119,10 +119,10 @@ information), and give magnitudes.
 \begin{matlab}
 %}
 tic;
-uSoln = fsolve(@theRes1,u0(patches.i) ...
+uSoln = fsolve(@theRes,u0(patches.i) ...
         ,optimoptions('fsolve','Display','off')); 
 solnTime = toc
-normResidual = norm(theRes1(uSoln))
+normResidual = norm(theRes(uSoln))
 normSoln = norm(uSoln)
 normError = norm(uSoln-uAnal(patches.i))
 %{
@@ -215,24 +215,4 @@ dimensions into the one~\verb|,:|.
 end%function monoscaleDiffForce2
 %{
 \end{matlab}
-
-
-\subsection{\texttt{theRes1()}: function to zero}
-This functions converts a vector of values into the interior
-values of the patches, then evaluates the time derivative of
-the system, and returns the vector of patch-interior time
-derivatives.
-\begin{matlab}
-%}
-function f=theRes1(u)
-  global patches
-  v=nan(size(patches.x+patches.y));
-  v(patches.i)=u;
-  f=patchSys2(0,v(:),patches);
-  f=f(patches.i);
-end%function theRes1
-%{
-\end{matlab}
-
-Fin.
 %}

@@ -111,7 +111,7 @@ patches.fu = exp(-((patches.x-mu(1)).^2 ...
 Set initial guess of zero, with \verb|NaN| to indicate
 patch-edge values.  Index~\verb|i| are the indices of
 patch-interior points, store in global patches for access by
-\verb|theRes2|, and the number of unknowns is then its
+\verb|theRes|, and the number of unknowns is then its
 number of elements.
 \begin{matlab}
 %}
@@ -123,14 +123,15 @@ nVariables = numel(patches.i)
 \end{matlab}
 Solve by iteration.  Use \verb|fsolve| for simplicity and
 robustness (and using \verb|optimoptions| to omit trace
-information).
+information), via the generic patch system wrapper
+\verb|theRes| (\cref{sec:theRes}).
 \begin{matlab}
 %}
 tic;
-uSoln = fsolve(@theRes2,u0(patches.i) ...
+uSoln = fsolve(@theRes,u0(patches.i) ...
         ,optimoptions('fsolve','Display','off')); 
 solnTime = toc
-normResidual = norm(theRes2(uSoln))
+normResidual = norm(theRes(uSoln))
 normSoln = norm(uSoln)
 %{
 \end{matlab}
@@ -214,24 +215,6 @@ dimensions into the one~\verb|,:|.
    -patches.cs(i,j,3).*(u(i,j+1,:)-u(i,j-1,:))/(2*dy) ...
    -u(i,j,:) +patches.fu(i,j,:); 
 end%function randAdvecDiffForce2
-%{
-\end{matlab}
-
-
-\subsection{\texttt{theRes2()}: function to zero}
-This functions converts a vector of values into the interior
-values of the patches, then evaluates the time derivative of
-the system, and returns the vector of patch-interior time
-derivatives.
-\begin{matlab}
-%}
-function f=theRes2(u)
-  global patches
-  v=nan(size(patches.x+patches.y));
-  v(patches.i)=u;
-  f=patchSys2(0,v(:),patches);
-  f=f(patches.i);
-end%function theRes2
 %{
 \end{matlab}
 %}
