@@ -1,6 +1,6 @@
 % configPatches3() creates a data struct of the design of 3D
 % patches for later use by the patch functions such as
-% patchSys3().  AJR, Aug 2020 -- Jan 2023
+% patchSys3().  AJR, Aug 2020 -- 2 Feb 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches3()}: configures spatial
@@ -45,10 +45,10 @@ domain of the same interval in all three directions.
 \item \verb|Dom| sets the type of macroscale conditions for
 the patches, and reflects the type of microscale boundary
 conditions of the problem.   If \verb|Dom| is \verb|NaN| or
-\verb|[]|, then the field~\verb|u| is triply macro-periodic in the
-3D spatial domain, and resolved on equi-spaced patches. If
-\verb|Dom| is a character string, then that specifies the
-\verb|.type| of the following structure, with
+\verb|[]|, then the field~\verb|u| is triply macro-periodic
+in the 3D spatial domain, and resolved on equi-spaced
+patches. If \verb|Dom| is a character string, then that
+specifies the \verb|.type| of the following structure, with
 \verb|.bcOffset| set to the default zero.  Otherwise
 \verb|Dom| is a structure with the following components.
 \begin{itemize}
@@ -114,10 +114,10 @@ must be~$0,2,4,\ldots$; where $0$~gives spectral
 interpolation.
 
 \item \verb|dx| (real---scalar or three elements) is usually
-the sub-patch micro-grid spacing in~\(x\), \(y\) and~\(z\).  If
-scalar, then use the same \verb|dx| in all three directions,
-otherwise \verb|dx(1:3)| gives the spacing in each of the
-three directions.
+the sub-patch micro-grid spacing in~\(x\), \(y\) and~\(z\). 
+If scalar, then use the same \verb|dx| in all three
+directions, otherwise \verb|dx(1:3)| gives the spacing in
+each of the three directions.
 
 However, if \verb|Dom| is~\verb|NaN| (as for pre-2023), then
 \verb|dx| actually is \verb|ratio| (scalar or three elements),
@@ -480,7 +480,7 @@ p = inputParser;
 fnValidation = @(f) isa(f, 'function_handle'); %test for fn name
 addRequired(p,'fun',fnValidation); 
 addRequired(p,'Xlim',@isnumeric);
-%addRequired(p,'Dom'); % nothing yet decided
+%addRequired(p,'Dom'); % too flexible
 addRequired(p,'nPatch',@isnumeric);
 addRequired(p,'ordCC',@isnumeric);
 addRequired(p,'dx',@isnumeric);
@@ -559,8 +559,8 @@ if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic'); end
 %{
 \end{matlab}
 If \verb|Dom| is a string, then just set type to that
-string, and subsequently set corresponding defaults for others
-fields.
+string, and subsequently set corresponding defaults for
+others fields.
 \begin{matlab}
 %}
 if ischar(Dom), Dom=struct('type',Dom); end
@@ -596,7 +596,7 @@ case 'periodic'
     if isfield(Dom,'Y'), warning(['Y' msg]), end
     if isfield(Dom,'Z'), warning(['Z' msg]), end
 case {'equispace','chebyshev'}
-    if ~isfield(Dom,'bcOffset'), Dom.bcOffset=zeros(2,2); end
+    if ~isfield(Dom,'bcOffset'), Dom.bcOffset=zeros(2,3); end
     % for mixed with usergiven, following should still work
     if numel(Dom.bcOffset)==1
         Dom.bcOffset=repmat(Dom.bcOffset,2,3); end
@@ -684,8 +684,8 @@ switch Dom.type(q,:)
 %{
 \end{matlab}
 %: case periodic
-The periodic case is evenly spaced within the spatial domain.
-Store the size ratio in \verb|patches|.
+The periodic case is evenly spaced within the spatial
+domain. Store the size ratio in \verb|patches|.
 \begin{matlab}
 %}
 case 'periodic'
@@ -693,7 +693,6 @@ case 'periodic'
   DQ=Q(2)-Q(1);
   Q=Q(1:nPatch(q))+diff(Q)/2;
   pEI=patches.EdgyInt;% abbreviation
-%  sizedx=size(dx), sizenSubP=size(nSubP)
   if pre2023, dx(q) = ratio(q)*DQ/(nSubP(q)-1-pEI)*(2-pEI);
   else        ratio(q) = dx(q)/DQ*(nSubP(q)-1-pEI)/(2-pEI);  
   end
@@ -722,8 +721,8 @@ The Chebyshev case is spaced according to the Chebyshev
 distribution in order to reduce macro-interpolation errors,
 \(Q_i \propto -cos(i\pi/N)\),  but with the extreme edges
 aligned with the spatial domain boundaries, modified by the
-offset, and modified by possible `boundary
-layers'.\footnote{ However, maybe overlapping patches near a
+offset, and modified by possible `boundary layers'.
+\footnote{ However, maybe overlapping patches near a
 boundary should be viewed as some sort of spatially analogue
 of the `christmas tree' of projective integration and its
 integration to a slow manifold.   Here maybe the overlapping
@@ -764,8 +763,8 @@ Assign the centre-patch coordinates.
 \end{matlab}
 
 %: case usergiven
-The user-given case is entirely up to a user to specify, we just
-ensure it has the correct shape of a row.
+The user-given case is entirely up to a user to specify, we
+just ensure it has the correct shape of a row.
 \begin{matlab}
 %}
 case 'usergiven'
@@ -793,7 +792,7 @@ end%for q
 
 
 \paragraph{Construct the micro-grids}
-Construct the microscale in each patch.   Reshape the grid
+Construct the microscale in each patch.  Reshape the grid
 to be 8D to suit dimensions (micro,Vars,Ens,macro).
 \begin{matlab}
 %}
@@ -814,9 +813,9 @@ patches.z = reshape( dx(3)*(-i0+1:i0-1)'+Z ...
 
 
 
-\paragraph{Pre-compute weights for macro-periodic}
-In the case of macro-periodicity, precompute the weightings
-to interpolate field values for coupling. (Might sometime
+\paragraph{Pre-compute weights for macro-periodic} In the
+case of macro-periodicity, precompute the weightings to
+interpolate field values for coupling. (Might sometime
 extend to coupling via derivative values.)   
 \begin{matlab}
 %}

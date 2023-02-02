@@ -45,10 +45,10 @@ directions.
 \item \verb|Dom| sets the type of macroscale conditions for
 the patches, and reflects the type of microscale boundary
 conditions of the problem.   If \verb|Dom| is \verb|NaN| or
-\verb|[]|, then the field~\verb|u| is doubly macro-periodic in the
-2D spatial domain, and resolved on equi-spaced patches. If
-\verb|Dom| is a character string, then that specifies the
-\verb|.type| of the following structure, with
+\verb|[]|, then the field~\verb|u| is doubly macro-periodic
+in the 2D spatial domain, and resolved on equi-spaced
+patches. If \verb|Dom| is a character string, then that
+specifies the \verb|.type| of the following structure, with
 \verb|.bcOffset| set to the default zero. Otherwise
 \verb|Dom| is a structure with the following components.
 \begin{itemize}

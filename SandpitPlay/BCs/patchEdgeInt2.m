@@ -1,6 +1,6 @@
 % patchEdgeInt2() provides the interpolation across 2D space
-% for 2D patches of simulations of a smooth lattice system
-% such as PDE discretisations.  AJR, Nov 2018 -- Jan 2023
+% for 2D patches of simulations of a lattice system such as
+% a PDE discretisation.  AJR, Nov 2018 -- 2 Feb 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeInt2()}: sets 2D patch
@@ -15,10 +15,10 @@ centre-values are sensible macroscale variables, and
 macroscale interpolation of these determine patch-edge
 values.  However, for computational homogenisation in
 multi-D, interpolating patch next-to-edge values appears
-better \cite[]{Bunder2020a}.  This function is primarily used
-by \verb|patchSys2()| but is also useful for user
-graphics. 
-\footnote{Script \texttt{patchEdgeInt2test.m} verifies this code.}
+better \cite[]{Bunder2020a}.  This function is primarily
+used by \verb|patchSys2()| but is also useful for user
+graphics. \footnote{Script \texttt{patchEdgeInt2test.m}
+verifies this code.}
  
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
@@ -28,7 +28,6 @@ Communicate patch-design variables via a second argument
 %}
 function u = patchEdgeInt2(u,patches)
 if nargin<2, global patches, end
-%disp('**** Invoking new patchEdgeInt2')
 %{
 \end{matlab}
 
@@ -85,7 +84,8 @@ patch-edge values by interpolation: true, from opposite-edge
 next-to-edge values (often preserves symmetry); false, from
 centre cross-patch values (near original scheme).
 
-\item \verb|.nEnsem| the number of realisations in the ensemble.
+\item \verb|.nEnsem| the number of realisations in the
+ensemble.
 
 \item \verb|.parallel| whether serial or parallel.
 
@@ -99,8 +99,7 @@ centre cross-patch values (near original scheme).
 \item \verb|u| is 6D array, $\verb|nSubP1| \cdot
 \verb|nSubP2| \cdot \verb|nVars| \cdot \verb|nEnsem| \cdot
 \verb|nPatch1| \cdot \verb|nPatch2|$, of the fields with
-edge values set by interpolation (and corner vales set
-to~\verb|NaN|).
+edge values set by interpolation.
 \end{itemize}
 
 
@@ -154,7 +153,6 @@ odd for centre-patch interpolation) is at indices
 %}
 i0 = round((nx+1)/2);
 j0 = round((ny+1)/2);
-%disp('finished common preamble')
 %{
 \end{matlab}
 
@@ -174,39 +172,44 @@ ry = patches.ratio(2);
 %{
 \end{matlab}
 
-\paragraph{Lagrange interpolation gives patch-edge values}
-Compute centred differences of the mid-patch values for
-the macro-interpolation, of all fields.  Here the domain
-is macro-periodic.
+
+
+\subsubsection{Lagrange interpolation gives patch-edge values}
+Compute centred differences of the mid-patch values for the
+macro-interpolation, of all fields.  Here the domain is
+macro-periodic.
 \begin{matlab}
 %}
 ordCC = patches.ordCC;
 if ordCC>0 % then finite-width polynomial interpolation
 %{
 \end{matlab}
-The patch-edge values are either interpolated from the
-next-to-edge values, or from the centre-cross values (not
-the patch-centre value itself as that seems to have worse
-properties in general).  Have not yet implemented core
-averages.
+Interpolate the three directions in succession, in this way
+we naturally fill-in face-edge and corner values. Start with
+\(x\)-direction, and give most documentation for that case
+as the others are essentially the same.
+
+
+\paragraph{\(x\)-normal edge values} The patch-edge values
+are either interpolated from the next-to-edge values, or
+from the centre-cross values (not the patch-centre value
+itself as that seems to have worse properties in general). 
+Have not yet implemented core averages.
 \begin{matlab}
 %}
-  if patches.EdgyInt % interpolate next-to-edge values    
-    Ux = u([2 nx-1],2:(ny-1),:,:,I,J);
-    Uy = u(2:(nx-1),[2 ny-1],:,:,I,J);
+  if patches.EdgyInt % interpolate next-to-face values    
+    U = u([2 nx-1],2:(ny-1),:,:,I,J);
   else % interpolate centre-cross values
-    Ux = u(i0,2:(ny-1),:,:,I,J);
-    Uy = u(2:(nx-1),j0,:,:,I,J);
+    U = u(i0,2:(ny-1),:,:,I,J);
   end;%if patches.EdgyInt
 %{
 \end{matlab}
-Just in case any last array dimension(s) are one, we have to
+Just in case the last array dimension(s) are one, we have to
 force a padding of the sizes, then adjoin the extra
 dimension for the subsequent array of differences.
 \begin{matlab}
 %}
-szUxO=size(Ux); szUxO=[szUxO ones(1,6-length(szUxO)) ordCC];
-szUyO=size(Uy); szUyO=[szUyO ones(1,6-length(szUyO)) ordCC];
+szUO=size(U); szUO=[szUO ones(1,6-length(szUO)) ordCC];
 %{
 \end{matlab}
 Use finite difference formulas for the interpolation, so
@@ -216,48 +219,37 @@ to preserve the distributed array structure we use an index
 at the end for the differences.
 \begin{matlab}
 %}
-  if patches.parallel
-    dmux = zeros(szUxO,patches.codist); % 7D
-    dmuy = zeros(szUyO,patches.codist); % 7D
-  else
-    dmux = zeros(szUxO); % 7D
-    dmuy = zeros(szUyO); % 7D
+  if ~patches.parallel, dmu = zeros(szUO); % 7D
+  else   dmu = zeros(szUO,patches.codist); % 7D
   end%if patches.parallel
 %{
 \end{matlab}
-First compute differences $\mu\delta$ and $\delta^2$ in both
-space directions.
+First compute differences $\mu\delta$ and $\delta^2$.
 \begin{matlab}
 %}
   if patches.stag % use only odd numbered neighbours
     error('polynomial interpolation not yet for staggered patch coupling')
-    dmux(:,:,:,:,I,:,1) = (Ux(:,:,:,:,Ip,:)+Ux(:,:,:,:,Im,:))/2; % \mu
-    dmux(:,:,:,:,I,:,2) = (Ux(:,:,:,:,Ip,:)-Ux(:,:,:,:,Im,:)); % \delta
-    Ip = Ip(Ip); Im = Im(Im); % increase shifts to \pm2
-    dmuy(:,:,:,:,:,J,1) = (Ux(:,:,:,:,:,Jp)+Ux(:,:,:,:,:,Jm))/2; % \mu
-    dmuy(:,:,:,:,:,J,2) = (Ux(:,:,:,:,:,Jp)-Ux(:,:,:,:,:,Jm)); % \delta
-    Jp = Jp(Jp); Jm = Jm(Jm); % increase shifts to \pm2
+%    dmux(:,:,:,:,I,:,1) = (Ux(:,:,:,:,Ip,:)+Ux(:,:,:,:,Im,:))/2; % \mu
+%    dmux(:,:,:,:,I,:,2) = (Ux(:,:,:,:,Ip,:)-Ux(:,:,:,:,Im,:)); % \delta
+%    Ip = Ip(Ip); Im = Im(Im); % increase shifts to \pm2
+%    dmuy(:,:,:,:,:,J,1) = (Ux(:,:,:,:,:,Jp)+Ux(:,:,:,:,:,Jm))/2; % \mu
+%    dmuy(:,:,:,:,:,J,2) = (Ux(:,:,:,:,:,Jp)-Ux(:,:,:,:,:,Jm)); % \delta
+%    Jp = Jp(Jp); Jm = Jm(Jm); % increase shifts to \pm2
   else %disp('starting standard interpolation')   
-    dmux(:,:,:,:,I,:,1) = (Ux(:,:,:,:,Ip,:) ...
-                          -Ux(:,:,:,:,Im,:))/2; %\mu\delta 
-    dmux(:,:,:,:,I,:,2) =  Ux(:,:,:,:,Ip,:) ...
-       -2*Ux(:,:,:,:,I,:) +Ux(:,:,:,:,Im,:);    % \delta^2    
-    dmuy(:,:,:,:,:,J,1) = (Uy(:,:,:,:,:,Jp) ...
-                          -Uy(:,:,:,:,:,Jm))/2; %\mu\delta 
-    dmuy(:,:,:,:,:,J,2) =  Uy(:,:,:,:,:,Jp) ...
-       -2*Uy(:,:,:,:,:,J) +Uy(:,:,:,:,:,Jm);    % \delta^2
+    dmu(:,:,:,:,I,:,1) = (U(:,:,:,:,Ip,:) ...
+                         -U(:,:,:,:,Im,:))/2; %\mu\delta 
+    dmu(:,:,:,:,I,:,2) = (U(:,:,:,:,Ip,:) ...
+       -2*U(:,:,:,:,I,:) +U(:,:,:,:,Im,:));   %\delta^2    
   end% if patches.stag
 %{
 \end{matlab}
-Recursively take $\delta^2$ of these to form successively higher order
-centred differences in both space directions.
+Recursively take $\delta^2$ of these to form successively
+higher order centred differences in space.
 \begin{matlab}
 %}
   for k = 3:ordCC    
-    dmux(:,:,:,:,I,:,k)   =     dmux(:,:,:,:,Ip,:,k-2) ...
-      -2*dmux(:,:,:,:,I,:,k-2) +dmux(:,:,:,:,Im,:,k-2);    
-    dmuy(:,:,:,:,:,J,k)   =     dmuy(:,:,:,:,:,Jp,k-2) ...
-      -2*dmuy(:,:,:,:,:,J,k-2) +dmuy(:,:,:,:,:,Jm,k-2);
+    dmu(:,:,:,:,I,:,k) =     dmu(:,:,:,:,Ip,:,k-2) ...
+    -2*dmu(:,:,:,:,I,:,k-2) +dmu(:,:,:,:,Im,:,k-2);    
   end
 %{
 \end{matlab}
@@ -275,29 +267,87 @@ each other, as specified by \verb|patches.le|,
 %}
 k=1+patches.EdgyInt; % use centre or two edges
 u(nx,2:(ny-1),:,patches.ri,I,:) ...
-  = Ux(1,:,:,:,:,:)*(1-patches.stag) ...
-    +sum( shiftdim(patches.Cwtsr(:,1),-6).*dmux(1,:,:,:,:,:,:) ,7);  
-u(1 ,2:(ny-1),:,patches.le,I,:) ...
-  = Ux(k,:,:,:,:,:)*(1-patches.stag) ...      
-    +sum( shiftdim(patches.Cwtsl(:,1),-6).*dmux(k,:,:,:,:,:,:) ,7);
-u(2:(nx-1),ny,:,patches.to,:,J) ...
-  = Uy(:,1,:,:,:,:)*(1-patches.stag) ...
-    +sum( shiftdim(patches.Cwtsr(:,2),-6).*dmuy(:,1,:,:,:,:,:) ,7);
-u(2:(nx-1),1 ,:,patches.bo,:,J) ...
-  = Uy(:,k,:,:,:,:)*(1-patches.stag) ...
-    +sum( shiftdim(patches.Cwtsl(:,2),-6).*dmuy(:,k,:,:,:,:,:) ,7);
-u([1 nx],[1 ny],:,:,:,:)=nan; % remove corner values
+  = U(1,:,:,:,:,:)*(1-patches.stag) ...
+  +sum( shiftdim(patches.Cwtsr(:,1),-6).*dmu(1,:,:,:,:,:,:) ,7);  
+u(1 ,2:(ny-1),:,patches.le,I,:,:) ...
+  = U(k,:,:,:,:,:)*(1-patches.stag) ...
+  +sum( shiftdim(patches.Cwtsl(:,1),-6).*dmu(k,:,:,:,:,:,:) ,7);
 %{
 \end{matlab}
 
 
 
-\paragraph{Case of spectral interpolation}
+\paragraph{\(y\)-normal edge values} Interpolate from either
+the next-to-edge values, or the centre-cross-line values.
+\begin{matlab}
+%}
+  if patches.EdgyInt % interpolate next-to-face values    
+    U = u(:,[2 ny-1],:,:,I,J);
+  else % interpolate centre-cross values
+    U = u(:,j0,:,:,I,J);
+  end;%if patches.EdgyInt
+%{
+\end{matlab}
+Adjoin extra dimension for the array of differences.
+\begin{matlab}
+%}
+szUO=size(U); szUO=[szUO ones(1,6-length(szUO)) ordCC];
+%{
+\end{matlab}
+Store finite differences ($\mu\delta, \delta^2, \mu\delta^3,
+\delta^4, \ldots$) in this array.
+\begin{matlab}
+%}
+  if ~patches.parallel, dmu = zeros(szUO); % 7D
+  else   dmu = zeros(szUO,patches.codist); % 7D
+  end%if patches.parallel
+%{
+\end{matlab}
+First compute differences $\mu\delta$ and $\delta^2$.
+\begin{matlab}
+%}
+  if patches.stag % use only odd numbered neighbours
+    error('polynomial interpolation not yet for staggered patch coupling')
+  else  %disp('starting standard interpolation')  
+    dmu(:,:,:,:,:,J,1) = (U(:,:,:,:,:,Jp) ...
+                         -U(:,:,:,:,:,Jm))/2; %\mu\delta 
+    dmu(:,:,:,:,:,J,2) = (U(:,:,:,:,:,Jp) ...
+       -2*U(:,:,:,:,:,J) +U(:,:,:,:,:,Jm));   %\delta^2
+  end% if stag
+%{
+\end{matlab}
+Recursively take $\delta^2$.
+\begin{matlab}
+%}
+  for k = 3:ordCC    
+    dmu(:,:,:,:,:,J,k) =     dmu(:,:,:,:,:,Jp,k-2) ...
+    -2*dmu(:,:,:,:,:,J,k-2) +dmu(:,:,:,:,:,Jm,k-2);
+  end
+%{
+\end{matlab}
+Interpolate macro-values using the weights pre-computed by
+\verb|configPatches2()|.  An ensemble of configurations may
+have cross-coupling.
+\begin{matlab}
+%}
+k = 1+patches.EdgyInt; % use centre or two edges
+u(:,ny,:,patches.to,:,J) ...
+  = U(:,1,:,:,:,:)*(1-patches.stag) ...
+  +sum( shiftdim(patches.Cwtsr(:,2),-6).*dmu(:,1,:,:,:,:,:) ,7);
+u(:,1 ,:,patches.bo,:,J) ...
+  = U(:,k,:,:,:,:)*(1-patches.stag) ...
+  +sum( shiftdim(patches.Cwtsl(:,2),-6).*dmu(:,k,:,:,:,:,:) ,7);
+%{
+\end{matlab}
+
+
+
+
+\subsubsection{Case of spectral interpolation}
 Assumes the domain is macro-periodic.
 \begin{matlab}
 %}
 else% patches.ordCC<=0, spectral interpolation
-%disp('executing spectral interpolation')
 %{
 \end{matlab}
 We interpolate in terms of the patch index, $j$~say, not
@@ -335,20 +385,30 @@ the middle of the gaps and swapped.
  end%if patches.stag
 %{
 \end{matlab}
-Now set wavenumbers in the two directions into two vectors
-at the correct dimension.  In the case of even~$N$ these
-compute the $+$-case for the highest wavenumber zig-zag
-mode, $\mathcode`\,="213B k=(0,1, \ldots, k_{\max},
-+(k_{\max}+1) -k_{\max}, \ldots, -1)$.
+Interpolate the two directions in succession, in this way we
+naturally fill-in edge-corner values. Start with
+\(x\)-direction, and give most documentation for that case
+as the other is essentially the same. Need these indices of
+patch interior.
 \begin{matlab}
 %}
-  kMax = floor((Nx-1)/2); 
-  krx = shiftdim( rx*2*pi/Nx*(mod((0:Nx-1)+kMax,Nx)-kMax) ,-3);
-  kMay = floor((Ny-1)/2); 
-  kry = shiftdim( ry*2*pi/Ny*(mod((0:Ny-1)+kMay,Ny)-kMay) ,-4);
+ix = 2:nx-1;   iy = 2:ny-1;  
 %{
 \end{matlab}
 
+
+
+\paragraph{\(x\)-normal edge values} Now set wavenumbers
+into a vector at the correct dimension.  In the case of
+even~$N$ these compute the $+$-case for the highest
+wavenumber zig-zag mode, $\mathcode`\,="213B k=(0,1, \ldots,
+k_{\max}, +(k_{\max}+1) -k_{\max}, \ldots, -1)$.
+\begin{matlab}
+%}
+  kMax = floor((Nx-1)/2); 
+  kr = shiftdim( rx*2*pi/Nx*(mod((0:Nx-1)+kMax,Nx)-kMax) ,-3);
+%{
+\end{matlab}
 Compute the Fourier transform of the centre-cross values.
 Unless doing patch-edgy interpolation when FT the
 next-to-edge values.  If there are an even number of points,
@@ -359,32 +419,61 @@ specified by \verb|patches.le|, \verb|patches.ri|,
 \verb|patches.to| and \verb|patches.bo|.
 \begin{matlab}
 %}
-ix=(2:nx-1)';  iy=2:ny-1; % indices of interior
 if ~patches.EdgyInt
-     % here try central cross interpolation
-     Cle = fft(fft(u(i0,iy,:,:,:,:),[],5),[],6);
-     Cbo = fft(fft(u(ix,j0,:,:,:,:),[],5),[],6);
-     Cri=Cle; Cto=Cbo;
-else % edgyInt uses next-to-edge values
-     Cle = fft(fft(u(   2,iy ,:,patches.le,:,:),[],5),[],6);
-     Cri = fft(fft(u(nx-1,iy ,:,patches.ri,:,:),[],5),[],6);
-     Cbo = fft(fft(u(ix,2    ,:,patches.bo,:,:),[],5),[],6);
-     Cto = fft(fft(u(ix,ny-1 ,:,patches.to,:,:),[],5),[],6);
-end%if ~patches.EdgyInt
+     Cm = fft( u(i0,iy,:,:,:,:) ,[],5); 
+     Cp = Cm;
+else 
+     Cm = fft( u(   2,iy ,:,patches.le,:,:) ,[],5);
+     Cp = fft( u(nx-1,iy ,:,patches.ri,:,:) ,[],5);
+end%if ~patches.EdgyInt  
 %{
 \end{matlab}
 Now invert the double Fourier transforms to complete
 interpolation.  Enforce reality when appropriate. 
 \begin{matlab}
 %}
-u(nx,iy,:,:,:,:) = uclean( ifft(ifft( ...
-    Cle.*exp(1i*(stagShift+krx))  ,[],5),[],6) );
-u( 1,iy,:,:,:,:) = uclean( ifft(ifft( ...
-    Cri.*exp(1i*(stagShift-krx))  ,[],5),[],6) );
-u(ix,ny,:,:,:,:) = uclean( ifft(ifft( ...
-    Cbo.*exp(1i*(stagShift+kry))  ,[],5),[],6) );
-u(ix, 1,:,:,:,:) = uclean( ifft(ifft( ...
-    Cto.*exp(1i*(stagShift-kry))  ,[],5),[],6) );
+u(nx,iy,:,:,:,:) = uclean( ifft( ...
+    Cm.*exp(1i*(stagShift+kr))  ,[],5) );
+u( 1,iy,:,:,:,:) = uclean( ifft( ...
+    Cp.*exp(1i*(stagShift-kr))  ,[],5) );
+%{
+\end{matlab}
+
+
+
+\paragraph{\(y\)-normal edge values} Set wavenumbers into a
+vector.
+\begin{matlab}
+%}
+  kMax = floor((Ny-1)/2); 
+  kr = shiftdim( ry*2*pi/Ny*(mod((0:Ny-1)+kMax,Ny)-kMax) ,-4);
+%{
+\end{matlab}
+Compute the Fourier transform of the patch values on the
+centre-lines for all the fields.  
+\begin{matlab}
+%}
+if ~patches.EdgyInt
+     Cm = fft( u(:,j0,:,:,:,:) ,[],6); 
+     Cp = Cm;
+else 
+     Cm = fft( u(:,2    ,:,patches.bo,:,:) ,[],6);
+     Cp = fft( u(:,ny-1 ,:,patches.to,:,:) ,[],6);
+end%if ~patches.EdgyInt  
+%{
+\end{matlab}
+Invert the Fourier transforms to complete interpolation. 
+\begin{matlab}
+%}
+u(:,ny,:,:,:,:) = uclean( ifft( ...
+    Cm.*exp(1i*(stagShift+kr))  ,[],6) );
+u(:, 1,:,:,:,:) = uclean( ifft( ...
+    Cp.*exp(1i*(stagShift-kr))  ,[],6) );
+%{
+\end{matlab}
+
+\begin{matlab}
+%}
 end% if ordCC>0 else, so spectral 
 %{
 \end{matlab}
@@ -397,7 +486,6 @@ end% if ordCC>0 else, so spectral
 \begin{matlab}
 %}
 else% patches.periodic false
-%disp('executing new non-periodic code')
 assert(~patches.stag, ...
 'not yet implemented staggered grids for non-periodic')
 %{
@@ -423,8 +511,8 @@ ix=2:nx-1;  iy=2:ny-1; % indices of edge 'interior' (ix n/a)
 \end{matlab}
 
 \subsubsection{\(x\)-direction values}
-Set function values in first `column' of the tables for every
-variable and across ensemble.  For~\verb|EdgyInt|, the
+Set function values in first `column' of the tables for
+every variable and across ensemble.  For~\verb|EdgyInt|, the
 `reversal' of the next-to-edge values are because their
 values are to interpolate to the opposite edge of each
 patch. (Have no plans to implement core averaging as yet.)
@@ -441,11 +529,11 @@ patch. (Have no plans to implement core averaging as yet.)
 %{
 \end{matlab}
 
-\paragraph{Form tables of divided differences}
-Compute tables of (forward) divided differences
+\paragraph{Form tables of divided differences} Compute
+tables of (forward) divided differences
 \cite[e.g.,][]{DividedDifferences} for every variable, and
-across ensemble, and for left/right edges.  
-Recursively find all divided differences.
+across ensemble, and for left/right edges. Recursively find
+all divided differences.
 \begin{matlab}
 %}
 for q = 1:px
@@ -457,8 +545,8 @@ end
 %{
 \end{matlab}
 
-\paragraph{Interpolate with divided differences}
-Now interpolate to find the edge-values on left/right edges
+\paragraph{Interpolate with divided differences} Now
+interpolate to find the edge-values on left/right edges
 at~\verb|Xedge| for every interior~\verb|Y|.
 \begin{matlab}
 %}
@@ -536,8 +624,8 @@ forward differences.
   end
 %{
 \end{matlab}
-Finally, insert edge values into the array of field values, using the
-required ensemble shifts.  
+Finally, insert edge values into the array of field values,
+using the required ensemble shifts.  
 \begin{matlab}
 %}
 u(:,1 ,:,patches.bo,:,:) = Uedge(:,1,:,:,:,:);
@@ -564,7 +652,6 @@ u(:,ny,:,:,:,Ny) = nan;
 End of the non-periodic interpolation code.
 \begin{matlab}
 %}
-%disp('finished new non-periodic code')
 end%if patches.periodic else
 %{
 \end{matlab}
