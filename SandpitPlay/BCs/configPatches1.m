@@ -118,7 +118,7 @@ default one, but if more, then an ensemble over this
 number of realisations.
 
 \item \verb|hetCoeffs|, \emph{optional}, default empty.
-Supply a 1/2D array of microscale heterogeneous coefficients
+Supply a 1D or 2D array of microscale heterogeneous coefficients
 to be used by the given microscale \verb|fun| in each patch.
 Say the given array~\verb|cs| is of size $m_x\times n_c$,
 where $n_c$~is the number of different sets of coefficients.
@@ -137,7 +137,7 @@ $m_x$~phase-shifts of the coefficients. In this scenario,
 the inter-patch coupling couples different members in the
 ensemble.  When \verb|EdgyInt| is true, and when the
 coefficients are diffusivities\slash elasticities, then this
-coupling cunningly preserves symmetry .
+coupling cunningly preserves symmetry.
 \end{itemize}
 
 \item \verb|nCore|,  \emph{optional-experimental}, default
@@ -254,7 +254,7 @@ disp('With no arguments, simulate example of Burgers PDE')
 %{
 \end{matlab}
 The code here shows one way to get started: a user's script
-may have the following three steps (left-right arrows denote
+may have the following three steps (``\into'' denotes
 function recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches1 
@@ -266,7 +266,7 @@ Establish global patch data struct to point to and interface
 with a function coding Burgers' \pde: to be solved on
 $2\pi$-periodic domain, with eight patches, spectral
 interpolation couples the patches, with micro-grid
-spacing~$0.0.06$, and with seven microscale points forming
+spacing~$0.06$, and with seven microscale points forming
 each patch.
 \begin{matlab}
 %}
@@ -281,7 +281,7 @@ u0=0.3*(1+sin(patches.x))+0.1*randn(size(patches.x));
 %{
 \end{matlab}
 Simulate in time using a standard stiff integrator and the
-interface function \verb|patchsmooth1()|
+interface function \verb|patchSys1()|
 (\cref{sec:patchSys1}).
 \begin{matlab}
 %}
@@ -505,8 +505,8 @@ case 'periodic'
 %{
 \end{matlab}
 In the case of macro-periodicity, precompute the weightings
-to interpolate field values for coupling. (Might sometime
-extend to coupling via derivative values.)   
+to interpolate field values for coupling. 
+\todo{Might sometime extend to coupling via derivative values.}   
 \begin{matlab}
 %}
   if ordCC>0
@@ -534,7 +534,7 @@ case 'equispace'
 %: case chebyshev
 The Chebyshev case is spaced according to the Chebyshev
 distribution in order to reduce macro-interpolation errors,
-\(X_i \propto -cos(i\pi/N)\),  but with the extreme edges
+\(X_i \propto -\cos(i\pi/N)\),  but with the extreme edges
 aligned with the spatial domain boundaries, modified by the
 offset, and modified by possible `boundary
 layers'.\footnote{ However, maybe overlapping patches near a
@@ -579,7 +579,7 @@ Assign the centre-patch coordinates.
 
 %: case usergiven
 The user-given case is entirely up to a user to specify, we just
-ensure it has the correct shape of a row.
+force it to have the correct shape of a row.
 \begin{matlab}
 %}
 case 'usergiven'
@@ -617,7 +617,7 @@ and
 \verb|re(li)=le(ri)| are both \verb|1:nEnsem|.
 Alternatively, one may use the statement
 \begin{verbatim}
-c=hankel(c(1:nSubP-1),c([nSubP 1:nSubP-2]));
+  c=hankel(c(1:nSubP-1),c([nSubP 1:nSubP-2]));
 \end{verbatim}
 to \emph{correspondingly} generates all phase shifted copies
 of microscale heterogeneity (see \verb|homoDiffEdgy1| of

@@ -10,7 +10,7 @@ edge values from 2D macroscale interpolation}
 
 Couples 2D patches across 2D space by computing their edge
 values via macroscale interpolation.  Research
-\cite[]{Roberts2011a, Bunder2019c} indicates the patch
+\cite[]{Roberts2011a, Bunder2019d} indicates the patch
 centre-values are sensible macroscale variables, and
 macroscale interpolation of these determine patch-edge
 values.  However, for computational homogenisation in
@@ -51,17 +51,15 @@ which includes the following information.
 \item \verb|.x| is $\verb|nSubP1| \times1 \times1 \times1
 \times \verb|nPatch1| \times1 $ array of the spatial
 locations~$x_{iI}$ of the microscale grid points in every
-patch. Currently it
-\emph{must} be an equi-spaced lattice on the
-microscale index~$i$, but may be variable spaced in 
+patch. Currently it \emph{must} be an equi-spaced lattice on
+the microscale index~$i$, but may be variable spaced in
 macroscale index~$I$.
 
 \item \verb|.y| is similarly $1 \times \verb|nSubP2| \times1
 \times1 \times1 \times \verb|nPatch2|$ array of the spatial
 locations~$y_{jJ}$ of the microscale grid points in every
-patch. Currently it
-\emph{must} be an equi-spaced lattice on the
-microscale index~$j$, but may be variable spaced in 
+patch. Currently it \emph{must} be an equi-spaced lattice on
+the microscale index~$j$, but may be variable spaced in
 macroscale index~$J$.
 
 \item \verb|.ordCC| is order of interpolation, currently 
@@ -140,7 +138,7 @@ u = reshape(u,[nx ny nVars nEnsem Nx Ny ]);
 For the moment assume the physical domain is either
 macroscale periodic or macroscale rectangle so that the
 coupling formulas are simplest.  These index vectors point
-to patches and their four immediate neighbours. 
+to patches and, if periodic, their four immediate neighbours. 
 \begin{matlab}
 %}
 I=1:Nx; Ip=mod(I,Nx)+1; Im=mod(I-2,Nx)+1;
@@ -185,9 +183,9 @@ if ordCC>0 % then finite-width polynomial interpolation
 %{
 \end{matlab}
 Interpolate the three directions in succession, in this way
-we naturally fill-in face-edge and corner values. Start with
+we naturally fill-in corner values. Start with
 \(x\)-direction, and give most documentation for that case
-as the others are essentially the same.
+as the \(y\)-direction is essentially the same.
 
 
 \paragraph{\(x\)-normal edge values} The patch-edge values
@@ -352,11 +350,11 @@ else% patches.ordCC<=0, spectral interpolation
 \end{matlab}
 We interpolate in terms of the patch index, $j$~say, not
 directly in space. As the macroscale fields are $N$-periodic
-in the patch index~$j$, the macroscale Fourier transform
-writes the centre-patch values as $U_j=\sum_{k}C_ke^{ik2\pi
-j/N}$. Then the edge-patch values $U_{j\pm r}
-=\sum_{k}C_ke^{ik2\pi/N(j\pm r)} =\sum_{k}C'_ke^{ik2\pi
-j/N}$ where $C'_k=C_ke^{ikr2\pi/N}$. For $N$~patches we
+in the patch index~$I$, the macroscale Fourier transform
+writes the centre-patch values as $U_I=\sum_{k}C_ke^{ik2\pi
+I/N}$. Then the edge-patch values $U_{I\pm r}
+=\sum_{k}C_ke^{ik2\pi/N(I\pm r)} =\sum_{k}C'_ke^{ik2\pi
+I/N}$ where $C'_k=C_ke^{ikr2\pi/N}$. For $N$~patches we
 resolve `wavenumbers' $|k|<N/2$, so set row vector
 $\verb|ks|=k2\pi/N$ for `wavenumbers' $\mathcode`\,="213B
 k=(0,1, \ldots, k_{\max}, -k_{\max}, \ldots, -1)$ for
@@ -428,8 +426,8 @@ else
 end%if ~patches.EdgyInt  
 %{
 \end{matlab}
-Now invert the double Fourier transforms to complete
-interpolation.  Enforce reality when appropriate. 
+Now invert the Fourier transforms to complete interpolation.
+Enforce reality when appropriate. 
 \begin{matlab}
 %}
 u(nx,iy,:,:,:,:) = uclean( ifft( ...
@@ -493,12 +491,12 @@ assert(~patches.stag, ...
 Determine the order of interpolation~\verb|px| and~\verb|py|
 (potentially different in the different directions!), and
 hence size of the (forward) divided difference tables
-in~\verb|Fx| and~\verb|Fy|~(7D) for interpolating to
-left/right edges and top/bottom edges, respectively. Because
-of the product-form of the patch grid, and because we are
-doing \emph{only} either edgy interpolation or cross-patch
-interpolation (\emph{not} just the centre patch value), the
-interpolations are all 1D interpolations.
+in~\verb|F|~(7D) for interpolating to left/right, and
+top/bottom edges. Because of the product-form of the patch
+grid, and because we are doing \emph{only} either edgy
+interpolation or cross-patch interpolation (\emph{not} just
+the centre patch value), the interpolations are all 1D
+interpolations.
 \begin{matlab}
 %}
 if patches.ordCC<1
@@ -515,7 +513,8 @@ Set function values in first `column' of the tables for
 every variable and across ensemble.  For~\verb|EdgyInt|, the
 `reversal' of the next-to-edge values are because their
 values are to interpolate to the opposite edge of each
-patch. (Have no plans to implement core averaging as yet.)
+patch. \todo{Have no plans to implement core averaging as
+yet.}
 \begin{matlab}
 %}
   F = nan(patches.EdgyInt+1,ny-2,nVars,nEnsem,Nx,Ny,px+1);
@@ -637,9 +636,8 @@ u(:,ny,:,patches.to,:,:) = Uedge(:,2,:,:,:,:);
 \subsubsection{Optional NaNs for safety}
 We want a user to set outer edge values on the extreme
 patches according to the microscale boundary conditions that
-hold at the extremes of the domain.  Consequently, may
-override their computed interpolation values
-with~\verb|NaN|.
+hold at the extremes of the domain.  Consequently, override
+their computed interpolation values with~\verb|NaN|.
 \begin{matlab}
 %}
 u( 1,:,:,:, 1,:) = nan;

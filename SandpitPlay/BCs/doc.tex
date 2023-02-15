@@ -63,9 +63,18 @@
 \newcommand{\todo}[1]{\footnote{\textbf{ToDo:}\quad #1}}
 \def\localtableofcontents{}
 \def\into{${}\mapsto{}$}
-\graphicspath{{../../Patch/Figs/}}
+\graphicspath{{Figs/}{../../Patch/Figs/}}
 
 \def\E#1{\textsc{e}{-}#1}
+\newcounter{i}
+\Vec n\Vec u
+\def\nw{\text{nw}}\def\ne{\text{ne}}
+\def\sw{\text{sw}}\def\se{\text{se}}
+% need following definitions for microgrid symbols
+\def\oSym{\temp{$\color{green!70!black}\circledcirc$}}
+\def\xSym{\temp{$\color{green!70!black}\otimes$}}
+\def\uSym{\temp{$\color{blue}\blacktriangleright$}}
+\def\vSym{\temp{$\color{red}\blacktriangle$}}
 
 
 \begin{document}
@@ -101,6 +110,8 @@
 \input{homoDiffBdryEquil3.m}
 
 \input{theRes.m}
+
+\input{elastic2DstagHeteroSim.m}
 
 
 \section*{New configuration and interpolation}

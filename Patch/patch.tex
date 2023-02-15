@@ -1,5 +1,5 @@
 % input *.m files for the Patch scheme in 1D, 2D, and 3D. AJR,
-% Nov 2017 -- Apr 2022
+% Nov 2017 -- Feb 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 \chapter{Patch scheme for given microscale discrete space system}
 \label{sec:patch}
@@ -113,8 +113,13 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 \input{../Patch/homoWaveEdgy1.m}
 \input{../Patch/waveEdgy1.m}
 \end{devMan}
+\input{../Patch/Eckhardt2210eg2.m}
+\input{../Patch/EckhardtEquilib.m}
+\input{../Patch/EckhardtEquilibErrs.m}
+\input{../Patch/Eckhardt2210eg1.m}
 \input{../Patch/homoLanLif1D.m}
 \input{../Patch/quasiLogAxes.m}
+\input{../Patch/theRes.m}
 
 % 2D stuff
 \input{../Patch/configPatches2.m}
@@ -125,6 +130,11 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 \input{../Patch/homoDiffEdgy2.m}
 \input{../Patch/homoDiffSoln2.m}
 \end{devMan}
+\input{../Patch/monoscaleDiffEquil2.m}
+\input{../Patch/twoscaleDiffEquil2.m}
+\input{../Patch/twoscaleDiffEquil2Errs.m}
+\input{../Patch/abdulleDiffEquil2.m}
+\input{../Patch/randAdvecDiffEquil2.m}
 \input{../Patch/homoWaveEdgy2.m}
 
 % 3D stuff
@@ -132,6 +142,7 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 \input{../Patch/patchSys3.m}
 \input{../Patch/patchEdgeInt3.m}
 \input{../Patch/homoDiffEdgy3.m}
+\input{../Patch/homoDiffBdryEquil3.m}
 
 
 
@@ -139,10 +150,6 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 
 \section{To do}
 \begin{itemize}
-\item Some users will have microscale that has a fixed
-microscale lattice spacing, in which case we should code the
-scale ratio~\(r\) to follow from the choice of the number of
-lattice points in a patch.
 \item Core averages code.
 %\item Heterogeneous microscale via averaging regions---but
 %I suspect should be separated from simple homogenisation

@@ -64,9 +64,10 @@ bottommost\slash topmost patches, respectively.
 \item \verb|.bcOffset|, optional one, two or four element
 vector/array, in the cases of \verb|'equispace'| or
 \verb|'chebyshev'| the patches are placed so the left\slash
-right macroscale boundaries are aligned to the left\slash
-right edges of the corresponding extreme patches, but offset
-by \verb|bcOffset| of the sub-patch micro-grid spacing.  For
+right\slash top\slash bottom macroscale boundaries are
+aligned to the left\slash right\slash top\slash bottom edges
+of the corresponding extreme patches, but offset by
+\verb|.bcOffset| of the sub-patch micro-grid spacing.  For
 example, use \verb|bcOffset=0| when the micro-code applies
 Dirichlet boundary values on the extreme edge micro-grid
 points, whereas use \verb|bcOffset=0.5| when the microcode
@@ -74,20 +75,20 @@ applies Neumann boundary conditions halfway between the
 extreme edge micro-grid points.  Similarly for the top and
 bottom edges.
 
-If a scalar, then apply the same offset to all boundaries.
-If two elements, then apply the first offset to both
-\(x\)-boundaries, and the second offset to both
-\(y\)-boundaries. If four elements, then apply the first two
-offsets to the respective \(x\)-boundaries, and the last two
-offsets to the respective \(y\)-boundaries.
+If \verb|.bcOffset| is a scalar, then apply the same offset
+to all boundaries. If two elements, then apply the first
+offset to both \(x\)-boundaries, and the second offset to
+both \(y\)-boundaries. If four elements, then apply the
+first two offsets to the respective \(x\)-boundaries, and
+the last two offsets to the respective \(y\)-boundaries.
 
 \item \verb|.X|, optional vector/array with \verb|nPatch(1)|
-elements, in the case~\verb|'usergiven'| it specifies the
+elements, in the case \verb|'usergiven'| it specifies the
 \(x\)-locations of the centres of the patches---the user is
 responsible the locations makes sense.
 
 \item \verb|.Y|, optional vector/array with \verb|nPatch(2)|
-elements, in the case~\verb|'usergiven'| it specifies the
+elements, in the case \verb|'usergiven'| it specifies the
 \(y\)-locations of the centres of the patches---the user is
 responsible the locations makes sense.
 \end{itemize}
@@ -144,17 +145,17 @@ default one, but if more, then an ensemble over this
 number of realisations.
 
 \item \verb|hetCoeffs|, \emph{optional}, default empty.
-Supply a 2/3D array of microscale heterogeneous coefficients
-to be used by the given microscale \verb|fun| in each patch.
-Say the given array~\verb|cs| is of size $m_x\times
-m_y\times n_c$, where $n_c$~is the number of different sets
-of coefficients.  For example, in heterogeneous diffusion,
-$n_c=2$ for the diffusivities in the \emph{two} different
-spatial directions (or $n_c=3$ for the diffusivity tensor). 
-The coefficients are to be the same for each and every
-patch; however, macroscale variations are catered for by the
-$n_c$~coefficients being $n_c$~parameters in some macroscale
-formula.
+Supply a 2D or 3D array of microscale heterogeneous
+coefficients to be used by the given microscale \verb|fun|
+in each patch. Say the given array~\verb|cs| is of size
+$m_x\times m_y\times n_c$, where $n_c$~is the number of
+different sets of coefficients.  For example, in
+heterogeneous diffusion, $n_c=2$ for the diffusivities in
+the \emph{two} different spatial directions (or $n_c=3$ for
+the diffusivity tensor). The coefficients are to be the same
+for each and every patch; however, macroscale variations are
+catered for by the $n_c$~coefficients being $n_c$~parameters
+in some macroscale formula.
 \begin{itemize}
 \item If $\verb|nEnsem|=1$, then the array of coefficients
 is just tiled across the patch size to fill up each patch,
@@ -290,8 +291,8 @@ disp('With no arguments, simulate example of nonlinear diffusion')
 %{
 \end{matlab}
 The code here shows one way to get started: a user's script
-may have the following three steps (arrows indicate function
-recursion).
+may have the following three steps (``\into'' denotes
+function recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches2 
 \item ode23 integrator \into patchSys2 \into user's PDE
@@ -373,8 +374,7 @@ end
 \end{matlab}
 Animate the computed simulation to end with
 \cref{fig:configPatches2t3}.  Use \verb|patchEdgeInt2| to
-interpolate patch-edge values (but not corner values, and
-even if not drawn).
+interpolate patch-edge values.
 \begin{matlab}
 %}
 for i = 1:length(ts)
@@ -495,8 +495,8 @@ if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic'); end
 %{
 \end{matlab}
 If \verb|Dom| is a string, then just set type to that
-string, and subsequently set corresponding defaults for others
-fields.
+string, and subsequently set corresponding defaults for
+others fields.
 \begin{matlab}
 %}
 if ischar(Dom), Dom=struct('type',Dom); end
@@ -516,7 +516,8 @@ if size(Dom.type,1)==1, Dom.type=repmat(Dom.type,2,1); end
 %{
 \end{matlab}
 Check what is and is not specified, and provide default of
-Dirichlet boundaries if no \verb|bcOffset| specified when
+zero 
+(Dirichlet boundaries) if no \verb|bcOffset| specified when
 needed.  Do so for both directions independently.
 \begin{matlab}
 %}
@@ -569,6 +570,7 @@ patches.fun = fun;
 Second, store the order of interpolation that is to provide
 the values for the inter-patch coupling conditions. Spectral
 coupling is \verb|ordCC| of~$0$ or (not yet??)~$-1$.
+\todo{Perhaps implement staggered spectral coupling.}
 \begin{matlab}
 %}
 assert((ordCC>=-1) & (floor(ordCC)==ordCC), ...
@@ -623,7 +625,6 @@ case 'periodic'
   DQ=Q(2)-Q(1);
   Q=Q(1:nPatch(q))+diff(Q)/2;
   pEI=patches.EdgyInt;% abbreviation
-%  sizedx=size(dx), sizenSubP=size(nSubP)
   if pre2023, dx(q) = ratio(q)*DQ/(nSubP(q)-1-pEI)*(2-pEI);
   else        ratio(q) = dx(q)/DQ*(nSubP(q)-1-pEI)/(2-pEI);  
   end
@@ -650,10 +651,10 @@ case 'equispace'
 %: case chebyshev
 The Chebyshev case is spaced according to the Chebyshev
 distribution in order to reduce macro-interpolation errors,
-\(Q_i \propto -cos(i\pi/N)\),  but with the extreme edges
+\(Q_i \propto -\cos(i\pi/N)\),  but with the extreme edges
 aligned with the spatial domain boundaries, modified by the
-offset, and modified by possible `boundary
-layers'.\footnote{ However, maybe overlapping patches near a
+offset, and modified by possible `boundary layers'.
+\footnote{ However, maybe overlapping patches near a
 boundary should be viewed as some sort of spatially analogue
 of the `christmas tree' of projective integration and its
 integration to a slow manifold.   Here maybe the overlapping
@@ -746,8 +747,8 @@ patches.y = reshape( dx(2)*(-i0+1:i0-1)'+Y ...
 
 \paragraph{Pre-compute weights for macro-periodic}
 In the case of macro-periodicity, precompute the weightings
-to interpolate field values for coupling. (Might sometime
-extend to coupling via derivative values.)   
+to interpolate field values for coupling. \todo{Might sometime
+extend to coupling via derivative values.}   
 \begin{matlab}
 %}
 if patches.periodic
@@ -848,8 +849,8 @@ preserve symmetry in the system when also invoking
 %{
 \end{matlab}
 Issue warning if the ensemble is likely to be affected by
-lack of scale separation.  Need to justify this and the
-arbitrary threshold more carefully??
+lack of scale separation.  \todo{Maybe need to justify this
+and the arbitrary threshold more carefully??}
 \begin{matlab}
 %}
 if prod(ratio)*patches.nEnsem>0.9, warning( ...

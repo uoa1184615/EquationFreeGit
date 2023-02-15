@@ -1,0 +1,52 @@
+\def\temp#1{#1}% modify inside in some places!
+\begin{figure}
+\centering
+\caption{\label{figpatchgridv}microscale staggered
+\(xy\)-grid in a patch of the 2D~beam (boxed pale yellow), the case of
+\(n_{\text{subpatch}}=7\) and \(n_y=4\): \uSym, horizontal
+displacement~\(u\); \vSym, vertical displacement~\(v\);
+\xSym, strains~\(\varepsilon_{yx}=\varepsilon_{xy}\) and
+stresses~\(\sigma_{yx}, \sigma_{xy}\); \oSym,
+strains~\(\varepsilon_{yy}, \varepsilon_{xx}\) and
+stresses~\(\sigma_{yy}, \sigma_{xx}\). Open symbols 
+represent values at ghost nodes outside the
+beam-patch determined by BCs. Symbols in squares are
+edge-values determined by inter-patch interpolation. 
+}
+\setlength{\unitlength}{5ex}
+\def\N{7}\def\Np{8}\def\Nm{6}\def\NN{14}\def\NNmm{12} % in x-dirn
+\def\M{4}\def\Mp{5}\def\Mm{3}\def\MM{8} % in y-dirn
+\def\temp#1{\makebox(0,0){#1}}
+\begin{picture}(14,8.5)
+%\put(0,0){\framebox(14,8.5){}}
+\put(0.5,0){% global shift of origin
+% background patch
+\put(0.4,1){\colorbox{yellow!15}{\framebox(\NNmm,6){}}}
+% notional microgrid
+{\color{magenta!40}
+    \multiput(-0.5,0.5)(0,2){\Mp}{\line(1,0){\NN}}
+    \multiput(-0.5,0.5)(2,0){\Np}{\line(0,1){\MM}} 
+    }
+% staggered nodes
+\multiput(1,2)(2,0){\N}{\multiput(0,0)(0,2){\Mm}{\uSym}}
+\multiput(0,1)(2,0){\N}{\multiput(0,0)(0,2){\M}{\vSym}}
+\multiput(2,2)(2,0){\Nm}{\multiput(0,0)(0,2){\Mm}{\oSym}}
+\multiput(1,1)(2,0){\Nm}{\multiput(0,0)(0,2){\M}{\xSym}}
+% top-bottom boundary ghosts
+\multiput(0,0)(0,\MM)2{%
+  \multiput(1,0)(2,0){\Nm}{\temp{$\color{blue}\vartriangleright$}}
+  \multiput(2,0)(2,0){\Nm}{\temp{$\color{green!60!black}\bigcirc$}}
+  }
+% patch-edge values
+\multiput(0,1)(\NNmm,0)2{\multiput(0,0)(0,2){\M}{\temp{$\square$}}}
+\multiput(1,2)(\NNmm,0)2{\multiput(0,0)(0,2){\Mm}{\temp{$\square$}}}
+% indices
+\setcounter{i}0
+\multiput(0,0.1)(2,0){\N}{\stepcounter{i}%
+    $\ifnum\value{i}=1i=\else\quad\fi\arabic{i}$}
+\setcounter{i}0
+\multiput(-0.4,1.4)(0,2){\M}{\stepcounter{i}%
+    $\ifnum\value{i}=1j\!=\!\else\quad\ \fi\arabic{i}$}
+}%end origin shift
+\end{picture}
+\end{figure}

@@ -1,6 +1,6 @@
 % configPatches1() creates a data struct of the design of
-% patches for later use by the patch functions such as
-% patchSys1(). AJR, Nov 2017 -- Nov 2020
+% 1D patches for later use by the patch functions such as
+% patchSys1(). AJR, Nov 2017 -- 4 Jan 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches1()}: configures spatial
@@ -16,8 +16,8 @@ gap-tooth time derivative\slash step function
 example of its use.
 \begin{matlab}
 %}
-function patches = configPatches1(fun,Xlim,BCs ...
-    ,nPatch,ordCC,ratio,nSubP,varargin)
+function patches = configPatches1(fun,Xlim,Dom ...
+    ,nPatch,ordCC,dx,nSubP,varargin)
 %{
 \end{matlab}
 
@@ -35,12 +35,44 @@ time derivatives (or time-steps) of quantities on the 1D
 micro-grid within all the 1D~patches.
 
 \item \verb|Xlim| give the macro-space spatial domain of the
-computation: patches are equi-spaced over the interior of
-the interval~$[\verb|Xlim(1)|,\verb|Xlim(2)|]$.
+computation, namely the interval $[ \verb|Xlim(1)|,
+\verb|Xlim(2)|]$.
 
-\item \verb|BCs| somehow will define the macroscale boundary
-conditions. Currently, \verb|BCs| is ignored and the system
-is assumed macro-periodic in the spatial domain.
+\item \verb|Dom| sets the type of macroscale conditions for
+the patches, and reflects the type of microscale boundary
+conditions of the problem.   If \verb|Dom| is \verb|NaN| or
+\verb|[]|, then the field~\verb|u| is macro-periodic in the
+1D spatial domain, and resolved on equi-spaced patches. If
+\verb|Dom| is a character string, then that specifies the
+\verb|.type| of the following structure, with
+\verb|.bcOffset| set to the default zero. Otherwise
+\verb|Dom| is a structure with the following components.
+\begin{itemize}
+
+\item \verb|.type|, string, of either \verb|'periodic'| (the
+default), \verb|'equispace'|, \verb|'chebyshev'|,
+\verb|'usergiven'|.  For all cases except \verb|'periodic'|,
+users \emph{must} code into \verb|fun| the micro-grid
+boundary conditions that apply at the left(right) edge of
+the leftmost(rightmost) patches.
+
+\item \verb|.bcOffset|, optional one or two element array,
+in the cases of \verb|'equispace'| or \verb|'chebyshev'|
+the patches are placed so the left\slash right macroscale
+boundaries are aligned to the left\slash right edges of the
+corresponding extreme patches, but offset by \verb|bcOffset|
+of the sub-patch micro-grid spacing.  For example, use
+\verb|bcOffset=0| when applying Dirichlet boundary values on
+the extreme edge micro-grid points, whereas use
+\verb|bcOffset=0.5| when applying Neumann boundary conditions
+halfway between the extreme edge micro-grid points.
+
+\item \verb|.X|, optional array, in the case~\verb|'usergiven'|
+it specifies the locations of the centres of the
+\verb|nPatch| patches---the user is responsible it makes
+sense.
+\end{itemize}
+
 
 \item \verb|nPatch| is the number of equi-spaced spatial
 patches.
@@ -52,13 +84,17 @@ where \verb|ordCC| of~$0$ or~$-1$ gives spectral
 interpolation; and \verb|ordCC| being odd specifies
 staggered spatial grids.
 
-\item \verb|ratio| (real) is the ratio of (depending upon
-\verb|EdgyInt|) either the half-width or full-width of a
-patch to the spacing of the patch mid-points.  So either
-$\verb|ratio|=\tfrac12$ means the patches abut and
-$\verb|ratio|=1$ is overlapping patches as in holistic
-discretisation, or $\verb|ratio|=1$ means the patches
-abut.  Small~\verb|ratio| should greatly reduce
+\item \verb|dx| (real) is usually the sub-patch micro-grid
+spacing in~\(x\).
+
+However, if \verb|Dom| is~\verb|NaN| (as for pre-2023), then
+\verb|dx| actually is \verb|ratio|, namely the ratio of
+(depending upon \verb|EdgyInt|) either the half-width or
+full-width of a patch to the equi-spacing of the patch
+mid-points.  So either $\verb|ratio|=\tfrac12$ means the
+patches abut and $\verb|ratio|=1$ is overlapping patches as
+in holistic discretisation, or $\verb|ratio|=1$ means the
+patches abut.  Small~\verb|ratio| should greatly reduce
 computational time.
 
 \item \verb|nSubP| is the number of equi-spaced microscale
@@ -82,7 +118,7 @@ default one, but if more, then an ensemble over this
 number of realisations.
 
 \item \verb|hetCoeffs|, \emph{optional}, default empty.
-Supply a 1/2D array of microscale heterogeneous coefficients
+Supply a 1D or 2D array of microscale heterogeneous coefficients
 to be used by the given microscale \verb|fun| in each patch.
 Say the given array~\verb|cs| is of size $m_x\times n_c$,
 where $n_c$~is the number of different sets of coefficients.
@@ -101,7 +137,7 @@ $m_x$~phase-shifts of the coefficients. In this scenario,
 the inter-patch coupling couples different members in the
 ensemble.  When \verb|EdgyInt| is true, and when the
 coefficients are diffusivities\slash elasticities, then this
-coupling cunningly preserves symmetry .
+coupling cunningly preserves symmetry.
 \end{itemize}
 
 \item \verb|nCore|,  \emph{optional-experimental}, default
@@ -153,21 +189,28 @@ the time derivatives (or steps) on the patchy lattice.
 \item \verb|.ordCC| is the specified order of inter-patch
 coupling. 
 
+\item \verb|.periodic|: either true, for interpolation on
+the macro-periodic domain; or false, for general
+interpolation by divided differences over non-periodic
+domain or unevenly distributed patches.
+
 \item \verb|.stag| is true for interpolation using only odd
 neighbouring patches as for staggered grids, and false for
 the usual case of all neighbour coupling.
 
-\item \verb|.Cwtsr| and \verb|.Cwtsl| are the
-$\verb|ordCC|$-vector of weights for the inter-patch
-interpolation onto the right and left edges (respectively)
-with patch:macroscale ratio as specified.
+\item \verb|.Cwtsr| and \verb|.Cwtsl|, only for
+macro-periodic conditions, are the $\verb|ordCC|$-vector of
+weights for the inter-patch interpolation onto the right and
+left edges (respectively) with patch:macroscale ratio as
+specified or as derived from~\verb|dx|.
 
 \item \verb|.x| (4D) is $\verb|nSubP| \times1 \times1
 \times \verb|nPatch|$ array of the regular spatial
 locations~$x_{iI}$ of the $i$th~microscale grid point in
 the $I$th~patch.  
 
-\item \verb|.ratio| is the size ratio of every patch.
+\item \verb|.ratio|, only for
+macro-periodic conditions, is the size ratio of every patch.
 
 \item \verb|.nEdge| is, for each patch, the number of edge
 values set by interpolation at the edge regions of each
@@ -211,7 +254,7 @@ disp('With no arguments, simulate example of Burgers PDE')
 %{
 \end{matlab}
 The code here shows one way to get started: a user's script
-may have the following three steps (left-right arrows denote
+may have the following three steps (``\into'' denotes
 function recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches1 
@@ -222,13 +265,13 @@ function recursion).
 Establish global patch data struct to point to and interface
 with a function coding Burgers' \pde: to be solved on
 $2\pi$-periodic domain, with eight patches, spectral
-interpolation couples the patches, each patch of half-size
-ratio~$0.2$, and with seven microscale points forming each
-patch.
+interpolation couples the patches, with micro-grid
+spacing~$0.06$, and with seven microscale points forming
+each patch.
 \begin{matlab}
 %}
 global patches
-patches = configPatches1(@BurgersPDE,[0 2*pi], nan, 8, 0, 0.2, 7);
+patches = configPatches1(@BurgersPDE,[0 2*pi], [], 8, 0, 0.06, 7);
 %{
 \end{matlab}
 Set some initial condition, with some microscale randomness.
@@ -238,7 +281,7 @@ u0=0.3*(1+sin(patches.x))+0.1*randn(size(patches.x));
 %{
 \end{matlab}
 Simulate in time using a standard stiff integrator and the
-interface function \verb|patchsmooth1()|
+interface function \verb|patchSys1()|
 (\cref{sec:patchSys1}).
 \begin{matlab}
 %}
@@ -266,25 +309,27 @@ surf(ts,patches.x(:),us)
 view(60,40), colormap(0.8*hsv)
 title('Burgers PDE: patches in space, continuous time')
 xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
-ifOurCf2eps(mfilename)
 %{
 \end{matlab}
+
 \begin{figure}
 \centering \caption{\label{fig:config1Burgers}field
 $u(x,t)$ of the patch scheme applied to Burgers'~\pde.}
 \includegraphics[scale=0.85]{configPatches1}
 \end{figure}
-Upon finishing execution of the example, exit this function.
+Upon finishing execution of the example, optionally save 
+the graph to be shown in \cref{fig:config1Burgers}, then 
+exit this function.
 \begin{matlab}
 %}
+ifOurCf2eps(mfilename)
 return
-end%if no arguments
+end%if nargin==0
 %{
 \end{matlab}
 
-\input{../Patch/BurgersPDE.m}
-\input{../Patch/odeOcts.m}
-
+\IfFileExists{../Patch/BurgersPDE.m}{\input{../Patch/BurgersPDE.m}}{}
+\IfFileExists{../Patch/odeOcts.m}{\input{../Patch/odeOcts.m}}{}
 
 
 
@@ -298,10 +343,10 @@ p = inputParser;
 fnValidation = @(f) isa(f, 'function_handle'); %test for fn name
 addRequired(p,'fun',fnValidation); 
 addRequired(p,'Xlim',@isnumeric);
-addRequired(p,'BCs'); % nothing yet decided
+%addRequired(p,'Dom'); % nothing yet decided
 addRequired(p,'nPatch',@isnumeric);
 addRequired(p,'ordCC',@isnumeric);
-addRequired(p,'ratio',@isnumeric);
+addRequired(p,'dx',@isnumeric);
 addRequired(p,'nSubP',@isnumeric);
 addParameter(p,'nEdge',1,@isnumeric);
 addParameter(p,'EdgyInt',false,@islogical);
@@ -309,7 +354,7 @@ addParameter(p,'nEnsem',1,@isnumeric);
 addParameter(p,'hetCoeffs',[],@isnumeric);
 addParameter(p,'parallel',false,@islogical);
 addParameter(p,'nCore',1,@isnumeric);
-parse(p,fun,Xlim,BCs,nPatch,ordCC,ratio,nSubP,varargin{:});
+parse(p,fun,Xlim,nPatch,ordCC,dx,nSubP,varargin{:});
 %{
 \end{matlab}
 Set the optional parameters. 
@@ -327,6 +372,8 @@ patches.nCore = p.Results.nCore;
 Check parameters.
 \begin{matlab}
 %}
+assert(Xlim(1)<Xlim(2) ...
+      ,'two entries of Xlim must be ordered increasing')
 assert(patches.nEdge==1 ...
       ,'multi-edge-value interp not yet implemented')
 assert(2*patches.nEdge+1<=nSubP ...
@@ -334,6 +381,64 @@ assert(2*patches.nEdge+1<=nSubP ...
 if patches.nCore>1
     warning('nCore>1 not yet tested in this version')
     end
+%{
+\end{matlab}
+
+
+For compatibility with pre-2023 functions, if parameter
+\verb|Dom| is \verb|Nan|, then  we set the \verb|ratio| to
+be the value of the so-called \verb|dx| parameter.
+\begin{matlab}
+%}
+if ~isstruct(Dom), pre2023=isnan(Dom);
+else pre2023=false; end
+if pre2023, ratio=dx; dx=nan; end
+%{
+\end{matlab}
+
+Default macroscale conditions are periodic with evenly
+spaced patches.
+\begin{matlab}
+%}
+if isempty(Dom), Dom=struct('type','periodic'); end
+if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic'); end
+%{
+\end{matlab}
+If \verb|Dom| is a string, then just set type to that
+string, and then get corresponding defaults for others
+fields.
+\begin{matlab}
+%}
+if ischar(Dom), Dom=struct('type',Dom); end
+%{
+\end{matlab}
+Check what is and is not specified, and provide default of
+Dirichlet boundaries if no \verb|bcOffset| specified when
+needed.
+\begin{matlab}
+%}
+patches.periodic=false;
+switch Dom.type
+case 'periodic'
+    patches.periodic=true;
+    if isfield(Dom,'bcOffset')
+    warning('bcOffset not available for Dom.type = periodic'), end
+    if isfield(Dom,'X')
+    warning('X not available for Dom.type = periodic'), end
+case {'equispace','chebyshev'}
+    if ~isfield(Dom,'bcOffset'), Dom.bcOffset=[0;0]; end
+    if length(Dom.bcOffset)==1
+        Dom.bcOffset=repmat(Dom.bcOffset,2,1); end
+    if isfield(Dom,'X')
+    warning('X not available for Dom.type = equispace or chebyshev')
+    end
+case 'usergiven'
+    if isfield(Dom,'bcOffset')
+    warning('bcOffset not available for usergiven Dom.type'), end
+    assert(isfield(Dom,'X'),'X required for Dom.type = usergiven')
+otherwise 
+    error([Dom.type 'is unknown Dom.type'])
+end%switch Dom.type
 %{
 \end{matlab}
 
@@ -375,45 +480,124 @@ Check for staggered grid and periodic case.
   end
 %{
 \end{matlab}
-Might as well precompute the weightings to interpolate field
-values for coupling. (Could sometime extend to coupling via
-derivative values.)   Store the size ratio in
-\verb|patches|.
+
+
+Third, set the centre of the patches in the macroscale grid
+of patches, depending upon \verb|Dom.type|.
 \begin{matlab}
 %}
-patches.ratio=ratio; 
-if ordCC>0
+switch Dom.type
+%{
+\end{matlab}
+%: case periodic
+The periodic case is evenly spaced within the spatial domain.
+Store the size ratio in \verb|patches|.
+\begin{matlab}
+%}
+case 'periodic'
+  X=linspace(Xlim(1),Xlim(2),nPatch+1);
+  DX=X(2)-X(1);
+  X=X(1:nPatch)+diff(X)/2;
+  pEI=patches.EdgyInt;% abbreviation
+  if pre2023, dx = ratio*DX/(nSubP-1-pEI)*(2-pEI);
+  else        ratio = dx/DX*(nSubP-1-pEI)/(2-pEI);  end
+  patches.ratio=ratio;
+%{
+\end{matlab}
+In the case of macro-periodicity, precompute the weightings
+to interpolate field values for coupling. 
+\todo{Might sometime extend to coupling via derivative values.}   
+\begin{matlab}
+%}
+  if ordCC>0
     [Cwtsr,Cwtsl] = patchCwts(ratio,ordCC,patches.stag);
     patches.Cwtsr = Cwtsr;  patches.Cwtsl = Cwtsl;
-end
+  end
+%{
+\end{matlab}
+%: case equispace
+The equi-spaced case is also evenly spaced but with the
+extreme edges aligned with the spatial domain boundaries,
+modified by the offset.
+\begin{matlab}
+%}
+case 'equispace'
+  X=linspace(Xlim(1)+((nSubP-1)/2-Dom.bcOffset(1))*dx ...
+            ,Xlim(2)-((nSubP-1)/2-Dom.bcOffset(2))*dx ,nPatch);
+  DX=diff(X(1:2));
+  width=(1+patches.EdgyInt)/2*(nSubP-1-patches.EdgyInt)*dx;
+  if DX<width*0.999999
+     warning('too many equispace patches (double overlapping)')
+     end
+%{
+\end{matlab}
+%: case chebyshev
+The Chebyshev case is spaced according to the Chebyshev
+distribution in order to reduce macro-interpolation errors,
+\(X_i \propto -\cos(i\pi/N)\),  but with the extreme edges
+aligned with the spatial domain boundaries, modified by the
+offset, and modified by possible `boundary
+layers'.\footnote{ However, maybe overlapping patches near a
+boundary should be viewed as some sort of spatial analogue
+of the `christmas tree' of projective integration and its
+projection to a slow manifold.   Here maybe the overlapping
+patches allow for a `christmas tree' approach to the
+boundary layers.   Needs to be explored??}
+\begin{matlab}
+%}
+case 'chebyshev'
+  halfWidth=dx*(nSubP-1)/2;
+  X1 = Xlim(1)+halfWidth-Dom.bcOffset(1)*dx;
+  X2 = Xlim(2)-halfWidth+Dom.bcOffset(2)*dx;
+%  X = (X1+X2)/2-(X2-X1)/2*cos(linspace(0,pi,nPatch));
+%{
+\end{matlab}
+Search for total width of `boundary layers' so that in the
+interior the patches are non-overlapping Chebyshev.   But
+the width for assessing overlap of patches is the following
+variable \verb|width|.
+\begin{matlab}
+%}
+  width=(1+patches.EdgyInt)/2*(nSubP-1-patches.EdgyInt)*dx;
+  for b=0:2:nPatch-2
+    DXmin=(X2-X1-b*width)/2*( 1-cos(pi/(nPatch-b-1)) );
+    if DXmin>width, break, end
+  end
+  if DXmin<width*0.999999
+     warning('too many Chebyshev patches (mid-domain overlap)')
+     end
+%{
+\end{matlab}
+Assign the centre-patch coordinates.
+\begin{matlab}
+%}
+  X = [ X1+(0:b/2-1)*width ...
+        (X1+X2)/2-(X2-X1-b*width)/2*cos(linspace(0,pi,nPatch-b)) ...
+        X2+(1-b/2:0)*width ];
 %{
 \end{matlab}
 
-Third, set the centre of the patches in the macroscale grid
-of patches, assuming periodic macroscale domain for now.
+%: case usergiven
+The user-given case is entirely up to a user to specify, we just
+force it to have the correct shape of a row.
 \begin{matlab}
 %}
-X=linspace(Xlim(1),Xlim(2),nPatch+1);
-DX=X(2)-X(1);
-X=X(1:nPatch)+diff(X)/2;
+case 'usergiven'
+  X = reshape(Dom.X,1,[]);
+end%switch Dom.type
 %{
 \end{matlab}
-Construct the microscale grid in each patch, assuming
-Dirichlet patch edges, and a half-patch length of
-$\verb|ratio| \cdot \verb|DX|$, unless
-\verb|patches.EdgyInt| is true in which case the patches are
-of length \verb|ratio*DX+dx|.  Reshape the grid to be 4D to
-suit dimensions (micro,Vars,Ens,macro).
+
+
+Fourth, construct the microscale grid in each patch. 
+Reshape the grid to be 4D to suit dimensions
+(micro,Vars,Ens,macro).
 \begin{matlab}
 %}
 assert(patches.EdgyInt | mod(nSubP,2)==1, ...
     'configPatches1: nSubP must be odd')
 i0=(nSubP+1)/2;
-if ~patches.EdgyInt, dx = ratio*DX/(i0-1);  
-else                 dx = ratio*DX/(nSubP-2);
-end
-patches.x = dx*(-i0+1:i0-1)'+X; % micro-grid
-patches.x = reshape(patches.x,nSubP,1,1,nPatch);
+patches.x = reshape( dx*(-i0+1:i0-1)'+X ,nSubP,1,1,nPatch);
 %{
 \end{matlab}
 
@@ -433,7 +617,7 @@ and
 \verb|re(li)=le(ri)| are both \verb|1:nEnsem|.
 Alternatively, one may use the statement
 \begin{verbatim}
-c=hankel(c(1:nSubP-1),c([nSubP 1:nSubP-2]));
+  c=hankel(c(1:nSubP-1),c([nSubP 1:nSubP-2]));
 \end{verbatim}
 to \emph{correspondingly} generates all phase shifted copies
 of microscale heterogeneity (see \verb|homoDiffEdgy1| of
@@ -580,3 +764,5 @@ end% function
 \end{matlab}
 \end{devMan}
 %}
+
+

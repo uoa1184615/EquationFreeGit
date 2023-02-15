@@ -76,9 +76,9 @@ applies Neumann boundary conditions halfway between the
 extreme face micro-grid points.  Similarly for the top,
 bottom, back, and front faces.
 
-If a scalar, then apply the same offset to all boundaries.
-If three elements, then apply the first offset to both
-\(x\)-boundaries, the second offset to both
+If \verb|.bcOffset| is a scalar, then apply the same offset
+to all boundaries. If three elements, then apply the first
+offset to both \(x\)-boundaries, the second offset to both
 \(y\)-boundaries, and the third offset to both
 \(z\)-boundaries. If six elements, then apply the first two
 offsets to the respective \(x\)-boundaries, the middle two
@@ -86,17 +86,17 @@ offsets to the respective \(y\)-boundaries, and the last two
 offsets to the respective \(z\)-boundaries.
 
 \item \verb|.X|, optional vector/array with \verb|nPatch(1)|
-elements, in the case~\verb|'usergiven'| it specifies the
+elements, in the case \verb|'usergiven'| it specifies the
 \(x\)-locations of the centres of the patches---the user is
 responsible the locations makes sense.
 
 \item \verb|.Y|, optional vector/array with \verb|nPatch(2)|
-elements, in the case~\verb|'usergiven'| it specifies the
+elements, in the case \verb|'usergiven'| it specifies the
 \(y\)-locations of the centres of the patches---the user is
 responsible the locations makes sense.
 
 \item \verb|.Z|, optional vector/array with \verb|nPatch(3)|
-elements, in the case~\verb|'usergiven'| it specifies the
+elements, in the case \verb|'usergiven'| it specifies the
 \(z\)-locations of the centres of the patches---the user is
 responsible the locations makes sense.
 \end{itemize}
@@ -150,15 +150,15 @@ top\slash back\slash front next-to-face values.  If false or
 omitted, then interpolate from centre-patch planes.  
 
 \item \verb|'nEnsem'|,  \emph{optional-experimental},
-default one, but if more, then an ensemble over this
-number of realisations.
+default one, but if more, then an ensemble over this number
+of realisations.
 
 \item \verb|'hetCoeffs'|, \emph{optional}, default empty.
-Supply a 3/4D array of microscale heterogeneous coefficients
-to be used by the given microscale \verb|fun| in each patch.
-Say the given array~\verb|cs| is of size $m_x\times
-m_y\times m_z\times n_c$, where $n_c$~is the number of
-different arrays of coefficients.  For example, in
+Supply a 3D or 4D array of microscale heterogeneous
+coefficients to be used by the given microscale \verb|fun|
+in each patch. Say the given array~\verb|cs| is of size
+$m_x\times m_y\times m_z\times n_c$, where $n_c$~is the
+number of different arrays of coefficients.  For example, in
 heterogeneous diffusion, $n_c=3$ for the diffusivities in
 the \emph{three} different spatial directions (or $n_c=6$
 for the diffusivity tensor).  The coefficients are to be the
@@ -193,7 +193,7 @@ Computing Toolbox, then it will distribute the patches over
 multiple \textsc{cpu}s\slash cores. In \Matlab, only one
 array dimension can be split in the distribution, so it
 chooses the one space dimension~$x,y,z$ corresponding to
-the highest~\verb|\nPatch| (if a tie, then chooses the
+the highest~\verb|nPatch| (if a tie, then chooses the
 rightmost of~$x,y,z$).  A user may correspondingly
 distribute arrays with property \verb|patches.codist|, or
 simply use formulas invoking the preset distributed arrays
@@ -258,9 +258,8 @@ microscale grid points in every patch.
 array of the regular spatial locations~$z_{kK}$ of the
 microscale grid points in every patch.  
 
-\item \verb|.ratio| $1\times 3$, only for
-macro-periodic conditions, are the size ratios of
-every patch.
+\item \verb|.ratio| $1\times 3$, only for macro-periodic
+conditions, are the size ratios of every patch.
 
 \item \verb|.nEdge| is, for each patch, the number of face
 values set by interpolation at the face regions of each
@@ -308,7 +307,7 @@ disp('With no arguments, simulate example of heterogeneous wave')
 %{
 \end{matlab}
 The code here shows one way to get started: a user's script
-may have the following three steps (arrows indicate function
+may have the following three steps (``\into'' denotes function
 recursion).
 \begin{enumerate}\def\itemsep{-1.5ex}
 \item configPatches3 
@@ -331,10 +330,9 @@ cHetr = cHetr*mean(1./cHetr(:))
 Establish global patch data struct to interface with a
 function coding a nonlinear `diffusion' \pde: to be solved
 on $[-\pi,\pi]^3$-periodic domain, with $5^3$~patches,
-spectral interpolation~($0$) couples the patches, each
-patch with micro-grid spacing~$0.22$ (relatively large for
-visualisation), and with $4^3$~points forming each
-patch.  
+spectral interpolation~($0$) couples the patches, each patch
+with micro-grid spacing~$0.22$ (relatively large for
+visualisation), and with $4^3$~points forming each patch.  
 \begin{matlab}
 %}
 global patches
@@ -381,8 +379,7 @@ end
 \end{matlab}
 Animate the computed simulation to end with
 \cref{fig:configPatches3fin}.  Use \verb|patchEdgeInt3| to
-obtain patch-face values (but not edge nor corner values,
-and even if not drawn) in order to most easily reconstruct
+obtain patch-face values in order to most easily reconstruct
 the array data structure.
 
 Replicate $x$, $y$, and~$z$ arrays to get individual
@@ -719,7 +716,7 @@ case 'equispace'
 %: case chebyshev
 The Chebyshev case is spaced according to the Chebyshev
 distribution in order to reduce macro-interpolation errors,
-\(Q_i \propto -cos(i\pi/N)\),  but with the extreme edges
+\(Q_i \propto -\cos(i\pi/N)\),  but with the extreme edges
 aligned with the spatial domain boundaries, modified by the
 offset, and modified by possible `boundary layers'.
 \footnote{ However, maybe overlapping patches near a
@@ -815,8 +812,8 @@ patches.z = reshape( dx(3)*(-i0+1:i0-1)'+Z ...
 
 \paragraph{Pre-compute weights for macro-periodic} In the
 case of macro-periodicity, precompute the weightings to
-interpolate field values for coupling. (Might sometime
-extend to coupling via derivative values.)   
+interpolate field values for coupling. \todo{Might sometime
+extend to coupling via derivative values.}
 \begin{matlab}
 %}
 if patches.periodic
@@ -929,8 +926,8 @@ without \verb|EdgyInt| is unknown.  Use auto-replication.
 %{
 \end{matlab}
 Issue warning if the ensemble is likely to be affected by
-lack of scale separation.  Need to justify this and the
-arbitrary threshold more carefully??
+lack of scale separation.  \todo{Need to justify this and 
+the arbitrary threshold more carefully??}
 \begin{matlab}
 %}
 if prod(ratio)*patches.nEnsem>0.9, warning( ...

@@ -1,9 +1,9 @@
-% Test the spectral and the finite-width 1D interpolation of
-% patchEdgeInt1(), for one or several variables, including
-% normal grid and staggered grid, and also edgy
-% interpolation. All tests passed in 2019--2020, except not
-% testing the zig-zag modes.
-% AJR, 26 Sep 2018 -- 28 July 2020
+% Test the spectral, finite-width, and divided difference 1D
+% interpolation of patchEdgeInt1(), for one or several
+% variables, including normal grid and staggered grid, and
+% also edgy interpolation. All tests passed in 2019--2020,
+% except not testing the zig-zag modes.
+% AJR, 26 Sep 2018 -- Jan 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt1test}: test the 1D patch coupling}
@@ -13,7 +13,7 @@ A script to test the spectral and finite-order polynomial
 interpolation of function \verb|patchEdgeInt1()|. Tests one
 or several variables,  normal and staggered grids, and also
 tests centre and edge interpolation.  But does not yet test
-core averaging, etc.
+core averaging, nor divided differences on staggered, etc.
 
 Start by establishing global data struct for the range of
 various cases.
@@ -24,6 +24,95 @@ global patches
 nSubP=5
 %{
 \end{matlab}
+
+
+
+
+
+
+\subsubsection{Check divided difference interpolation}
+But not yet implemented staggered grid version?? Check over
+various types and orders of interpolation, numbers of
+patches, random domain lengths, random ratios, and
+randomised distribution of patches. (The \verb|@sin| is a
+dummy.)
+\begin{matlab}
+%}
+for edgyInt=[mod(nSubP,2)==0 true]
+for ordCC=2:2:8
+for nPatch=ordCC+(2:4)
+    edgyInt=edgyInt
+    ordCC=ordCC
+    nPatch=nPatch
+    Domain=5*[-rand rand]
+    ratio=0.5*rand
+    configPatches1(@sin,Domain,nan,nPatch,ordCC,ratio,nSubP ...
+        ,'EdgyInt',edgyInt);
+%{
+\end{matlab}
+Until \verb|configPatches1| updated, change the data
+structure here: first, specify general divided differences.
+\begin{matlab}
+%}
+patches.periodic=false;
+%{
+\end{matlab}
+Second, displace patches to a random non-uniform spacing.
+\begin{matlab}
+%}
+H = diff(patches.x(1,:,:,1:2));
+patches.x = patches.x+0.8*H*(rand(1,1,1,nPatch)-0.5);
+H = squeeze( diff(patches.x(1,:,:,:)) )% for information only
+%{
+\end{matlab}
+
+
+
+\paragraph{Check multiple fields simultaneously}
+Set profiles to be various powers of~\(x\), \verb|ps|, and
+store as different `variables' at each point.  
+\begin{matlab}
+%}
+    ps=1:ordCC
+    cs=randn(size(ps))
+    u0=patches.x.^ps.*cs+randn;
+%{
+\end{matlab}
+Then evaluate the interpolation and squeeze the singleton
+dimension of an `ensemble'.
+\begin{matlab}
+%}
+    ui=patchEdgeInt1(u0(:));
+    ui=squeeze(ui);
+%{
+\end{matlab}
+All patches should have zero error: but need to either in
+\verb|patchEdgeInt1| comment out \verb|NaN| assignment of
+boundary values, or not test the two extreme patches here,
+or add code to omit NaNs here.  High-order interpolation
+seems to be more affected by round-off so relax error size.
+\begin{matlab}
+%}
+    j=1:nPatch;
+    iError=ui(:,:,j)-u0(:,:,j);
+    hist(log10(abs(iError(abs(iError)>0))),-17:-10)
+    xlabel('log10 iError'),pause(0.3)%??
+    normError=norm(iError(:))
+    assert(normError<5e-10 ...
+    ,'failed divided difference interpolation')
+%{
+\end{matlab}
+
+End the for-loops over various parameters.
+\begin{matlab}
+%}
+end,end,end
+disp('Passed all divided difference interpolation')
+%error('Not testing any further')% temporary halt
+%{
+\end{matlab}
+
+
 
 
 
@@ -48,6 +137,7 @@ configPatches1(@sin,[0,Len],nan,nPatch,0,ratio,nSubP ...
 if mod(nPatch,2)==0, disp('Avoiding highest wavenumber'), end
 kMax=floor((nPatch-1)/2);
 if patches.EdgyInt, i0=[2 nSubP-1], else i0=(nSubP+1)/2, end
+patches.periodic=true; % temporary
 %{
 \end{matlab}
 
@@ -130,6 +220,7 @@ configPatches1(@simpleWavepde,[0,Len],nan,nPatch,-1,ratio,nSubP ...
 if mod(nPatch,4)==0, disp('Avoiding highest wavenumber'), end
 kMax=floor((nPatch/2-1)/2) 
 if patches.EdgyInt, i0=[2 nSubP-1], else i0=(nSubP+1)/2, end%??
+patches.periodic=true; % temporary
 %{
 \end{matlab}
 Identify which microscale grid points are \(h\)~or~\(u\) values.
@@ -236,6 +327,7 @@ for nPatch=ordCC+(2:4)
     ratio=0.5*rand
     configPatches1(@sin,Domain,nan,nPatch,ordCC,ratio,nSubP ...
         ,'EdgyInt',edgyInt);
+    patches.periodic=true; % temporary
 %{
 \end{matlab}
 
@@ -299,6 +391,7 @@ nSubP=3; % of form 4*N-1
 Len=10*rand
 configPatches1(@simpleWavepde,[0,Len],nan,nPatch,-1,ratio,nSubP);
 kMax=floor((nPatch/2-1)/2)
+patches.periodic=true; % temporary
 %{
 \end{matlab}
 Identify which microscale grid points are \(h\)~or~\(u\) values.

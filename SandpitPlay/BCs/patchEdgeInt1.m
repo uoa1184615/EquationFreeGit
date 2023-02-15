@@ -82,8 +82,6 @@ false, from centre-patch values (original scheme).
 \item \verb|.nCore| \todo{introduced sometime but not fully
 implemented yet, because prefer ensemble}
 
-\item \todo{additional macros bdry info}
-
 \end{itemize}
 \end{itemize}
 
@@ -133,12 +131,8 @@ If the user has not defined the patch core, then we assume
 it to be a single point in the middle of the patch, unless
 we are interpolating from next-to-edge values. 
 
-\todo{Revise??}
-For the moment assume the physical domain is macroscale
-periodic so that the coupling formulas are simplest. Should
-eventually cater for periodic, odd-mid-gap, even-mid-gap,
-even-mid-patch, Dirichlet, Neumann, ??. These index vectors
-point to patches and their two immediate neighbours.
+These index vectors point to patches and their two 
+immediate neighbours, for periodic domain.
 \begin{matlab}
 %}
 I = 1:Nx; Ip = mod(I,Nx)+1; Im = mod(I-2,Nx)+1;
@@ -295,8 +289,8 @@ Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches1()|
 tests that there are an even number of patches). Then the
 patch-ratio is effectively halved. The patch edges are near
-the middle of the gaps and swapped. Have not yet tested
-whether works for Edgy Interpolation??
+the middle of the gaps and swapped. \todo{Have not yet tested
+whether works for Edgy Interpolation.}
 \begin{matlab}
 %}
   if patches.stag % transform by doubling the number of fields
