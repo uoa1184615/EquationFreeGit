@@ -1,7 +1,7 @@
 % patchSys1() provides an interface to time integrators
 % for the dynamics on patches  coupled across space. The
 % system must be a smooth lattice system such as PDE
-% discretisations.  AJR, Nov 2017 -- Nov 2020
+% discretisations.  AJR, Nov 2017 -- Mar 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchSys1()}: interface 1D space to time integrators}
@@ -25,7 +25,7 @@ parallel computing of \verb|spmd|).
 
 \begin{matlab}
 %}
-function dudt=patchSys1(t,u,patches)
+function dudt=patchSys1(t,u,patches,varargin)
 if nargin<3, global patches, end
 %{
 \end{matlab}
@@ -48,19 +48,22 @@ with the following information  used here.
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,patches)| that computes the time derivatives
-on the patchy lattice. The array~\verb|u| has size
-$\verb|nSubP| \times \verb|nVars| \times \verb|nEnsem|
+\verb|fun(t,u,patches,...)| that computes the time
+derivatives on the patchy lattice. The array~\verb|u| has
+size $\verb|nSubP| \times \verb|nVars| \times \verb|nEnsem|
 \times \verb|nPatch|$.  Time derivatives should be computed
-into the same sized array, then herein the patch edge
-values are overwritten by zeros.
+into the same sized array, then herein the patch edge values
+are overwritten by zeros.
 
 \item \verb|.x| is $\verb|nSubP| \times1 \times1 \times
 \verb|nPatch|$ array of the spatial locations~$x_{i}$ of
 the microscale grid points in every patch.  Currently it
-\emph{must} be an equi-spaced lattice on both macro- and
-microscales.
+\emph{must} be an equi-spaced lattice on the microscale.
 \end{itemize}
+
+\item \verb|varargin|,optional, is arbitrary number of
+parameters to be passed onto the users time-derivative
+function as specified in configPatches1.
 \end{itemize}
 
 
@@ -92,7 +95,7 @@ zero (as \verb|ode15s| chokes on NaNs), then return to the
 user\slash integrator as same sized array as input.
 \begin{matlab}
 %}
-dudt=patches.fun(t,u,patches);
+dudt=patches.fun(t,u,patches,varargin{:});
 dudt([1 end],:,:,:) = 0;
 dudt=reshape(dudt,sizeu);
 %{

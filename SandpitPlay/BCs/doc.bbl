@@ -17,308 +17,133 @@
 \endgroup
 
 \datalist[entry]{nyt/global//global/global}
-  \entry{Abdulle2020b}{report}{}
-    \name{author}{3}{}{%
-      {{hash=AA}{%
-         family={Abdulle},
-         familyi={A\bibinitperiod},
-         given={Assyr},
-         giveni={A\bibinitperiod},
-      }}%
-      {{hash=AD}{%
-         family={Arjmand},
-         familyi={A\bibinitperiod},
-         given={Doghonay},
-         giveni={D\bibinitperiod},
-      }}%
-      {{hash=PE}{%
-         family={Paganoni},
-         familyi={P\bibinitperiod},
-         given={Edoardo},
-         giveni={E\bibinitperiod},
+  \entry{Combescure2022}{article}{}
+    \name{author}{1}{}{%
+      {{hash=CC}{%
+         family={Combescure},
+         familyi={C\bibinitperiod},
+         given={Christelle},
+         giveni={C\bibinitperiod},
       }}%
     }
-    \strng{namehash}{AAADPE1}
-    \strng{fullhash}{AAADPE1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2020}
-    \field{labeldatesource}{year}
-    \field{sortinit}{A}
-    \field{sortinithash}{A}
-    \field{abstract}{%
-    This paper aims at an accurate and efficient computation of effective
-  quantities, e.g., the homogenized coefficients for approximating the
-  solutions to partial differential equations with oscillatory coefficients.
-  Typical multiscale methods are based on a micro-macro coupling, where the
-  macro model describes the coarse scale behaviour, and the micro model is
-  solved only locally to upscale the effective quantities, which are missing in
-  the macro model. The fact that the micro problems are solved over small
-  domains within the entire macroscopic domain, implies imposing artificial
-  boundary conditions on the boundary of the microscopic domains. A naive
-  treatment of these artificial boundary conditions leads to a first order
-  error in */*, where * < * represents the characteristic length of the small
-  scale oscillations and *d is the size of micro domain. This error dominates
-  all other errors originating from the discretization of the macro and the
-  micro problems, and its reduction is a main issue in today*s engineering
-  multiscale computations. The objective of the present work is to analyse a
-  parabolic approach, first announced in [A. Abdulle, D. Arjmand, E. Paganoni,
-  C. R. Acad. Sci. Paris, Ser. I, 2019], for computing the homogenized
-  coefficients with arbitrarily high convergence rates in */*. The analysis
-  covers the setting of periodic microstructure, and numerical simulations are
-  provided to verify the theoretical findings for more general settings, e.g.
-  random stationary micro structures.%
-    }
-    \field{title}{A parabolic local problem with exponential decay of the
-  resonance error for numerical homogenization}
-    \list{institution}{1}{%
-      {Institute of Mathematics, \'Ecole Polytechnique F\'ed\'erale de
-  Lausanne}%
-    }
-    \field{type}{techreport}
-    \field{year}{2020}
-    \warn{\item Invalid format of field 'month'}
-  \endentry
-
-  \entry{Bunder2020a}{article}{}
-    \name{author}{3}{}{%
-      {{hash=BJE}{%
-         family={Bunder},
-         familyi={B\bibinitperiod},
-         given={J.\bibnamedelima E.},
-         giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod},
-      }}%
-      {{hash=KIG}{%
-         family={Kevrekidis},
-         familyi={K\bibinitperiod},
-         given={I.\bibnamedelima G.},
-         giveni={I\bibinitperiod\bibinitdelim G\bibinitperiod},
-      }}%
-      {{hash=RAJ}{%
-         family={Roberts},
-         familyi={R\bibinitperiod},
-         given={A.\bibnamedelima J.},
-         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
-      }}%
-    }
-    \keyw{Mathematics - Dynamical Systems, Physics - Computational Physics}
-    \strng{namehash}{BJEKIGRAJ1}
-    \strng{fullhash}{BJEKIGRAJ1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2021}
-    \field{labeldatesource}{year}
-    \field{sortinit}{B}
-    \field{sortinithash}{B}
-    \field{abstract}{%
-    Equation-free macroscale modelling is a systematic and rigorous
-  computational methodology for efficiently predicting the dynamics of a
-  microscale system at a desired macroscale system level. In this scheme, the
-  given microscale model is computed in small patches spread across the
-  space-time domain, with patch coupling conditions bridging the unsimulated
-  space. For accurate simulations, care must be taken in designing the patch
-  coupling conditions. Here we construct novel coupling conditions which
-  preserve translational invariance, rotational invariance, and self-adjoint
-  symmetry, thus guaranteeing that conservation laws associated with these
-  symmetries are preserved in the macroscale simulation. Spectral and algebraic
-  analyses of the proposed scheme in both one and two dimensions reveal
-  mechanisms for further improving the accuracy of the simulations. Consistency
-  of the patch scheme's macroscale dynamics with the original microscale model
-  is proved. This new self-adjoint patch scheme provides an efficient,
-  flexible, and accurate computational homogenisation in a wide range of
-  multiscale scenarios of interest to scientists and engineers.%
-    }
-    \verb{doi}
-    \verb 10.1007/s00211-021-01232-5
-    \endverb
-    \field{number}{2}
-    \field{pages}{229\bibrangedash 272}
-    \field{title}{Equation-free patch scheme for efficient computational
-  homogenisation via self-adjoint coupling}
-    \field{volume}{149}
-    \field{journaltitle}{Numerische Mathematik}
-    \field{month}{07}
-    \field{year}{2021}
-  \endentry
-
-  \entry{Bunder2013b}{article}{}
-    \name{author}{3}{}{%
-      {{hash=BJE}{%
-         family={Bunder},
-         familyi={B\bibinitperiod},
-         given={J.\bibnamedelima E.},
-         giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod},
-      }}%
-      {{hash=RAJ}{%
-         family={Roberts},
-         familyi={R\bibinitperiod},
-         given={A.\bibnamedelima J.},
-         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
-      }}%
-      {{hash=KIG}{%
-         family={Kevrekidis},
-         familyi={K\bibinitperiod},
-         given={I.\bibnamedelima G.},
-         giveni={I\bibinitperiod\bibinitdelim G\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{BJERAJKIG1}
-    \strng{fullhash}{BJERAJKIG1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2017}
-    \field{labeldatesource}{year}
-    \field{sortinit}{B}
-    \field{sortinithash}{B}
-    \field{abstract}{%
-    Computational simulation of microscale detailed systems is frequently only
-  feasible over spatial domains much smaller than the macroscale of interest.
-  The `equation-free' methodology couples many small patches of microscale
-  computations across space to empower efficient computational simulation over
-  macroscale domains of interest. Motivated by molecular or agent simulations,
-  we analyse the performance of various coupling schemes for patches when the
-  microscale is inherently `rough'. As a canonical problem in this universality
-  class, we systematically analyse the case of heterogeneous diffusion on a
-  lattice. Computer algebra explores how the dynamics of coupled patches
-  predict the large scale emergent macroscale dynamics of the computational
-  scheme. We determine good design for the coupling of patches by comparing the
-  macroscale predictions from patch dynamics with the emergent macroscale on
-  the entire domain, thus minimising the computational error of the multiscale
-  modelling. The minimal error on the macroscale is obtained when the coupling
-  utilises averaging regions which are between a third and a half of the patch.
-  Moreover, when the symmetry of the inter-patch coupling matches that of the
-  underlying microscale structure, patch dynamics predicts the desired
-  macroscale dynamics to any specified order of error. The results confirm that
-  the patch scheme is useful for macroscale computational simulation of a range
-  of systems with microscale heterogeneity.%
-    }
-    \verb{doi}
-    \verb 10.1016/j.jcp.2017.02.004
-    \endverb
-    \field{pages}{154\bibrangedash 174}
-    \field{title}{Good coupling for the multiscale patch scheme on systems with
-  microscale heterogeneity}
-    \field{volume}{337}
-    \field{journaltitle}{J.~Computational Physics}
-    \field{year}{2017}
-    \warn{\item Invalid format of field 'month'}
-  \endentry
-
-  \entry{Bunder2019d}{article}{}
-    \name{author}{5}{}{%
-      {{hash=BJ}{%
-         family={Bunder},
-         familyi={B\bibinitperiod},
-         given={J.E.},
-         giveni={J\bibinitperiod},
-      }}%
-      {{hash=DJ}{%
-         family={Divahar},
-         familyi={D\bibinitperiod},
-         given={J.},
-         giveni={J\bibinitperiod},
-      }}%
-      {{hash=KIG}{%
-         family={Kevrekidis},
-         familyi={K\bibinitperiod},
-         given={Ioannis\bibnamedelima G.},
-         giveni={I\bibinitperiod\bibinitdelim G\bibinitperiod},
-      }}%
-      {{hash=MTW}{%
-         family={Mattner},
-         familyi={M\bibinitperiod},
-         given={Trent\bibnamedelima W.},
-         giveni={T\bibinitperiod\bibinitdelim W\bibinitperiod},
-      }}%
-      {{hash=RA}{%
-         family={Roberts},
-         familyi={R\bibinitperiod},
-         given={A.J.},
-         giveni={A\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{BJ+1}
-    \strng{fullhash}{BJDJKIGMTWRA1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2021}
-    \field{labeldatesource}{year}
-    \field{sortinit}{B}
-    \field{sortinithash}{B}
-    \field{abstract}{%
-    The multiscale patch scheme is built from given small micro-scale
-  simulations of complicated physical processes to empower large macro-scale
-  simulations. By coupling small patches of simulations over unsimulated
-  spatial gaps, large savings in computational time are possible. Here we
-  discuss generalising the patch scheme to the case of wave systems on
-  staggered grids in 2D space. Classic macro-scale interpolation provides a
-  generic coupling between patches that achieves arbitrarily high order
-  consistency between the emergent macro-scale simulation and the underlying
-  micro-scale dynamics. Eigen-analysis indicates that the resultant scheme
-  empowers feasible computation of large macro-scale simulations of wave
-  systems even with complicated underlying physics. As examples we use the
-  scheme to simulate some wave scenarios via a turbulent shallow water model.%
-    }
-    \verb{doi}
-    \verb 10.1002/fld.4915
-    \endverb
-    \field{number}{4}
-    \field{pages}{953\bibrangedash 977}
-    \field{title}{Large-scale simulation of shallow water waves with
-  computation only on small staggered patches}
-    \field{volume}{93}
-    \list{institution}{1}{%
-      {\url{https://arxiv.org/abs/1912.07815}}%
-    }
-    \field{journaltitle}{International Journal for Numerical Methods in Fluids}
-    \field{year}{2021}
-    \warn{\item Invalid format of field 'month'}
-  \endentry
-
-  \entry{Eckhardt2022}{report}{}
-    \name{author}{2}{}{%
-      {{hash=ED}{%
-         family={Eckhardt},
-         familyi={E\bibinitperiod},
-         given={Daniel},
-         giveni={D\bibinitperiod},
-      }}%
-      {{hash=VB}{%
-         family={Verf{\"u}rth},
-         familyi={V\bibinitperiod},
-         given={Barbara},
-         giveni={B\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{EDVB1}
-    \strng{fullhash}{EDVB1}
+    \keyw{74-10, 74A20, 74B20, 74G60, 74Q05, Bloch wave, Higher-order,
+  Homogenization, Instability, Micromorphic, Patterning, Strain gradient}
+    \strng{namehash}{CC1}
+    \strng{fullhash}{CC1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
     \field{labelyear}{2022}
     \field{labeldatesource}{year}
-    \field{sortinit}{E}
-    \field{sortinithash}{E}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
     \field{abstract}{%
-    The aim of this work is the numerical homogenization of a parabolic problem
-  with several time and spatial scales using the heterogeneous multiscale
-  method. We replace the actual cell problem with an alternate one, using
-  Dirichlet boundary and initial values instead of periodic boundary and time
-  conditions. Further, we give a detailed a priori error analysis of the fully
-  discretized, i.e., in space and time for both the macroscopic and the cell
-  problem, method. Numerical experiments illustrate the theoretical convergence
-  rates.%
+    In the context of architected materials, it has been observed that both
+  long-wavelength instabilities leading possibly to localization and
+  short-wavelength instabilities leading to the apparition of a deformation
+  pattern could occur. This work proposes for the first time a comparison of
+  the ability of two families of higher order equivalent media, namely
+  strain-gradient and micromorphic media, to capture both patterning and
+  long-wavelength macroscopic instabilities in those materials. The studied
+  architected material consists in a simple one-dimensional arrangement of
+  non-linear springs, thus allowing for analytical or nearly analytical
+  treatment of the problem, avoiding any uncertainties or imprecisions coming
+  from a numerical method. A numerical solution of the problem is then used to
+  compare the post-buckling prediction of both models. The study concludes
+  that, micromorphic media are the appropriate choice of equivalent continuum
+  models to emply when dealing with the possibility of patterning inside a
+  structured medium, but if long-wavelength global instability is of interest,
+  a strain-gradient type equivalent medium is well suited.%
     }
-    \field{title}{Fully discrete Heterogeneous Multiscale Method for parabolic
-  problems with multiple spatial and temporal scales}
+    \verb{doi}
+    \verb 10.1007/s10659-022-09949-6
+    \endverb
+    \field{issn}{1573-2681}
+    \field{title}{Selecting {Generalized} {Continuum} {Theories} for
+  {Nonlinear} {Periodic} {Solids} {Based} on the {Instabilities} of the
+  {Underlying} {Microstructure}}
+    \field{journaltitle}{Journal of Elasticity}
+    \field{month}{11}
+    \field{year}{2022}
+  \endentry
+
+  \entry{Govaerts2019}{report}{}
+    \name{author}{10}{}{%
+      {{hash=GW}{%
+         family={Govaerts},
+         familyi={G\bibinitperiod},
+         given={W.},
+         giveni={W\bibinitperiod},
+      }}%
+      {{hash=KYA}{%
+         family={Kuznetsov},
+         familyi={K\bibinitperiod},
+         given={Yu.\bibnamedelima A.},
+         giveni={Y\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=MH}{%
+         family={Meijer},
+         familyi={M\bibinitperiod},
+         given={H.G.E.},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=AHB}{%
+         family={Al-Hdaibat},
+         familyi={A\bibinitperiod-H\bibinitperiod},
+         given={B.},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=WVD}{%
+         family={Witte},
+         familyi={W\bibinitperiod},
+         given={V.\bibnamedelima De},
+         giveni={V\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=DA}{%
+         family={Dhooge},
+         familyi={D\bibinitperiod},
+         given={A.},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=MW}{%
+         family={Mestrom},
+         familyi={M\bibinitperiod},
+         given={W.},
+         giveni={W\bibinitperiod},
+      }}%
+      {{hash=NN}{%
+         family={Neirynck},
+         familyi={N\bibinitperiod},
+         given={N.},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=RA}{%
+         family={Riet},
+         familyi={R\bibinitperiod},
+         given={A.M.},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=SB}{%
+         family={Sautois},
+         familyi={S\bibinitperiod},
+         given={B.},
+         giveni={B\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{GW+1}
+    \strng{fullhash}{GWKYAMHAHBWVDDAMWNNRASB1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2019}
+    \field{labeldatesource}{year}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{title}{MATCONT: Continuation toolbox for ODEs in Matlab}
     \list{institution}{1}{%
-      {\url{http://arxiv.org/abs/2210.04536}}%
+  {\url{https://webspace.science.uu.nl/~kouzn101/NBA/ManualMatcontAug2019.pdf}}%
     }
     \field{type}{techreport}
-    \field{annotation}{%
-    Comment: 46 pages, 4 figures%
-    }
-    \field{month}{10}
-    \field{year}{2022}
+    \field{year}{2019}
+    \warn{\item Invalid format of field 'month'}
   \endentry
 
   \entry{Maclean2020a}{article}{}
@@ -384,261 +209,6 @@
     Comment: 35 pages, 4 figures, submitted to Numerical Algorithms%
     }
     \field{year}{2021}
-    \warn{\item Invalid format of field 'month'}
-  \endentry
-
-  \entry{Roberts00a}{article}{}
-    \name{author}{1}{}{%
-      {{hash=RAJ}{%
-         family={Roberts},
-         familyi={R\bibinitperiod},
-         given={A.\bibnamedelima J.},
-         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{RAJ1}
-    \strng{fullhash}{RAJ1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2003}
-    \field{labeldatesource}{year}
-    \field{sortinit}{R}
-    \field{sortinithash}{R}
-    \verb{doi}
-    \verb 10.1090/S0025-5718-02-01448-5
-    \endverb
-    \field{pages}{247\bibrangedash 262}
-    \field{title}{A holistic finite difference approach models linear dynamics
-  consistently}
-    \verb{url}
-    \verb http://www.ams.org/mcom/2003-72-241/S0025-5718-02-01448-5
-    \endverb
-    \field{volume}{72}
-    \field{journaltitle}{Mathematics of Computation}
-    \field{year}{2003}
-  \endentry
-
-  \entry{Roberts06d}{article}{}
-    \name{author}{2}{}{%
-      {{hash=RAJ}{%
-         family={Roberts},
-         familyi={R\bibinitperiod},
-         given={A.\bibnamedelima J.},
-         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
-      }}%
-      {{hash=KIG}{%
-         family={Kevrekidis},
-         familyi={K\bibinitperiod},
-         given={I.\bibnamedelima G.},
-         giveni={I\bibinitperiod\bibinitdelim G\bibinitperiod},
-      }}%
-    }
-    \keyw{multiscale computation; gap-tooth scheme; coupling boundary
-  conditions; high order consistency}
-    \strng{namehash}{RAJKIG1}
-    \strng{fullhash}{RAJKIG1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2007}
-    \field{labeldatesource}{year}
-    \field{sortinit}{R}
-    \field{sortinithash}{R}
-    \field{abstract}{%
-    We are developing a framework for multiscale computation which enables
-  models at a ``microscopic'' level of description, for example, lattice
-  Boltzmann, Monte Carlo, or molecular dynamics simulators, to perform modeling
-  tasks at ``macroscopic'' length scales of interest. The plan is to use the
-  microscopic rules restricted to small ``patches'' of the domain, the
-  ``teeth,'' using interpolation to bridge the ``gaps.'' Here we explore
-  general boundary conditions coupling the widely separated ``teeth'' of the
-  microscopic simulation that achieve high order accuracy over the macroscale.
-  We present the simplest case when the microscopic simulator is the
-  quintessential example of a PDE. We argue that classic high order
-  interpolation of the macroscopic field provides the correct forcing in
-  whatever boundary condition is required by the microsimulator. Such
-  interpolation leads to tooth boundary conditions, which achieve arbitrarily
-  high order consistency. The high order consistency is demonstrated on a class
-  of linear PDEs in two ways: first through the eigenvalues of the scheme for
-  selected numerical problems, and second using the dynamical systems approach
-  of holistic discretization on a general class of linear PDEs. Analytic
-  modeling shows that, for a wide class of microscopic systems, the subgrid
-  fields and the effective macroscopic model are largely independent of the
-  tooth size and the particular tooth boundary conditions. When applied to
-  patches of microscopic simulations these tooth boundary conditions promise
-  efficient macroscale simulation. We expect the same approach will also
-  accurately couple patch simulations in higher spatial dimensions.%
-    }
-    \verb{doi}
-    \verb 10.1137/060654554
-    \endverb
-    \field{number}{4}
-    \field{pages}{1495\bibrangedash 1510}
-    \field{title}{General tooth boundary conditions for equation free
-  modelling}
-    \field{volume}{29}
-    \field{journaltitle}{SIAM J.~Scientific Computing}
-    \field{year}{2007}
-  \endentry
-
-  \entry{Roberts2011a}{article}{}
-    \name{author}{3}{}{%
-      {{hash=RAJ}{%
-         family={Roberts},
-         familyi={R\bibinitperiod},
-         given={A.\bibnamedelima J.},
-         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
-      }}%
-      {{hash=MT}{%
-         family={MacKenzie},
-         familyi={M\bibinitperiod},
-         given={Tony},
-         giveni={T\bibinitperiod},
-      }}%
-      {{hash=BJ}{%
-         family={Bunder},
-         familyi={B\bibinitperiod},
-         given={Judith},
-         giveni={J\bibinitperiod},
-      }}%
-    }
-    \keyw{Centre manifolds; Computer algebra; Discrete modelling closure; Gap
-  tooth method; Multiscale computation; Multiple dimensions;
-  Reaction--diffusion equations}
-    \strng{namehash}{RAJMTBJ1}
-    \strng{fullhash}{RAJMTBJ1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2014}
-    \field{labeldatesource}{year}
-    \field{sortinit}{R}
-    \field{sortinithash}{R}
-    \field{abstract}{%
-    Developments in dynamical systems theory provides new support for the
-  macroscale modelling of \pde{}s and other microscale systems such as Lattice
-  Boltzmann, Monte Carlo or Molecular Dynamics simulators. By systematically
-  resolving subgrid microscale dynamics the dynamical systems approach
-  constructs accurate closures of macroscale discretisations of the microscale
-  system. Here we specifically explore reaction-diffusion problems in two
-  spatial dimensions as a prototype of generic systems in multiple dimensions.
-  Our approach unifies into one the modelling of systems by a type of finite
-  elements, and the `equation free' macroscale modelling of microscale
-  simulators efficiently executing only on small patches of the spatial domain.
-  Centre manifold theory ensures that a closed model exist on the macroscale
-  grid, is emergent, and is systematically approximated. Dividing space either
-  into overlapping finite elements or into spatially separated small patches,
-  the specially crafted inter-element/patch coupling also ensures that the
-  constructed discretisations are consistent with the microscale
-  system\slash\pde\ to as high an order as desired. Computer algebra handles
-  the considerable algebraic details as seen in the specific application to the
-  Ginzburg--Landau \pde. However, higher order models in multiple dimensions
-  require a mixed numerical and algebraic approach that is also developed. The
-  modelling here may be straightforwardly adapted to a wide class of
-  reaction-diffusion \pde{}s and lattice equations in multiple space
-  dimensions. When applied to patches of microscopic simulations our coupling
-  conditions promise efficient macroscale simulation.%
-    }
-    \verb{doi}
-    \verb 10.1007/s10665-013-9653-6
-    \endverb
-    \field{number}{1}
-    \field{pages}{175\bibrangedash 207}
-    \field{title}{A dynamical systems approach to simulating macroscale spatial
-  dynamics in multiple dimensions}
-    \field{volume}{86}
-    \field{journaltitle}{J.~Engineering Mathematics}
-    \field{year}{2014}
-  \endentry
-
-  \entry{Virieux86}{article}{}
-    \name{author}{1}{}{%
-      {{hash=VJ}{%
-         family={Virieux},
-         familyi={V\bibinitperiod},
-         given={Jean},
-         giveni={J\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{VJ1}
-    \strng{fullhash}{VJ1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{1986}
-    \field{labeldatesource}{year}
-    \field{sortinit}{V}
-    \field{sortinithash}{V}
-    \field{abstract}{%
-    I present a finite-difference method for modeling P-SV wave propagation in
-  heterogeneous media. This is an extension of the method I previously proposed
-  for modeling SH-wave propagation by using velocity and stress in a discrete
-  grid. The two components of the velocity cannot be defined at the same node
-  for a complete staggered grid: the stability condition and the P-wave phase
-  velocity dispersion curve do not depend on the Poisson's ratio, while the
-  S-wave phase velocity dispersion curve behavior is rather insensitive to the
-  Poisson's ratio. Therefore, the same code used for elastic media can be used
-  for liquid media, where S-wave velocity goes to zero, and no special
-  treatment is needed for a liquid-solid interface. Typical physical phenomena
-  arising with P-SV modeling, such as surface waves, are in agreement with
-  analytical results. The weathered-layer and corner-edge models show in
-  seismograms the same converted phases obtained by previous authors. This
-  method gives stable results for step discontinuities, as shown for a liquid
-  layer above an elastic half-space. The head wave preserves the correct
-  amplitude. Finally, the corner-edge model illustrates a more complex geometry
-  for the liquid-solid interface. As the Poisson's ratio v increases from 0.25
-  to 0.5, the shear converted phases are removed from seismograms and from the
-  time section of the wave field.%
-    }
-    \verb{doi}
-    \verb 10.1190/1.1442147
-    \endverb
-    \field{issn}{0016-8033}
-    \field{number}{4}
-    \field{pages}{889\bibrangedash 901}
-    \field{title}{P-SV wave propagation in heterogeneous media: Velocity-stress
-  finite-difference method}
-    \verb{url}
-    \verb https://library.seg.org/doi/abs/10.1190/1.1442147
-    \endverb
-    \field{volume}{51}
-    \field{journaltitle}{Geophysics}
-    \field{month}{04}
-    \field{year}{1986}
-    \field{urlday}{07}
-    \field{urlmonth}{09}
-    \field{urlyear}{2022}
-  \endentry
-
-  \entry{DividedDifferences}{online}{}
-    \name{author}{1}{}{%
-      {{hash=W}{%
-         family={Wikipedia},
-         familyi={W\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{W1}
-    \strng{fullhash}{W1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{labelyear}{2022}
-    \field{labeldatesource}{year}
-    \field{sortinit}{W}
-    \field{sortinithash}{W}
-    \field{abstract}{%
-    In mathematics, divided differences is an algorithm, historically used for
-  computing tables of logarithms and trigonometric functions. Charles Babbage's
-  difference engine, an early mechanical calculator, was designed to use this
-  algorithm in its operation. Divided differences is a recursive division
-  process. Given a sequence of data points $(x_{0},y_{0}),\ldots
-  ,(x_{n},y_{n})$, the method calculates the coefficients of the interpolation
-  polynomial of these points in the Newton form.%
-    }
-    \field{title}{Divided differences}
-    \verb{url}
-    \verb https://en.wikipedia.org/wiki/Divided_differences
-    \endverb
-    \field{year}{2022}
-    \field{urlday}{28}
-    \field{urlmonth}{12}
-    \field{urlyear}{2022}
     \warn{\item Invalid format of field 'month'}
   \endentry
 \enddatalist

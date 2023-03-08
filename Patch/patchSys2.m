@@ -1,7 +1,7 @@
 % patchSys2() Provides an interface to time integrators
 % for the dynamics on patches in 2D coupled across space.
 % The system must be a smooth lattice system such as PDE
-% discretisations. AJR, Nov 2018 -- Nov 2020
+% discretisations. AJR, Nov 2018 -- Mar 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchSys2()}: interface 2D space to time integrators}
@@ -25,7 +25,7 @@ parallel computing of \verb|spmd|).
 
 \begin{matlab}
 %}
-function dudt = patchSys2(t,u,patches)
+function dudt = patchSys2(t,u,patches,varargin)
 if nargin<3, global patches, end
 %{
 \end{matlab}
@@ -49,13 +49,13 @@ with the following information used here.
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,patches)| that computes the time derivatives
-on the patchy lattice.  The array~\verb|u| has size
-$\verb|nSubP(1)| \times \verb|nSubP(2)| \times \verb|nVars|
-\times \verb|nEsem| \times \verb|nPatch(1)| \times
-\verb|nPatch(2)|$.  Time derivatives must be computed into
-the same sized array, although herein the patch edge-values
-are overwritten by zeros.
+\verb|fun(t,u,patches,...)| that computes the time
+derivatives on the patchy lattice.  The array~\verb|u| has
+size $\verb|nSubP(1)| \times \verb|nSubP(2)| \times
+\verb|nVars| \times \verb|nEsem| \times \verb|nPatch(1)|
+\times \verb|nPatch(2)|$.  Time derivatives must be computed
+into the same sized array, although herein the patch
+edge-values are overwritten by zeros.
 
 \item \verb|.x| is $\verb|nSubP(1)| \times1 \times1 \times1
 \verb|nPatch(1)| \times1$ array of the spatial
@@ -71,6 +71,10 @@ $(i,j)$-grid points in every patch.  Currently it
 micro-scales.
 
 \end{itemize}
+
+\item \verb|varargin|, optional, is arbitrary number of
+parameters to be passed onto the users time-derivative
+function as specified in configPatches2.
 \end{itemize}
 
 
@@ -102,7 +106,7 @@ zero (as \verb|ode15s| chokes on NaNs), then return to the
 user\slash integrator as same sized array as input.
 \begin{matlab}
 %}
-dudt = patches.fun(t,u,patches);
+dudt = patches.fun(t,u,patches,varargin{:});
 dudt([1 end],:,:,:,:,:) = 0;
 dudt(:,[1 end],:,:,:,:) = 0;
 dudt = reshape(dudt,sizeu);

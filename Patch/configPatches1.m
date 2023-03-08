@@ -30,9 +30,10 @@ for the example code.
 \begin{itemize}
 
 \item \verb|fun| is the name of the user function,
-\verb|fun(t,u,patches)| or \verb|fun(t,u)|, that computes
-time derivatives (or time-steps) of quantities on the 1D
-micro-grid within all the 1D~patches.
+\verb|fun(t,u,patches)| or \verb|fun(t,u)| or
+\verb|fun(t,u,patches,...)|, that computes time derivatives
+(or time-steps) of quantities on the 1D micro-grid within
+all the 1D~patches.
 
 \item \verb|Xlim| give the macro-space spatial domain of the
 computation, namely the interval $[ \verb|Xlim(1)|,
@@ -183,8 +184,9 @@ if nargout==0, global patches, end
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,patches)| or \verb|fun(t,u)|, that computes
-the time derivatives (or steps) on the patchy lattice. 
+\verb|fun(t,u,patches)| or \verb|fun(t,u)| or
+\verb|fun(t,u,patches,...)|, that computes the time
+derivatives (or steps) on the patchy lattice. 
 
 \item \verb|.ordCC| is the specified order of inter-patch
 coupling. 
@@ -437,7 +439,7 @@ case 'usergiven'
     warning('bcOffset not available for usergiven Dom.type'), end
     assert(isfield(Dom,'X'),'X required for Dom.type = usergiven')
 otherwise 
-    error([Dom.type 'is unknown Dom.type'])
+    error([Dom.type ' is unknown Dom.type'])
 end%switch Dom.type
 %{
 \end{matlab}

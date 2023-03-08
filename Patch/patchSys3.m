@@ -1,7 +1,7 @@
 % patchSys3() provides an interface to time integrators
 % for the dynamics on patches in 3D coupled across space.
 % The system must be a lattice system such as PDE
-% discretisations. AJR, Aug--Nov 2020
+% discretisations. AJR, Aug 2020 -- Mar 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchSys3()}: interface 3D space to time integrators}
@@ -25,7 +25,7 @@ parallel computing of \verb|spmd|).
 
 \begin{matlab}
 %}
-function dudt = patchSys3(t,u,patches)
+function dudt = patchSys3(t,u,patches,varargin)
 if nargin<3, global patches, end
 %{
 \end{matlab}
@@ -50,9 +50,9 @@ with the following information used here.
 
 \begin{itemize}
 \item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,patches)| that computes the time derivatives
-on the patchy lattice.  The array~\verb|u| has size
-$\verb|nSubP(1)| \times \verb|nSubP(2)| \times
+\verb|fun(t,u,patches,...)| that computes the time
+derivatives on the patchy lattice.  The array~\verb|u| has
+size $\verb|nSubP(1)| \times \verb|nSubP(2)| \times
 \verb|nSubP(3)| \times \verb|nVars| \times \verb|nEsem|
 \times \verb|nPatch(1)| \times \verb|nPatch(2)| \times
 \verb|nPatch(3)|$.  Time derivatives must be computed into
@@ -81,6 +81,10 @@ Currently it \emph{must} be an equi-spaced lattice on both
 macro- and microscales.
 
 \end{itemize}
+
+\item \verb|varargin|, optional, is arbitrary number of
+parameters to be passed onto the users time-derivative
+function as specified in configPatches3.
 \end{itemize}
 
 
@@ -114,7 +118,7 @@ return to the user\slash integrator as same sized array as
 input.
 \begin{matlab}
 %}
-dudt = patches.fun(t,u,patches);
+dudt = patches.fun(t,u,patches,varargin{:});
 dudt([1 end],:,:,:,:,:,:,:) = 0;
 dudt(:,[1 end],:,:,:,:,:,:) = 0;
 dudt(:,:,[1 end],:,:,:,:,:) = 0;

@@ -1,7 +1,7 @@
 % Explore the time integration function projIntDMD() 
 % on discretisation of a nonlinear diffusion PDE.  
 % AJR, Jan 2018
-%!TEX root = ../Doc/eqnFreeDevMan.tex
+%!TEX root = doc.tex
 %{
 \section{\texttt{projIntDMDExplore1}: explore effect of varying parameters}
 \label{sec:pi1eevp}
@@ -28,7 +28,7 @@ Very strangely, the results from Matlab and Octave are different for the zero no
 \begin{figure}
 \caption{\label{fig:explor1icn0}errors in the projective integration of the nonlinear diffusion \pde\ from initial conditions that are on the slow manifold.  Plotted are stereo views of isosurfaces in parameter space: the first row is after the first projective step; the second row after the second step.  }
 \centering
-\includegraphics[width=\linewidth]{ProjInt/explore1icn0}
+\includegraphics[width=\linewidth]{explore1icn0}
 \end{figure}%
 \autoref{fig:explor1icn0} shows the parameter variations when the system is already on the slow manifold.
 The picture after two time-steps, bottom row, appears clearer than for one time-step.
@@ -40,7 +40,7 @@ There is a weak dependence upon the transient-time, but only by a factor of two 
 \begin{figure}
 \caption{\label{fig:explor1icn3}errors in the projective integration of the nonlinear diffusion \pde\ from initial conditions with noise~\texttt{0.3*rand}.  Plotted are stereo views of isosurfaces in parameter space: the first row is after the first projective step; the second row after the second step.  }
 \centering
-\includegraphics[width=\linewidth]{ProjInt/explore1icn3}
+\includegraphics[width=\linewidth]{explore1icn3}
 \end{figure}%
 With the addition of a noisy initial conditions, \autoref{fig:explor1icn3}, the rank has an effect, and the transient-time appears to be a slightly stronger influence.
 I suspect this means that we need to allow the initial burst to have a longer transient time than subsequent bursts.

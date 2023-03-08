@@ -437,7 +437,7 @@ case 'usergiven'
     warning('bcOffset not available for usergiven Dom.type'), end
     assert(isfield(Dom,'X'),'X required for Dom.type = usergiven')
 otherwise 
-    error([Dom.type 'is unknown Dom.type'])
+    error([Dom.type ' is unknown Dom.type'])
 end%switch Dom.type
 %{
 \end{matlab}

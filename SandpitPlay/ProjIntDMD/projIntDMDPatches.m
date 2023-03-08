@@ -1,7 +1,7 @@
 % Example of the time integration function projIntDMD() 
 % on a patch simulation of Burgers PDE.  
 % AJR, Oct 2017
-%!TEX root = ../Doc/eqnFreeDevMan.tex
+%!TEX root = doc.tex
 %{
 \section{\texttt{projIntDMDPatches}: Projective integration of patch scheme}
 \label{sec:pips}
@@ -17,7 +17,7 @@ Use a patch scheme \cite[]{Roberts06d} to only compute on part of space as shown
 \begin{figure}
 \centering
 \caption{\label{fig:pit1psu}field \(u(x,t)\) tests basic projective integration of a basic patch scheme of Burgers' \pde, from randomly corrupted initial conditions.}
-\includegraphics[width=\linewidth]{ProjInt/pi1PatchesU}
+\includegraphics[width=\linewidth]{pi1PatchesU}
 \end{figure}
 
 Function header and variables needed by discrete patch scheme.
@@ -106,7 +106,7 @@ Also plot a surface of the microscale bursts as shown in \autoref{fig:piBurgersM
 \begin{figure}
 \centering
 \caption{\label{fig:piBurgersMicro}stereo pair of the field \(u(x,t)\) during each of the microscale bursts used in the projective integration.}
-\includegraphics[width=\linewidth]{ProjInt/pi1PatchesMicro}
+\includegraphics[width=\linewidth]{pi1PatchesMicro}
 \end{figure}
 \begin{matlab}
 %}

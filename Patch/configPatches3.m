@@ -31,9 +31,10 @@ of simulating a heterogeneous wave \pde---see
 \begin{itemize}
 
 \item \verb|fun| is the name of the user function,
-\verb|fun(t,u,patches)| or \verb|fun(t,u)|, that computes
-time-derivatives (or time-steps) of quantities on the 3D
-micro-grid within all the 3D~patches.
+\verb|fun(t,u,patches)| or \verb|fun(t,u)| or
+\verb|fun(t,u,patches,...)|, that computes time-derivatives
+(or time-steps) of quantities on the 3D micro-grid within
+all the 3D~patches.
 
 \item \verb|Xlim| array/vector giving the rectangular-cuboid
 macro-space domain of the computation: namely
@@ -220,8 +221,9 @@ if nargout==0, global patches, end
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,patches)| or \verb|fun(t,u)| that computes the
-time derivatives (or steps) on the patchy lattice. 
+\verb|fun(t,u,patches)| or \verb|fun(t,u)| or
+\verb|fun(t,u,patches,...)| that computes the time
+derivatives (or steps) on the patchy lattice. 
 
 \item \verb|.ordCC| is the specified order of inter-patch
 coupling. 
@@ -611,7 +613,7 @@ case 'usergiven'
     if p==2, assert(isfield(Dom,'Y'),['Y' msg]), end
     if p==3, assert(isfield(Dom,'Z'),['Z' msg]), end
 otherwise 
-    error([Dom.type 'is unknown Dom.type'])
+    error([Dom.type ' is unknown Dom.type'])
 end%switch Dom.type
 end%for p
 %{
