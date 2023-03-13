@@ -118,9 +118,12 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 \input{../Patch/EckhardtEquilibErrs.m}
 \input{../Patch/Eckhardt2210eg1.m}
 \input{../Patch/homoLanLif1D.m}
-\input{../Patch/quasiLogAxes.m}
+\input{../Patch/Combescure2022.m}
 \input{../Patch/theRes.m}
+\input{../Patch/quasiLogAxes.m}
 
+
+\chapter{Patches in 2D space}
 % 2D stuff
 \input{../Patch/configPatches2.m}
 \input{../Patch/patchSys2.m}
@@ -137,6 +140,7 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 \input{../Patch/randAdvecDiffEquil2.m}
 \input{../Patch/homoWaveEdgy2.m}
 
+\chapter{Patches in 3D space}
 % 3D stuff
 \input{../Patch/configPatches3.m}
 \input{../Patch/patchSys3.m}
@@ -150,6 +154,7 @@ If necessary, define additional components for the struct \texttt{patches} (e.g.
 
 \section{To do}
 \begin{itemize}
+\item Wider edges of interpolation---maybe code as reshaping to multiple variables.
 \item Core averages code.
 %\item Heterogeneous microscale via averaging regions---but
 %I suspect should be separated from simple homogenisation

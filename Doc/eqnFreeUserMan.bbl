@@ -47,6 +47,12 @@ Cao, M. \harvardand\ Roberts, A.~J.  \harvardyearleft 2016\harvardyearright ,
   `Multiscale modelling couples patches of nonlinear wave-like simulations',
   {\em IMA J.~Applied Maths.} {\bf 81}(2),~228--254.
 
+\harvarditem{Combescure}{2022}{Combescure2022}
+Combescure, C.  \harvardyearleft 2022\harvardyearright , `Selecting
+  {Generalized} {Continuum} {Theories} for {Nonlinear} {Periodic} {Solids}
+  {Based} on the {Instabilities} of the {Underlying} {Microstructure}', {\em
+  Journal of Elasticity} .
+
 \harvarditem{Dellar \harvardand\ Salmon}{2005}{Dellar2005}
 Dellar, P.~J. \harvardand\ Salmon, R.  \harvardyearleft 2005\harvardyearright ,
   `Shallow water equations with a complete coriolis force and topography', {\em
@@ -104,6 +110,14 @@ Givon, D., Kevrekidis, I.~G. \harvardand\ Kupferman, R.  \harvardyearleft
   2006\harvardyearright , `Strong convergence of projective integration schemes
   for singularly perturbed stochastic differential systems', {\em Comm. Math.
   Sci.} {\bf 4}(4),~707--729.
+
+\harvarditem[Govaerts et~al.]{Govaerts, Kuznetsov, Meijer, Al-Hdaibat, Witte,
+  Dhooge, Mestrom, Neirynck, Riet \harvardand\ Sautois}{2019}{Govaerts2019}
+Govaerts, W., Kuznetsov, Y.~A., Meijer, H., Al-Hdaibat, B., Witte, V.~D.,
+  Dhooge, A., Mestrom, W., Neirynck, N., Riet, A. \harvardand\ Sautois, B.
+  \harvardyearleft 2019\harvardyearright , Matcont: Continuation toolbox for
+  odes in matlab, Technical report,
+  \url{https://webspace.science.uu.nl/~kouzn101/NBA/ManualMatcontAug2019.pdf}.
 
 \harvarditem{Hereman}{2009}{Hereman2009}
 Hereman, W.  \harvardyearleft 2009\harvardyearright , Shallow water waves and

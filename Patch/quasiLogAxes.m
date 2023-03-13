@@ -46,10 +46,10 @@ If invoked with no arguments, then execute an example.
 \begin{matlab}
 %}
 if nargin==0  
-   % first generate your data
+   % generate some data
    n=99;  fast=(rand(n,1)<0.8);
    z = -rand(n,1).*(1+1e3*fast)+1i*randn(n,1).*(5+1e2*fast);
-   % second plot data and transform axes
+   % plot data and transform axes
    handle = plot(real(z),imag(z),'o');
    xlabel('real-part'), ylabel('imag-part')
    quasiLogAxes(handle,1,10);
