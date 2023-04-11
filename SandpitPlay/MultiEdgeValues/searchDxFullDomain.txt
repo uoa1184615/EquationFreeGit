@@ -1,0 +1,15 @@
+% search for dx that makes it a full-domain simulation
+% AJR, 28 Mar 2023
+for i=1:5
+patches = configPatches1(@SwiftHohenbergPDE,[0 Len],dom ...
+    ,nPatch,ordCC,dx,nSubP,'EdgyInt',true,'nEdge',2);
+xs=squeeze(patches.x);
+xEnds=xs([1:4 end-3:end],:)
+fn(i)=xs(4,2)-xs(end,1)
+if abs(fn(i))<1e-12, magic=nPtsPeriod*dx*nGap, return, end
+x(i)=dx;
+if i==1, dx=dx/1.1
+else dfdx=diff(fn)./diff(x)
+    dx=dx-fn(end)/dfdx(end)
+end
+end%for

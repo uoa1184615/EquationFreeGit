@@ -267,7 +267,7 @@ the generic patch system wrapper \verb|theRes|
 \begin{matlab}
 %}
     tic;
-    uSoln = fsolve(@theRes,u0(patches.i) ...
+    [uSoln,resSoln] = fsolve(@theRes,u0(patches.i) ...
         ,optimoptions('fsolve','Display','off'));
     fsolveTime = toc
 %{
@@ -277,7 +277,7 @@ magnitudes---Inf norm is max(abs()).
 \begin{matlab}
 %}
     normSoln = norm(uSoln,Inf)
-    normResidual = norm(theRes(uSoln),Inf)
+    normResidual = norm(resSoln,Inf)
     u0(patches.i) = uSoln;
     u0 = patchEdgeInt1(u0);
     u0( 1 ,:,:, 1 ) = 0;

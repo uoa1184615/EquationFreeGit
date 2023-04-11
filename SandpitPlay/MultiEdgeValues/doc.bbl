@@ -1,0 +1,349 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{Bunder2020a}{article}{}
+    \name{author}{3}{}{%
+      {{hash=BJE}{%
+         family={Bunder},
+         familyi={B\bibinitperiod},
+         given={J.\bibnamedelima E.},
+         giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+      {{hash=KIG}{%
+         family={Kevrekidis},
+         familyi={K\bibinitperiod},
+         given={I.\bibnamedelima G.},
+         giveni={I\bibinitperiod\bibinitdelim G\bibinitperiod},
+      }}%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \keyw{Mathematics - Dynamical Systems, Physics - Computational Physics}
+    \strng{namehash}{BJEKIGRAJ1}
+    \strng{fullhash}{BJEKIGRAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2021}
+    \field{labeldatesource}{year}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{abstract}{%
+    Equation-free macroscale modelling is a systematic and rigorous
+  computational methodology for efficiently predicting the dynamics of a
+  microscale system at a desired macroscale system level. In this scheme, the
+  given microscale model is computed in small patches spread across the
+  space-time domain, with patch coupling conditions bridging the unsimulated
+  space. For accurate simulations, care must be taken in designing the patch
+  coupling conditions. Here we construct novel coupling conditions which
+  preserve translational invariance, rotational invariance, and self-adjoint
+  symmetry, thus guaranteeing that conservation laws associated with these
+  symmetries are preserved in the macroscale simulation. Spectral and algebraic
+  analyses of the proposed scheme in both one and two dimensions reveal
+  mechanisms for further improving the accuracy of the simulations. Consistency
+  of the patch scheme's macroscale dynamics with the original microscale model
+  is proved. This new self-adjoint patch scheme provides an efficient,
+  flexible, and accurate computational homogenisation in a wide range of
+  multiscale scenarios of interest to scientists and engineers.%
+    }
+    \verb{doi}
+    \verb 10.1007/s00211-021-01232-5
+    \endverb
+    \field{number}{2}
+    \field{pages}{229\bibrangedash 272}
+    \field{title}{Equation-free patch scheme for efficient computational
+  homogenisation via self-adjoint coupling}
+    \field{volume}{149}
+    \field{journaltitle}{Numerische Mathematik}
+    \field{month}{07}
+    \field{year}{2021}
+  \endentry
+
+  \entry{Bunder2013b}{article}{}
+    \name{author}{3}{}{%
+      {{hash=BJE}{%
+         family={Bunder},
+         familyi={B\bibinitperiod},
+         given={J.\bibnamedelima E.},
+         giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=KIG}{%
+         family={Kevrekidis},
+         familyi={K\bibinitperiod},
+         given={I.\bibnamedelima G.},
+         giveni={I\bibinitperiod\bibinitdelim G\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{BJERAJKIG1}
+    \strng{fullhash}{BJERAJKIG1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2017}
+    \field{labeldatesource}{year}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{abstract}{%
+    Computational simulation of microscale detailed systems is frequently only
+  feasible over spatial domains much smaller than the macroscale of interest.
+  The `equation-free' methodology couples many small patches of microscale
+  computations across space to empower efficient computational simulation over
+  macroscale domains of interest. Motivated by molecular or agent simulations,
+  we analyse the performance of various coupling schemes for patches when the
+  microscale is inherently `rough'. As a canonical problem in this universality
+  class, we systematically analyse the case of heterogeneous diffusion on a
+  lattice. Computer algebra explores how the dynamics of coupled patches
+  predict the large scale emergent macroscale dynamics of the computational
+  scheme. We determine good design for the coupling of patches by comparing the
+  macroscale predictions from patch dynamics with the emergent macroscale on
+  the entire domain, thus minimising the computational error of the multiscale
+  modelling. The minimal error on the macroscale is obtained when the coupling
+  utilises averaging regions which are between a third and a half of the patch.
+  Moreover, when the symmetry of the inter-patch coupling matches that of the
+  underlying microscale structure, patch dynamics predicts the desired
+  macroscale dynamics to any specified order of error. The results confirm that
+  the patch scheme is useful for macroscale computational simulation of a range
+  of systems with microscale heterogeneity.%
+    }
+    \verb{doi}
+    \verb 10.1016/j.jcp.2017.02.004
+    \endverb
+    \field{pages}{154\bibrangedash 174}
+    \field{title}{Good coupling for the multiscale patch scheme on systems with
+  microscale heterogeneity}
+    \field{volume}{337}
+    \field{journaltitle}{J.~Computational Physics}
+    \field{year}{2017}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{ZhenfangHu2014}{article}{}
+    \name{author}{4}{}{%
+      {{hash=HZ}{%
+         family={Hu},
+         familyi={H\bibinitperiod},
+         given={Zhenfang},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=PG}{%
+         family={Pan},
+         familyi={P\bibinitperiod},
+         given={Gang},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=WY}{%
+         family={Wang},
+         familyi={W\bibinitperiod},
+         given={Yueming},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=WZ}{%
+         family={Wu},
+         familyi={W\bibinitperiod},
+         given={Zhaohui},
+         giveni={Z\bibinitperiod},
+      }}%
+    }
+    \keyw{Approximation algorithms, Approximation methods, approximation
+  theory, Complexity theory, data dimension, data handling, data subspace,
+  GPower, iterative methods, Learning systems, Loading, PCA basis, principal
+  component analysis, Principal component analysis, Principal component
+  analysis (PCA), rotation, rotation matrix, sparse, sparse matrices, Sparse
+  matrices, sparse PCA algorithm, sparse PCA via rotation and truncation,
+  sparse principal component analysis, SPCArt, truncation, truncation.}
+    \strng{namehash}{HZ+1}
+    \strng{fullhash}{HZPGWYWZ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2016}
+    \field{labeldatesource}{year}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{abstract}{%
+    Sparse principal component analysis (sparse PCA) aims at finding a sparse
+  basis to improve the interpretability over the dense basis of PCA, while
+  still covering the data subspace as much as possible. In contrast to most
+  existing work that addresses the problem by adding sparsity penalties on
+  various objectives of PCA, we propose a new method, sparse PCA via rotation
+  and truncation (SPCArt), which finds a rotation matrix and a sparse basis
+  such that the sparse basis approximates the basis of PCA after the rotation.
+  The algorithm of SPCArt consists of three alternating steps: 1) rotating the
+  PCA basis; 2) truncating small entries; and 3) updating the rotation matrix.
+  Its performance bounds are also given. The SPCArt is efficient, with each
+  iteration scaling linearly with the data dimension. Parameter choice is
+  simple, due to explicit physical explanations. We give a unified view to
+  several existing sparse PCA methods and discuss the connections with SPCArt.
+  Some ideas from SPCArt are extended to GPower, a popular sparse PCA
+  algorithm, to address its limitations. Experimental results demonstrate that
+  SPCArt achieves the state-of-the-art performance, along with a good tradeoff
+  among various criteria, including sparsity, explained variance,
+  orthogonality, balance of sparsity among loadings, and computational speed.%
+    }
+    \verb{doi}
+    \verb 10.1109/TNNLS.2015.2427451
+    \endverb
+    \field{issn}{2162-237X}
+    \field{number}{4}
+    \field{pages}{875\bibrangedash 890}
+    \field{title}{Sparse Principal Component Analysis via Rotation and
+  Truncation}
+    \field{volume}{27}
+    \field{journaltitle}{IEEE Transactions on Neural Networks and Learning
+  Systems}
+    \field{month}{04}
+    \field{year}{2016}
+  \endentry
+
+  \entry{Roberts00a}{article}{}
+    \name{author}{1}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{RAJ1}
+    \strng{fullhash}{RAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2003}
+    \field{labeldatesource}{year}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \verb{doi}
+    \verb 10.1090/S0025-5718-02-01448-5
+    \endverb
+    \field{pages}{247\bibrangedash 262}
+    \field{title}{A holistic finite difference approach models linear dynamics
+  consistently}
+    \verb{url}
+    \verb http://www.ams.org/mcom/2003-72-241/S0025-5718-02-01448-5
+    \endverb
+    \field{volume}{72}
+    \field{journaltitle}{Mathematics of Computation}
+    \field{year}{2003}
+  \endentry
+
+  \entry{Roberts06d}{article}{}
+    \name{author}{2}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=KIG}{%
+         family={Kevrekidis},
+         familyi={K\bibinitperiod},
+         given={I.\bibnamedelima G.},
+         giveni={I\bibinitperiod\bibinitdelim G\bibinitperiod},
+      }}%
+    }
+    \keyw{multiscale computation; gap-tooth scheme; coupling boundary
+  conditions; high order consistency}
+    \strng{namehash}{RAJKIG1}
+    \strng{fullhash}{RAJKIG1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2007}
+    \field{labeldatesource}{year}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{abstract}{%
+    We are developing a framework for multiscale computation which enables
+  models at a ``microscopic'' level of description, for example, lattice
+  Boltzmann, Monte Carlo, or molecular dynamics simulators, to perform modeling
+  tasks at ``macroscopic'' length scales of interest. The plan is to use the
+  microscopic rules restricted to small ``patches'' of the domain, the
+  ``teeth,'' using interpolation to bridge the ``gaps.'' Here we explore
+  general boundary conditions coupling the widely separated ``teeth'' of the
+  microscopic simulation that achieve high order accuracy over the macroscale.
+  We present the simplest case when the microscopic simulator is the
+  quintessential example of a PDE. We argue that classic high order
+  interpolation of the macroscopic field provides the correct forcing in
+  whatever boundary condition is required by the microsimulator. Such
+  interpolation leads to tooth boundary conditions, which achieve arbitrarily
+  high order consistency. The high order consistency is demonstrated on a class
+  of linear PDEs in two ways: first through the eigenvalues of the scheme for
+  selected numerical problems, and second using the dynamical systems approach
+  of holistic discretization on a general class of linear PDEs. Analytic
+  modeling shows that, for a wide class of microscopic systems, the subgrid
+  fields and the effective macroscopic model are largely independent of the
+  tooth size and the particular tooth boundary conditions. When applied to
+  patches of microscopic simulations these tooth boundary conditions promise
+  efficient macroscale simulation. We expect the same approach will also
+  accurately couple patch simulations in higher spatial dimensions.%
+    }
+    \verb{doi}
+    \verb 10.1137/060654554
+    \endverb
+    \field{number}{4}
+    \field{pages}{1495\bibrangedash 1510}
+    \field{title}{General tooth boundary conditions for equation free
+  modelling}
+    \field{volume}{29}
+    \field{journaltitle}{SIAM J.~Scientific Computing}
+    \field{year}{2007}
+  \endentry
+
+  \entry{DividedDifferences}{online}{}
+    \name{author}{1}{}{%
+      {{hash=W}{%
+         family={Wikipedia},
+         familyi={W\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{W1}
+    \strng{fullhash}{W1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2022}
+    \field{labeldatesource}{year}
+    \field{sortinit}{W}
+    \field{sortinithash}{W}
+    \field{abstract}{%
+    In mathematics, divided differences is an algorithm, historically used for
+  computing tables of logarithms and trigonometric functions. Charles Babbage's
+  difference engine, an early mechanical calculator, was designed to use this
+  algorithm in its operation. Divided differences is a recursive division
+  process. Given a sequence of data points $(x_{0},y_{0}),\ldots
+  ,(x_{n},y_{n})$, the method calculates the coefficients of the interpolation
+  polynomial of these points in the Newton form.%
+    }
+    \field{title}{Divided differences}
+    \verb{url}
+    \verb https://en.wikipedia.org/wiki/Divided_differences
+    \endverb
+    \field{year}{2022}
+    \field{urlday}{28}
+    \field{urlmonth}{12}
+    \field{urlyear}{2022}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+\enddatalist
+\endinput
