@@ -21,7 +21,7 @@ realisations of cases.
 %}
 clear all, close all
 global patches
-nReal = 20 
+nRealise = 20 
 %{
 \end{matlab}
 
@@ -44,8 +44,8 @@ randomised distribution of patches. (The \verb|@sin| is a
 dummy.)
 \begin{matlab}
 %}
-for iReal=1:nReal
-    nEdge=randi(3)% =1,2, or 3
+for iReal=1:nRealise
+    nEdge = randi(3)% =1,2, or 3
     edgyInt = rand<0.5
     nSubP = nEdge*( (2-edgyInt)*randi(2)+1+edgyInt )
     ordCC = 2*randi(4)
@@ -78,11 +78,11 @@ store as different `variables' at each point.
     u0=patches.x.^ps.*cs+randn;
 %{
 \end{matlab}
-Copy data, and set edges to NaN so we can be certain that
+Copy data, and set edges to \verb|inf| so we can be certain that
 interpolation is computing the required edge values.
 \begin{matlab}
 %}
-    u=u0;  u([1:nEdge  end-nEdge+1:end],:)=nan; 
+    u=u0;  u([1:nEdge  end-nEdge+1:end],:)=inf; 
 %{
 \end{matlab}
 Then evaluate the interpolation and squeeze the singleton
@@ -139,7 +139,7 @@ random microscale spacing, random choice of \verb|edgyInt|.
 Say do fifteen realisations.
 \begin{matlab}
 %}
-for iReal=1:nReal
+for iReal=1:nRealise
     nEdge=randi(3)% =1,2, or 3
     edgyInt = rand<0.5
     nSubP = nEdge*( (2-edgyInt)*randi(2)+1+edgyInt )
@@ -228,7 +228,7 @@ grid as I am uncertain whether it makes any
 sense---certainly this test fails anyway. 
 \begin{matlab}
 %}
-for iReal=1:nReal
+for iReal=1:nRealise
     nEdge = 1 % required
     edgyInt = rand<0.5
     nPatch=2*randi([3 10])
@@ -342,7 +342,7 @@ numbers of patches, random domain lengths and random ratios.
 (The \verb|@sin| is a dummy.)
 \begin{matlab}
 %}
-for iReal=1:nReal
+for iReal=1:nRealise
     nEdge=randi(3)% =1,2, or 3
     edgyInt = rand<0.5
     nSubP = nEdge*( (2-edgyInt)*randi(2)+1+edgyInt )
@@ -417,7 +417,7 @@ pause(1)
 Must have even number of patches for a staggered grid.
 \begin{matlab}
 %}
-for iReal=1:nReal
+for iReal=1:nRealise
     nEdge = 1 % required for now
     edgyInt = rand<0.5
     nPatch=2*randi([3 10])

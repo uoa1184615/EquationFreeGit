@@ -106,11 +106,10 @@ is/are centre-patch lattice point(s).  So for the defaults
 of $\verb|nEdge|=1$ and not \verb|EdgyInt|, then 
 \verb|nSubP| must be odd.
 
-\item \verb|nEdge|, \emph{optional}, default=1, for each
-patch, the number of edge values set by interpolation at the
-edge regions of each patch.  The default is one (suitable
-for microscale lattices with only nearest neighbour
-interactions).
+\item \verb|'nEdge'|, \emph{optional}, default=1, the number
+of edge values set by interpolation at the edge regions of
+each patch.  The default is one (suitable for microscale
+lattices with only nearest neighbour interactions).
 
 \item \verb|EdgyInt|, true/false, \emph{optional},
 default=false.  If true, then interpolate to left\slash
@@ -137,7 +136,7 @@ is just tiled across the patch size to fill up each patch,
 starting from the first point in each patch.  Best accuracy 
 usually obtained when the periodicity of the coefficients 
 is a factor of \verb|nSubP-2*nEdge| for \verb|EdgyInt|, or 
-a factor of \verb|(nSubP-nEdge)/2| for not \verb|EdgyInt|,
+a factor of \verb|(nSubP-nEdge)/2| for not \verb|EdgyInt|.
 
 \item If $\verb|nEnsem|>1$ (value immaterial), then reset
 $\verb|nEnsem|:=m_x$ and construct an ensemble of all
@@ -539,7 +538,7 @@ to interpolate field values for coupling.
 The equi-spaced case is also evenly spaced but with the
 extreme edges aligned with the spatial domain boundaries,
 modified by the offset.
-\todo{This warning needs refinement for multi-edges??}
+%\todo{This warning needs refinement for multi-edges??}
 \begin{matlab}
 %}
 case 'equispace'
@@ -585,7 +584,7 @@ variable \verb|width|.  We need to find~\verb|b|, the number of patches `glued' 
   for b=0:2:nPatch-2
     DXmin=(X2-X1-b*width)/2*( 1-cos(pi/(nPatch-b-1)) );
     if DXmin>width, break, end
-  end
+  end%for
   if DXmin<width*0.999999
      warning('too many Chebyshev patches (mid-domain overlap)')
      end

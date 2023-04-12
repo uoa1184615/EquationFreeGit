@@ -141,6 +141,77 @@
     \warn{\item Invalid format of field 'month'}
   \endentry
 
+  \entry{Bunder2019d}{article}{}
+    \name{author}{5}{}{%
+      {{hash=BJ}{%
+         family={Bunder},
+         familyi={B\bibinitperiod},
+         given={J.E.},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=DJ}{%
+         family={Divahar},
+         familyi={D\bibinitperiod},
+         given={J.},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=KIG}{%
+         family={Kevrekidis},
+         familyi={K\bibinitperiod},
+         given={Ioannis\bibnamedelima G.},
+         giveni={I\bibinitperiod\bibinitdelim G\bibinitperiod},
+      }}%
+      {{hash=MTW}{%
+         family={Mattner},
+         familyi={M\bibinitperiod},
+         given={Trent\bibnamedelima W.},
+         giveni={T\bibinitperiod\bibinitdelim W\bibinitperiod},
+      }}%
+      {{hash=RA}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.J.},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{BJ+1}
+    \strng{fullhash}{BJDJKIGMTWRA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2021}
+    \field{labeldatesource}{year}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{abstract}{%
+    The multiscale patch scheme is built from given small micro-scale
+  simulations of complicated physical processes to empower large macro-scale
+  simulations. By coupling small patches of simulations over unsimulated
+  spatial gaps, large savings in computational time are possible. Here we
+  discuss generalising the patch scheme to the case of wave systems on
+  staggered grids in 2D space. Classic macro-scale interpolation provides a
+  generic coupling between patches that achieves arbitrarily high order
+  consistency between the emergent macro-scale simulation and the underlying
+  micro-scale dynamics. Eigen-analysis indicates that the resultant scheme
+  empowers feasible computation of large macro-scale simulations of wave
+  systems even with complicated underlying physics. As examples we use the
+  scheme to simulate some wave scenarios via a turbulent shallow water model.%
+    }
+    \verb{doi}
+    \verb 10.1002/fld.4915
+    \endverb
+    \field{number}{4}
+    \field{pages}{953\bibrangedash 977}
+    \field{title}{Large-scale simulation of shallow water waves with
+  computation only on small staggered patches}
+    \field{volume}{93}
+    \list{institution}{1}{%
+      {\url{https://arxiv.org/abs/1912.07815}}%
+    }
+    \field{journaltitle}{International Journal for Numerical Methods in Fluids}
+    \field{year}{2021}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
   \entry{ZhenfangHu2014}{article}{}
     \name{author}{4}{}{%
       {{hash=HZ}{%
@@ -216,6 +287,72 @@
   Systems}
     \field{month}{04}
     \field{year}{2016}
+  \endentry
+
+  \entry{Maclean2020a}{article}{}
+    \name{author}{3}{}{%
+      {{hash=MJ}{%
+         family={Maclean},
+         familyi={M\bibinitperiod},
+         given={John},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=BJE}{%
+         family={Bunder},
+         familyi={B\bibinitperiod},
+         given={J.\bibnamedelima E.},
+         giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \keyw{Computer Science - Mathematical Software, Mathematics - Numerical
+  Analysis}
+    \strng{namehash}{MJBJERAJ1}
+    \strng{fullhash}{MJBJERAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2021}
+    \field{labeldatesource}{year}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{abstract}{%
+    The `equation-free toolbox' empowers the computer-assisted analysis of
+  complex, multiscale systems. Its aim is to enable you to immediately use
+  microscopic simulators to perform macro-scale system level tasks and
+  analysis, because micro-scale simulations are often the best available
+  description of a system. The methodology bypasses the derivation of
+  macroscopic evolution equations by computing the micro-scale simulator only
+  over short bursts in time on small patches in space, with bursts and patches
+  well-separated in time and space respectively. We introduce the suite of
+  coded equation-free functions in an accessible way, link to more detailed
+  descriptions, discuss their mathematical support, and introduce a novel and
+  efficient algorithm for Projective Integration. Some facets of toolbox
+  development of equation-free functions are then detailed. Download the
+  toolbox functions (https://github.com/uoa1184615/EquationFreeGit) and use to
+  empower efficient and accurate simulation in a wide range of your science and
+  engineering problems.%
+    }
+    \verb{doi}
+    \verb 10.1007/s11075-020-01027-z
+    \endverb
+    \field{pages}{1729\bibrangedash 1748}
+    \field{title}{A toolbox of Equation-Free functions in Matlab/Octave for
+  efficient system level simulation}
+    \field{volume}{87}
+    \list{institution}{1}{%
+      {\url{http://arxiv.org/abs/2002.01895}}%
+    }
+    \field{journaltitle}{Numerical Algorithms}
+    \field{annotation}{%
+    Comment: 35 pages, 4 figures, submitted to Numerical Algorithms%
+    }
+    \field{year}{2021}
+    \warn{\item Invalid format of field 'month'}
   \endentry
 
   \entry{Roberts00a}{article}{}
@@ -309,6 +446,75 @@
     \field{volume}{29}
     \field{journaltitle}{SIAM J.~Scientific Computing}
     \field{year}{2007}
+  \endentry
+
+  \entry{Roberts2011a}{article}{}
+    \name{author}{3}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=MT}{%
+         family={MacKenzie},
+         familyi={M\bibinitperiod},
+         given={Tony},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=BJ}{%
+         family={Bunder},
+         familyi={B\bibinitperiod},
+         given={Judith},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \keyw{Centre manifolds; Computer algebra; Discrete modelling closure; Gap
+  tooth method; Multiscale computation; Multiple dimensions;
+  Reaction--diffusion equations}
+    \strng{namehash}{RAJMTBJ1}
+    \strng{fullhash}{RAJMTBJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2014}
+    \field{labeldatesource}{year}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{abstract}{%
+    Developments in dynamical systems theory provides new support for the
+  macroscale modelling of \pde{}s and other microscale systems such as Lattice
+  Boltzmann, Monte Carlo or Molecular Dynamics simulators. By systematically
+  resolving subgrid microscale dynamics the dynamical systems approach
+  constructs accurate closures of macroscale discretisations of the microscale
+  system. Here we specifically explore reaction-diffusion problems in two
+  spatial dimensions as a prototype of generic systems in multiple dimensions.
+  Our approach unifies into one the modelling of systems by a type of finite
+  elements, and the `equation free' macroscale modelling of microscale
+  simulators efficiently executing only on small patches of the spatial domain.
+  Centre manifold theory ensures that a closed model exist on the macroscale
+  grid, is emergent, and is systematically approximated. Dividing space either
+  into overlapping finite elements or into spatially separated small patches,
+  the specially crafted inter-element/patch coupling also ensures that the
+  constructed discretisations are consistent with the microscale
+  system\slash\pde\ to as high an order as desired. Computer algebra handles
+  the considerable algebraic details as seen in the specific application to the
+  Ginzburg--Landau \pde. However, higher order models in multiple dimensions
+  require a mixed numerical and algebraic approach that is also developed. The
+  modelling here may be straightforwardly adapted to a wide class of
+  reaction-diffusion \pde{}s and lattice equations in multiple space
+  dimensions. When applied to patches of microscopic simulations our coupling
+  conditions promise efficient macroscale simulation.%
+    }
+    \verb{doi}
+    \verb 10.1007/s10665-013-9653-6
+    \endverb
+    \field{number}{1}
+    \field{pages}{175\bibrangedash 207}
+    \field{title}{A dynamical systems approach to simulating macroscale spatial
+  dynamics in multiple dimensions}
+    \field{volume}{86}
+    \field{journaltitle}{J.~Engineering Mathematics}
+    \field{year}{2014}
   \endentry
 
   \entry{DividedDifferences}{online}{}
