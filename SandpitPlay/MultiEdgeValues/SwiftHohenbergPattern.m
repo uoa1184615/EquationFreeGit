@@ -46,9 +46,7 @@ long times the phases of the oscillations evolve in space to
 adapt to the boundaries.
 
 
-Set the desired microscale periodicity, and correspondingly
-choose random microscale diffusion coefficients (with
-subscripts shifted by a half).
+Set the desired microscale periodicity of the emergent pattern.
 \begin{matlab}
 %}
 clear all, close all
@@ -65,7 +63,7 @@ k0 = 2*pi/waveLength
 \end{matlab}
 
 Establish global data struct~\verb|patches| for
-heterogeneous diffusion on \(2\pi\)-periodic domain. Use
+the Swift--Hohenberg \pde\ on some length domain. Use
 seven patches. Quartic (fourth-order) interpolation 
 \(\verb|ordCC|=4\) provides values for the inter-patch
 coupling conditions. 

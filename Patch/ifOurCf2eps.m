@@ -5,14 +5,19 @@ function ifOurCf2eps(fileName,sz)
 % However, eps format does not work with isosurfaces, so
 % output those otherwise.  Include graphs with scale=0.8
 % Optional: sz is of drawn size in cms (two element row).
-% AJR, 11 Dec 2020  -- 13 Mar 2023
+% AJR, 11 Dec 2020  -- 16 Apr 2023
 global OurCf2eps
 if ~isempty(OurCf2eps) && OurCf2eps
   if nargin<2, sz=[17 12]; end
-  a=gca;
-  a.XLabel.Interpreter='latex';
-  a.YLabel.Interpreter='latex';
-  a.ZLabel.Interpreter='latex';
+  cf=gcf;
+  for p=1:numel(cf.Children)
+    a=cf.Children(p);
+    if class(a)=="matlab.graphics.axis.Axes"
+      a.XLabel.Interpreter='latex';
+      a.YLabel.Interpreter='latex';
+      a.ZLabel.Interpreter='latex';
+    end%if class
+  end%for p
   set(gcf,'PaperUnits','centimeters' ...
       ,'PaperPosition',[0 0 sz] ...
       ,'renderer','Painters')
