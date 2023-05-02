@@ -190,7 +190,7 @@ for p=1:2
   figure(p),clf
   mesh(ts(j),xs(:),us(:,j)) 
   view(60,40), colormap(0.8*hsv)
-  xlabel('time t'), ylabel('space x'), zlabel('u(x,t)') 
+  xlabel('time $t$'), ylabel('space $x$'), zlabel('$u(x,t)$') 
   ifOurCf2eps([mfilename 'U' num2str(p)])
 end
 pause(3)

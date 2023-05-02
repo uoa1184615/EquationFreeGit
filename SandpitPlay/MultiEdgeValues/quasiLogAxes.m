@@ -1,6 +1,6 @@
 % quasiLogAxes() transforms selected axes of the given plot
-% to a quasi-log axes (via asinh).  AJR, 25 Sep 2021 -- 17
-% Apr 2023
+% to a quasi-log axes (via asinh), including possibly
+% transforming color axis.  AJR, 25 Sep 2021 -- 18 Apr 2023
 %!TEX root = doc.tex
 %{
 \section{\texttt{quasiLogAxes()}: transforms some axes of a
@@ -27,9 +27,9 @@ function quasiLogAxes(handle,xScale,yScale,zScale,cScale)
 example, obtained by \verb|handle=plot(...)|
 
 \item \verb|xScale| (optional, default~inf): if inf, then no
-transformation is done in this coordinate.  Otherwise, with
-\(x\) denoting every horizontal coordinate, then transforms
-the plot-data with the \(\text{asinh}()\) function so that
+transformation is done in the `x'-coordinate.  Otherwise, when
+\verb|xScale| is not inf, transforms the plot \(x\)-coordinates 
+with the \(\text{asinh}()\) function so that
 \begin{itemize}
 \item for \(|x|\lesssim x_{\text{scale}}\) the x-axis scaling 
 is approximately linear, whereas
@@ -44,12 +44,8 @@ is approximately signed-logarithmic.
 \verb|xScale| for a third axis scaling if it exists.
 
 \item \verb|cScale| (optional, default~inf): corresponds to
-\verb|cScale| for a colormap, and colorbar scaling if it exists.
-
-\item axis limits (optional): if the axis limits of the plot
-do not 'fit' the plot data, then we assume you have set the
-axis limits, in which case your limits are used (each direction 
-considered separately).
+\verb|xScale| but for a colormap, and colorbar scaling if 
+one exists.
 \end{itemize}
 
 \paragraph{Output} None, just the transformed plot.
@@ -86,9 +82,9 @@ if nargin<2, xScale=inf; end
 
 
 \begin{devMan}
-Get current limits of the plot so we can attempt to detect
-if a user has set some limits that we should keep.  And also
-get the pointer to the axes and to the figure of the plot. 
+Get current limits of the plot to use if the user has set
+them already.  And also get the pointer to the axes and to
+the figure of the plot. 
 \begin{matlab}
 %}
 xlim0=xlim; ylim0=ylim; zlim0=zlim; clim0=caxis;
@@ -136,69 +132,76 @@ for k=1:length(handle)
        'Replot graph---it appears plot data is already transformed')
     if ~isinf(cScale)
     handle(k).CData = cFac*asinh(handle(k).CData/cScale); 
+    clim1=[min(handle(k).CData(:)) max(handle(k).CData(:))];
     end
     if ~isinf(xScale)
     handle(k).XData = xFac*asinh(handle(k).XData/xScale); 
+    xlim1=[min(handle(k).XData(:)) max(handle(k).XData(:))];
     end
     if ~isinf(yScale)
     handle(k).YData = yFac*asinh(handle(k).YData/yScale); 
+    ylim1=[min(handle(k).YData(:)) max(handle(k).YData(:))];
     end
     if ~isinf(zScale)
     handle(k).ZData = zFac*asinh(handle(k).ZData/zScale); 
+    zlim1=[min(handle(k).ZData(:)) max(handle(k).ZData(:))];
     end
     handle(k).UserData = 'quasiLogAxes';
 end%for
-if ~isinf(xScale), xlim0=xFac*asinh(xlim0/xScale); end
-if ~isinf(yScale), ylim0=yFac*asinh(ylim0/yScale); end
-if ~isinf(zScale), zlim0=zFac*asinh(zlim0/zScale); end
-if ~isinf(cScale), clim0=cFac*asinh(clim0/cScale); end
 %{
 \end{matlab}
-Get limits of nonlinearly transformed data, and reset with
-4\%~padding around all margins---crude but serviceable.
+Set 4\%~padding around all margins of transformed
+data---crude but serviceable.  Unless the axis had already
+been manually set, in which case use the transformed set
+limits.
 \begin{matlab}
 %}
-axis tight; 
-xlim1=xlim+0.04*diff(xlim)*[-1 1];
-ylim1=ylim+0.04*diff(ylim)*[-1 1];
-zlim1=zlim+0.04*diff(zlim)*[-1 1];
-clim1=caxis+ 0*diff(caxis)*[-1 1];
-%{
-\end{matlab}
-But if the scaled range is too different from the original,
-then restore the original.  Then set the scaled limits.
-\begin{matlab}
-%}
-if diff(xlim1)<0.5*diff(xlim0) | diff(xlim1)>2*diff(xlim0)
-    xlim1=xlim0; end
-if diff(ylim1)<0.5*diff(ylim0) | diff(ylim1)>2*diff(ylim0)
-    ylim1=ylim0; end
-if diff(zlim1)<0.5*diff(zlim0) | diff(zlim1)>2*diff(zlim0)
-    zlim1=zlim0; end
-if diff(clim1)<0.5*diff(clim0) | diff(clim1)>2*diff(clim0)
-    clim1=clim0; end
-xlim(xlim1); ylim(ylim1); zlim(zlim1); caxis(clim1);
+if ~isinf(xScale), 
+    if xlim('mode')=="manual"
+         xlim1=xFac*asinh(xlim0/xScale);
+    else xlim1=xlim1+0.04*diff(xlim1)*[-1 1]; 
+    end, end
+if ~isinf(yScale), 
+    if ylim('mode')=="manual"
+         ylim1=yFac*asinh(ylim0/yScale);
+    else ylim1=ylim1+0.04*diff(ylim1)*[-1 1];  
+    end, end
+if ~isinf(zScale), 
+    if zlim('mode')=="manual"
+         zlim1=zFac*asinh(zlim0/zScale);
+    else zlim1=zlim1+0.04*diff(zlim1)*[-1 1];  
+    end, end
+if ~isinf(cScale), 
+    if theAxes.CLimMode=="manual"
+         clim1=cFac*asinh(clim0/cScale);
+    else clim1=clim1+   0*diff(clim1)*[-1 1];  
+    end, end
 %{
 \end{matlab}
 
-\paragraph{Tick marks on the axes}
+
+\paragraph{Scale axes, and tick marks on axes}
 \begin{matlab}
 %}
 if ~isinf(xScale)
+    xlim(xlim1);
     tickingQuasiLogAxes(theAxes,'X',xlim1,xScale,xFac)
 end%if
 if ~isinf(yScale)
+    ylim(ylim1);
     tickingQuasiLogAxes(theAxes,'Y',ylim1,yScale,yFac)
 end%if
 if ~isinf(zScale)
+    zlim(zlim1);
     tickingQuasiLogAxes(theAxes,'Z',zlim1,zScale,zFac)
 end%if
 %{
 \end{matlab}
-But for color, only if we can find a colorbar. 
+But for color, only tick when we find a colorbar. 
 \begin{matlab}
 %}
 if ~isinf(cScale)
+  caxis(clim1);
   for p=1:numel(theFig.Children)
     ca = theFig.Children(p);
     if class(ca) == "matlab.graphics.illustration.ColorBar"

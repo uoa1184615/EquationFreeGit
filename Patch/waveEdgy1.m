@@ -181,7 +181,7 @@ lattice.
 [~,j]=min(abs(ts-linspace(ts(1),ts(end),50)));
 figure(1),clf
 mesh(ts(j),xs(:),us(:,j)),  view(60,40)
-xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
+xlabel('time $t$'), ylabel('space $x$'), zlabel('$u(x,t)$')
 ifOurCf2eps([mfilename 'U' num2str(2)])
 %{
 \end{matlab}

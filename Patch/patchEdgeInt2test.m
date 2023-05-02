@@ -1,6 +1,6 @@
 % Test spectral, finite-width, and divided difference
 % interpolation in 2D with many random parameters. 
-% Including edgy interpolation. AJR, Nov 2018 -- 2 Feb 2023
+% AJR, Nov 2018 -- 13 Apr 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt2test}: tests 2D patch coupling}
@@ -9,7 +9,7 @@
 A script to test the spectral, finite-order, and divided
 difference, polynomial interpolation of function
 \verb|patchEdgeInt2()|. Tests one or several variables,
-normal grids, and also tests centre and edge interpolation. 
+normal grids, and also tests centre and edge interpolation.
 But does not yet test staggered grids, core averaging, etc
 as they are not yet implemented.
 
@@ -20,7 +20,7 @@ type.
 %}
 clear all, close all
 global patches
-nRealise = 19
+nRealise = 20
 %{
 \end{matlab}
 
@@ -31,6 +31,12 @@ nRealise = 19
 
 
 \subsubsection{Check divided difference interpolation}
+\begin{matlab}
+%}
+fprintf('\n\n**** Check divided difference interpolation\n')
+pause(1)
+%{
+\end{matlab}
 Check over various types and orders of interpolation,
 numbers of patches, random domain lengths, random ratios,
 and randomised distribution of patches. (The \verb|@sin| is
@@ -39,15 +45,16 @@ a dummy.)
 %}
 maxErrors=[];
 for realisation = 1:nRealise
-    Lx = 1+3*rand; Ly = 1+3*rand;
-    Domain = [0 Lx 0 Ly]-[rand*[1 1] rand*[1 1]]
-    nSubP = 1+2*randi(3,1,2)
-    nPatch = randi([3 8],1,2)
-    dx = [Lx Ly]./nPatch./nSubP.*rand(1,2)/2
-    ordCC = 2*randi([1 4])
+    nEdge = randi(3,1,2)% =1,2, or 3
     edgyInt = (rand>0.5)
-    configPatches2(@sin,Domain,'equispace' ...
-        ,nPatch,ordCC,dx,nSubP,'EdgyInt',edgyInt);
+    Lx = 1+3*rand; Ly = 1+3*rand;
+    xyLim = [0 Lx 0 Ly]-[rand*[1 1] rand*[1 1]]
+    nSubP = nEdge.*( (2-edgyInt)*randi(3,1,2)+1+edgyInt )
+    ordCC = 2*randi(4)
+    nPatch = ordCC+randi(4,1,2)
+    dx = [Lx Ly]./nPatch./nSubP.*rand(1,2)/2
+    configPatches2(@sin,xyLim,'equispace',nPatch,ordCC ...
+        ,dx,nSubP,'EdgyInt',edgyInt,'nEdge',nEdge);
 %{
 \end{matlab}
 Second, displace patches to a random non-uniform spacing.
@@ -78,13 +85,15 @@ order of interpolation and by the number of patches.
     qs=reshape(qs,1,1,[]);
     cs=2*rand(size(ps))-1;
     u0=cs.*patches.x.^ps.*patches.y.^qs;
-%    sizeu0=size(u0)
 %{
 \end{matlab}
-Then evaluate the interpolation
+Then evaluate the interpolation, setting edges to \verb|inf|
+for error checking.
 \begin{matlab}
 %}
-    u=u0; u([1 end],:)=inf; u(:,[1 end],:)=inf;
+    u=u0; 
+    u([1:nEdge(1)  end-nEdge(1)+1:end],:,:)=inf; 
+    u(:,[1:nEdge(2)  end-nEdge(2)+1:end],:)=inf;
     ui=patchEdgeInt2(u(:));
 %{
 \end{matlab}
@@ -96,14 +105,13 @@ seems to be more affected by round-off so relax error size.
 \begin{matlab}
 %}
     error = ui-u0;
-%    hist(log10(abs(error(abs(error)>1e-20))),-20:-8)
-%    xlabel('log10 error')
-%    pause(0.1)%??
+    hist(log10(abs(error(abs(error)>1e-20))),-20:-7)
+    xlabel('log10 error'), pause(0.3)%??
     maxError=max(abs(error(:)))
     maxErrors=[maxErrors maxError];
-    assert(maxError<1e-9 ...
+    assert(maxError<3e-12*4^ordCC ...
     ,'failed divided difference interpolation')
-    disp('***** This divided difference test passed')
+    disp('*** This divided difference test passed')
 %{
 \end{matlab}
 
@@ -125,6 +133,12 @@ pause(1)
 
 
 \subsubsection{Test standard spectral interpolation}
+\begin{matlab}
+%}
+fprintf('\n\n**** Test standard spectral interpolation\n')
+pause(1)
+%{
+\end{matlab}
 Test over various numbers of patches, random domain lengths
 and random ratios.  Try realisations of random tests.
 \begin{matlab}
@@ -137,13 +151,15 @@ resolution, random size-ratios, random number of
 periodic-patches, randomly edge or mid-patch interpolation.
 \begin{matlab}
 %}
-Lx = 1+3*rand, Ly = 1+3*rand
-nSubP = 1+2*randi(3,1,2)
-ratios = rand(1,2)/2
-nPatch = randi([3 6],1,2)
+nEdge=randi(3,1,2)% =1,2, or 3
 edgyInt = (rand>0.5)
-configPatches2(@sin,[0 Lx 0 Ly],nan ...
-    ,nPatch,0,ratios,nSubP,'EdgyInt',edgyInt);
+Lx = 1+3*rand, Ly = 1+3*rand
+xyLim = [0 Lx 0 Ly]-[rand*[1 1] rand*[1 1]]
+nSubP = nEdge.*( (2-edgyInt)*randi(3,1,2)+1+edgyInt )
+nPatch = randi([3 6],1,2)
+dx = [Lx Ly]./nPatch./nSubP.*rand(1,2)/2
+configPatches2(@sin,xyLim,'periodic',nPatch,0 ...
+    ,dx,nSubP,'EdgyInt',edgyInt,'nEdge',nEdge);
 %{
 \end{matlab}
 Choose a random number of fields, then generate
@@ -168,24 +184,27 @@ for iV=1:nV
 end
 %{
 \end{matlab}
-Copy and NaN the edges, then interpolate
+Copy and \verb|nan| the edges, then interpolate
 \begin{matlab}
 %}
-u=u0; u([1 end],:,:)=nan; u(:,[1 end],:)=nan;
+u=u0; 
+u([1:nEdge(1)  end-nEdge(1)+1:end],:,:)=nan; 
+u(:,[1:nEdge(2)  end-nEdge(2)+1:end],:)=nan;
 u=patchEdgeInt2(u(:));
 %{
 \end{matlab}
-Compute difference, ignoring the nans which should only be
-in the corners. If there is an error in the interpolation,
+Compute difference. If there is an error in the interpolation,
 then abort the script for checking: please record parameter
 values and inform us.
 \begin{matlab}
 %}
-error=u-u0;
+error = u-u0;
 assert(all(~isnan(error(:))),'found nans in the error!')
+hist(log10(abs(error(abs(error)>1e-20))),-20:-7)
+xlabel('log10 error'), pause(0.3)%??
 normError=norm(error(:))
 assert(normError<1e-12, '2D spectral interpolation failed')
-disp('***** This spectral test passed')
+disp('*** This spectral test passed')
 %{
 \end{matlab}
 
@@ -206,21 +225,22 @@ pause(1)
 
 
 
-\subsubsection{Check standard finite width interpolation}
+\subsubsection{Check polynomial finite width interpolation}
 Check over various types and orders of interpolation,
 numbers of patches, random domain lengths and random ratios.
 (The \verb|@sin| is a dummy.)
 \begin{matlab}
 %}
 for realisations=1:nRealise
-    ordCC=2*randi([1 4])
-    nPatch=ordCC+randi([2 4],1,2)
+    nEdge = randi(3,1,2)% =1,2, or 3
     edgyInt = (rand>0.5)
-    nSubP = 1+2*randi(3,1,2)
-    Domain=5*[-rand rand -rand rand]
-    ratios=0.5*rand(1,2)
-    configPatches2(@sin,Domain,nan ...
-        ,nPatch,ordCC,ratios,nSubP,'EdgyInt',edgyInt);
+    nSubP = nEdge.*( (2-edgyInt)*randi(3,1,2)+1+edgyInt )
+    ordCC = 2*randi(4)
+    nPatch = ordCC+randi(4,1,2)
+    xyLim=5*[-rand(1,2); rand(1,2)]
+    dx = diff(xyLim)./nPatch./nSubP.*rand(1,2)/2
+    configPatches2(@sin,xyLim,'periodic',nPatch,ordCC ...
+        ,dx,nSubP,'EdgyInt',edgyInt,'nEdge',nEdge);
 %{
 \end{matlab}
 
@@ -231,7 +251,8 @@ as different `variables' at each point.
 %}
     [ps,qs]=meshgrid(0:ordCC);
     ps=reshape(ps,1,1,[]); qs=reshape(qs,1,1,[]);
-    u0=ones(size(ps)).*patches.x.^ps.*patches.y.^qs;
+    cs=2*rand(size(ps))-1;
+    u0=cs.*patches.x.^ps.*patches.y.^qs;
 %{
 \end{matlab}
 Then evaluate the interpolation.
@@ -249,10 +270,12 @@ domain and the high order of interpolation.
     J=ordCC/2+1:nPatch(2)-ordCC/2;
     error=ui(:,:,:,:,I,J)-u0(:,:,:,:,I,J);
     assert(all(~isnan(error(:))),'found nans in the error!')
+    hist(log10(abs(error(abs(error)>1e-20))),-20:-7)
+    xlabel('log10 error'), pause(0.3)%??
     normError=norm(error(:))
-    assert(normError<5e-8 ...
+    assert(normError<5e-9 ...
     ,'failed finite stencil interpolation')
-    disp('***** This finite stencil test passed')
+    disp('*** This finite stencil test passed')
 %{
 \end{matlab}
 
@@ -274,7 +297,7 @@ disp('***** Passed all standard polynomial interpolation')
 If no error messages, then all OK.
 \begin{matlab}
 %}
-disp('***** All the interpolation tests successful')
+disp('******* All the interpolation tests successful')
 %{
 \end{matlab}
 %}

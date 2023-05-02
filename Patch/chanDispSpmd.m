@@ -334,7 +334,7 @@ macro-scale variation in space.
     hp = surf(x(:),yj,c');
     axis([0 Len -1 1 0 max(c(:))])
     axis equal
-    xlabel('space x'), ylabel('y'); zlabel('c(x,y,t)')
+    xlabel('space $x$'), ylabel('$y$'); zlabel('$c(x,y,t)$')
     ifOurCf2eps([mfilename 't0'])
     legend(['time = ' num2str(ts(l),'%4.2f')] ...
         ,'Location','north')
@@ -376,7 +376,7 @@ X = squeeze(mean(x(2:end-1,:,:,:)));
 C = squeeze(mean(mean(cs(:,2:end-1,:,:,:),2),3));
 j = 1:ceil(nTimes/30):nTimes;
 mesh(X,ts(j),C(j,:));
-xlabel('space x'),ylabel('time t'),zlabel('C(X,t)')
+xlabel('space $x$'),ylabel('time $t$'),zlabel('$C(X,t)$')
 zlim([-0.1 11])
 ifOurCf2eps([mfilename 'Macro'])
 %{

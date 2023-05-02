@@ -124,7 +124,7 @@ x([1 end],:) = nan; y([1 end],:) = nan;
 u = reshape(permute(squeeze(u0),[1 3 2 4]), [numel(x) numel(y)]);
 usurf = surf(x(:),y(:),u');
 axis([-3 3 -3 3 -0.5 1]), view(60,40)
-xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
+xlabel('space $x$'), ylabel('space $y$'), zlabel('$u(x,y)$')
 legend('time = 0','Location','north')
 colormap(hsv)
 drawnow

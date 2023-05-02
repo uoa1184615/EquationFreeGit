@@ -112,7 +112,7 @@ otherwise just update the surface data.
   if i==1
        hsurf = surf(x(:),y(:),u'); view(60,40) 
        axis([-pi pi -pi pi -1 1]),   caxis([-1 1])
-       xlabel('x'), ylabel('y'), zlabel('u(x,y)')
+       xlabel('$x$'), ylabel('$y$'), zlabel('$u(x,y)$')
   else set(hsurf,'ZData', u');
   end
   legend(['time = ' num2str(ts(i),2)],'Location','north')

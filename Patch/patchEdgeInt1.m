@@ -1,6 +1,6 @@
 % patchEdgeInt1() provides the interpolation across 1D space
 % for 1D patches of simulations of a lattice system such as
-% PDE discretisations.  AJR & JB, Sep 2018 -- Jan 2023
+% PDE discretisations.  AJR & JB, Sep 2018 -- 23 Mar 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeInt1()}: sets patch-edge values
@@ -24,8 +24,8 @@ the core averages \citep{Bunder2013b}. \footnote{Script
 
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
-\verb|spmd|), or otherwise via the global
-struct~\verb|patches|.
+\verb|spmd|), or otherwise via the global struct
+\verb|patches|.
 \begin{matlab}
 %}
 function u=patchEdgeInt1(u,patches)
@@ -50,9 +50,9 @@ $\verb|nSubP| \times \verb|nPatch|$ multiscale spatial grid.
 \item \verb|.x| is $\verb|nSubP| \times1 \times1 \times
 \verb|nPatch|$ array of the spatial locations~$x_{iI}$ of
 the microscale grid points in every patch. Currently it
-\emph{must} be an equi-spaced lattice on the
-microscale index~$i$, but may be variable spaced in 
-macroscale index~$I$. 
+\emph{must} be an equi-spaced lattice on the microscale
+index~$i$, but may be variable spaced in macroscale
+index~$I$. 
 
 \item \verb|.ordCC| is order of interpolation, integer~$\geq
 -1$.
@@ -75,7 +75,12 @@ true, from opposite-edge next-to-edge values (often
 preserves symmetry); 
 false, from centre-patch values (original scheme).
 
-\item \verb|.nEnsem| the number of realisations in the ensemble.
+\item \verb|.nEdge|, for each patch, the number of edge
+values set by interpolation at the edge regions of each
+patch (default is one).
+
+\item \verb|.nEnsem| the number of realisations in the
+ensemble.
 
 \item \verb|.parallel| whether serial or parallel.
 
@@ -138,6 +143,26 @@ immediate neighbours, for periodic domain.
 I = 1:Nx; Ip = mod(I,Nx)+1; Im = mod(I-2,Nx)+1;
 %{
 \end{matlab}
+
+\paragraph{Implement multiple width edges by folding}
+Subsample~\(x\) coordinates, noting it is only differences
+that count \emph{and} the microgrid~\(x\) spacing must be
+uniform.
+\begin{matlab}
+%}
+x = patches.x;
+if patches.nEdge>1
+  nEdge = patches.nEdge;
+  x = x(1:nEdge:nx,:,:,:);
+  nx = nx/nEdge;
+  u = reshape(u,nEdge,nx,nVars,nEnsem,Nx);
+  nVars = nVars*nEdge;
+  u = reshape( permute(u,[2 1 3:5]) ,nx,nVars,nEnsem,Nx);
+end%if patches.nEdge
+%{
+\end{matlab}
+
+
 Calculate centre of each patch and the surrounding core
 (\verb|nx| and \verb|nCore| are both odd).
 \begin{matlab}
@@ -177,9 +202,9 @@ fields.  Here the domain is macro-periodic.
   end;
 %{
 \end{matlab}
-Just in case any last array dimension(s) are one, we have to
-force a padding of the sizes, then adjoin the extra
-dimension for the subsequent array of differences.
+Just in case any last array dimension(s) are one, we force a
+padding of the sizes, then adjoin the extra dimension for
+the subsequent array of differences.
 \begin{matlab}
 %}
 szUxO=size(Ux); 
@@ -289,8 +314,10 @@ Deal with staggered grid by doubling the number of fields
 and halving the number of patches (\verb|configPatches1()|
 tests that there are an even number of patches). Then the
 patch-ratio is effectively halved. The patch edges are near
-the middle of the gaps and swapped. \todo{Have not yet tested
-whether works for Edgy Interpolation.}
+the middle of the gaps and swapped. \todo{Have not yet
+tested whether works for Edgy Interpolation.}  \todo{Have
+not yet implemented multiple edge values for a staggered
+grid as I am uncertain whether it makes any sense. }
 \begin{matlab}
 %}
   if patches.stag % transform by doubling the number of fields
@@ -298,7 +325,7 @@ whether works for Edgy Interpolation.}
     u = [u(:,:,:,1:2:Nx) u(:,:,:,2:2:Nx)];
     stagShift = 0.5*[ones(1,nVars) -ones(1,nVars)];
     iV = [nVars+1:2*nVars 1:nVars]; % scatter interp to alternate field
-    r = r/2;           % ratio effectively halved
+    r = r/2;   % ratio effectively halved
     Nx = Nx/2; % halve the number of patches
     nVars = nVars*2;   % double the number of fields
   else % the values for standard spectral
@@ -390,10 +417,10 @@ patch.
 %}
   if patches.EdgyInt % interpolate next-to-edge values
     F(:,:,:,:,1) = u([nx-1 2],:,:,I);
-    X(:,:,:,:) = patches.x([nx-1 2],:,:,I);
+    X(:,:,:,:)   = x([nx-1 2],:,:,I);
   else % interpolate mid-patch values/sums
     F(:,:,:,:,1) = sum( u((i0-c):(i0+c),:,:,I) ,1);
-    X(:,:,:,:) = patches.x(i0,:,:,I);
+    X(:,:,:,:)   = x(i0,:,:,I);
   end;
 %{
 \end{matlab}
@@ -412,7 +439,7 @@ end
 Now interpolate to the edge-values at locations~\verb|Xedge|.
 \begin{matlab}
 %}
-Xedge = patches.x([1 nx],:,:,:);
+Xedge = x([1 nx],:,:,:);
 %{
 \end{matlab}
 Code Horner's evaluation of the interpolation polynomials. 
@@ -487,18 +514,34 @@ u(nx,:,patches.ri,I) = Uedge(2,:,:,I);
 \end{matlab}
 We want a user to set the extreme patch edge values
 according to the microscale boundary conditions that hold at
-the extremes of the domain.  Consequently, may override
-their computed interpolation values with~\verb|NaN|.
+the extremes of the domain.  Consequently, unless testing,
+override their computed interpolation values
+with~\verb|NaN|.
 \begin{matlab}
 %}
-u( 1,:,:, 1) = nan;
-u(nx,:,:,Nx) = nan;
+if isfield(patches,'intTest')&&patches.intTest
+else % usual case
+  u( 1,:,:, 1) = nan;
+  u(nx,:,:,Nx) = nan;
+end%if
 %{
 \end{matlab}
 End of the non-periodic interpolation code.
 \begin{matlab}
 %}
 end%if patches.periodic
+%{
+\end{matlab}
+
+\paragraph{Unfold multiple edges}  No need to restore~\(x\).
+\begin{matlab}
+%}
+if patches.nEdge>1
+  nVars = nVars/nEdge;
+  u = reshape( u ,nx,nEdge,nVars,nEnsem,Nx);
+  nx = nx*nEdge;
+  u = reshape( permute(u,[2 1 3:5]) ,nx,nVars,nEnsem,Nx);
+end%if patches.nEdge
 %{
 \end{matlab}
 

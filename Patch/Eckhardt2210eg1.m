@@ -219,7 +219,7 @@ Us=squeeze(mean( reshape(us,length(ts),[],nPatch), 2,'omitnan'));
 figure(1),clf
 for k = 1:2, subplot(2,2,k)
   mesh(ts,Xs(:),Us')
-  ylabel('x'), xlabel('t'), zlabel('U(x,t)')
+  ylabel('space $x$'), xlabel('time $t$'), zlabel('$U(x,t)$')
   colormap(0.8*hsv), axis tight, view(62-4*k,45)
 end
 %{
@@ -232,7 +232,7 @@ values.  Optionally save to Figs folder.
 xs([1 end],:) = nan;
 for k = 1:2, subplot(2,2,2+k)
   surf(tss,xs(:),uss',  'EdgeColor','none')
-  ylabel('x'), xlabel('t'), zlabel('u(x,t)')
+  ylabel('space $x$'), xlabel('time $t$'), zlabel('$u(x,t)$')
   colormap(0.7*hsv), axis tight, view(62-4*k,45)
 end
 ifOurCf2eps(mfilename)

@@ -148,7 +148,7 @@ Draw cross-eyed stereo view of some isosurfaces.
     end
     axis equal, view(45-7*p,25)
     axis(pi*[-1 1 -1 1 -1 1])
-    xlabel('x'), ylabel('y'), zlabel('z')
+    xlabel('$x$'), ylabel('$y$'), zlabel('$z$')
     legend(['time = ' num2str(ts(i),'%4.2f')],'Location','north')
     camlight, lighting gouraud
     hold off

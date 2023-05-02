@@ -223,8 +223,8 @@ for p=1:3
   subplot(2,2,p)
   mesh(ts(j),xs(:),Ms(:,j,p))
   view(60,40), colormap(0.8*hsv)
-  xlabel('time t'), ylabel('space x')
-  zlabel([uvw(p) '(x,t)']) 
+  xlabel('time $t$'), ylabel('space $x$')
+  zlabel(['$' uvw(p) '(x,t)$']) 
 end
 %{
 \end{matlab}
@@ -234,7 +234,7 @@ Final time plot to compare with Fig.~2.1 of
 %}
 subplot(2,2,4)
 plot(xs(:),squeeze(Ms(:,end,:)),'.')
-xlabel('space x'), legend(uvw(1),uvw(2),uvw(3))
+xlabel('space $x$'), legend(uvw(1),uvw(2),uvw(3))
 title(['time = ' num2str(ts(end),4)])
 ifOurCf2eps([mfilename 'uvw'])
 %{
@@ -311,8 +311,8 @@ Plot the spectrum of eigenvalues on quasi-log axes.
 \begin{matlab}
 %}
 figure(2),clf
-hp = plot(real(eval),imag(eval),'.')
-xlabel('Re\lambda'), ylabel('Im\lambda')
+hp = plot(real(eval),imag(eval),'.');
+xlabel('$\Re\lambda$'), ylabel('$\Im\lambda$')
 quasiLogAxes(hp,1,100);
 ifOurCf2eps([mfilename 'Spec'])
 %{

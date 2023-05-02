@@ -101,7 +101,7 @@ Plot the simulation in \cref{fig:HomogenisationCtsU}.
 figure(1),clf
 xs = patches.x;  xs([1 end],:) = nan;
 mesh(ts,xs(:),ucts'),  view(60,40)
-xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
+xlabel('time $t$'), ylabel('space $x$'), zlabel('$u(x,t)$')
 ifOurCf2eps([mfilename 'CtsU'])
 %{
 \end{matlab}
@@ -162,7 +162,7 @@ Plot the macroscale predictions to draw
 %}
 figure(2),clf
 plot(xs(:),us','.')
-ylabel('u(x,t)'), xlabel('space x')
+ylabel('$u(x,t)$'), xlabel('space $x$')
 legend(num2str(ts',3))
 ifOurCf2eps([mfilename 'U'])
 %{
@@ -182,7 +182,7 @@ diffusion.}
 figure(3),clf
 for k = 1:2, subplot(2,2,k)
   surf(tss,xs(:),uss',  'EdgeColor','none')
-  ylabel('x'), xlabel('t'), zlabel('u(x,t)')
+  ylabel('$x$'), xlabel('$t$'), zlabel('$u(x,t)$')
   axis tight, view(126-4*k,45)
 end
 ifOurCf2eps([mfilename 'Micro'])

@@ -342,7 +342,7 @@ to the velocity~$v$ in the $y$-direction.
     legend(['time = ' num2str(ts(l),'%4.2f')] ...
         ,'Location','north')
     axis equal
-    xlabel('space x'), ylabel('space y'), zlabel('h(x,y,t)')
+    xlabel('space $x$'), ylabel('space $y$'), zlabel('$h(x,y,t)$')
     ifOurCf2eps([mfilename 't0'])
     disp('**** pausing, press blank to begin animation')
     pause

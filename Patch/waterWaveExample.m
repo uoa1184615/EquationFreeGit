@@ -182,7 +182,7 @@ Plot the simulation.
   xs = squeeze(patches.x);  xs([1 end],:) = nan;
   mesh(ts,xs(hPts),Ucts(:,hPts)'),hold on
   mesh(ts,xs(uPts),Ucts(:,uPts)'),hold off
-  xlabel('time t'), ylabel('space x'), zlabel('u(x,t) and h(x,t)')
+  xlabel('time $t$'), ylabel('space $x$'), zlabel('$u(x,t)$ and $h(x,t)$')
   axis tight, view(70,45)
 %{
 \end{matlab}

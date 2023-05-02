@@ -1,7 +1,7 @@
-% patchSys1() provides an interface to time integrators
-% for the dynamics on patches  coupled across space. The
-% system must be a smooth lattice system such as PDE
-% discretisations.  AJR, Nov 2017 -- Mar 2023
+% patchSys1() provides an interface to time integrators for
+% the dynamics on patches  coupled across space. The system
+% must be a  lattice system such as PDE discretisations. 
+% AJR, Nov 2017 -- 31 Mar 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchSys1()}: interface 1D space to time integrators}
@@ -11,17 +11,12 @@
 To simulate in time with 1D spatial patches we often need to
 interface a user's time derivative function with time
 integration routines such as \verb|ode23| or~\verb|PIRK2|.
-This function provides an interface.  It mostly assumes that
-the sub-patch structure is \emph{smooth enough} so that the
-patch centre-values are sensible macroscale variables, and
-patch edge values are determined by macroscale interpolation
-of the patch-centre or edge values. Nonetheless, microscale
-heterogeneous systems may be accurately simulated with this
-function via appropriate interpolation.  Communicate
+This function provides an interface.  Communicate
 patch-design variables (\cref{sec:configPatches1}) either
 via the global struct~\verb|patches| or via an optional
-third argument (except that this last is required for
-parallel computing of \verb|spmd|).
+third argument. \verb|patches| is required for the parallel
+computing of \verb|spmd|, or if parameters are to be passed
+though to the user microscale function.
 
 \begin{matlab}
 %}
@@ -61,7 +56,7 @@ the microscale grid points in every patch.  Currently it
 \emph{must} be an equi-spaced lattice on the microscale.
 \end{itemize}
 
-\item \verb|varargin|,optional, is arbitrary number of
+\item \verb|varargin|, optional, is arbitrary number of
 parameters to be passed onto the users time-derivative
 function as specified in configPatches1.
 \end{itemize}
@@ -96,7 +91,8 @@ user\slash integrator as same sized array as input.
 \begin{matlab}
 %}
 dudt=patches.fun(t,u,patches,varargin{:});
-dudt([1 end],:,:,:) = 0;
+n=patches.nEdge;
+dudt([1:n end-n+1:end],:,:,:) = 0;
 dudt=reshape(dudt,sizeu);
 %{
 \end{matlab}

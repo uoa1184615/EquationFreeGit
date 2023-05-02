@@ -250,7 +250,7 @@ solution over time, and computes spectrum of the system.
 end%for iPat
 figure(1), clf
 loglog(H,relrmserr,'o:'),  grid on
-xlabel('H'), ylabel('relative error')
+xlabel('$H$'), ylabel('relative error')
 return
 %{
 \end{matlab}
@@ -322,7 +322,7 @@ otherwise just update the surface data.
        hsurf = surf(x,y,u'); view(60,40) 
 %       axis([-1 1 -1 1 -maxu maxu]), caxis(maxu*[-1 1])
        axis([0 1 0 1 0 maxu]), caxis(maxu*[0 1])
-       xlabel('x'), ylabel('y'), zlabel('u(x,y)')
+       xlabel('$x$'), ylabel('$y$'), zlabel('$u(x,y)$')
        pause
   else set(hsurf,'ZData', u');
   end
@@ -407,7 +407,7 @@ of decoupled systems in this patch configuration.
     leadingEvals=evals(1+4*(0:nPatch^2/1.5));
     figure(2),clf
     hp = plot(real(evals),imag(evals),'.')
-    xlabel('Re\lambda'), ylabel('Im\lambda')
+    xlabel('$\Re\lambda$'), ylabel('$\Im\lambda$')
     quasiLogAxes(hp,1,1);
     pause
 end%if compute eigenvals

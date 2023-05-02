@@ -1,6 +1,6 @@
 % patchEdgeInt3() provides the interpolation across 3D space
 % for 3D patches of simulations of a smooth lattice system
-% such as PDE discretisations.  AJR, Aug 2020 -- 2 Feb 2023
+% such as PDE discretisations.  AJR, Aug 2020 -- 12 Apr 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeInt3()}: sets 3D patch
@@ -21,7 +21,7 @@ verifies this code.}
 Communicate patch-design variables via a second argument
 (optional, except required for parallel computing of
 \verb|spmd|), or otherwise via the global
-struct \verb|patches|.
+struct~\verb|patches|.
 \begin{matlab}
 %}
 function u = patchEdgeInt3(u,patches)
@@ -87,6 +87,11 @@ $x,y,z$-directions---when invoking a periodic domain.
 patch-edge values by interpolation: true, from opposite-edge
 next-to-edge values (often preserves symmetry); false, from
 centre cross-patch values (near original scheme).
+
+\item \verb|.nEdge|, three elements, the width of edge
+values set by interpolation at the \(x,y,z\)-face regions, 
+respectively, of each patch (default is one all 
+\(x,y,z\)-faces).
 
 \item \verb|.nEnsem| the number of realisations in the
 ensemble.
@@ -155,6 +160,64 @@ J=1:Ny; Jp=mod(J,Ny)+1; Jm=mod(J-2,Ny)+1;
 K=1:Nz; Kp=mod(K,Nz)+1; Km=mod(K-2,Nz)+1;
 %{
 \end{matlab}
+
+\paragraph{Implement multiple width edges by folding}
+Subsample~\(x,y,z\) coordinates, noting it is only differences
+that count \emph{and} the microgrid~\(x,y,z\) spacing must be
+uniform.
+\begin{matlab}
+%}
+%x = patches.x;
+%if patches.nEdge(1)>1
+%  m = patches.nEdge(1);
+%  x = x(1:m:nx,:,:,:,:,:,:,:);
+%  nx = nx/m;
+%  u = reshape(u,m,nx,ny,nz,nVars,nEnsem,Nx,Ny,Nz);
+%  nVars = nVars*m;
+%  u = reshape( permute(u,[2:4 1 5:9]) ...
+%             ,nx,ny,nz,nVars,nEnsem,Nx,Ny,Nz);
+%end%if patches.nEdge(1)
+%y = patches.y;
+%if patches.nEdge(2)>1
+%  m = patches.nEdge(2);
+%  y = y(:,1:m:ny,:,:,:,:,:,:);
+%  ny = ny/m;
+%  u = reshape(u,nx,m,ny,nz,nVars,nEnsem,Nx,Ny,Nz);
+%  nVars = nVars*m;
+%  u = reshape( permute(u,[1 3:4 2 5:9]) ...
+%             ,nx,ny,nz,nVars,nEnsem,Nx,Ny,Nz);
+%end%if patches.nEdge(2)
+%z = patches.z;
+%if patches.nEdge(3)>1
+%  m = patches.nEdge(3);
+%  z = z(:,:,1:m:nz,:,:,:,:,:);
+%  nz = nz/m;
+%  u = reshape(u,nx,ny,m,nz,nVars,nEnsem,Nx,Ny,Nz);
+%  nVars = nVars*m;
+%  u = reshape( permute(u,[1:2 4 3 5:9]) ...
+%             ,nx,ny,nz,nVars,nEnsem,Nx,Ny,Nz);
+%end%if patches.nEdge(3)
+x = patches.x;
+y = patches.y; 
+z = patches.z;
+if mean(patches.nEdge)>1
+  mx = patches.nEdge(1);
+  my = patches.nEdge(2);
+  mz = patches.nEdge(3);
+  x = x(1:mx:nx,:,:,:,:,:,:,:);
+  y = y(:,1:my:ny,:,:,:,:,:,:);
+  z = z(:,:,1:mz:nz,:,:,:,:,:);
+  nx = nx/mx;
+  ny = ny/my;
+  nz = nz/mz;
+  u = reshape(u,mx,nx,my,ny,mz,nz,nVars,nEnsem,Nx,Ny,Nz);
+  nVars = nVars*mx*my*mz;
+  u = reshape( permute(u,[2:2:6 1:2:5 7:11]) ...
+             ,nx,ny,nz,nVars,nEnsem,Nx,Ny,Nz);
+end%if patches.nEdge
+%{
+\end{matlab}
+
 The centre of each patch (as \verb|nx|, \verb|ny| and
 \verb|nz| are odd for centre-patch interpolation) is at
 indices
@@ -214,9 +277,9 @@ general).  Have not yet implemented core averages.
   end;%if patches.EdgyInt
 %{
 \end{matlab}
-Just in case the last array dimension(s) are one, we have to
-force a padding of the sizes, then adjoin the extra
-dimension for the subsequent array of differences.
+Just in case any last array dimension(s) are one, we force a
+padding of the sizes, then adjoin the extra dimension for
+the subsequent array of differences.
 \begin{matlab}
 %}
 szUO=size(U); szUO=[szUO ones(1,8-length(szUO)) ordCC];
@@ -639,10 +702,10 @@ patch. \todo{Have no plans to implement core averaging as yet.}
   F = nan(patches.EdgyInt+1,ny-2,nz-2,nVars,nEnsem,Nx,Ny,Nz,px+1);
   if patches.EdgyInt % interpolate next-to-face values
     F(:,:,:,:,:,:,:,:,1) = u([nx-1 2],iy,iz,:,:,:,:,:);
-    X = patches.x([nx-1 2],:,:,:,:,:,:,:);
+    X = x([nx-1 2],:,:,:,:,:,:,:);
   else % interpolate mid-patch cross-patch values 
     F(:,:,:,:,:,:,:,:,1) = u(i0,iy,iz,:,:,:,:,:);
-    X = patches.x(i0,:,:,:,:,:,:,:);
+    X = x(i0,:,:,:,:,:,:,:);
   end%if patches.EdgyInt
 %{
 \end{matlab}
@@ -670,7 +733,7 @@ interpolate to find the face-values on left/right faces
 at~\verb|Xface| for every interior~\verb|Y,Z|.
 \begin{matlab}
 %}
-Xface = patches.x([1 nx],:,:,:,:,:,:,:);
+Xface = x([1 nx],:,:,:,:,:,:,:);
 %{
 \end{matlab}
 Code Horner's recursive evaluation of the interpolation
@@ -708,10 +771,10 @@ every variable and across ensemble.
   F = nan(nx,patches.EdgyInt+1,nz-2,nVars,nEnsem,Nx,Ny,Nz,py+1);
   if patches.EdgyInt % interpolate next-to-face values
     F(:,:,:,:,:,:,:,:,1) = u(:,[ny-1 2],iz,:,:,:,:,:);
-    Y = patches.y(:,[ny-1 2],:,:,:,:,:,:);
+    Y = y(:,[ny-1 2],:,:,:,:,:,:);
   else % interpolate mid-patch cross-patch values 
     F(:,:,:,:,:,:,:,:,1) = u(:,j0,iz,:,:,:,:,:);
-    Y = patches.y(:,j0,:,:,:,:,:,:);
+    Y = y(:,j0,:,:,:,:,:,:);
   end%if patches.EdgyInt
 %{
 \end{matlab}
@@ -730,7 +793,7 @@ Interpolate to find the top/bottom faces~\verb|Yface| for
 every~\(x\) and interior~\(z\).
 \begin{matlab}
 %}
-Yface = patches.y(:,[1 ny],:,:,:,:,:,:);
+Yface = y(:,[1 ny],:,:,:,:,:,:);
 %{
 \end{matlab}
 Code Horner's recursive evaluation of the interpolation
@@ -766,10 +829,10 @@ every variable and across ensemble.
   F = nan(nx,ny,patches.EdgyInt+1,nVars,nEnsem,Nx,Ny,Nz,pz+1);
   if patches.EdgyInt % interpolate next-to-face values
     F(:,:,:,:,:,:,:,:,1) = u(:,:,[nz-1 2],:,:,:,:,:);
-    Z = patches.z(:,:,[nz-1 2],:,:,:,:,:);
+    Z = z(:,:,[nz-1 2],:,:,:,:,:);
   else % interpolate mid-patch cross-patch values 
     F(:,:,:,:,:,:,:,:,1) = u(:,:,k0,:,:,:,:,:);
-    Z = patches.z(:,:,k0,:,:,:,:,:);
+    Z = z(:,:,k0,:,:,:,:,:);
   end%if patches.EdgyInt
 %{
 \end{matlab}
@@ -788,7 +851,7 @@ Interpolate to find the face-values on front/back
 faces~\verb|Zface| for every~\(x,y\).
 \begin{matlab}
 %}
-Zface = patches.z(:,:,[1 nz],:,:,:,:,:);
+Zface = z(:,:,[1 nz],:,:,:,:,:);
 %{
 \end{matlab}
 Code Horner's recursive evaluation of the interpolation
@@ -819,16 +882,19 @@ u(:,:,nz,:,patches.ba,:,:,:) = Uface(:,:,2,:,:,:,:,:);
 \subsubsection{Optional NaNs for safety}
 We want a user to set outer face values on the extreme
 patches according to the microscale boundary conditions that
-hold at the extremes of the domain.  Consequently, override
+hold at the extremes of the domain.  Consequently, unless testing, override
 their computed interpolation values with~\verb|NaN|.
 \begin{matlab}
 %}
-u( 1,:,:,:,:, 1,:,:) = nan;
-u(nx,:,:,:,:,Nx,:,:) = nan;
-u(:, 1,:,:,:,:, 1,:) = nan;
-u(:,ny,:,:,:,:,Ny,:) = nan;
-u(:,:, 1,:,:,:,:, 1) = nan;
-u(:,:,nz,:,:,:,:,Nz) = nan;
+if isfield(patches,'intTest')&&patches.intTest
+else % usual case
+    u( 1,:,:,:,:, 1,:,:) = nan;
+    u(nx,:,:,:,:,Nx,:,:) = nan;
+    u(:, 1,:,:,:,:, 1,:) = nan;
+    u(:,ny,:,:,:,:,Ny,:) = nan;
+    u(:,:, 1,:,:,:,:, 1) = nan;
+    u(:,:,nz,:,:,:,:,Nz) = nan;
+end%if
 %{
 \end{matlab}
 
@@ -839,8 +905,20 @@ end%if patches.periodic else
 %{
 \end{matlab}
 
-
-
+\paragraph{Unfold multiple edges}  No need to restore~\(x,y,z\).
+\begin{matlab}
+%}
+if mean(patches.nEdge)>1
+  nVars = nVars/(mx*my*mz);
+  u = reshape( u ,nx,ny,nz,mx,my,mz,nVars,nEnsem,Nx,Ny,Nz);
+  nx = nx*mx;
+  ny = ny*my;
+  nz = nz*mz;
+  u = reshape( permute(u,[4 1 5 2 6 3 7:11]) ...
+             ,nx,ny,nz,nVars,nEnsem,Nx,Ny,Nz);
+end%if patches.nEdge
+%{
+\end{matlab}
 
 Fin, returning the 8D array of field values with
 interpolated faces. 

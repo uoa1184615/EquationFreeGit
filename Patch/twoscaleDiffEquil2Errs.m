@@ -310,7 +310,7 @@ end, hold off
 view(60,55) 
 colorbar('Ticks',1:size(u,3) ...
     ,'TickLabels',[num2str(nPs) ['x';'x';'x'] num2str(nPs)]);
-xlabel('space x'), ylabel('space y'), zlabel('u(x,y)')
+xlabel('space $x$'), ylabel('space $y$'), zlabel('$u(x,y)$')
 ifOurCf2eps([mfilename 'us'])%optionally save
 %{
 \end{matlab}
@@ -333,8 +333,8 @@ end, hold off
 view(60,55)
 colorbar('Ticks',1:size(u,3) ...
     ,'TickLabels',[num2str(nPs) ['x';'x';'x'] num2str(nPs)]);
-xlabel('space x'), ylabel('space y')
-zlabel('errors in u(x,y)')
+xlabel('space $x$'), ylabel('space $y$')
+zlabel('errors in $u(x,y)$')
 ifOurCf2eps(mfilename)%optionally save
 %{
 \end{matlab}

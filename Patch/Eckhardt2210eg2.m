@@ -190,7 +190,7 @@ macroscale duration of the simulation.
       mesh(ts,xs(:),uss) 
       if iPP==1, uMax=ceil(max(uss(:))*100)/100, end
       view(60,40), colormap(0.8*hsv), zlim([0 uMax])
-      xlabel('time t'), ylabel('space x'), zlabel('u(x,t)') 
+      xlabel('time $t$'), ylabel('space $x$'), zlabel('$u(x,t)$') 
       drawnow
     end%if 
 %{
@@ -218,7 +218,7 @@ DXs=DXs
 Uerr=squeeze(max(max(abs(Us-Us(:,:,end)))))
 figure(2),clf,
 loglog(DXs,Uerr,'o:')
-xlabel('H'),ylabel('error')
+xlabel('$H$'),ylabel('error')
 ifOurCf2eps([mfilename 'Errs']) %optionally save plot
 %{
 \end{matlab}

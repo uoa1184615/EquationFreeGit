@@ -73,7 +73,7 @@ to leave gaps.
 figure(1),clf
 xs = patches.x;  xs([1 end],:) = nan;
 mesh(ts,xs(:),us')
-xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
+xlabel('time $t$'), ylabel('space $x$'), zlabel('$u(x,t)$')
 view(105,45)
 %{
 \end{matlab}
@@ -135,7 +135,7 @@ values to give the macroscale mesh-surface of
 figure(2),clf
 midP = (nSubP+1)/2;
 mesh(ts,xs(midP,:),us(:,midP:nSubP:end)')
-xlabel('time t'), ylabel('space x'), zlabel('u(x,t)')
+xlabel('time $t$'), ylabel('space $x$'), zlabel('$u(x,t)$')
 view(120,50)
 ifOurCf2eps([mfilename 'U'])
 %{
@@ -155,7 +155,7 @@ cross-eyed.}
 figure(3),clf
 for k = 1:2, subplot(2,2,k)
   mesh(tss,xs(:),uss')
-  ylabel('space x'),xlabel('time t'),zlabel('u(x,t)')
+  ylabel('space $x$'),xlabel('time $t$'),zlabel('$u(x,t)$')
   axis tight, view(126-4*k,50)
 end
 ifOurCf2eps([mfilename 'Micro'])

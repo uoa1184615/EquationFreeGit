@@ -1,9 +1,9 @@
 % Test the spectral, finite-width, and divided difference 1D
 % interpolation of patchEdgeInt1(), for one or several
 % variables, including normal grid and staggered grid, and
-% also edgy interpolation. All tests passed in 2019--2020,
+% also edgy interpolation. All tests passed in 2019--2023,
 % except not testing the zig-zag modes.
-% AJR, 26 Sep 2018 -- Jan 2023
+% AJR, 26 Sep 2018 -- 23 Mar 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt1test}: test the 1D patch coupling}
@@ -15,13 +15,13 @@ or several variables,  normal and staggered grids, and also
 tests centre and edge interpolation.  But does not yet test
 core averaging, nor divided differences on staggered, etc.
 
-Start by establishing global data struct for the range of
-various cases.
+Start by establishing global data struct, and the number of
+realisations of cases.
 \begin{matlab}
 %}
-clear all
+clear all, close all
 global patches
-nSubP=5
+nRealise = 20 
 %{
 \end{matlab}
 
@@ -31,6 +31,12 @@ nSubP=5
 
 
 \subsubsection{Check divided difference interpolation}
+\begin{matlab}
+%}
+fprintf('\n\n**** Check divided difference interpolation\n')
+pause(1)
+%{
+\end{matlab}
 But not yet implemented staggered grid version?? Check over
 various types and orders of interpolation, numbers of
 patches, random domain lengths, random ratios, and
@@ -38,31 +44,25 @@ randomised distribution of patches. (The \verb|@sin| is a
 dummy.)
 \begin{matlab}
 %}
-for edgyInt=[mod(nSubP,2)==0 true]
-for ordCC=2:2:8
-for nPatch=ordCC+(2:4)
-    edgyInt=edgyInt
-    ordCC=ordCC
-    nPatch=nPatch
+for iReal=1:nRealise
+    nEdge = randi(3)% =1,2, or 3
+    edgyInt = rand<0.5
+    nSubP = nEdge*( (2-edgyInt)*randi(2)+1+edgyInt )
+    ordCC = 2*randi(4)
+    nPatch = ordCC+randi([2 4])
     Domain=5*[-rand rand]
-    ratio=0.5*rand
-    configPatches1(@sin,Domain,nan,nPatch,ordCC,ratio,nSubP ...
-        ,'EdgyInt',edgyInt);
+    dx=rand*diff(Domain)/nPatch/nSubP
+    configPatches1(@sin,Domain,'equispace',nPatch,ordCC,dx,nSubP ...
+        ,'EdgyInt',edgyInt,'nEdge',nEdge);
+    patches.intTest = true; 
 %{
 \end{matlab}
-Until \verb|configPatches1| updated, change the data
-structure here: first, specify general divided differences.
-\begin{matlab}
-%}
-patches.periodic=false;
-%{
-\end{matlab}
-Second, displace patches to a random non-uniform spacing.
+Displace patches to a random non-uniform spacing.
 \begin{matlab}
 %}
 H = diff(patches.x(1,:,:,1:2));
 patches.x = patches.x+0.8*H*(rand(1,1,1,nPatch)-0.5);
-H = squeeze( diff(patches.x(1,:,:,:)) )% for information only
+%H = squeeze( diff(patches.x(1,:,:,:)) )% for information only
 %{
 \end{matlab}
 
@@ -74,15 +74,22 @@ store as different `variables' at each point.
 \begin{matlab}
 %}
     ps=1:ordCC
-    cs=randn(size(ps))
+    cs=randn(size(ps));
     u0=patches.x.^ps.*cs+randn;
+%{
+\end{matlab}
+Copy data, and set edges to \verb|inf| so we can be certain that
+interpolation is computing the required edge values.
+\begin{matlab}
+%}
+    u=u0;  u([1:nEdge  end-nEdge+1:end],:)=inf; 
 %{
 \end{matlab}
 Then evaluate the interpolation and squeeze the singleton
 dimension of an `ensemble'.
 \begin{matlab}
 %}
-    ui=patchEdgeInt1(u0(:));
+    ui=patchEdgeInt1(u(:));
     ui=squeeze(ui);
 %{
 \end{matlab}
@@ -95,20 +102,19 @@ seems to be more affected by round-off so relax error size.
 %}
     j=1:nPatch;
     iError=ui(:,:,j)-u0(:,:,j);
-    hist(log10(abs(iError(abs(iError)>0))),-17:-10)
+    hist(log10(abs(iError(abs(iError)>0))),-17:-9)
     xlabel('log10 iError'),pause(0.3)%??
     normError=norm(iError(:))
-    assert(normError<5e-10 ...
+    assert(normError<1e-13*4^ordCC ...
     ,'failed divided difference interpolation')
 %{
 \end{matlab}
 
-End the for-loops over various parameters.
+End the for-loop over random parameters.
 \begin{matlab}
 %}
-end,end,end
-disp('Passed all divided difference interpolation')
-%error('Not testing any further')% temporary halt
+end%for iReal
+fprintf('\n\nPassed all divided difference interpolation\n')
 %{
 \end{matlab}
 
@@ -122,32 +128,39 @@ disp('Passed all divided difference interpolation')
 
 
 \subsubsection{Test standard spectral interpolation}
-Test over various numbers of patches, random domain lengths
-and random ratios.  Say do three realisations for each
-number of patches.
 \begin{matlab}
 %}
-nReal=3 
-for nPatch=repmat(5:10,1,nReal) 
-nPatch=nPatch
-Len=10*rand
-ratio=0.5*rand
-configPatches1(@sin,[0,Len],nan,nPatch,0,ratio,nSubP ...
-    ,'EdgyInt',rand<0.5); % random Edgy or not
-if mod(nPatch,2)==0, disp('Avoiding highest wavenumber'), end
-kMax=floor((nPatch-1)/2);
-if patches.EdgyInt, i0=[2 nSubP-1], else i0=(nSubP+1)/2, end
-patches.periodic=true; % temporary
+fprintf('\n\n**** Test standard spectral interpolation\n')
+pause(1)
+%{
+\end{matlab}
+Test over random numbers of patches, random domain lengths,
+random microscale spacing, random choice of \verb|edgyInt|. 
+Say do fifteen realisations.
+\begin{matlab}
+%}
+for iReal=1:nRealise
+    nEdge=randi(3)% =1,2, or 3
+    edgyInt = rand<0.5
+    nSubP = nEdge*( (2-edgyInt)*randi(2)+1+edgyInt )
+    nPatch=randi([5 10])
+    Len=10*rand
+    dx=0.5*rand*Len/nPatch/nSubP
+    configPatches1(@sin,[0 Len],'periodic',nPatch,0,dx,nSubP ...
+        ,'EdgyInt',edgyInt,'nEdge',nEdge); % random Edgy or not
+    if mod(nPatch,2)==0, fprintf('\nAvoiding highest wavenumber\n'), end
+    kMax=floor((nPatch-1)/2);
 %{
 \end{matlab}
 
-\paragraph{Test single field}
-Set a profile, and evaluate the interpolation.
+\paragraph{Test single field} Set a profile, and evaluate
+the interpolation.
 \begin{matlab}
 %}
 for k=-kMax:kMax
   u0=exp(1i*k*patches.x*2*pi/Len);
-  ui=patchEdgeInt1(u0(:));
+  u=u0;  u([1:nEdge  end-nEdge+1:end],:)=nan; 
+  ui=patchEdgeInt1(u(:));
   normError=rms(ui(:)-u0(:));
   if abs(normError)>5e-14
     normError=normError, k=k
@@ -157,22 +170,19 @@ end
 %{
 \end{matlab}
 
-\paragraph{Test multiple fields}
-Use this to measure some of the errors in order to omit
-singleton dimensions, and also squish any errors if the
-second argument is essential zero (to cater for cosine
-aliasing errors).
+\paragraph{Test multiple fields} Use this to measure some of
+the errors in order to omit singleton dimensions, 
 \begin{matlab}
 %}
   normDiff=@(u,v) ...
-  norm(squeeze(u)-squeeze(v))*norm(squeeze(v(i0,:,:,:)));
+  norm(squeeze(u)-squeeze(v));%*norm(squeeze(v(i0,:,:,:)));
 %{
 \end{matlab}
 
 Set a profile, and evaluate the interpolation. For the case
 of the highest wavenumber, squash the error when the
-centre-patch values are all zero by multiplying by result norm.
-Not yet working for edgy interpolation.
+centre-patch values are all zero by multiplying by result
+norm. Not yet working for edgy interpolation.
 \begin{matlab}
 %}
 for k=1:(nPatch-1)/2 % not checking the highest wavenumber
@@ -193,7 +203,7 @@ End the for-loop over various geometries.
 \begin{matlab}
 %}
 end
-disp('Passed standard spectral interpolation tests')
+fprintf('\nPassed standard spectral interpolation tests\n')
 %{
 \end{matlab}
 
@@ -206,21 +216,29 @@ disp('Passed standard spectral interpolation tests')
 
 
 \subsubsection{Now test spectral interpolation on staggered grid}
-Must have even number of patches for a staggered grid.
 \begin{matlab}
 %}
-disp('*** spectral interpolation on staggered grid')
-for nPatch=repmat(6:2:20,1,nReal)
-nPatch=nPatch
-ratio=0.5*rand
-nSubP=7; % of form 4*N-1
-Len=10*rand
-configPatches1(@simpleWavepde,[0,Len],nan,nPatch,-1,ratio,nSubP ...
-    ,'EdgyInt',rand<0.5);
-if mod(nPatch,4)==0, disp('Avoiding highest wavenumber'), end
-kMax=floor((nPatch/2-1)/2) 
-if patches.EdgyInt, i0=[2 nSubP-1], else i0=(nSubP+1)/2, end%??
-patches.periodic=true; % temporary
+fprintf('\n\n**** Test spectral interpolation on staggered\n')
+pause(1)
+%{
+\end{matlab}
+Must have even number of patches for a staggered grid. Have
+not yet implemented multiple edge values for a staggered
+grid as I am uncertain whether it makes any
+sense---certainly this test fails anyway. 
+\begin{matlab}
+%}
+for iReal=1:nRealise
+    nEdge = 1 % required
+    edgyInt = rand<0.5
+    nPatch=2*randi([3 10])
+    nSubP=7 % of form 4*N-1
+    Len=10*rand
+    dx=0.5*rand*Len/nPatch/nSubP
+    configPatches1(@simpleWavepde,[0 Len],'periodic' ...
+        ,nPatch,-1,dx,nSubP,'EdgyInt',edgyInt,'nEdge',nEdge);
+    if mod(nPatch,4)==0, fprintf('\nAvoiding highest wavenumber\n'), end
+    kMax=floor((nPatch/2-1)/2) 
 %{
 \end{matlab}
 Identify which microscale grid points are \(h\)~or~\(u\) values.
@@ -241,6 +259,8 @@ for k=-kMax:kMax
   U0=nan(nSubP,nPatch);
   U0(hPts)=rand*exp(+1i*k*patches.x(hPts)*2*pi/Len);
   U0(uPts)=rand*exp(-1i*k*patches.x(uPts)*2*pi/Len);
+  U=U0;
+  U([1:nEdge  end-nEdge+1:end],:)=nan; 
   Ui=patchEdgeInt1(U0(:));
   normError=norm(Ui(:)-U0(:));
   if abs(normError)>5e-14
@@ -260,7 +280,7 @@ aliasing errors).
 \begin{matlab}
 %}
   normDiff=@(u,v,w) ...
-  norm(squeeze(u)-squeeze(v))*norm(squeeze(w(i0,:,:,:)));
+  norm(squeeze(u)-squeeze(v));%*norm(squeeze(w(i0,:,:,:)));
 %{
 \end{matlab}
 Set a profile, and evaluate the interpolation. For the case
@@ -278,18 +298,17 @@ for k=1:kMax
   U0=nan(nSubP,1,1,nPatch); V0=U0;
   U0(hPts)=rand*sin(k*patches.x(hPts)*2*pi/Len);
   U0(uPts)=rand*sin(k*patches.x(uPts)*2*pi/Len);
+  U=U0; U([1:nEdge  end-nEdge+1:end],:)=nan; 
   V0(hPts)=rand*cos(k*patches.x(hPts)*2*pi/Len);
   V0(uPts)=rand*cos(k*patches.x(uPts)*2*pi/Len);
+  V=V0; V([1:nEdge  end-nEdge+1:end],:)=nan; 
   UVi=patchEdgeInt1([U0 V0]);
-%  U0i0odd=squeeze(U0(i0,:,:,oddP)), U0i0evn=squeeze(U0(i0,:,:,evnP)) 
-%  V0i0odd=squeeze(V0(i0,:,:,oddP)), V0i0evn=squeeze(V0(i0,:,:,evnP)) 
   normuError=[normDiff(UVi(:,1,:,oddP),U0(:,:,:,oddP),U0(:,:,:,evnP)) 
       normDiff(UVi(:,1,:,evnP),U0(:,:,:,evnP),U0(:,:,:,oddP))]';
   normvError=[normDiff(UVi(:,2,:,oddP),V0(:,:,:,oddP),V0(:,:,:,evnP)) 
       normDiff(UVi(:,2,:,evnP),V0(:,:,:,evnP),V0(:,:,:,oddP))]';
   if norm(normuError)+norm(normvError)>2e-13
     normuError=normuError, normvError=normvError
-%    [U0 UVi(:,1,:,:) V0 UVi(:,2,:,:)]
     patches=patches
     error(['staggered: failed double field interpolation k=' num2str(k)])
   end
@@ -312,22 +331,27 @@ end
 
 
 \subsubsection{Check standard finite width interpolation}
+\begin{matlab}
+%}
+fprintf('\n\n**** Check standard finite width interpolation\n')
+pause(1)
+%{
+\end{matlab}
 Check over various types and orders of interpolation,
 numbers of patches, random domain lengths and random ratios.
 (The \verb|@sin| is a dummy.)
 \begin{matlab}
 %}
-for edgyInt=[mod(nSubP,2)==0 true]
-for ordCC=2:2:8
-for nPatch=ordCC+(2:4)
-    edgyInt=edgyInt
-    ordCC=ordCC
-    nPatch=nPatch
+for iReal=1:nRealise
+    nEdge=randi(3)% =1,2, or 3
+    edgyInt = rand<0.5
+    nSubP = nEdge*( (2-edgyInt)*randi(2)+1+edgyInt )
+    ordCC = 2*randi(4)
+    nPatch = ordCC+randi([2 4])
     Domain=5*[-rand rand]
-    ratio=0.5*rand
-    configPatches1(@sin,Domain,nan,nPatch,ordCC,ratio,nSubP ...
-        ,'EdgyInt',edgyInt);
-    patches.periodic=true; % temporary
+    dx=0.5*rand*diff(Domain)/nPatch/nSubP
+    configPatches1(@sin,Domain,'periodic',nPatch,ordCC,dx,nSubP ...
+        ,'EdgyInt',edgyInt,'nEdge',nEdge);
 %{
 \end{matlab}
 
@@ -337,15 +361,22 @@ store as different `variables' at each point.
 \begin{matlab}
 %}
     ps=1:ordCC
-    cs=randn(size(ps))
+    cs=randn(size(ps));
     u0=patches.x.^ps.*cs+randn;
+%{
+\end{matlab}
+Copy data, and set edges to NaN so we can be certain that
+interpolation is computing the required edge values.
+\begin{matlab}
+%}
+    u=u0;  u([1:nEdge  end-nEdge+1:end],:)=nan; 
 %{
 \end{matlab}
 Then evaluate the interpolation and squeeze the singleton
 dimension of an `ensemble'.
 \begin{matlab}
 %}
-    ui=patchEdgeInt1(u0(:));
+    ui=patchEdgeInt1(u(:));
     ui=squeeze(ui);
 %{
 \end{matlab}
@@ -363,14 +394,10 @@ The interior patches should have zero error.
 End the for-loops over various parameters.
 \begin{matlab}
 %}
-end,end,end
-disp('Passed all standard polynomial interpolation')
+end%for iReal
+fprintf('\nPassed all standard polynomial interpolation\n')
 %{
 \end{matlab}
-\endinput%%%%%%%%%%%%%%%%%%%%%%%%%%??
-
-
-
 
 
 
@@ -381,25 +408,34 @@ disp('Passed all standard polynomial interpolation')
 
 
 \subsubsection{Now test finite width interpolation on staggered grid}
+\begin{matlab}
+%}
+fprintf('\n\n**** Check finite width staggered\n')
+pause(1)
+%{
+\end{matlab}
 Must have even number of patches for a staggered grid.
 \begin{matlab}
 %}
-for nPatch=6:2:20
-nPatch=nPatch
-ratio=0.5*rand
-nSubP=3; % of form 4*N-1
-Len=10*rand
-configPatches1(@simpleWavepde,[0,Len],nan,nPatch,-1,ratio,nSubP);
-kMax=floor((nPatch/2-1)/2)
-patches.periodic=true; % temporary
+for iReal=1:nRealise
+    nEdge = 1 % required for now
+    edgyInt = rand<0.5
+    nPatch=2*randi([3 10])
+    nSubP=3; % of form 4*N-1
+    Len=10*rand
+    dx=0.5*rand*Len/nPatch/nSubP
+    configPatches1(@simpleWavepde,[0 Len],'periodic' ...
+        ,nPatch,-1,dx,nSubP,'EdgyInt',edgyInt,'nEdge',nEdge);
+    kMax=floor((nPatch/2-1)/2)
 %{
 \end{matlab}
-Identify which microscale grid points are \(h\)~or~\(u\) values.
+Identify which microscale grid points are \(h\)~or~\(u\)
+values.
 \begin{matlab}
 %}
-uPts=mod( (1:nSubP)'+(1:nPatch) ,2);
-hPts=find(1-uPts);
-uPts=find(uPts);
+    uPts=mod( (1:nSubP)'+(1:nPatch) ,2);
+    hPts=find(1-uPts);
+    uPts=find(uPts);
 %{
 \end{matlab}
 Set a profile for various wavenumbers. The capital
@@ -407,7 +443,7 @@ letter~\verb|U| denotes an array of values merged from
 both~\(u\) and~\(h\) fields on the staggered grids.
 \begin{matlab}
 %}
-fprintf('Single field-pair test.\n')
+fprintf('\nSingle field-pair test.\n')
 for k=-kMax:kMax
   U0=nan(nSubP,nPatch);
   U0(hPts)=rand*exp(+1i*k*patches.x(hPts)*2*pi/Len);
@@ -455,7 +491,7 @@ end
 %{
 \end{matlab}
 
-End for-loop over the cases
+End for-loop over the realisations
 \begin{matlab}
 %}
 end
@@ -470,7 +506,7 @@ end
 If no error messages, then all OK.
 \begin{matlab}
 %}
-fprintf('\nIf you read this, then all tests were passed\n')
+fprintf('\n**** If you read this, then all tests were passed\n')
 %{
 \end{matlab}
 %}

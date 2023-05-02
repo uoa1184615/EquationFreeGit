@@ -92,14 +92,18 @@
 
 % command definitions
 \def\Pe{\ensuremath{\operatorname{Pe}}}
-\def\into{\(\leftrightarrow\)\ }
-\Vec f\Vec x\Vec u\Vec v 
+%\def\into{\(\leftrightarrow\)\ }
+\def\into{${}\mapsto{}$}
+\Vec f\Vec n\Vec x\Vec u\Vec v 
 \Vec H\Vec M\Vec X \Vec U
 \Bb R  \Bb X
 \Cal D
 \newcommand{\todo}[1]{\footnote{\textbf{ToDo:}\quad #1}}
 \def\E#1{\textsc{e}{-}#1}
 \def\sign{\operatorname{sign}}
+\def\Ra{\ensuremath{\operatorname{Ra}}}
+\def\bc{\textsc{bc}}
+\newcounter{i}
 
 % to set overall size for each chart, propto linewidth
 \newlength{\WD}
@@ -116,7 +120,7 @@
 
 
 \graphicspath{{../ProjInt/}{../Patch/}{../ProjInt/Figs/}{../Patch/Figs/}}
-
+\def\inputFigs#1{\input{\inputFigsFolder/#1}}
 
 
 \begin{document}

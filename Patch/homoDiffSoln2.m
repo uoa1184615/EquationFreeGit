@@ -182,7 +182,7 @@ bothering to interpolate them.
 surf(x(:),y(:),u'); view(60,40) 
 maxu = ceil(max(u(:))*10)/10;
 axis([0 1 0 1 0 maxu]),   caxis([0 maxu])
-xlabel('x'), ylabel('y'), zlabel('u(x,y)')
+xlabel('$x$'), ylabel('$y$'), zlabel('$u(x,y)$')
 %{
 \end{matlab}
 

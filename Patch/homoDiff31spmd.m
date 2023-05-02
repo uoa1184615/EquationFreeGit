@@ -273,7 +273,7 @@ well as macro-scale variation in the long space direction.
   if l==1
     hp = plot(x,u,'.');
     axis([0 Len 0 max(u(:))])
-    xlabel('space x'), ylabel('u(x,y,z,t)')
+    xlabel('space $x$'), ylabel('$u(x,y,z,t)$')
     ifOurCf2eps([mfilename 't0'])
     legend(['time = ' num2str(ts(l),'%4.2f')])
     disp('**** pausing, press blank to animate')

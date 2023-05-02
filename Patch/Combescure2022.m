@@ -330,7 +330,7 @@ duration of the simulation.
   figure(1), clf()
   mesh(ts,xs(:),us) 
   view(60,40), colormap(0.8*jet), axis tight
-  xlabel('time t'), ylabel('space x'), zlabel('u(x,t)') 
+  xlabel('time $t$'), ylabel('space $x$'), zlabel('$u(x,t)$') 
 %{
 \end{matlab}
 Ditto for the velocity.
@@ -343,7 +343,7 @@ vs = reshape(vs,[],length(ts));
   figure(2), clf()
   mesh(ts,xs(:),vs) 
   view(60,40), colormap(0.8*jet), axis tight
-  xlabel('time t'), ylabel('space x'), zlabel('v(x,t)') 
+  xlabel('time $t$'), ylabel('space $x$'), zlabel('$v(x,t)$') 
   drawnow
 %{
 \end{matlab}
@@ -444,7 +444,7 @@ duration of the simulation.
   figure(4), clf()
   mesh(muLP,xs(:),us) 
   view(60,40), colormap(0.8*jet), axis tight
-  xlabel('-u(L)'), ylabel('space x'), zlabel('u(x)') 
+  xlabel('-u(L)'), ylabel('space $x$'), zlabel('$u(x)$') 
 %{
 \end{matlab}
 Plot space-time surface of strain, differences in
@@ -454,7 +454,7 @@ displacements, over the parameter variation.
   figure(5), clf()
   mesh(muLP,xs(1:end-1),diff(us)) 
   view(45,20), colormap(0.8*jet), axis tight
-  xlabel('-u(L)'), ylabel('space x'), zlabel('strain \delta u(x)') 
+  xlabel('$-u(L)$'), ylabel('space $x$'), zlabel('strain $\delta u(x)$') 
   ifOurCf2eps(['Comb22diffu' num2str(theCase)],[12 9])%optionally save
 %{
 \end{matlab}
@@ -502,7 +502,7 @@ end%if
   figure(7),clf
   du = diff( uvs(:,nSubP/2,1:2,thePatch) ,1,3);
   cpl([muLs;du'],[],s);
-  xlabel('-u(L)')
+  xlabel('$-u(L)$')
   if thePatch==1,  ylabel('boundary layer strain')
   else ylabel('mid-domain strain')
   end
