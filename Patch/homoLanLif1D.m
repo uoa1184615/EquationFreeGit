@@ -311,9 +311,9 @@ Plot the spectrum of eigenvalues on quasi-log axes.
 \begin{matlab}
 %}
 figure(2),clf
-hp = plot(real(eval),imag(eval),'.');
+plot(real(eval),imag(eval),'.');
 xlabel('$\Re\lambda$'), ylabel('$\Im\lambda$')
-quasiLogAxes(hp,1,100);
+quasiLogAxes(1,100);
 ifOurCf2eps([mfilename 'Spec'])
 %{
 \end{matlab}

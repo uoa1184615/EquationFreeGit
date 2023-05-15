@@ -1,30 +1,32 @@
-% quasiLogAxes() transforms selected axes of the given plot
-% to a quasi-log axes (via asinh), including possibly
-% transforming color axis.  AJR, 25 Sep 2021 -- 18 Apr 2023
+% quasiLogAxes() transforms all plots currently drawn on the
+% current axes to a quasi-log axes (via asinh), including
+% possibly transforming color axis. 
+% AJR, 25 Sep 2021 -- 15 May 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{quasiLogAxes()}: transforms some axes of a
-plot to quasi-log}
+\section{\texttt{quasiLogAxes()}: transforms current axes of
+plot(s) to quasi-log}
 \label{sec:quasiLogAxes}
 
-This function rescales some coordinates and labels the axes
-of the given 2D or 3D~plot.  The original aim was to
-effectively show the complex spectrum of multiscale systems
-such as the patch scheme. The eigenvalues are over a wide
-range of magnitudes, but are signed.  So we use a nonlinear
-asinh transformation of the axes, and then label the axes
-with reasonable ticks. The nonlinear rescaling is useful in
-other scenarios also.
+This function transforms the plots in the current axes.  It
+rescales specified coordinates and labels the axes and its
+2D or 3D~plot(s).  The original aim was to effectively show
+the complex spectrum of multiscale systems such as the patch
+scheme. The eigenvalues are over a wide range of magnitudes,
+but are signed.  So we use a nonlinear asinh transformation
+of the axes, and then label the axes with reasonable ticks.
+This nonlinear rescaling is useful in other scenarios also.
 
 \begin{matlab}
 %}
-function quasiLogAxes(handle,xScale,yScale,zScale,cScale)
+function quasiLogAxes(xScale,yScale,zScale,cScale)
 %{
 \end{matlab}
-\paragraph{Input} 
+\paragraph{Input} This function rescales the \emph{current
+axes}  (you may need to invoke \verb|set()| to change to the
+axes you require).  It rescales the existing plots  (do not
+do further plots into the same axes).
 \begin{itemize}
-\item \verb|handle|: handle to your plot to transform, for
-example, obtained by \verb|handle=plot(...)|
 
 \item \verb|xScale| (optional, default~inf): if inf, then no
 transformation is done in the `x'-coordinate.  Otherwise, when
@@ -52,7 +54,8 @@ one exists.
 
 
 \paragraph{Example}
-If invoked with no arguments, then execute an example.
+If invoked with no arguments, then execute an example plot
+and its transformation.
 \begin{matlab}
 %}
 if nargin==0  
@@ -60,9 +63,11 @@ if nargin==0
    n=99;  fast=(rand(n,1)<0.8);
    z = -rand(n,1).*(1+1e3*fast)+1i*randn(n,1).*(5+1e2*fast);
    % plot data and transform axes
-   handle = plot(real(z),imag(z),'.');
+   plot(real(z),imag(z),'.');   
    xlabel('real-part'), ylabel('imag-part')
-   quasiLogAxes(handle,1,10);
+   title('un-transformed plot, pausing for 3 secs'), pause(3)
+   quasiLogAxes(1,10);
+   title('transformed plot')
    return
 end% example
 %{
@@ -73,10 +78,12 @@ Default values for scaling, \verb|inf| denotes no
 transformation of that axis.
 \begin{matlab}
 %}
-if nargin<5, cScale=inf; end
-if nargin<4, zScale=inf; end
-if nargin<3, yScale=inf; end
-if nargin<2, xScale=inf; end
+if nargin<4, cScale=inf; end
+if nargin<3, zScale=inf; end
+if nargin<2, yScale=inf; end
+if nargin<1, xScale=inf; end
+assert(class(xScale)=="double" ...
+      ,"May 2023 version of quasiLogAxes does not accept a handle")
 %{
 \end{matlab}
 
@@ -88,7 +95,7 @@ the figure of the plot.
 \begin{matlab}
 %}
 xlim0=xlim; ylim0=ylim; zlim0=zlim; clim0=caxis;
-theAxes = get(handle(1),'parent');
+theAxes = gca;  %get(handle(1),'parent');
 theFig = get(theAxes,'parent');
 %{
 \end{matlab}
@@ -99,7 +106,9 @@ there is an overall scaling factor on the axes.
 \begin{matlab}
 %}
 xFac=1e-99; yFac=xFac; zFac=xFac; cFac=xFac;
-for k=1:length(handle)
+for kk=1:numel(theAxes.Children)
+  handle = theAxes.Children(kk);
+  for k=1:length(handle)
     if ~isinf(xScale)
     temp = asinh(handle(k).XData/xScale);
     xFac = max(xFac, max(abs(temp(:)),[],'omitnan') );
@@ -116,38 +125,47 @@ for k=1:length(handle)
     temp = asinh(handle(k).CData/cScale);
     cFac = max(cFac, max(abs(temp(:)),[],'omitnan') );
     end
-end%for
+  end%for k
+end%for kk
 xFac=9/xFac; yFac=9/yFac; zFac=9/zFac; cFac=9/cFac;
 %{
 \end{matlab}
 
-Scale the plot data in the plot \verb|handle|. Give an
+Scale all the plot data in the axes. Give an
 error if it appears that the plot-data has already been
 transformed.   Color data has to be transformed first
 because usually there is automatic flow from z-data to c-data.
 \begin{matlab}
 %}
-for k=1:length(handle)
+xlim1=[Inf -Inf]; ylim1=xlim1; zlim1=xlim1; clim1=xlim1; 
+for kk=1:numel(theAxes.Children)
+  handle = theAxes.Children(kk);
+  for k=1:length(handle)
     assert(~strcmp(handle(k).UserData,'quasiLogAxes'), ...
        'Replot graph---it appears plot data is already transformed')
     if ~isinf(cScale)
     handle(k).CData = cFac*asinh(handle(k).CData/cScale); 
-    clim1=[min(handle(k).CData(:)) max(handle(k).CData(:))];
+    climk=[min(handle(k).CData(:)) max(handle(k).CData(:))];
+    clim1=[min(climk(1),clim1(1)) max(climk(2),clim1(2))];
     end
     if ~isinf(xScale)
     handle(k).XData = xFac*asinh(handle(k).XData/xScale); 
-    xlim1=[min(handle(k).XData(:)) max(handle(k).XData(:))];
+    xlimk=[min(handle(k).XData(:)) max(handle(k).XData(:))];
+    xlim1=[min(xlimk(1),xlim1(1)) max(xlimk(2),xlim1(2))];
     end
     if ~isinf(yScale)
     handle(k).YData = yFac*asinh(handle(k).YData/yScale); 
-    ylim1=[min(handle(k).YData(:)) max(handle(k).YData(:))];
+    ylimk=[min(handle(k).YData(:)) max(handle(k).YData(:))];
+    ylim1=[min(ylimk(1),ylim1(1)) max(ylimk(2),ylim1(2))];
     end
     if ~isinf(zScale)
     handle(k).ZData = zFac*asinh(handle(k).ZData/zScale); 
-    zlim1=[min(handle(k).ZData(:)) max(handle(k).ZData(:))];
+    zlimk=[min(handle(k).ZData(:)) max(handle(k).ZData(:))];
+    zlim1=[min(zlimk(1),zlim1(1)) max(zlimk(2),zlim1(2))];
     end
     handle(k).UserData = 'quasiLogAxes';
-end%for
+  end%for k
+end%for kk
 %{
 \end{matlab}
 Set 4\%~padding around all margins of transformed

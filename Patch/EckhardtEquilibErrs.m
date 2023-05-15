@@ -332,8 +332,8 @@ Use quasi-log axis to separate the errors.
 %}
 err = u(:,1)-u;  
 figure(2), clf
-h=plot(x(:),err,'.-'); legend(num2str(nPs))
-quasiLogAxes(h,10,sqrt(prod(meanAbsErrs(2:3))))
+plot(x(:),err,'.-'); legend(num2str(nPs))
+quasiLogAxes(10,sqrt(prod(meanAbsErrs(2:3))))
 xlabel('space $x$'), ylabel('errors in $u(x)$')
 ifOurCf2tex(mfilename)%optionally save
 %{

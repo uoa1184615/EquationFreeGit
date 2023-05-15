@@ -279,11 +279,11 @@ the number of decoupled systems in this patch configuration.
     [~,k] = sort(-real(evals));
     evals=evals(k); evecs=evecs(:,k);
     if ord==0, nZeroEv=sum(abs(evals(:))<1e-5), end
-    if ord==0, evec0=evecs(:,1:nZeroEv*nLeadEvals); 
-    else % find evec closest to that of each leading spectral
-        [~,k]=max(abs(evecs'*evec0));
-        evals=evals(k); % re-sort in corresponding order
-    end
+%    if ord==0, evec0=evecs(:,1:nZeroEv*nLeadEvals); 
+%    else % find evec closest to that of each leading spectral
+%        [~,k]=max(abs(evecs'*evec0));
+%        evals=evals(k); % re-sort in corresponding order
+%    end
     leadingEvals=[leadingEvals evals(nZeroEv*(1:nLeadEvals))];
 end 
 disp('     spectral    quadratic      quartic  sixth-order ...')

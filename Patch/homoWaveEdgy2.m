@@ -406,9 +406,9 @@ of decoupled systems in this patch configuration.
     nZeroEv=sum(abs(evals(:))<1e-4)
     leadingEvals=evals(1+4*(0:nPatch^2/1.5));
     figure(2),clf
-    hp = plot(real(evals),imag(evals),'.')
+    plot(real(evals),imag(evals),'.')
     xlabel('$\Re\lambda$'), ylabel('$\Im\lambda$')
-    quasiLogAxes(hp,1,1);
+    quasiLogAxes(1,1);
     pause
 end%if compute eigenvals
 %{
