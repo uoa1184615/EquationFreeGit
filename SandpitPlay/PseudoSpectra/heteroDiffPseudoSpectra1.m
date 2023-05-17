@@ -129,10 +129,8 @@ the number of decoupled systems in this patch configuration.
 \paragraph{Pseuso-spectrum of the Jacobian}
 \begin{matlab}
 %}
-figure(1),clf()
-psa(Jac)
-xlabel('$\Re\lambda$'), ylabel('$\Im\lambda$')
-quasiLogAxes(0.3,0.3);
+figure(1)
+multiscalePseudoSpectra(Jac,1)
 %{
 \end{matlab}
 
