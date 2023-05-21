@@ -1,4 +1,4 @@
-% multiscalePseudoSpectra() hierarchially contours the
+% multiscalePseudoSpectra()  hierarchially contours the
 % 2-norm pseudospectra of a given matrix A.  For matrices A
 % obtained from multiscale systems there are often big
 % boring gaps in the spectrum which it is useless to bother
@@ -8,7 +8,7 @@
 % obvious SVD method.  Comes with no guarantees! L.N.
 % Trefethen, March 1999.  Ditto, AJR, 18 May 2023
 
-function multiscalePseudoSpectra(A,sc) 
+function multiscalePseudoSpectra(A,sc,maxLevel,nInt) 
 
 % Inputs:
 % A - the matrix to contour the pseudospectra
@@ -19,19 +19,23 @@ if nargin<1, A=randn(20); disp("Using matrix randn(20)"), end
 % the plot is approximately linear, and for s>sc the plot is
 % approximately logarithmic.
 if nargin<2, sc=Inf; end
+%
+% maxLevel - (optional, default 2) depth of recursive refinement
+if nargin<3, maxLevel=2; end
+%
+% nInt - (optional, default 22) the grid resolution of each level
+% maxLevel=3; nInt=10; % similar resolution and operation count
+if nargin<4, nInt=22; end
 
 % Output: in the current figure, plots spectrum and plots
 % the pseudospectra contours at levels 10^n for n in log10Vals
 
 % Parameters:  
-nInt = 22;    % the grid resolution of each level
-maxLevel = 2; % depth of recursive refinement
-% nInt=10; maxLevel=3; % similar resolution and operation count
 % fracZoom is the fraction of mesh points to refine about.
 % With fracZoom=1/nInt, operation count is roughly propto
 % nInt^(maxLevel+1)
 fracZoom = 1/nInt; 
-log10Vals = -8:4; 
+log10Vals = -8:2; 
 
 
 % establish independent scaling in each direction
@@ -78,7 +82,7 @@ end
   drawLevel(1)
   hold off
   xlabel('$\Re\lambda$'), ylabel('$\Im\lambda$')
-  colormap(0.8*parula)
+  colormap(0.8*parula(numel(log10Vals)))
   % designed to use quasiLogAxes(), but need not 
   if exist('quasiLogAxes')==2, quasiLogAxes(sc(1),sc(2)); end
   return% end of this function execution
@@ -97,7 +101,7 @@ function drawLevel(l)
     else
       for j = 1:length(M{l}.x)
         z = Z(i,j); T1 = z*I-T; T2 = T1';
-        if real(z)<100      % <- ALTER GRID POINT SELECTION
+        if real(z)<1e9 % was 100      % <- ALTER GRID POINT SELECTION
           sigold = 0; qold = zeros(n,1); beta = 0; H = [];
           q = randn(n,1) + sqrt(-1)*randn(n,1); q = q/norm(q);
           for k = 1:99
@@ -116,8 +120,8 @@ function drawLevel(l)
       end
     end%if
   end%for i
-  M{l}.h = log10(sigmin+1e-20);
-%  M{l}.h = log(1e-4+abs(Z).^2); % <-for testing
+  sig0 = 10^(min(log10Vals)-2); % avoid log(zero)
+  M{l}.h = log10(sigmin+sig0);
   
   % conditionally recursively refine
   if l<maxLevel

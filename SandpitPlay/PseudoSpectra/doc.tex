@@ -1,0 +1,196 @@
+\documentclass[11pt,a5paper]{article}
+\usepackage[a5paper,margin=9mm,bmargin=15mm]{geometry}
+%\pagestyle{headings}\let\MakeUppercase\sf
+
+\title{Pseudospectra of the patch scheme in various scenarios shows mostly insensitive}
+
+\author{A.~J.~Roberts%
+\thanks{School of Mathematical Sciences, University of Adelaide, South Australia.
+\url{https://profajroberts.github.io},
+\url{http://orcid.org/0000-0001-8930-1552}}
+}
+
+
+
+\usepackage{pgfplots} 
+\pgfplotsset{compat=newest} 
+\usepgfplotslibrary{external} %exports an external pdf for each tikz 
+% have not externalized yet though
+
+% fancyvrb does code listing, including line numbers
+\usepackage{fancyvrb}
+\newenvironment{matlab}%
+    {\Verbatim[numbers=left,firstnumber=\the\inputlineno]}%
+    {\endVerbatim}
+% Also get fancyvrb to omit %{ and %} pairs, 
+% although this requires they always be used
+\makeatletter
+\def\fancyvrbStartStop{%
+  \edef\FancyVerbStartString{\@percentchar\@charrb} 
+  \edef\FancyVerbStopString{\@percentchar\@charlb} }
+\makeatother
+% could change appearance with e.g. \renewcommand{\theFancyVerbLine}{%
+%  \textcolor{red}{\small 8.\alph{FancyVerbLine}}}
+
+
+\usepackage{url,microtype,amsmath,amssymb,defns,graphicx,hyperref,doi}
+\usepackage{mybiblatex}
+\usepackage[leftcaption,raggedright]{sidecap}
+\hypersetup{colorlinks
+    ,linkcolor=blue,citecolor=blue,pagecolor=blue%
+    ,urlcolor=magenta,filecolor=magenta,breaklinks%
+    ,dvips,bookmarks,bookmarksopen}
+\usepackage[capitalise,nameinlink,noabbrev]{cleveref}
+\crefname{equation}{}{}
+% Default "Item" useless, use enumitem and ref=
+\crefname{enumi}{}{}
+\crefname{enumii}{}{}
+\crefname{enumiii}{}{}
+\crefname{enumiv}{}{}
+
+% These are recommended by Rob J Hyndman (2011)
+% \footnote{\url{http://robjhyndman.com/researchtips/latex-floats/}}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
+
+\def\figurename{\sl Figure}
+
+\def\sign{\operatorname{sign}}
+%\newenvironment{devMan}{}{}
+\newcommand{\todo}[1]{\footnote{\textbf{ToDo:}\quad #1}}
+\def\localtableofcontents{}
+\def\into{${}\mapsto{}$}
+%\graphicspath{{Figs/}{../../Patch/Figs/}}
+
+%\def\E#1{\textsc{e}{-}#1}
+%\newcounter{i}
+%\def\Ra{\ensuremath{\operatorname{Ra}}}
+%\def\bc{\textsc{bc}}
+\Vec v
+\Bb C
+
+\newcommand\PSfig[2]{\begin{SCfigure}\centering
+    \caption{\label{fig:#1}#2}
+    \includegraphics[scale=0.75]{#1}
+    \end{SCfigure}}
+
+
+\begin{document}
+\fancyvrbStartStop
+
+\maketitle
+
+\tableofcontents
+
+
+\section{Introduction}
+
+Recall that eigenvalues~\(\lambda\) of a matrix~\(A\) are complex numbers~\(z\in\CC\) such that the \emph{resolvent}~\((zI-A)^{-1}\) does not exist---is `infinite' \citep[p.3]{Trefethen2005}.
+
+\begin{definition}
+For a given \(N\times N\) matrix~\(A\), the \emph{\(\epsilon\)-pseudospectrum} of~\(A\) is the (open) set \(z\in\CC\) such that \citep[pp.13--17]{Trefethen2005} any of the following four equivalent conditions hold:\footnote{Define \(\|\vv\|:=\sqrt{\vv\cdot\vv}\), and  \(\|A\|:=\max_{\|\vv\|=1}\|A\vv\|\).}\begin{itemize}
+\item \(\|(zI-A)^{-1}\|>\epsilon^{-1}\);
+\item \(z\) is an eigenvalue of~\(A+E\) for some matrix~\(E\) with \(\|E\|<\epsilon\);
+\item \(\min_{\|\vv\|=1}\|(zI-A)\vv\|<\epsilon\);
+\item the smallest singular value of \(zI-A\) is\({}<\epsilon\).
+\end{itemize}
+The \(\epsilon\)-pseudospectrum is denoted~\(\sigma_\epsilon(A)\).
+\end{definition}
+
+So-called normal matrices have the nicest properties: a matrix~\(A\) is termed \emph{normal} if it has a complete set of orthogonal eigenvectors \citep[p.18]{Trefethen2005}.   
+That is, if real then~\(A\) is normal iff it is symmetric.  
+Equivalently, a matrix~\(A\) is normal if it commutes with its adjoint: \(A^\dag A=AA^\dag\).
+
+\begin{theorem}
+Define the \(\epsilon\)-disk \(B_\epsilon:=\{z\in\CC: |z|<\epsilon\}\).
+Then \(\sigma_\epsilon(A)\supseteq \sigma(A)+B_\epsilon\) for each matrix~\(A\).  Equality holds iff \(A\)~is normal.
+\end{theorem}
+\PSfig{heteroDiffPseudoSpectra1}{pseudo-spectra of a patch scheme applied to heterogeneous diffusion in 1D space (\cref{sec:heteroDiffPseudoSpectra1}).  
+Plotted are the contours of the reciprocal-resolvent \(1\big/(zI-A)^{-1}\) for \(\epsilon=10^{-1:2}\).  The interior of these contours is the corresponding \(\epsilon\)-pseudospectrum.  The asinh-scaling of each axis deforms the circular contours.}%
+That is, for a normal matrix~\(A\), the \(\epsilon\)-pseudospectrum is the union of \(\epsilon\)-disks centred on each eigenvalue.
+This is the best case.
+For example, \cref{fig:heteroDiffPseudoSpectra1} plots, for \(\epsilon=10^{-1:2}\), the \(\epsilon\)-pseudospectrum of a patch scheme applied to heterogeneous diffusion in 1D space: the plot is consistent with the pseudospectra being the union of circular disks (do not be misled by the nonlinear scaling of both axes).
+
+
+For a non-normal matrix, the \(\epsilon\)-pseudospectrum is larger than (a superset of) the union of \(\epsilon\)-disks centred on each eigenvalue.
+
+
+\section{Patch schemes}
+
+Possibly the most significant property of the \(\epsilon\)-pseudospectra for a patch scheme is the property that \(\sigma_\epsilon(A)\) are the eigenvalues of~\(A+E\) for some~\(E\) with \(\|E\|<\epsilon\).
+Let matrix~\(A\) denote the linearisation matrix of the chosen patch scheme wrapped around a given microscale system.
+Then matrix~\(E\) represents `perturbation' effects of the linear system due to nonlinearity, forcing, spatial variations, etc. 
+Consequently, the \(\epsilon\)-pseudospectra indicates whether a chosen patch scheme is likely to induce any artificial instability in real application where such effects are typical. 
+
+
+
+\PSfig{heteroDiffPseudoSpectra2}{pseudo-spectrum of a patch scheme applied to heterogeneous diffusion in 2D space (\cref{sec:heteroDiffPseudoSpectra2}).
+Plotted are the contours of the reciprocal-resolvent \(1\big/(zI-A)^{-1}\) for \(\epsilon=10^{-1:2}\).
+\cref{fig:heteroDiffPseudoSpectra1%
+,fig:heteroDiffPseudoSpectra2} use spectral, edgy interpolation: finite order and/or centre-cross interpolation appears similar. }
+\cref{fig:heteroDiffPseudoSpectra1%
+,fig:heteroDiffPseudoSpectra2} indicate that the patch scheme implemented in the toolbox\footcite{Maclean2020a, Roberts2019b} for heterogeneous diffusion in 1D and 2D are robust.
+
+
+\paragraph{Wave-like systems}
+\PSfig{waveIdealPS}{pseudo-spectrum of a patch scheme applied to ideal wave system in 1D space (\cref{sec:waveIdealPS}): \(h_t=u_x\) and \(u_t=h_x\).
+Plotted are the contours of the reciprocal-resolvent \(1\big/(zI-A)^{-1}\) for \(\epsilon=0.1,1\).
+Spectra are for the toolbox's staggered patches with spectral interpolation.}
+Wave systems are challenging because it is excruciatingly easy for perturbations to tip the patch-wrapped system into unphysical instability.
+\cref{fig:waveIdealPS} are \(\epsilon\)-pseudospectra for a staggered patch scheme in 1D ideal waves.  
+The spectra indicate the patch-wrapped waves are reasonably robust to perturbations: the \(\epsilon\)-pseudospectra appear to be circles as for normal matrices; and the microscale subpatch waves appear no more sensitive to perturbations than the macroscale waves.
+
+
+ 
+
+%\PSfig{stag2DPS}{pseudo-spectrum of a staggered patch scheme applied to waves in 2D space.}
+
+\PSfig{ww2DPS0}{pseudo-spectrum of a patch scheme applied to weakly dissipative waves in 2D space:  here \(\epsilon=0.1,1,10\).  
+The scheme is staggered patches, with centre-node to patch-edge interpolation.
+Some sub-patch waves may be a little sensitive.}
+However, waves in multiple space dimensions are trickier.
+\cref{fig:ww2DPS0} plots the pseudo-spectra for an older patch scheme applied to weakly dissipative waves.
+The shape of the pseudospectra appears non-circular, suggesting the matrix is non-normal.
+The plot suggests that some of the sub-patch modes may be a little sensitive to perturbations in that a \(\epsilon=1\) contour (labelled~0) pokes out into instability. 
+
+
+\begin{figure}
+\centering
+\caption{\label{fig:heteroWave2DPS}%
+pseudo-spectrum of a patch scheme applied to heterogeneous waves in 2D space: left, \emph{unscaled}; right, scaled.  Here \(\epsilon=10^{-1:2}\).  
+The staggered patch scheme interpolates centre-cross values to the patch edges.
+These \(\epsilon\)-pseudospectra suggest that this patch scheme for waves is normal and so robust.}
+\begin{tabular}{@{}cc@{}}
+\raisebox{0.017\linewidth}{%
+\includegraphics[width=0.49\linewidth]{heteroWave2DPSinf}
+}&
+\includegraphics[width=0.49\linewidth]{heteroWave2DPS0}
+\end{tabular}
+\end{figure}
+\cref{fig:heteroWave2DPS} shows what happens when we change the inter-patch interpolation to that \emph{from the centre-cross values} in a patch to the patch-edges.
+The left panel suggests the patch-wrapped wave system is normal.
+The right panel expands the domain of the macroscale waves near zero to further indicate the robust properties of this patch-wrapping.
+
+
+%\PSfig{heteroWave2DPSinf}{\emph{unscaled} pseudo-spectrum of a patch scheme applied to heterogeneous waves in 2D space.}
+%
+%\PSfig{heteroWave2DPS0}{pseudo-spectrum of a patch scheme applied to heterogeneous waves in 2D space.}
+
+The toolbox \citep{Maclean2020a, Roberts2019b} implements this more robust centre-cross interpolation for multi-D space.
+
+\paragraph{ToDo} explore pseudospectra of implemented polynomial interpolation for bounded domains.
+
+
+
+\newpage\appendix
+\input{heteroDiffPseudoSpectra1.m}
+\input{heteroDiffPseudoSpectra2.m}
+\input{waveIdealPS.m}
+
+
+\end{document}

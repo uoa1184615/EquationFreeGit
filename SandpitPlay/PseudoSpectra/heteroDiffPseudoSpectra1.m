@@ -1,6 +1,6 @@
 % find pseudospectra of heterogeneous diffusion in 1D on
-% patches for curiosity. Here we interpolate next-to-edge
-% values to get opposite edge values.  AJR, May 2023
+% patches for curiosity. We code for either edgy or 
+% centred interpolation.  AJR, May 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{heteroDiffPseudoSpectra1}: computational
@@ -79,9 +79,9 @@ as we do not plot.
 nPatch = 5
 ratio = 0.2;
 
-leadingEvals=[];
-for ord=0:2:0
-  ordInterp=ord
+leadingEvals = [];
+for ord = 0:2:0
+  ordInterp = ord
   configPatches1(@heteroDiff,[-pi pi],nan,nPatch ...
       ,ord,ratio,nSubP,'EdgyInt',edgyInt ,'hetCoeffs',cHetr);
 %{
@@ -95,21 +95,20 @@ patches and hence are the system variables.
 %}
   u0 = zeros(nSubP,1,1,nPatch);
   u0([1 end],:,:,:)=nan; u0=u0(:);
-  i=find(~isnan(u0));
-  nJ=length(i)
-  Jac=nan(nJ);
-  for j=1:nJ
-    u0(i)=((1:nJ)==j);
-    dudt=patchSys1(0,u0);
-    Jac(:,j)=dudt(i);
+  i = find(~isnan(u0));
+  nJac = length(i)
+  Jac = nan(nJac);
+  for j = 1:nJac
+    u0(i) = ((1:nJac)==j);
+    dudt = patchSys1(0,u0);
+    Jac(:,j) = dudt(i);
   end
-  nonSymmetric=norm(Jac-Jac')
+  nonSymmetric = norm(Jac-Jac')
 %  assert(nonSymmetric<5e-9,'failed symmetry')
-  Jac(abs(Jac)<1e-12)=0;
+  Jac(abs(Jac)<1e-12) = 0;
 %{
 \end{matlab}
-Find the eigenvalues of the Jacobian, and list for
-inspection in \cref{tbl:homoDiffEdgy1}: the spectral
+Find the eigenvalues of the Jacobian: the spectral
 interpolation is effectively exact for the macroscale;
 quadratic interpolation is usually quantitatively in error;
 quartic interpolation appears to be the lowest order for
@@ -119,10 +118,10 @@ The number of zero eigenvalues, \verb|nZeroEv|, indicates
 the number of decoupled systems in this patch configuration.
 \begin{matlab}
 %}
-  [evecs,evals]=eig(Jac,'vector');
-  eval=-sort(-real(evals));
-  nZeroEv=sum(eval(:)>-1e-5) 
-  leadingEvals=[leadingEvals eval(1:2*nPatch)]
+  evals = eig(Jac);
+  eval = -sort(-real(evals));
+  nZeroEv = sum(eval(:)>-1e-5) 
+  leadingEvals = [leadingEvals eval(1:2*nPatch)]
 %{
 \end{matlab}
 
@@ -130,7 +129,22 @@ the number of decoupled systems in this patch configuration.
 \begin{matlab}
 %}
 figure(1)
-multiscalePseudoSpectra(Jac,1)
+if 0
+    opts.npts=200; opts.levels=-8:2
+    eigtool(Jac,opts,1)
+else
+multiscalePseudoSpectra(Jac,1,1,200)
+figfn=mfilename;
+set(gcf,'PaperUnits','centimeters' ...
+      ,'PaperPosition',[0 0 14 14] ...
+      ,'renderer','Painters')
+print('-depsc2',figfn)
+matlab2tikz([figfn '.tex'],'showInfo',false ...
+    ,'noSize',true,'parseStrings',false,'showWarnings',false ...
+    ,'extraCode',['\tikzsetnextfilename{' figfn '}'] ...
+    ,'extraAxisOptions','\extraAxisOptions' ...
+    ,'checkForUpdates',false)
+end
 %{
 \end{matlab}
 
@@ -145,8 +159,6 @@ End of the main script.
 
 
 
-\input{../Patch/heteroDiff.m}
+%\input{../Patch/heteroDiff.m}
 
-
-Fin.
 %}
