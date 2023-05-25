@@ -1,11 +1,11 @@
-% patchEdgeInt1() provides the interpolation across 1D space
+% aPatchEdgeInt1() provides the interpolation across 1D space
 % for 1D patches of simulations of a lattice system such as
 % PDE discretisations.  AJR & JB, Sep 2018 -- 23 Mar 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{patchEdgeInt1()}: sets patch-edge values
+\section{\texttt{aPatchEdgeInt1()}: sets patch-edge values
 from interpolation over the 1D macroscale}
-\label{sec:patchEdgeInt1}
+\label{sec:aPatchEdgeInt1}
 
 
 Couples 1D patches across 1D space by computing their edge
@@ -13,13 +13,7 @@ values from macroscale interpolation of either the mid-patch
 value \cite[]{Roberts00a, Roberts06d}, or the patch-core
 average \cite[]{Bunder2013b}, or the opposite next-to-edge
 values \cite[]{Bunder2020a}---this last alternative often
-maintains symmetry.  This function is primarily used by
-\verb|patchSys1()| but is also useful for user graphics.
-When using core averages (not fully implemented), assumes
-the averages are sensible macroscale variables: then patch
-edge values are determined by macroscale interpolation of
-the core averages \citep{Bunder2013b}. \footnote{Script
-\texttt{patchEdgeInt1test.m} verifies this code.}
+maintains symmetry.
 
 
 Communicate patch-design variables via a second argument
@@ -28,7 +22,7 @@ Communicate patch-design variables via a second argument
 \verb|patches|.
 \begin{matlab}
 %}
-function u=patchEdgeInt1(u,patches)
+function u=aPatchEdgeInt1(u,patches)
 if nargin<2, global patches, end
 %{
 \end{matlab}
@@ -128,7 +122,7 @@ reshape indicates~\verb|u| has the wrong size.
 nEnsem = patches.nEnsem;
 nVars = round(numel(u)/numel(patches.x)/nEnsem);
 assert(numel(u) == nx*nVars*nEnsem*Nx ...
-  ,'patchEdgeInt1: input u has wrong size for parameters')
+  ,'aPatchEdgeInt1: input u has wrong size for parameters')
 u = reshape(u,nx,nVars,nEnsem,Nx);
 %{
 \end{matlab}

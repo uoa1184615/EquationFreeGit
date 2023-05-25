@@ -1,11 +1,11 @@
-% patchSys1() provides an interface to time integrators for
+% aPatchSys1() provides an interface to time integrators for
 % the dynamics on patches  coupled across space. The system
 % must be a  lattice system such as PDE discretisations. 
 % AJR, Nov 2017 -- 31 Mar 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
-\section{\texttt{patchSys1()}: interface 1D space to time integrators}
-\label{sec:patchSys1}
+\section{\texttt{aPatchSys1()}: interface 1D space to time integrators}
+\label{sec:aPatchSys1}
 
 
 To simulate in time with 1D spatial patches we often need to
@@ -20,7 +20,7 @@ though to the user microscale function.
 
 \begin{matlab}
 %}
-function dudt=patchSys1(t,u,patches,varargin)
+function dudt=aPatchSys1(t,u,patches,varargin)
 if nargin<3, global patches, end
 %{
 \end{matlab}
@@ -80,7 +80,7 @@ values from macroscale interpolation of centre-patch values.
 \begin{matlab}
 %}
 sizeu = size(u);
-u = patchEdgeInt1(u,patches);
+u = aPatchEdgeInt1(u,patches);
 %{
 \end{matlab}
 
