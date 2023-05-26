@@ -4,8 +4,8 @@
 <h4>Users</h4> 
 <a href="https://github.com/uoa1184615/EquationFreeGit">
 Click to download the toolbox via Github</a>, and then place
-the toolbox's folder in a path searched by Matlab/Octave. 
-There was a major upgrade on 17 August 2020.
+the toolbox's folders <tt>Patch</tt> and <tt>ProjInt</tt> in
+a path searched by Matlab/Octave. 
 
 <p>This <em>equation-free toolbox</em> empowers the
 computer-assisted analysis of complex, multiscale systems.
@@ -26,8 +26,8 @@ main functions of interest to you.
 View Equation-Free Toolbox on Matlab's File Exchange</a>
 
 <p><strong>Please contact us</strong> via
-<a href="http://www.maths.adelaide.edu.au/anthony.roberts/">
-http://www.maths.adelaide.edu.au/anthony.roberts/ </a>
+<a href="https://profajroberts.github.io">
+https://profajroberts.github.io</a>
 
 
 
@@ -64,10 +64,10 @@ computation.
 
 
 <h4>Contributors</h4> 
-This project aims to collectively develop a
-Matlab/Octave toolbox of <em>equation-free</em> algorithms.
-Initially the algorithms are to be straightforward.  The
-plan is to subsequently develop more and more capability.
+This project aims to collectively develop a powerful and
+flexible Matlab/Octave toolbox of <em>equation-free</em>
+algorithms. Initially the algorithms are basic, and the
+ongoing program is developing more and more capability.
 <a href="https://github.com/uoa1184615/EquationFreeGit/raw/master/Doc/eqnFreeDevMan.pdf">
 <tt>Doc/eqnFreeDevMan.pdf</tt></a> fully details the
 function code and many examples.  The Appendix outlines how

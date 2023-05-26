@@ -10,7 +10,7 @@ This Developers Manual contains complete descriptions of the code in each functi
 
 \paragraph{Users}
 Download via \url{https://github.com/uoa1184615/EquationFreeGit}.
-Place the folder of this toolbox in a path searched by \script.
+Place the folders \verb|Patch| and \verb|ProjInt| of this toolbox in a path searched by \script\ (but \emph{not} the folder \verb|SandpitPlay| as that contains experimental development functions).
 Then read the section(s) that documents the function of interest.
 
 
@@ -42,13 +42,12 @@ To efficiently simulate over the large domain, one can simulate in just small pa
 
 
 \paragraph{Verification}
-Most of these schemes have proven `accuracy' when compared to the underlying specified microscale system.
-In the spatial patch schemes, we measure `accuracy' by the order of consistency between macroscale dynamics and the specified microscale.  
+Most of these schemes have analytically proven `accuracy' when compared to the underlying specified microscale system.
+In the spatial patch schemes, we measure `accuracy' by the order of consistency between macroscale dynamics and the given specified microscale.  
 \begin{itemize}
 \item \cite{Roberts06d} and \cite{Roberts2011a} proved reasonably general high-order consistency for the 1D and 2D patch schemes, respectively.
-\item In wave-like systems, \cite{Cao2014a} established high-order consistency for the 1D staggered patch scheme.
-\item A heterogeneous microscale is more difficult, but \cite{Bunder2013b} showed good accuracy in a variety of circumstances, for appropriately chosen parameters. 
-Further, \cite{Bunder2020a} developed a new `edgy' inter-patch interpolation that is proven to be good for simulating the macroscale homogenised dynamics of microscale heterogeneous systems---now coded in the toolbox.
+\item In wave-like systems, \cite{Cao2014a} established high-order consistency for the 1D staggered patch scheme, and \cite{Divahar2022b, Bunder2019d} established excellent 2D staggered patch schemes for waves.
+\item A heterogeneous microscale is more difficult, but \cite{Bunder2020a, Bunder2022b} developed a new `edgy' inter-patch interpolation that is analytically proven to be excellent for simulating the macroscale homogenised dynamics of microscale heterogeneous systems in multiple space dimensions---now coded in the toolbox.
 \end{itemize}
 
 
@@ -73,11 +72,11 @@ But such parallelisation may be only useful for scenarios where the microscale c
 
 
 \paragraph{Contributors}
-The aim of this project is to collectively develop a \script\ toolbox of equation-free algorithms.
-Initially the algorithms are basic, and the plan is to subsequently develop more and more capability.
+The aim of this project is to collectively develop a powerful and flexible \script\ toolbox of equation-free algorithms.
+Initially the algorithms are basic, and the ongoing program is developing more and more capability.
 
 \Matlab\ appears a good choice for a first version since it is widespread, efficient, supports various parallel modes, and development costs are reasonably low.
-Further it is built on \textsc{blas} and \textsc{lapack} so the cache and superscalar \cpu{} are potentially well utilised.
+Further it is built on \textsc{blas} and \textsc{lapack} so the cache and superscalar \cpu{} are well utilised.
 We aim to develop functions that work for~\script.
 \ifcsname r@sec:contribute\endcsname\cref{sec:contribute} outlines some details for contributors.\fi
 

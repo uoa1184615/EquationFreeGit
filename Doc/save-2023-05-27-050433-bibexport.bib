@@ -1,0 +1,1455 @@
+
+
+@article{Kevrekidis09a,
+  author =        {Kevrekidis, Ioannis~G. and Samaey, Giovanni},
+  journal =       {Annu. Rev. Phys. Chem.},
+  pages =         {321---44},
+  title =         {Equation-Free Multiscale Computation: Algorithms and
+                   Applications},
+  volume =        {60},
+  year =          {2009},
+  abstract =      {In traditional physicochemical modeling, one derives
+                   evolution equations at the (macroscopic, coarse)
+                   scale of interest; these are used to perform a
+                   variety of tasks (simulation, bifurcation analysis,
+                   optimization) using an arsenal of analytical and
+                   numerical techniques. For many complex systems,
+                   however, although one observes evolution at a
+                   macroscopic scale of interest, accurate models are
+                   only given at a more detailed (fine-scale,
+                   microscopic) level of description (e.g., lattice
+                   Boltzmann, kinetic Monte Carlo, molecular dynamics).
+                   Here, we review a framework for computer-aided
+                   multiscale analysis, which enables macroscopic
+                   computational tasks (over extended spatiotemporal
+                   scales) using only appropriately initialized
+                   microscopic simulation on short time and length
+                   scales. The methodology bypasses the derivation of
+                   macroscopic evolution equations when these equations
+                   conceptually exist but are not available in closed
+                   form---hence the term equation-free. We selectively
+                   discuss basic algorithms and underlying principles
+                   and illustrate the approach through representative
+                   applications. We also discuss potential difficulties
+                   and outline areas for future research.},
+  doi =           {10.1146/annurev.physchem.59.032607.093610},
+}
+
+@article{Kevrekidis04a,
+  author =        {Kevrekidis, I.~G. and Gear, C.~W. and Hummer, G.},
+  journal =       {A.~I.~Ch.~E. Journal},
+  pages =         {1346--1354},
+  title =         {Equation-free: the computer-assisted analysis of
+                   complex, multiscale systems},
+  volume =        {50},
+  year =          {2004},
+  doi =           {10.1002/aic.10106},
+}
+
+@article{Kevrekidis03b,
+  author =        {Kevrekidis, I.~G. and Gear, C.~W. and Hyman, J.~M. and
+                   Kevrekidis, P.~G. and Runborg, O. and
+                   Theodoropoulos, K.},
+  journal =       {Comm. Math. Sciences},
+  pages =         {715--762},
+  title =         {Equation-free, coarse-grained multiscale computation:
+                   enabling microscopic simulators to perform system
+                   level tasks},
+  volume =        {1},
+  year =          {2003},
+}
+
+@article{Roberts2011a,
+  author =        {Roberts, A.~J. and MacKenzie, Tony and
+                   Bunder, Judith},
+  journal =       {J.~Engineering Mathematics},
+  number =        {1},
+  pages =         {175--207},
+  title =         {A dynamical systems approach to simulating macroscale
+                   spatial dynamics in multiple dimensions},
+  volume =        {86},
+  year =          {2014},
+  abstract =      {Developments in dynamical systems theory provides new
+                   support for the macroscale modelling of \pde{}s and
+                   other microscale systems such as Lattice Boltzmann,
+                   Monte Carlo or Molecular Dynamics simulators. By
+                   systematically resolving subgrid microscale dynamics
+                   the dynamical systems approach constructs accurate
+                   closures of macroscale discretisations of the
+                   microscale system. Here we specifically explore
+                   reaction-diffusion problems in two spatial dimensions
+                   as a prototype of generic systems in multiple
+                   dimensions. Our approach unifies into one the
+                   modelling of systems by a type of finite elements,
+                   and the `equation free' macroscale modelling of
+                   microscale simulators efficiently executing only on
+                   small patches of the spatial domain. Centre manifold
+                   theory ensures that a closed model exist on the
+                   macroscale grid, is emergent, and is systematically
+                   approximated. Dividing space either into overlapping
+                   finite elements or into spatially separated small
+                   patches, the specially crafted inter-element/patch
+                   coupling also ensures that the constructed
+                   discretisations are consistent with the microscale
+                   system\slash\pde\ to as high an order as desired.
+                   Computer algebra handles the considerable algebraic
+                   details as seen in the specific application to the
+                   Ginzburg--Landau \pde. However, higher order models
+                   in multiple dimensions require a mixed numerical and
+                   algebraic approach that is also developed. The
+                   modelling here may be straightforwardly adapted to a
+                   wide class of reaction-diffusion \pde{}s and lattice
+                   equations in multiple space dimensions. When applied
+                   to patches of microscopic simulations our coupling
+                   conditions promise efficient macroscale simulation.},
+  doi =           {10.1007/s10665-013-9653-6},
+  url =           {http://arxiv.org/abs/1103.1187},
+}
+
+@article{Roberts06d,
+  author =        {Roberts, A.~J. and Kevrekidis, I.~G.},
+  journal =       {SIAM J.~Scientific Computing},
+  number =        {4},
+  pages =         {1495--1510},
+  title =         {General tooth boundary conditions for equation free
+                   modelling},
+  volume =        {29},
+  year =          {2007},
+  abstract =      {We are developing a framework for multiscale
+                   computation which enables models at a ``microscopic''
+                   level of description, for example, lattice Boltzmann,
+                   Monte Carlo, or molecular dynamics simulators, to
+                   perform modeling tasks at ``macroscopic'' length
+                   scales of interest. The plan is to use the
+                   microscopic rules restricted to small ``patches'' of
+                   the domain, the ``teeth,'' using interpolation to
+                   bridge the ``gaps.'' Here we explore general boundary
+                   conditions coupling the widely separated ``teeth'' of
+                   the microscopic simulation that achieve high order
+                   accuracy over the macroscale. We present the simplest
+                   case when the microscopic simulator is the
+                   quintessential example of a PDE. We argue that
+                   classic high order interpolation of the macroscopic
+                   field provides the correct forcing in whatever
+                   boundary condition is required by the microsimulator.
+                   Such interpolation leads to tooth boundary
+                   conditions, which achieve arbitrarily high order
+                   consistency. The high order consistency is
+                   demonstrated on a class of linear PDEs in two ways:
+                   first through the eigenvalues of the scheme for
+                   selected numerical problems, and second using the
+                   dynamical systems approach of holistic discretization
+                   on a general class of linear PDEs. Analytic modeling
+                   shows that, for a wide class of microscopic systems,
+                   the subgrid fields and the effective macroscopic
+                   model are largely independent of the tooth size and
+                   the particular tooth boundary conditions. When
+                   applied to patches of microscopic simulations these
+                   tooth boundary conditions promise efficient
+                   macroscale simulation. We expect the same approach
+                   will also accurately couple patch simulations in
+                   higher spatial dimensions.},
+  doi =           {10.1137/060654554},
+}
+
+@article{Cao2014a,
+  author =        {Cao, Meng and Roberts, A. J.},
+  journal =       {IMA J.~Applied Maths.},
+  number =        {2},
+  pages =         {228--254},
+  title =         {Multiscale modelling couples patches of nonlinear
+                   wave-like simulations},
+  volume =        {81},
+  year =          {2016},
+  abstract =      {The multiscale gap-tooth scheme is built from given
+                   microscale simulations of complicated physical
+                   processes to empower macroscale simulations. By
+                   coupling small patches of simulations over
+                   unsimulated physical gaps, large savings in
+                   computational time are possible. So far the gap-tooth
+                   scheme has been developed for dissipative systems,
+                   but wave systems are also of great interest. This
+                   article develops the gap-tooth scheme to the case of
+                   nonlinear microscale simulations of wave-like
+                   systems. Classic macroscale interpolation provides a
+                   generic coupling between patches that achieves
+                   arbitrarily high order consistency between the
+                   multiscale scheme and the underlying microscale
+                   dynamics. Eigen-analysis indicates that the resultant
+                   gap-tooth scheme empowers feasible computation of
+                   large scale simulations of wave-like dynamics with
+                   complicated underlying physics. As an pilot study, we
+                   implement numerical simulations of dam-breaking waves
+                   by the gap-tooth scheme. Comparison between a
+                   gap-tooth simulation, a microscale simulation over
+                   the whole domain, and some published experimental
+                   data on dam breaking, demonstrates that the gap-tooth
+                   scheme feasibly computes large scale wave-like
+                   dynamics with computational savings.},
+  doi =           {10.1093/imamat/hxv034},
+}
+
+@article{Bunder2013b,
+  author =        {Bunder, J.~E. and Roberts, A.~J. and
+                   Kevrekidis, I.~G.},
+  journal =       {J.~Computational Physics},
+  month =         {may},
+  pages =         {154-174},
+  title =         {Good coupling for the multiscale patch scheme on
+                   systems with microscale heterogeneity},
+  volume =        {337},
+  year =          {2017},
+  abstract =      {Computational simulation of microscale detailed
+                   systems is frequently only feasible over spatial
+                   domains much smaller than the macroscale of interest.
+                   The `equation-free' methodology couples many small
+                   patches of microscale computations across space to
+                   empower efficient computational simulation over
+                   macroscale domains of interest. Motivated by
+                   molecular or agent simulations, we analyse the
+                   performance of various coupling schemes for patches
+                   when the microscale is inherently `rough'. As a
+                   canonical problem in this universality class, we
+                   systematically analyse the case of heterogeneous
+                   diffusion on a lattice. Computer algebra explores how
+                   the dynamics of coupled patches predict the large
+                   scale emergent macroscale dynamics of the
+                   computational scheme. We determine good design for
+                   the coupling of patches by comparing the macroscale
+                   predictions from patch dynamics with the emergent
+                   macroscale on the entire domain, thus minimising the
+                   computational error of the multiscale modelling. The
+                   minimal error on the macroscale is obtained when the
+                   coupling utilises averaging regions which are between
+                   a third and a half of the patch. Moreover, when the
+                   symmetry of the inter-patch coupling matches that of
+                   the underlying microscale structure, patch dynamics
+                   predicts the desired macroscale dynamics to any
+                   specified order of error. The results confirm that
+                   the patch scheme is useful for macroscale
+                   computational simulation of a range of systems with
+                   microscale heterogeneity.},
+  doi =           {10.1016/j.jcp.2017.02.004},
+}
+
+@techreport{Bunder2020a,
+  author =        {Bunder, J. E. and Kevrekidis, I. G. and
+                   Roberts, A. J.},
+  institution =   {\url{http://arxiv.org/abs/2007.06815}},
+  month =         jul,
+  title =         {Equation-free patch scheme for efficient
+                   computational homogenisation via self-adjoint
+                   coupling},
+  year =          {2020},
+  abstract =      {Equation-free macroscale modelling is a systematic
+                   and rigorous computational methodology for
+                   efficiently predicting the dynamics of a microscale
+                   system at a desired macroscale system level. In this
+                   scheme, the given microscale model is computed in
+                   small patches spread across the space-time domain,
+                   with patch coupling conditions bridging the
+                   unsimulated space. For accurate simulations, care
+                   must be taken in designing the patch coupling
+                   conditions. Here we construct novel coupling
+                   conditions which preserve translational invariance,
+                   rotational invariance, and self-adjoint symmetry,
+                   thus guaranteeing that conservation laws associated
+                   with these symmetries are preserved in the macroscale
+                   simulation. Spectral and algebraic analyses of the
+                   proposed scheme in both one and two dimensions reveal
+                   mechanisms for further improving the accuracy of the
+                   simulations. Consistency of the patch scheme's
+                   macroscale dynamics with the original microscale
+                   model is proved. This new self-adjoint patch scheme
+                   provides an efficient, flexible, and accurate
+                   computational homogenisation in a wide range of
+                   multiscale scenarios of interest to scientists and
+                   engineers.},
+}
+
+@article{Gear02b,
+  author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
+  journal =       {SIAM Journal on Scientific Computing},
+  number =        {4},
+  pages =         {1091--1106},
+  publisher =     {SIAM},
+  title =         {Projective Methods for Stiff Differential Equations:
+                   Problems with Gaps in Their Eigenvalue Spectrum},
+  volume =        {24},
+  year =          {2003},
+  abstract =      {We show that there exist classes of explicit
+                   numerical integration methods that can handle very
+                   stiff problems if the eigenvalues are separated into
+                   two clusters, one containing the "stiff," or fast,
+                   components, and one containing the slow components.
+                   These methods have large average step sizes relative
+                   to the fast components. Conventional implicit methods
+                   involve the solution of nonlinear equations at each
+                   step, which for large problems requires significant
+                   communication between processors on a multiprocessor
+                   machine. For such problems the methods proposed here
+                   have significant potential for speed improvement.},
+  doi =           {10.1137/S1064827501388157},
+  url =           {http://link.aip.org/link/?SCE/24/1091/1},
+}
+
+@article{Gear03c,
+  author =        {Gear, C. W. and Kevrekidis, Ioannis G.},
+  journal =       {Journal of Computational Physics},
+  pages =         {95--109},
+  title =         {Telescopic projective methods for parabolic
+                   differential equations},
+  volume =        {187},
+  year =          {2003},
+}
+
+@article{Givon06,
+  author =        {Givon, Dror and Kevrekidis, Ioannis~G. and
+                   Kupferman, Raz},
+  journal =       {Comm. Math. Sci.},
+  number =        {4},
+  pages =         {707--729},
+  title =         {Strong convergence of projective integration schemes
+                   for singularly perturbed stochastic differential
+                   systems},
+  volume =        {4},
+  year =          {2006},
+  abstract =      {We study the convergence of the slow (or
+                   ``essential'') components of singularly perturbed
+                   stochastic differential systems to solutions of lower
+                   dimensional stochastic systems (the ``effective'', or
+                   ``coarse'' dynamics). We prove strong, mean-square
+                   convergence in systems where both fast and slow
+                   components are driven by noise, with full coupling
+                   between fast and slow components. We analyze a class
+                   of ``projective integration'' methods, which consist
+                   of a hybridization between a standard solver for the
+                   slow components, and short runs for the fast
+                   dynamics, which are used to estimate the effect that
+                   the fast components have on the slow ones. We obtain
+                   explicit bounds for the discrepancy between the
+                   results of the projective integration method and the
+                   slow components of the original system.},
+}
+
+@article{Marschler2014b,
+  author =        {Marschler, Christian and Sieber, Jan and
+                   Berkemer, Rainer and Kawamoto, Atsushi and
+                   Starke, Jens},
+  journal =       {SIAM J.~Appl. Dyn. Syst.},
+  number =        {2},
+  pages =         {1202--1238},
+  title =         {Implicit Methods for Equation-Free Analysis:
+                   Convergence Results and Analysis of Emergent Waves in
+                   Microscopic Traffic Models},
+  volume =        {13},
+  year =          {2014},
+  abstract =      {We introduce a general formulation for an implicit
+                   equation-free method in the setting of slow-fast
+                   systems. First, we give a rigorous convergence result
+                   for equation-free analysis showing that the
+                   implicitly defined coarse-level time stepper
+                   converges to the true dynamics on the slow manifold
+                   within an error that is exponentially small with
+                   respect to the small parameter measuring time scale
+                   separation. Second, we apply this result to the
+                   idealized traffic modeling problem of phantom jams
+                   generated by cars with uniform behavior on a circular
+                   road. The traffic jams are waves that travel slowly
+                   against the direction of traffic. Equation-free
+                   analysis enables us to investigate the behavior of
+                   the microscopic traffic model on a macroscopic level.
+                   The standard deviation of cars' headways is chosen as
+                   the macroscopic measure of the underlying dynamics
+                   such that traveling wave solutions correspond to
+                   equilibria on the macroscopic level in the
+                   equation-free setup. The collapse of the traffic jam
+                   to the free flow then corresponds to a saddle-node
+                   bifurcation of this macroscopic equilibrium. We
+                   continue this bifurcation in two parameters using
+                   equation-free analysis.},
+  doi =           {10.1137/130913961},
+}
+
+@article{Maclean2015,
+  author =        {Maclean, John and Gottwald, Georg A.},
+  journal =       {Journal of Computational and Applied Mathematics},
+  pages =         {44--69},
+  title =         {On convergence of higher order schemes for the
+                   projective integration method for stiff ordinary
+                   differential equations},
+  volume =        {288},
+  year =          {2015},
+  abstract =      {Abstract We present a convergence proof for higher
+                   order implementations of the projective integration
+                   method (PI) for a class of deterministic multi-scale
+                   systems in which fast variables quickly settle on a
+                   slow manifold. The error is shown to contain
+                   contributions associated with the length of the
+                   microsolver, the numerical accuracy of the
+                   macrosolver and the distance from the slow manifold
+                   caused by the combined effect of micro- and
+                   macrosolvers, respectively. We also provide stability
+                   conditions for the \{PI\} methods under which the
+                   fast variables will not diverge from the slow
+                   manifold. We corroborate our results by numerical
+                   simulations.},
+  doi =           {http://dx.doi.org/10.1016/j.cam.2015.04.004},
+  url =           {http://www.sciencedirect.com/science/article/pii/
+                   S0377042715002149},
+}
+
+@article{Sieber2018,
+  author =        {Sieber, J. and Marschler, C. and Starke, J.},
+  journal =       {SIAM Journal on Applied Dynamical Systems},
+  month =         jan,
+  number =        {4},
+  pages =         {2574--2614},
+  title =         {Convergence of {Equation}-{Free} {Methods} in the
+                   {Case} of {Finite} {Time} {Scale} {Separation} with
+                   {Application} to {Deterministic} and {Stochastic}
+                   {Systems}},
+  volume =        {17},
+  year =          {2018},
+  abstract =      {A common approach to studying high-dimensional
+                   systems with emergent low-dimensional behavior is
+                   based on lift-evolve-restrict maps (called
+                   equation-free methods): first, a user-defined lifting
+                   operator maps a set of low-dimensional coordinates
+                   into the high-dimensional phase space, then the
+                   high-dimensional (microscopic) evolution is applied
+                   for some time, and finally a user-defined restriction
+                   operator maps down into a low-dimensional space
+                   again. We prove convergence of equation-free methods
+                   for finite time scale separation with respect to a
+                   method parameter, the so-called healing time. Our
+                   convergence result justifies equation-free methods as
+                   a tool for performing high-level tasks such as
+                   bifurcation analysis on high-dimensional systems.
+                   More precisely, if the high-dimensional system has an
+                   attracting invariant manifold with smaller expansion
+                   and attraction rates in the tangential direction than
+                   in the transversal direction (normal hyperbolicity),
+                   and restriction and lifting satisfy some generic
+                   transversality conditions, then an implicit
+                   formulation of the lift-evolve-restrict procedure
+                   generates an approximate map that converges to the
+                   flow on the invariant manifold for healing time going
+                   to infinity. In contrast to all previous results, our
+                   result does not require the time scale separation to
+                   be large. A demonstration with Michaelis--Menten
+                   kinetics shows that the error estimates of our
+                   theorem are sharp. The ability to achieve convergence
+                   even for finite time scale separation is especially
+                   important for applications involving stochastic
+                   systems, where the evolution occurs at the level of
+                   distributions, governed by the Fokker--Planck
+                   equation. In these applications the spectral gap is
+                   typically finite. We investigate a low-dimensional
+                   stochastic differential equation where the ratio
+                   between the decay rates of fast and slow variables is
+                   2.},
+  doi =           {10.1137/17M1126084},
+}
+
+@techreport{Petersik2019,
+  author =        {Paul Petersik},
+  institution =   {[\url{https://github.com/pjpetersik/eqnfree}]},
+  title =         {Equation-free modeling},
+  year =          {2019--},
+  abstract =      {In this repository, I am working on a module that
+                   contains code from the equation-free modeling
+                   developed by Kevrekidis et al. (2004). Later, this
+                   method was refined by Marschler et al. (2014). Up
+                   until now, my focus was on wirting a the code for a
+                   coarse bifurcation analysis. The theory for this is
+                   described in Marschler et al. (2014). In the example
+                   directory, I show some codes for the coarse
+                   bifuraction analysis of traffic models.},
+}
+
+@article{Gear04,
+  author =        {Gear, C.~W. and Kaper, T.~J. and Kevrekidis, I.~G. and
+                   Zagaris, A.},
+  institution =   {[\url{http://arXiv.org/abs/physics/0405074}]},
+  journal =       {SIAM J.~Applied Dynamical Systems},
+  number =        {3},
+  pages =         {711--732},
+  title =         {Projecting to a slow manifold: singularly perturbed
+                   systems and legacy codes},
+  volume =        {4},
+  year =          {2005},
+  abstract =      {We consider dynamical systems possessing an
+                   attracting, invariant ``slow manifold '' that can be
+                   parameterized by a few observable variables. We
+                   present a procedure that, given a process for
+                   integrating the system step by step and a set of
+                   values of the observables, finds the values of the
+                   remaining system variables such that the state is
+                   close to the slow manifold to some desired accuracy.
+                   It should be noted that this is not equivalent to
+                   ``integrating down to the manifold '' since the
+                   latter process may significantly change the values of
+                   the observables. We consider problems whose solution
+                   has a singular perturbation expansion, although we do
+                   not know what it is nor have any way to compute it
+                   (because the system is not necessarily expressed in a
+                   singular perturbation form). We show in this paper
+                   that, under some conditions, computing the values of
+                   the remaining variables so that their (m + 1)st time
+                   derivatives are zero provides an estimate of the
+                   unknown variables that is an mth-order approximation
+                   to a point on the slow manifold in a sense to be
+                   defined. We then show how this criterion can be
+                   applied approximately when the system is defined by a
+                   legacy code rather than directly through closed form
+                   equations. This procedure can be valuable when one
+                   wishes to start a simulation of the detailed model on
+                   the slow manifold with particular values of
+                   observable variables characterizing the slow
+                   manifold.},
+  doi =           {10.1137/040608295},
+  url =           {http://www.siam.org/journals/siads/4-3/60829.html},
+}
+
+@article{Gear03b,
+  author =        {Gear, C.~W. and Kevrekidis, I.~G.},
+  journal =       {Phys. Lett.~A},
+  pages =         {335--343},
+  title =         {Computing in the past with forward integration},
+  volume =        {321},
+  year =          {2003},
+  abstract =      {Using existing, forward-in-time integration schemes,
+                   we demonstrate that under certain conditions it is
+                   possible to compute the solution at earlier times,
+                   even in the presence of stiffness (for which reverse
+                   integration is unstable). This technique can be used
+                   when a reverse integrator is not available---for
+                   example, when all one has is a forward-in-time legacy
+                   code. It can also be used for the ``reverse coarse''
+                   integration of the macroscopic closure of a system
+                   defined by a microscopic model which itself is
+                   naturally forward in time (e.g., a particle model of
+                   a gas). The method proposed has stability properties
+                   that enable it to converge to stationary points of
+                   unstable stiff systems.},
+  doi =           {10.1016/j.physleta.2003.12.041},
+}
+
+@article{Frewen2009,
+  author =        {Frewen, Thomas A. and Hummer, Gerhard and
+                   Kevrekidis, Ioannis G.},
+  journal =       {The Journal of Chemical Physics},
+  month =         oct,
+  number =        {13},
+  pages =         {134104},
+  title =         {Exploration of effective potential landscapes using
+                   coarse reverse integration},
+  volume =        {131},
+  year =          {2009},
+  abstract =      {We describe a reverse integration approach for the
+                   exploration of low-dimensional effective potential
+                   landscapes. Coarse reverse integration initialized on
+                   a ring of coarse states enables efficient navigation
+                   on the landscape terrain: Escape from local effective
+                   potential wells, detection of saddle points, and
+                   identification of significant transition paths
+                   between wells. We consider several distinct ring
+                   evolution modes: Backward stepping in time, solution
+                   arc length, and effective potential. The performance
+                   of these approaches is illustrated for a
+                   deterministic problem where the energy landscape is
+                   known explicitly. Reverse ring integration is then
+                   applied to noisy problems where the ring integration
+                   routine serves as an outer wrapper around a
+                   forward-in-time inner simulator. Two versions of such
+                   inner simulators are considered: A Gillespie-type
+                   stochastic simulator and a molecular dynamics
+                   simulator. In these ``equation-free'' computational
+                   illustrations, estimation techniques are applied to
+                   the results of short bursts of inner simulation to
+                   obtain the unavailable (in closed-form) quantities
+                   (local drift and diffusion coefficient estimates)
+                   required for reverse ring integration; this naturally
+                   leads to approximations of the effective landscape.},
+  doi =           {10.1063/1.3207882},
+}
+
+@article{Gear05,
+  author =        {Gear, C William and Kaper, Tasso J and
+                   Kevrekidis, Ioannis G and Zagaris, Antonios},
+  journal =       {SIAM Journal on Applied Dynamical Systems},
+  number =        {3},
+  pages =         {711--732},
+  publisher =     {SIAM},
+  title =         {Projecting to a slow manifold: Singularly perturbed
+                   systems and legacy codes},
+  volume =        {4},
+  year =          {2005},
+}
+
+@article{Hyman2005,
+  author =        {Hyman, James M.},
+  journal =       {Computing in Science \& Engineering},
+  number =        {3},
+  pages =         {47--53},
+  title =         {Patch Dynamics for Multiscale Problems},
+  volume =        {7},
+  year =          {2005},
+  doi =           {10.1109/MCSE.2005.57},
+  url =           {http://scitation.aip.org/content/aip/journal/cise/7/3/
+                   10.1109/MCSE.2005.57},
+}
+
+@article{Samaey03b,
+  author =        {Samaey, G. and Kevrekidis, I.~G. and Roose, D.},
+  journal =       {Multiscale Modeling and Simulation},
+  pages =         {278--306},
+  title =         {The gap-tooth scheme for homogenization problems},
+  volume =        {4},
+  year =          {2005},
+  abstract =      {An important class of problems exhibits smooth
+                   behavior in space and time on a macroscopic scale,
+                   while only a microscopic evolution law is known. For
+                   such time-dependent multiscale problems, an
+                   "equation-free framework'" has been proposed, of
+                   which the gap-tooth scheme is an essential component.
+                   The gap-tooth scheme is designed to approximate a
+                   time-stepper for an unavailable macroscopic equation
+                   in a macroscopic domain; it uses appropriately
+                   initialized simulations of the available microscopic
+                   model in a number of small boxes, which cover only a
+                   fraction of the domain. We analyze the convergence of
+                   this scheme for a parabolic homogenization problem
+                   with nonlinear reaction. In this case, the
+                   microscopic model is a partial differential equation
+                   with rapidly oscillating coefficients, while the
+                   unknown macroscopic model is approximated by the
+                   homogenized equation. We show that our method
+                   approximates a finite difference scheme of arbitrary
+                   (even) order for the homogenized equation when we
+                   appropriately constrain the microscopic problem in
+                   the boxes. We illustrate this theoretical result with
+                   numerical tests on several model problems. We also
+                   demonstrate that it is possible to obtain a
+                   convergent scheme without constraining the
+                   microscopic code, by introducing buffer regions
+                   around the computational boxes.},
+  doi =           {10.1137/030602046},
+}
+
+@article{Samaey04,
+  author =        {Samaey, Giovanni and Roose, Dirk and
+                   Kevrekidis, Ioannis~G.},
+  journal =       {J.~Comput Phys.},
+  pages =         {264--287},
+  title =         {Patch dynamics with buffers for homogenization
+                   problems},
+  volume =        {213},
+  year =          {2006},
+  abstract =      {An important class of problems exhibits smooth
+                   behaviour on macroscopic space and time scales, while
+                   only a microscopic evolution law is known. For such
+                   time-dependent multi-scale problems, an
+                   ``equation-free'' framework has been proposed, of
+                   which patch dynamics is an essential component. Patch
+                   dynamics is designed to perform numerical simulations
+                   of an unavailable macroscopic equation on macroscopic
+                   time and length scales; it uses appropriately
+                   initialized simulations of the available microscopic
+                   model in a number of small boxes (patches), which
+                   cover only a fraction of the space-time domain. We
+                   show that it is possible to use arbitrary boundary
+                   conditions for these patches, provided that suitably
+                   large buffer regions ``shield'' the boundary
+                   artefacts from the interior of the patches. We
+                   analyze the accuracy of this scheme for a diffusion
+                   homogenization problem with periodic heterogeneity
+                   and illustrate the approach with a set of numerical
+                   examples, which include a non-linear
+                   reaction--diffusion equation and the
+                   Kuramoto--Sivashinsky equation.},
+  doi =           {10.1016/j.jcp.2005.08.010},
+}
+
+@article{Liu2015,
+  author =        {Liu, Ping and Samaey, Giovanni and Gear, C. William and
+                   Kevrekidis, Ioannis G.},
+  journal =       {Applied Numerical Mathematics},
+  pages =         {54--69},
+  title =         {On the acceleration of spatially distributed
+                   agent-based computations: A patch dynamics scheme},
+  volume =        {92},
+  year =          {2015},
+  abstract =      {Abstract In recent years,
+                   individual-based/agent-based modeling has been
+                   applied to study a wide range of applications,
+                   ranging from engineering problems to phenomena in
+                   sociology, economics and biology. Simulating such
+                   agent-based models over extended spatiotemporal
+                   domains can be prohibitively expensive due to
+                   stochasticity and the presence of multiple scales.
+                   Nevertheless, many agent-based problems exhibit
+                   smooth behavior in space and time on a macroscopic
+                   scale, suggesting that a useful coarse-grained
+                   continuum model could be obtained. For such problems,
+                   the equation-free framework [16--18] can
+                   significantly reduce the computational cost. Patch
+                   dynamics is an essential component of this framework.
+                   This scheme is designed to perform numerical
+                   simulations of an unavailable macroscopic equation on
+                   macroscopic time and length scales; it uses
+                   appropriately initialized simulations of the
+                   fine-scale agent-based model in a number of small
+                   ``patches'', which cover only a fraction of the
+                   spatiotemporal domain. In this work, we construct a
+                   finite-volume-inspired conservative patch dynamics
+                   scheme and apply it to a financial market agent-based
+                   model based on the work of Omurtag and Sirovich [22].
+                   We first apply our patch dynamics scheme to a
+                   continuum approximation of the agent-based model, to
+                   study its performance and analyze its accuracy. We
+                   then apply the scheme to the agent-based model
+                   itself. Our computational experiments indicate that
+                   here, typically, the patch dynamics-based simulation
+                   needs to be performed in only 20% of the full agent
+                   simulation space, and in only 10% of the temporal
+                   domain.},
+  doi =           {http://dx.doi.org/10.1016/j.apnum.2014.12.007},
+  url =           {http://www.sciencedirect.com/science/article/pii/
+                   S0168927414002086},
+}
+
+@article{Roberts00a,
+  author =        {Roberts, A.~J.},
+  journal =       {Mathematics of Computation},
+  pages =         {247--262},
+  title =         {A holistic finite difference approach models linear
+                   dynamics consistently},
+  volume =        {72},
+  year =          {2003},
+  doi =           {10.1090/S0025-5718-02-01448-5},
+  url =           {http://www.ams.org/mcom/2003-72-241/S0025-5718-02-01448-5},
+}
+
+@{DividedDifferences,
+  author =        {Wikipedia},
+  month =         {dec},
+  title =         {Divided differences},
+  year =          {2022},
+  abstract =      {In mathematics, divided differences is an algorithm,
+                   historically used for computing tables of logarithms
+                   and trigonometric functions. Charles Babbage's
+                   difference engine, an early mechanical calculator,
+                   was designed to use this algorithm in its operation.
+                   Divided differences is a recursive division process.
+                   Given a sequence of data points $(x_{0},y_{0}),\ldots
+                   ,(x_{n},y_{n})$, the method calculates the
+                   coefficients of the interpolation polynomial of these
+                   points in the Newton form.},
+  url =           {https://en.wikipedia.org/wiki/Divided_differences},
+}
+
+@inproceedings{Cao2013,
+  author =        {Cao, Meng and Roberts, A. J.},
+  booktitle =     {Proceedings of the 16th Biennial Computational
+                   Techniques and Applications Conference, CTAC-2012},
+  editor =        {McCue, Scott and Moroney, Tim and Mallet, Dann and
+                   Bunder, Judith},
+  month =         may,
+  pages =         {C153--C170},
+  series =        {ANZIAM J.},
+  title =         {Multiscale modelling couples patches of wave-like
+                   simulations},
+  volume =        {54},
+  year =          {2013},
+  abstract =      {A multiscale model is proposed to significantly
+                   reduce the expensive numerical simulations of
+                   complicated waves over large spatial domains. The
+                   multiscale model is built from given microscale
+                   simulations of complicated physical processes such as
+                   sea ice or turbulent shallow water. Our long term aim
+                   is to enable macroscale simulations obtained by
+                   coupling small patches of simulations together over
+                   large physical distances. This initial work explores
+                   the coupling of patch simulations of wave-like pdes.
+                   With the line of development being to water waves we
+                   discuss the dynamics of two complementary fields
+                   called the `depth' h and `velocity' u. A staggered
+                   grid is used for the microscale simulation of the
+                   depth h and velocity u. We introduce a macroscale
+                   staggered grid to couple the microscale patches.
+                   Linear or quadratic interpolation provides boundary
+                   conditions on the field in each patch. Linear
+                   analysis of the whole coupled multiscale system
+                   establishes that the resultant macroscale dynamics is
+                   appropriate. Numerical simulations support the linear
+                   analysis. This multiscale method should empower the
+                   feasible computation of large scale simulations of
+                   wave-like dynamics with complicated underlying
+                   physics.},
+  doi =           {10.21914/anziamj.v54i0.6137},
+}
+
+@inproceedings{Cao2012,
+  author =        {Cao, Meng and Roberts, A. J.},
+  booktitle =     {18th Australasian Fluid Mechanics Conference},
+  editor =        {Brandner, P.~A. and Pearce, B.~W.},
+  month =         {Dec},
+  title =         {Modelling 3D turbulent floods based upon the
+                   Smagorinski large eddy closure},
+  year =          {2012},
+  url =           {http://people.eng.unimelb.edu.au/imarusic/proceedings/18/
+                   70%20-%20Cao.pdf},
+}
+
+@article{Cao2014b,
+  author =        {Cao, Meng and Roberts, A. J.},
+  institution =   {[\url{http://arxiv.org/abs/1407.1579}]},
+  journal =       {J.~Engrg.\ Maths},
+  number =        {1},
+  pages =         {187--204},
+  title =         {Modelling suspended sediment in environmental
+                   turbulent fluids},
+  volume =        {98},
+  year =          {2016},
+  abstract =      {Modelling sediment transport in environmental
+                   turbulent fluids is a challenge. This article
+                   develops a model of the longitudinal transport of
+                   suspended sediment in environmental fluid flows such
+                   as floods and tsunamis. The model is systematically
+                   derived from a three-dimensional turbulence model
+                   based on the Smagorinski large eddy closure.
+                   Embedding the physical dynamics into a family of
+                   problems and analysing the linear dynamics of the
+                   system, the centre manifold theory indicates the
+                   existence of a slow manifold parameterised by
+                   macroscale variables. Computer algebra then
+                   constructs the slow manifold in terms of fluid depth,
+                   depth-averaged longitudinal velocities, and suspended
+                   sediment concentration. The model includes the
+                   effects of sediment erosion, advection and dispersion
+                   and the interactions between the sediment and
+                   turbulent fluid flow. Vertical distributions of the
+                   velocity and concentration in steady flow agree with
+                   established experimental data. For a pilot study,
+                   numerical simulations of the suspended sediment under
+                   long waves show that the developed model predicts
+                   physically reasonable sediment flow interaction.},
+  doi =           {10.1007/s10665-015-9817-7},
+}
+
+@techreport{Eckhardt2022,
+  author =        {Daniel Eckhardt and Barbara Verf{\"u}rth},
+  institution =   {\url{http://arxiv.org/abs/2210.04536}},
+  month =         oct,
+  title =         {Fully discrete Heterogeneous Multiscale Method for
+                   parabolic problems with multiple spatial and temporal
+                   scales},
+  year =          {2022},
+  abstract =      {The aim of this work is the numerical homogenization
+                   of a parabolic problem with several time and spatial
+                   scales using the heterogeneous multiscale method. We
+                   replace the actual cell problem with an alternate
+                   one, using Dirichlet boundary and initial values
+                   instead of periodic boundary and time conditions.
+                   Further, we give a detailed a priori error analysis
+                   of the fully discretized, i.e., in space and time for
+                   both the macroscopic and the cell problem, method.
+                   Numerical experiments illustrate the theoretical
+                   convergence rates.},
+  annote =        {Comment: 46 pages, 4 figures},
+}
+
+@techreport{Leitenmaier2021,
+  author =        {Lena Leitenmaier and Olof Runborg},
+  institution =   {\url{http://arxiv.org/abs/2108.09463}},
+  month =         aug,
+  title =         {Heterogeneous multiscale methods for the
+                   Landau-Lifshitz equation},
+  year =          {2021},
+  abstract =      {In this paper, we present a finite difference
+                   heterogeneous multiscale method for the
+                   Landau-Lifshitz equation with a highly oscillatory
+                   diffusion coefficient. The approach combines a higher
+                   order discretization and artificial damping in the
+                   so-called micro problem to obtain an efficient
+                   implementation. The influence of different parameters
+                   on the resulting approximation error is discussed.
+                   Numerical examples for both periodic as well as more
+                   general coefficients are given to demonstrate the
+                   functionality of the approach.},
+}
+
+@techreport{Govaerts2019,
+  author =        {W. Govaerts and Yu. A. Kuznetsov and H.G.E. Meijer and
+                   B. Al-Hdaibat and V. De Witte and A. Dhooge and
+                   W. Mestrom and N. Neirynck and A.M. Riet and
+                   B. Sautois},
+  institution =
+  {\url{https://webspace.science.uu.nl/~kouzn101/NBA/ManualMatcontAug2019.pdf}},
+  month =         {aug},
+  title =         {MATCONT: Continuation toolbox for ODEs in Matlab},
+  year =          {2019},
+}
+
+@article{Maclean2020a,
+  author =        {Maclean, John and Bunder, J. E. and Roberts, A. J.},
+  institution =   {\url{http://arxiv.org/abs/2002.01895}},
+  journal =       {Numerical Algorithms},
+  month =         {oct},
+  title =         {A toolbox of Equation-Free functions in Matlab/Octave
+                   for efficient system level simulation},
+  year =          {2020},
+  abstract =      {The `equation-free toolbox' empowers the
+                   computer-assisted analysis of complex, multiscale
+                   systems. Its aim is to enable you to immediately use
+                   microscopic simulators to perform macro-scale system
+                   level tasks and analysis, because micro-scale
+                   simulations are often the best available description
+                   of a system. The methodology bypasses the derivation
+                   of macroscopic evolution equations by computing the
+                   micro-scale simulator only over short bursts in time
+                   on small patches in space, with bursts and patches
+                   well-separated in time and space respectively. We
+                   introduce the suite of coded equation-free functions
+                   in an accessible way, link to more detailed
+                   descriptions, discuss their mathematical support, and
+                   introduce a novel and efficient algorithm for
+                   Projective Integration. Some facets of toolbox
+                   development of equation-free functions are then
+                   detailed. Download the toolbox functions
+                   (https://github.com/uoa1184615/EquationFreeGit) and
+                   use to empower efficient and accurate simulation in a
+                   wide range of your science and engineering problems.},
+  annote =        {Comment: 35 pages, 4 figures, submitted to Numerical
+                   Algorithms},
+  doi =           {10.1007/s11075-020-01027-z},
+}
+
+@article{Combescure2022,
+  author =        {Combescure, Christelle},
+  journal =       {Journal of Elasticity},
+  month =         nov,
+  title =         {Selecting {Generalized} {Continuum} {Theories} for
+                   {Nonlinear} {Periodic} {Solids} {Based} on the
+                   {Instabilities} of the {Underlying} {Microstructure}},
+  year =          {2022},
+  abstract =      {In the context of architected materials, it has been
+                   observed that both long-wavelength instabilities
+                   leading possibly to localization and short-wavelength
+                   instabilities leading to the apparition of a
+                   deformation pattern could occur. This work proposes
+                   for the first time a comparison of the ability of two
+                   families of higher order equivalent media, namely
+                   strain-gradient and micromorphic media, to capture
+                   both patterning and long-wavelength macroscopic
+                   instabilities in those materials. The studied
+                   architected material consists in a simple
+                   one-dimensional arrangement of non-linear springs,
+                   thus allowing for analytical or nearly analytical
+                   treatment of the problem, avoiding any uncertainties
+                   or imprecisions coming from a numerical method. A
+                   numerical solution of the problem is then used to
+                   compare the post-buckling prediction of both models.
+                   The study concludes that, micromorphic media are the
+                   appropriate choice of equivalent continuum models to
+                   emply when dealing with the possibility of patterning
+                   inside a structured medium, but if long-wavelength
+                   global instability is of interest, a strain-gradient
+                   type equivalent medium is well suited.},
+  doi =           {10.1007/s10659-022-09949-6},
+  issn =          {1573-2681},
+}
+
+@article{ZhenfangHu2014,
+  author =        {Zhenfang Hu and Gang Pan and Yueming Wang and
+                   Zhaohui Wu},
+  journal =       {IEEE Transactions on Neural Networks and Learning
+                   Systems},
+  month =         apr,
+  number =        {4},
+  pages =         {875--890},
+  title =         {Sparse Principal Component Analysis via Rotation and
+                   Truncation},
+  volume =        {27},
+  year =          {2016},
+  abstract =      {Sparse principal component analysis (sparse PCA) aims
+                   at finding a sparse basis to improve the
+                   interpretability over the dense basis of PCA, while
+                   still covering the data subspace as much as possible.
+                   In contrast to most existing work that addresses the
+                   problem by adding sparsity penalties on various
+                   objectives of PCA, we propose a new method, sparse
+                   PCA via rotation and truncation (SPCArt), which finds
+                   a rotation matrix and a sparse basis such that the
+                   sparse basis approximates the basis of PCA after the
+                   rotation. The algorithm of SPCArt consists of three
+                   alternating steps: 1) rotating the PCA basis; 2)
+                   truncating small entries; and 3) updating the
+                   rotation matrix. Its performance bounds are also
+                   given. The SPCArt is efficient, with each iteration
+                   scaling linearly with the data dimension. Parameter
+                   choice is simple, due to explicit physical
+                   explanations. We give a unified view to several
+                   existing sparse PCA methods and discuss the
+                   connections with SPCArt. Some ideas from SPCArt are
+                   extended to GPower, a popular sparse PCA algorithm,
+                   to address its limitations. Experimental results
+                   demonstrate that SPCArt achieves the state-of-the-art
+                   performance, along with a good tradeoff among various
+                   criteria, including sparsity, explained variance,
+                   orthogonality, balance of sparsity among loadings,
+                   and computational speed.},
+  doi =           {10.1109/TNNLS.2015.2427451},
+  issn =          {2162-237X},
+}
+
+@article{Bunder2019d,
+  author =        {J.E. Bunder and J. Divahar and Ioannis G. Kevrekidis and
+                   Trent W. Mattner and A.J. Roberts},
+  institution =   {\url{https://arxiv.org/abs/1912.07815}},
+  journal =       {International Journal for Numerical Methods in
+                   Fluids},
+  month =         {apr},
+  number =        {4},
+  pages =         {953--977},
+  title =         {Large-scale simulation of shallow water waves with
+                   computation only on small staggered patches},
+  volume =        {93},
+  year =          {2021},
+  abstract =      {The multiscale patch scheme is built from given small
+                   micro-scale simulations of complicated physical
+                   processes to empower large macro-scale simulations.
+                   By coupling small patches of simulations over
+                   unsimulated spatial gaps, large savings in
+                   computational time are possible. Here we discuss
+                   generalising the patch scheme to the case of wave
+                   systems on staggered grids in 2D space. Classic
+                   macro-scale interpolation provides a generic coupling
+                   between patches that achieves arbitrarily high order
+                   consistency between the emergent macro-scale
+                   simulation and the underlying micro-scale dynamics.
+                   Eigen-analysis indicates that the resultant scheme
+                   empowers feasible computation of large macro-scale
+                   simulations of wave systems even with complicated
+                   underlying physics. As examples we use the scheme to
+                   simulate some wave scenarios via a turbulent shallow
+                   water model.},
+  doi =           {10.1002/fld.4915},
+}
+
+@techreport{Biezemans2022,
+  author =        {Rutger A. Biezemans and Claude {Le Bris} and
+                   Frederic Legoll and Alexei Lozinski},
+  institution =   {\url{https://arxiv.org/abs/2204.06852}},
+  month =         {apr},
+  title =         {Non-intrusive implementation of Multiscale Finite
+                   Element Methods: an illustrative example},
+  year =          {2022},
+  abstract =      {Multiscale Finite Element Methods (MsFEM) are finite
+                   element type approaches dedicated to multiscale
+                   problems. They first compute local, oscillatory,
+                   problem-dependent basis functions which generate a
+                   specific discretization space, and next perform a
+                   Galerkin approximation of the problem on that space.
+                   We investigate here how these approaches can be
+                   implemented in a non-intrusive way, in order to
+                   facilitate their dissemination within industrial
+                   codes or non academic environments.},
+}
+
+@techreport{Abdulle2020b,
+  author =        {Abdulle, Assyr and Arjmand, Doghonay and
+                   Paganoni, Edoardo},
+  institution =   {Institute of Mathematics, \'Ecole Polytechnique
+                   F\'ed\'erale de Lausanne},
+  month =         {apr},
+  title =         {A parabolic local problem with exponential decay of
+                   the resonance error for numerical homogenization},
+  year =          {2020},
+  abstract =      {This paper aims at an accurate and efficient
+                   computation of effective quantities, e.g., the
+                   homogenized coefficients for approximating the
+                   solutions to partial differential equations with
+                   oscillatory coefficients. Typical multiscale methods
+                   are based on a micro-macro coupling, where the macro
+                   model describes the coarse scale behaviour, and the
+                   micro model is solved only locally to upscale the
+                   effective quantities, which are missing in the macro
+                   model. The fact that the micro problems are solved
+                   over small domains within the entire macroscopic
+                   domain, implies imposing artificial boundary
+                   conditions on the boundary of the microscopic
+                   domains. A naive treatment of these artificial
+                   boundary conditions leads to a first order error in
+                   */*, where * < * represents the characteristic length
+                   of the small scale oscillations and *d is the size of
+                   micro domain. This error dominates all other errors
+                   originating from the discretization of the macro and
+                   the micro problems, and its reduction is a main issue
+                   in today*s engineering multiscale computations. The
+                   objective of the present work is to analyse a
+                   parabolic approach, first announced in [A. Abdulle,
+                   D. Arjmand, E. Paganoni, C. R. Acad. Sci. Paris, Ser.
+                   I, 2019], for computing the homogenized coefficients
+                   with arbitrarily high convergence rates in */*. The
+                   analysis covers the setting of periodic
+                   microstructure, and numerical simulations are
+                   provided to verify the theoretical findings for more
+                   general settings, e.g. random stationary micro
+                   structures.},
+}
+
+@techreport{Maier2021,
+  author =        {Bernhard Maier and Barbara Verf{\"u}rth},
+  institution =   {\url{http://arxiv.org/abs/2107.14069}},
+  month =         jul,
+  title =         {Numerical upscaling for wave equations with
+                   time-dependent multiscale coefficients},
+  year =          {2021},
+  abstract =      {In this paper, we consider the classical wave
+                   equation with time-dependent, spatially multiscale
+                   coefficients. We propose a fully discrete
+                   computational multiscale method in the spirit of the
+                   localized orthogonal decomposition in space with a
+                   backward Euler scheme in time. We show optimal
+                   convergence rates in space and time beyond the
+                   assumptions of spatial periodicity or scale
+                   separation of the coefficients. Further, we propose
+                   an adaptive update strategy for the time-dependent
+                   multiscale basis. Numerical experiments illustrate
+                   the theoretical results and showcase the
+                   practicability of the adaptive update strategy.},
+}
+
+@article{Bunder2015a,
+  author =        {Bunder, Judith and Roberts, A.~J. and
+                   Kevrekidis, Ioannis~G.},
+  journal =       {SIAM Journal on Scientific Computing},
+  number =        {4},
+  pages =         {C335--C371},
+  title =         {Accuracy of patch dynamics with mesoscale temporal
+                   coupling for efficient massively parallel
+                   simulations},
+  volume =        {38},
+  year =          {2016},
+  abstract =      {Massive parallelisation has lead to a dramatic
+                   increase in available computational power. However,
+                   data transfer speeds have failed to keep pace and are
+                   the major limiting factor in the development of
+                   exascale computing. New algorithms must be developed
+                   which minimise the transfer of data. Patch dynamics
+                   is a computational macroscale modelling scheme which
+                   provides a coarse macroscale solution of a problem
+                   defined on a fine microscale by dividing the domain
+                   into many nonoverlapping, coupled patches. Patch
+                   dynamics is readily adaptable to massive
+                   parallelisation as each processor can evaluate the
+                   dynamics on one, or a few, patches. However, patch
+                   coupling conditions interpolate across the
+                   unevaluated parts of the domain between patches, and
+                   are typically reevaluated at every microscale time
+                   step, thus requiring almost continuous data transfer.
+                   We propose a modified patch dynamics scheme which
+                   minimises data transfer by only reevaluating the
+                   patch coupling conditions at `mesoscale' time scales
+                   which are significantly larger than the microscale
+                   time of the microscale problem. We analyse the error
+                   arising from patch dynamics with mesoscale temporal
+                   coupling as a function of the mesoscale time
+                   interval, patch size, and ratio between the
+                   microscale and macroscale.},
+  doi =           {10.1137/15M1015005},
+}
+
+@article{Taylor53,
+  author =        {Taylor, G.~I.},
+  journal =       {Proc. Roy. Soc. Lond.~A},
+  pages =         {186--203},
+  title =         {Dispersion of soluble matter in solvent flowing
+                   slowly through a tube},
+  volume =        {219},
+  year =          {1953},
+}
+
+@article{Watt94b,
+  author =        {Watt, S.~D. and Roberts, A.~J.},
+  journal =       {SIAM J.~Appl. Math.},
+  note =              {\url{http://epubs.siam.org/sam-bin/dbq/article/25797}},
+  number =        {4},
+  pages =         {1016--1038},
+  title =         {The accurate dynamic modelling of contaminant
+                   dispersion in channels},
+  volume =        {55},
+  year =          {1995},
+  abstract =      {Throw some dye into a flowing river; how is the dye
+                   going to disperse along the river? The dynamics may
+                   be modelled by Taylor's one-dimensional model of
+                   shear dispersion. We discuss the creation and utility
+                   of models of the dispersion of the dye, using
+                   invariant manifold theory. The models are effective
+                   exponentially quickly. We describe a one-mode centre
+                   manifold and a two-mode and a three-mode invariant
+                   manifold model. From the analysis, we decide under
+                   what conditions these three models are valid. Using
+                   the geometric picture provided by the theory of
+                   invariant manifolds, we find a complete set of
+                   initial conditions for the models so that the
+                   evolution of the full and approximate systems are
+                   identical after a short time. Throughout, a
+                   comparison of the three models is made to identify
+                   the practical situations when each model will be
+                   preferred.},
+  doi =           {10.1137/S0036139993257971},
+}
+
+@inproceedings{MacKenzie03,
+  author =        {MacKenzie, T. and Roberts, A.~J.},
+  booktitle =     {Proc. of 10th Computational Techniques and
+                   Applications Conference CTAC-2001},
+  editor =        {Burrage, K. and Sidje, Roger B.},
+  journal =       {ANZIAM~J.},
+  month =         mar,
+  pages =         {C512--C530},
+  title =         {Holistic discretisation of shear dispersion in a
+                   two-dimensional channel},
+  volume =        {44},
+  year =          {2003},
+  doi =           {10.21914/anziamj.v44i0.694},
+}
+
+@article{Wilson00,
+  author =        {Wilson, S.~K. and Hunt, R. and Duffy, B.~R.},
+  journal =       {J.~Fluid Mech.},
+  pages =         {65--88},
+  title =         {The rate of spreading in spin coating},
+  volume =        {413},
+  year =          {2000},
+}
+
+@article{Oron97,
+  author =        {Oron, A. and Davis, S.~H. and Bankoff, S.~G.},
+  journal =       {Rev. Mod. Phys.},
+  note =          {\url{http://link.aps.org/abstract/RMP/v69/p931}},
+  pages =         {931--980},
+  title =         {Long-scale evolution of thin liquid films},
+  volume =        {69},
+  year =          {1997},
+  abstract =      {Macroscopic thin liquid films are entities that are
+                   important in biophysics, physics, and engineering, as
+                   well as in natural settings. They can be composed of
+                   common liquids such as water or oil, rheologically
+                   complex materials such as polymers solutions or
+                   melts, or complex mixtures of phases or components.
+                   When the films are subjected to the action of various
+                   mechanical, thermal, or structural factors, they
+                   display interesting dynamic phenomena such as wave
+                   propagation, wave steepening, and development of
+                   chaotic responses. Such films can display rupture
+                   phenomena creating holes, spreading of fronts, and
+                   the development of fingers. In this review a unified
+                   mathematical theory is presented that takes advantage
+                   of the disparity of the length scales and is based on
+                   the asymptotic procedure of reduction of the full set
+                   of governing equations and boundary conditions to a
+                   simplified, highly nonlinear, evolution equation or
+                   to a set of equations. As a result of this long-wave
+                   theory, a mathematical system is obtained that does
+                   not have the mathematical complexity of the original
+                   free-boundary problem but does preserve many of the
+                   important features of its physics. The basics of the
+                   long-wave theory are explained. If, in addition, the
+                   Reynolds number of the flow is not too large, the
+                   analogy with Reynolds's theory of lubrication can be
+                   drawn. A general nonlinear evolution equation or
+                   equations are then derived and various particular
+                   cases are considered. Each case contains a discussion
+                   of the linear stability properties of the base-state
+                   solutions and of the nonlinear spatiotemporal
+                   evolution of the interface (and other scalar
+                   variables, such as temperature or solute
+                   concentration). The cases reducing to a single highly
+                   nonlinear evolution equation are first examined.
+                   These include: (a) films with constant interfacial
+                   shear stress and constant surface tension, (b) films
+                   with constant surface tension and gravity only, (c)
+                   films with van der Waals (long-range molecular)
+                   forces and constant surface tension only, (d) films
+                   with thermocapillarity, surface tension, and body
+                   force only, (e) films with temperature-dependent
+                   physical properties, (f) evaporating/condensing
+                   films, (g) films on a thick substrate, (h) films on a
+                   horizontal cylinder, and (i) films on a rotating
+                   disc. The dynamics of the films with a spatial
+                   dependence of the base-state solution are then
+                   studied. These include the examples of nonuniform
+                   temperature or heat flux at liquid-solid boundaries.
+                   Problems which reduce to a set of nonlinear evolution
+                   equations are considered next. Those include (a) the
+                   dynamics of free liquid films, (b) bounded films with
+                   interfacial viscosity, and (c) dynamics of soluble
+                   and insoluble surfactants in bounded and free films.
+                   The spreading of drops on a solid surface and moving
+                   contact lines, including effects of heat and mass
+                   transport and van der Waals attractions, are then
+                   addressed. Several related topics such as falling
+                   films and sheets and Hele-Shaw flows are also briefly
+                   discussed. The results discussed give motivation for
+                   the development of careful experiments which can be
+                   used to test the theories and exhibit new phenomena.},
+}
+
+@article{Dellar2005,
+  author =        {Dellar, Paul J. and Salmon, Rick},
+  journal =       {Phys. Fluids},
+  pages =         {106601},
+  title =         {Shallow water equations with a complete Coriolis
+                   force and topography},
+  volume =        {17},
+  year =          {2005},
+  doi =           {10.1063/1.2116747},
+}
+
+@incollection{Hereman2009,
+  author =        {Hereman, Willy},
+  booktitle =     {Mathematics of Complexity and Dynamical Systems},
+  month =         {01},
+  pages =         {8112--8125},
+  publisher =     {Springer, New York},
+  title =         {Shallow Water Waves and Solitary Waves},
+  year =          {2009},
+  doi =           {10.1007/978-0-387-30440-3_480},
+}
+
+@techreport{Bunder2018a,
+  author =        {Bunder, J. E. and Roberts, A. J.},
+  institution =   {[\url{https://arxiv.org/abs/1806.10297}]},
+  month =         jun,
+  title =         {Nonlinear emergent macroscale {PDEs}, with error
+                   bound, for nonlinear microscale systems},
+  year =          {2018},
+  abstract =      {Many physical systems are formulated on domains which
+                   are relatively large in some directions but
+                   relatively thin in other directions. We expect such
+                   systems to have emergent structures that vary slowly
+                   over the large dimensions. Common mathematical
+                   approximations for determining the emergent dynamics
+                   often rely on self-consistency arguments or limits as
+                   the aspect ratio of the `large' and `thin' dimensions
+                   becomes nonphysically infinite. Here we extend to
+                   nonlinear dynamics a new approach [IMA J. Appl.
+                   Maths, DOI: 10.1093/imamat/hxx021] which analyses the
+                   dynamics at each cross-section of the domain via a
+                   rigorous multivariate Taylor series. Then centre
+                   manifold theory supports the global modelling of the
+                   system's emergent dynamics in the large but finite
+                   domain. Interactions between the cross-section
+                   coupling and both fast and slow dynamics determines
+                   quantitative error bounds for the nonlinear
+                   modelling. We illustrate the methodology by deriving
+                   the large-scale dynamics of a thin liquid film, where
+                   the film is subject to a Coriolis force induced by a
+                   rotating substrate. The approach developed here
+                   quantifies the accuracy of known approximations,
+                   extends such approximations to mixed order modelling,
+                   and may open previously intractable modelling issues
+                   to new tools and insights.},
+}
+
+@book{Higham98,
+  author =        {N.~J.~Higham},
+  edition =       {2nd edition},
+  publisher =     {SIAM},
+  title =         {Handbook of writing for the mathematical sciences},
+  year =          {1998},
+}
+
+@article{Calderon2007,
+  author =        {Calderon, C.~P.},
+  journal =       {Molecular Simulation},
+  month =         {August},
+  number =        {9---10},
+  pages =         {713---731},
+  title =         {Local diffusion models for stochastic reacting
+                   systems: estimation issues in equation-free numerics},
+  volume =        {33},
+  year =          {2007},
+  abstract =      {Extracting coarse-grained derivative information from
+                   fine scale, atomistic/stochastic simulations
+                   constitutes an important component of multiscale
+                   numerics for reacting systems. In this paper, we
+                   demonstrate the use of local parametric diffusion
+                   models; observing the output of short bursts of
+                   stochastic simulation, the drift and diffusion
+                   coefficients of such local models are obtained ``on
+                   demand'' by maximizing an approximation of the
+                   likelihood function. The parametric fit utilizes the
+                   likelihood expansion of Ait-Sahalia, giving
+                   closed-form expressions for the transition density of
+                   both scalar and multivariate processes. The fine
+                   scale simulations generating the data are the
+                   Gillespie stochastic simulation algorithm as well as
+                   stochastic differential equations (SDEs). The
+                   postulated local parametric diffusion models are SDEs
+                   with affine drift and diffusion functions; the
+                   information extracted from these (estimated) local
+                   parametric models is utilized in various
+                   ``equation-free'' computational tasks. We demonstrate
+                   how such local diffusion modeling can (1) contribute
+                   to linking stochastic simulation with traditional,
+                   continuum numerical methods such as fixed point and
+                   initial value problem solving algorithms as well as
+                   variational integration; (2) aid in extracting
+                   quantitative information about the invariant
+                   distribution associated with the underlying
+                   stochastic system; and (3) be used in computational
+                   model reduction motivated by singular perturbation
+                   theory.},
+  doi =           {10.1080/08927020701344740},
+}
+
+@article{Roberts99b,
+  author =        {Roberts, A.~J. and Li, Zhenquan},
+  journal =       {J.~Fluid Mech.},
+  month =         apr,
+  pages =         {33--73},
+  title =         {An accurate and comprehensive model of thin fluid
+                   flows with inertia on curved substrates},
+  volume =        {553},
+  year =          {2006},
+  doi =           {10.1017/S0022112006008640},
+}
+
+@article{Gustafsson1975,
+  author =        {Gustafsson, Bertil},
+  journal =       {Mathematics of Computation},
+  number =        {10},
+  pages =         {396--406},
+  title =         {The convergence rate for difference approximations to
+                   mixed initial boundary value problems},
+  volume =        {29},
+  year =          {1975},
+}
+
+@article{Svard2006,
+  author =        {Svard, Magnus and Nordstrom, Jan},
+  journal =       {Journal of Computational Physics},
+  pages =         {333--352},
+  title =         {On the order of accuracy for difference
+                   approximations of initial-boundary value problems},
+  volume =        {218},
+  year =          {2006},
+  doi =           {10.1016/j.jcp.2006.02.014},
+}
+
+@techreport{LAMMPS,
+  author =        {Plimpton, Steve and Thompson, Aidan and Shan, Ray and
+                   Moore, Stan and Kohlmeyer, Axel and Crozier, Paul and
+                   Stevens, Mark},
+  institution =   {\url{http://lammps.sandia.gov}},
+  title =         {Large-scale Atomic/Molecular Massively Parallel
+                   Simulator},
+  year =          {2016},
+}
+

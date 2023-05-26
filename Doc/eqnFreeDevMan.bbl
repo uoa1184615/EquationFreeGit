@@ -35,6 +35,13 @@ Bunder, J.~E. \harvardand\ Roberts, A.~J.  \harvardyearleft
   bound, for nonlinear microscale systems, Technical report,
   [\url{https://arxiv.org/abs/1806.10297}].
 
+\harvarditem{Bunder \harvardand\ Roberts}{2022}{Bunder2022b}
+Bunder, J.~E. \harvardand\ Roberts, A.~J.  \harvardyearleft
+  2022\harvardyearright , `High-order homogenisation by learning spatial
+  discretisations of {PDEs} that provably preserve self-adjointness', {\em
+  Partial Differential Equations in Applied Mathematics} {\bf
+  6}(100449),~1--16.
+
 \harvarditem[Bunder et~al.]{Bunder, Roberts \harvardand\
   Kevrekidis}{2017}{Bunder2013b}
 Bunder, J.~E., Roberts, A.~J. \harvardand\ Kevrekidis, I.~G.  \harvardyearleft
@@ -89,6 +96,14 @@ Combescure, C.  \harvardyearleft 2022\harvardyearright , `Selecting
 Dellar, P.~J. \harvardand\ Salmon, R.  \harvardyearleft 2005\harvardyearright ,
   `Shallow water equations with a complete coriolis force and topography', {\em
   Phys. Fluids} {\bf 17},~106601.
+
+\harvarditem[Divahar et~al.]{Divahar, Roberts, Mattner, Bunder \harvardand\
+  Kevrekidis}{2022}{Divahar2022b}
+Divahar, J., Roberts, A.~J., Mattner, T.~W., Bunder, J.~E. \harvardand\
+  Kevrekidis, I.~G.  \harvardyearleft 2022\harvardyearright , `Two novel
+  families of multiscale staggered patch schemes efficiently simulate
+  large-scale, weakly damped, linear waves', {\em Computer Methods in Applied
+  Mechanics and Engineering} {\bf accepted 16/5/2023}.
 
 \harvarditem{Eckhardt \harvardand\ Verf{\"u}rth}{2022}{Eckhardt2022}
 Eckhardt, D. \harvardand\ Verf{\"u}rth, B.  \harvardyearleft
