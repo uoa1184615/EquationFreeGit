@@ -1,0 +1,259 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{Bunder2020a}{article}{}
+    \name{author}{3}{}{%
+      {{hash=BJE}{%
+         family={Bunder},
+         familyi={B\bibinitperiod},
+         given={J.\bibnamedelima E.},
+         giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+      {{hash=KIG}{%
+         family={Kevrekidis},
+         familyi={K\bibinitperiod},
+         given={I.\bibnamedelima G.},
+         giveni={I\bibinitperiod\bibinitdelim G\bibinitperiod},
+      }}%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \keyw{Mathematics - Dynamical Systems, Physics - Computational Physics}
+    \strng{namehash}{BJEKIGRAJ1}
+    \strng{fullhash}{BJEKIGRAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2021}
+    \field{labeldatesource}{}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{abstract}{%
+    Equation-free macroscale modelling is a systematic and rigorous
+  computational methodology for efficiently predicting the dynamics of a
+  microscale system at a desired macroscale system level. In this scheme, the
+  given microscale model is computed in small patches spread across the
+  space-time domain, with patch coupling conditions bridging the unsimulated
+  space. For accurate simulations, care must be taken in designing the patch
+  coupling conditions. Here we construct novel coupling conditions which
+  preserve translational invariance, rotational invariance, and self-adjoint
+  symmetry, thus guaranteeing that conservation laws associated with these
+  symmetries are preserved in the macroscale simulation. Spectral and algebraic
+  analyses of the proposed scheme in both one and two dimensions reveal
+  mechanisms for further improving the accuracy of the simulations. Consistency
+  of the patch scheme's macroscale dynamics with the original microscale model
+  is proved. This new self-adjoint patch scheme provides an efficient,
+  flexible, and accurate computational homogenisation in a wide range of
+  multiscale scenarios of interest to scientists and engineers.%
+    }
+    \verb{doi}
+    \verb 10.1007/s00211-021-01232-5
+    \endverb
+    \field{number}{2}
+    \field{pages}{229\bibrangedash 272}
+    \field{title}{Equation-free patch scheme for efficient computational
+  homogenisation via self-adjoint coupling}
+    \field{volume}{149}
+    \field{journaltitle}{Numerische Mathematik}
+    \field{month}{07}
+    \field{year}{2021}
+  \endentry
+
+  \entry{Maclean2020a}{article}{}
+    \name{author}{3}{}{%
+      {{hash=MJ}{%
+         family={Maclean},
+         familyi={M\bibinitperiod},
+         given={John},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=BJE}{%
+         family={Bunder},
+         familyi={B\bibinitperiod},
+         given={J.\bibnamedelima E.},
+         giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \keyw{Computer Science - Mathematical Software, Mathematics - Numerical
+  Analysis}
+    \strng{namehash}{MJBJERAJ1}
+    \strng{fullhash}{MJBJERAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2021}
+    \field{labeldatesource}{}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{abstract}{%
+    The `equation-free toolbox' empowers the computer-assisted analysis of
+  complex, multiscale systems. Its aim is to enable you to immediately use
+  microscopic simulators to perform macro-scale system level tasks and
+  analysis, because micro-scale simulations are often the best available
+  description of a system. The methodology bypasses the derivation of
+  macroscopic evolution equations by computing the micro-scale simulator only
+  over short bursts in time on small patches in space, with bursts and patches
+  well-separated in time and space respectively. We introduce the suite of
+  coded equation-free functions in an accessible way, link to more detailed
+  descriptions, discuss their mathematical support, and introduce a novel and
+  efficient algorithm for Projective Integration. Some facets of toolbox
+  development of equation-free functions are then detailed. Download the
+  toolbox functions (https://github.com/uoa1184615/EquationFreeGit) and use to
+  empower efficient and accurate simulation in a wide range of your science and
+  engineering problems.%
+    }
+    \verb{doi}
+    \verb 10.1007/s11075-020-01027-z
+    \endverb
+    \field{pages}{1729\bibrangedash 1748}
+    \field{title}{A toolbox of Equation-Free functions in Matlab/Octave for
+  efficient system level simulation}
+    \field{volume}{87}
+    \list{institution}{1}{%
+      {\url{http://arxiv.org/abs/2002.01895}}%
+    }
+    \field{journaltitle}{Numerical Algorithms}
+    \field{annotation}{%
+    Comment: 35 pages, 4 figures, submitted to Numerical Algorithms%
+    }
+    \field{year}{2021}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Roberts2023a}{report}{}
+    \name{author}{4}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=TDT}{%
+         family={Tran-Duc},
+         familyi={T\bibinithyphendelim D\bibinitperiod},
+         given={Thien},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=BJ}{%
+         family={Bunder},
+         familyi={B\bibinitperiod},
+         given={J.E.},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=KY}{%
+         family={Kevrekidis},
+         familyi={K\bibinitperiod},
+         given={Yannis},
+         giveni={Y\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{RAJ+1}
+    \strng{fullhash}{RAJTDTBJKY1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2023}
+    \field{labeldatesource}{}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{abstract}{%
+    Modern `smart' materials have complex microscale structure, often with
+  unknown macroscale closure. The Equation-Free Patch Scheme empowers us to
+  non-intrusively, efficiently, and accurately simulate over large scales
+  through computations on only small well-separated patches of the microscale
+  system. Here the microscale system is a solid beam of random heterogeneous
+  elasticity. The continuing challenge is to compute the given physics on just
+  the microscale patches, and couple the patches across un-simulated macroscale
+  space, in order to establish efficiency, accuracy, consistency, and stability
+  on the macroscale. Dynamical systems theory supports the scheme. This
+  research program is to develop a systematic non-intrusive approach, both
+  computationally and analytically proven, to model and compute accurately
+  macroscale system levels of general complex physical and engineering
+  systems.%
+    }
+    \verb{doi}
+    \verb 10.48550/arXiv.2301.13145
+    \endverb
+    \field{title}{Accurate and efficient multiscale simulation of a
+  heterogeneous elastic beam via computation on small sparse patches}
+    \list{institution}{1}{%
+      {\url{https://arxiv.org/abs/2301.13145}}%
+    }
+    \field{type}{techreport}
+    \field{month}{01}
+    \field{year}{2023}
+  \endentry
+
+  \entry{Samaey08}{incollection}{}
+    \name{author}{3}{}{%
+      {{hash=SG}{%
+         family={Samaey},
+         familyi={S\bibinitperiod},
+         given={G.},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=KIG}{%
+         family={Kevrekidis},
+         familyi={K\bibinitperiod},
+         given={I.\bibnamedelima G.},
+         giveni={I\bibinitperiod\bibinitdelim G\bibinitperiod},
+      }}%
+    }
+    \name{editor}{1}{}{%
+      {{hash=FJ}{%
+         family={Fish},
+         familyi={F\bibinitperiod},
+         given={Jacob},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Oxford University Press}%
+    }
+    \strng{namehash}{SGRAJKIG1}
+    \strng{fullhash}{SGRAJKIG1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2010}
+    \field{labeldatesource}{}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{booktitle}{Multiscale methods: bridging the scales in science and
+  engineering}
+    \field{chapter}{8}
+    \field{isbn}{978-0-19-923385-4}
+    \field{pages}{216\bibrangedash 246}
+    \field{title}{Equation-free computation: an overview of patch dynamics}
+    \field{year}{2010}
+  \endentry
+\enddatalist
+\endinput

@@ -104,7 +104,7 @@ responsible the locations makes sense.
 \end{itemize}
 
 
-\item \verb|nPatch| sets the number of equi-spaced spatial
+\item \verb|nPatch| determines the number of spatial
 patches: if scalar, then use the same number of patches in
 all three directions, otherwise \verb|nPatch(1:3)| gives the
 number~($\geq1$) of patches in each direction.

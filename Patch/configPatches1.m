@@ -76,8 +76,7 @@ sense.
 \end{itemize}
 
 
-\item \verb|nPatch| is the number of equi-spaced spatial
-patches.
+\item \verb|nPatch| is the number of spatial patches.
 
 \item \verb|ordCC|, must be~$\geq -1$, is the `order' of
 interpolation across empty space of the macroscale patch

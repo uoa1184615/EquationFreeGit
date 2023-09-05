@@ -96,7 +96,7 @@ responsible the locations makes sense.
 \end{itemize}
 
 
-\item \verb|nPatch| sets the number of equi-spaced spatial
+\item \verb|nPatch| determines the number of spatial
 patches: if scalar, then use the same number of patches in
 both directions, otherwise \verb|nPatch(1:2)| gives the
 number of patches~($\geq1$) in each direction.
