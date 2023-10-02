@@ -1,6 +1,6 @@
 % configPatches3() creates a data struct of the design of 3D
 % patches for later use by the patch functions such as
-% patchSys3().  AJR, Aug 2020 -- 2 Feb 2023
+% patchSys3().  AJR, Aug 2020 -- 2 Oct 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches3()}: configures spatial
@@ -19,6 +19,7 @@ of its use.
 %}
 function patches = configPatches3(fun,Xlim,Dom ...
     ,nPatch,ordCC,dx,nSubP,varargin)
+version = '2023-10-02';
 %{
 \end{matlab}
 
@@ -31,9 +32,10 @@ of simulating a heterogeneous wave \pde---see
 \begin{itemize}
 
 \item \verb|fun| is the name of the user function,
-\verb|fun(t,u,patches)| or \verb|fun(t,u)|, that computes
-time-derivatives (or time-steps) of quantities on the 3D
-micro-grid within all the 3D~patches.
+\verb|fun(t,u,patches)| or \verb|fun(t,u)| or
+\verb|fun(t,u,patches,...)|, that computes time-derivatives
+(or time-steps) of quantities on the 3D micro-grid within
+all the 3D~patches.
 
 \item \verb|Xlim| array/vector giving the rectangular-cuboid
 macro-space domain of the computation: namely
@@ -41,6 +43,11 @@ $[\verb|Xlim(1)|, \verb|Xlim(2)|] \times [\verb|Xlim(3)|,
 \verb|Xlim(4)| \times [\verb|Xlim(5)|, \verb|Xlim(6)|]$. If
 \verb|Xlim| has two elements, then the domain is the cubic
 domain of the same interval in all three directions.
+
+But, if \(\verb|nPatch(n)|=1\), then in the spatial 
+direction~\verb|n| the domain is the mean of 
+\verb|Xlim(2*n-1:2*n)| plus/minus half the patch-width 
+in that direction.
 
 \item \verb|Dom| sets the type of macroscale conditions for
 the patches, and reflects the type of microscale boundary
@@ -102,7 +109,7 @@ responsible the locations makes sense.
 \end{itemize}
 
 
-\item \verb|nPatch| sets the number of equi-spaced spatial
+\item \verb|nPatch| determines the number of spatial
 patches: if scalar, then use the same number of patches in
 all three directions, otherwise \verb|nPatch(1:3)| gives the
 number~($\geq1$) of patches in each direction.
@@ -123,24 +130,29 @@ However, if \verb|Dom| is~\verb|NaN| (as for pre-2023), then
 \verb|dx| actually is \verb|ratio| (scalar or three elements),
 namely the ratio of (depending upon \verb|EdgyInt|) either
 the half-width or full-width of a patch to the equi-spacing
-of the patch mid-points.  So either $\verb|ratio|=\tfrac12$
-means the patches abut and $\verb|ratio|=1$ is overlapping
-patches as in holistic discretisation, or $\verb|ratio|=1$
-means the patches abut.  Small~\verb|ratio| should greatly
-reduce computational time.
+of the patch mid-points---adjusted a little when $\verb|nEdge|>1$. So
+either $\verb|ratio|=\tfrac12$ means the patches abut and
+$\verb|ratio|=1$ is overlapping patches as in holistic
+discretisation, or $\verb|ratio|=1$ means the patches abut. 
+Small~\verb|ratio| should greatly reduce computational time.
+
 
 \item \verb|nSubP| is the number of equi-spaced microscale
 lattice points in each patch: if scalar, then use the same
 number in all three directions, otherwise \verb|nSubP(1:3)|
 gives the number in each direction. If not using
-\verb|EdgyInt|, then must be odd so that there is/are
-centre-patch micro-grid point\slash planes in each patch.
+\verb|EdgyInt|, then $\verb|nSubP./nEdge|$ must be odd integer(s) so that there 
+is/are centre-patch lattice planes.  So for the defaults 
+of $\verb|nEdge|=1$ and not \verb|EdgyInt|, then 
+\verb|nSubP| must be odd.
 
-\item \verb|'nEdge'| (not yet implemented), \emph{optional},
-default=1, for each patch, the number of face values set by
-interpolation at the face regions of each patch.  The
-default is one (suitable for microscale lattices with only
-nearest neighbour interactions).
+
+\item \verb|'nEdge'|, \emph{optional} (integer---scalar or
+three element), default=1, the width of face values set by
+interpolation at the face regions of each patch.  If two
+elements, then respectively the width in \(x,y\)-directions.
+ The default is one (suitable for microscale lattices with
+only nearest neighbour interactions).
 
 \item \verb|'EdgyInt'|, true/false, \emph{optional},
 default=false.  If true, then interpolate to left\slash
@@ -149,7 +161,7 @@ face-values from right\slash left\slash bottom\slash
 top\slash back\slash front next-to-face values.  If false or
 omitted, then interpolate from centre-patch planes.  
 
-\item \verb|'nEnsem'|,  \emph{optional-experimental},
+\item \verb|'nEnsem'|, \emph{optional-experimental},
 default one, but if more, then an ensemble over this number
 of realisations.
 
@@ -168,7 +180,11 @@ $n_c$~parameters in some macroscale formula.
 \begin{itemize}
 \item If $\verb|nEnsem|=1$, then the array of coefficients
 is just tiled across the patch size to fill up each patch,
-starting from the $(1,1,1)$-point in each patch.
+starting from the $(1,1,1)$-point in each patch.  Best
+accuracy usually obtained when the periodicity of the
+coefficients is a factor of \verb|nSubP-2*nEdge| for
+\verb|EdgyInt|, or a factor of \verb|(nSubP-nEdge)/2| for
+not \verb|EdgyInt|.
 
 \item If $\verb|nEnsem|>1$ (value immaterial), then reset
 $\verb|nEnsem|:=m_x\cdot m_y\cdot m_z$ and construct an
@@ -215,13 +231,15 @@ variable.}
 \begin{matlab}
 %}
 if nargout==0, global patches, end
+patches.version = version;
 %{
 \end{matlab}
 \begin{itemize}
 
 \item \verb|.fun| is the name of the user's function
-\verb|fun(t,u,patches)| or \verb|fun(t,u)| that computes the
-time derivatives (or steps) on the patchy lattice. 
+\verb|fun(t,u,patches)| or \verb|fun(t,u)| or
+\verb|fun(t,u,patches,...)| that computes the time
+derivatives (or steps) on the patchy lattice. 
 
 \item \verb|.ordCC| is the specified order of inter-patch
 coupling. 
@@ -261,9 +279,9 @@ microscale grid points in every patch.
 \item \verb|.ratio| $1\times 3$, only for macro-periodic
 conditions, are the size ratios of every patch.
 
-\item \verb|.nEdge| is, for each patch, the number of face
+\item \verb|.nEdge|  $1\times 3$, is the width of face
 values set by interpolation at the face regions of each
-patch.
+patch, in the \(x,y,z\)-directions respectively.
 
 \item \verb|.le|, \verb|.ri|, \verb|.bo|, \verb|.to|,
 \verb|.ba|, \verb|.fr| determine inter-patch coupling of
@@ -336,8 +354,8 @@ visualisation), and with $4^3$~points forming each patch.
 \begin{matlab}
 %}
 global patches
-patches = configPatches3(@heteroWave3,[-pi pi], 'periodic' ...
-    , 5, 0, 0.22, mPeriod+2 ,'EdgyInt',true ...
+patches = configPatches3(@heteroWave3,[-pi pi] ...
+    ,'periodic' , 5, 0, 0.22, mPeriod+2 ,'EdgyInt',true ...
     ,'hetCoeffs',cHetr);
 %{
 \end{matlab}
@@ -419,7 +437,7 @@ for i = 1:length(ts)
     if (i==1)| exist('OCTAVE_VERSION','builtin')
       scat(p) = scatter3(xs(j),ys(j),zs(j),'filled');
       axis equal, caxis(col([0 1])), view(45-5*p,25)
-      xlabel('x'), ylabel('y'), zlabel('z')
+      xlabel('$x$'), ylabel('$y$'), zlabel('$z$')
       title('view stereo pair cross-eyed')
     end % in matlab just update values
     set(scat(p),'CData',col(u(j)) ...
@@ -495,6 +513,9 @@ Set the optional parameters.
 \begin{matlab}
 %}
 patches.nEdge = p.Results.nEdge;
+if numel(patches.nEdge)==1 
+    patches.nEdge = repmat(patches.nEdge,1,3); 
+    end
 patches.EdgyInt = p.Results.EdgyInt;
 patches.nEnsem = p.Results.nEnsem;
 cs = p.Results.hetCoeffs;
@@ -517,16 +538,26 @@ if numel(nSubP)==1,  nSubP = repmat(nSubP,1,3); end
 Check parameters.
 \begin{matlab}
 %}
+assert(all(nPatch==round(nPatch))&all(nPatch>0) ...
+      ,'nPatch must be integer(s) and at least one')
 assert(Xlim(1)<Xlim(2) ...
       ,'first pair of Xlim must be ordered increasing')
 assert(Xlim(3)<Xlim(4) ...
       ,'second pair of Xlim must be ordered increasing')
 assert(Xlim(5)<Xlim(6) ...
       ,'third pair of Xlim must be ordered increasing')
-assert(patches.nEdge==1 ...
-      ,'multi-edge-value interp not yet implemented')
-assert(all(2*patches.nEdge<nSubP) ...
+assert((mod(ordCC,2)==0)|all(patches.nEdge==1) ...
+      ,'Cannot yet have nEdge>1 and staggered patch grids')
+assert(all(3*patches.nEdge<=nSubP) ...
       ,'too many edge values requested')
+assert(all(rem(nSubP,patches.nEdge)==0) ...
+      ,'nSubP must be integer multiple of nEdge')
+if ~patches.EdgyInt, assert(all(rem(nSubP./patches.nEdge,2)==1) ...
+      ,'for non-edgyInt, nSubP./nEdge must be odd integer')
+      end
+if (patches.nEnsem>1)&all(patches.nEdge>1)
+      warning('not yet tested when both nEnsem and nEdge non-one')
+      end
 %if patches.nCore>1
 %    warning('nCore>1 not yet tested in this version')
 %    end
@@ -611,7 +642,7 @@ case 'usergiven'
     if p==2, assert(isfield(Dom,'Y'),['Y' msg]), end
     if p==3, assert(isfield(Dom,'Z'),['Z' msg]), end
 otherwise 
-    error([Dom.type 'is unknown Dom.type'])
+    error([Dom.type ' is unknown Dom.type'])
 end%switch Dom.type
 end%for p
 %{
@@ -671,7 +702,7 @@ array of corresponding direction.
 \begin{matlab}
 %}
 for q=1:3
-qq=2*q-1;
+qq=2*q-1; qstr=num2str(q);
 %{
 \end{matlab}
 Distribution depends upon \verb|Dom.type|:
@@ -690,8 +721,9 @@ case 'periodic'
   DQ=Q(2)-Q(1);
   Q=Q(1:nPatch(q))+diff(Q)/2;
   pEI=patches.EdgyInt;% abbreviation
-  if pre2023, dx(q) = ratio(q)*DQ/(nSubP(q)-1-pEI)*(2-pEI);
-  else        ratio(q) = dx(q)/DQ*(nSubP(q)-1-pEI)/(2-pEI);  
+  pnE=patches.nEdge(q);% abbreviation
+  if pre2023, dx(q) = ratio(q)*DQ/(nSubP(q)-pnE*(1+pEI))*(2-pEI);
+  else        ratio(q) = dx(q)/DQ*(nSubP(q)-pnE*(1+pEI))/(2-pEI);  
   end
   patches.ratio=ratio;
 %{
@@ -703,14 +735,21 @@ modified by the offset.
 \begin{matlab}
 %}
 case 'equispace'
-  Q=linspace(Xlim(qq)+((nSubP(q)-1)/2-Dom.bcOffset(qq))*dx(q) ...
-          ,Xlim(qq+1)-((nSubP(q)-1)/2-Dom.bcOffset(qq+1))*dx(q) ...
-          ,nPatch(q));
-  DQ=diff(Q(1:2));
+  halfWidth=dx(q)*(nSubP(q)-1)/2;
+  if nPatch(q)>1
+    Q=linspace(Xlim(qq)+halfWidth-Dom.bcOffset(qq)*dx(q) ...
+            ,Xlim(qq+1)-halfWidth+Dom.bcOffset(qq+1)*dx(q) ...
+            ,nPatch(q));
+    DQ=diff(Q(1:2));
+  else% nPatch(q)==1
+    warning(['nPatch(' qstr ')==1 so placing one patch at the mean of Xlim'])
+    Q=mean(Xlim(qq:qq+1));
+    DQ=Inf;
+  end%if nPatch(q)
   width=(1+patches.EdgyInt)/2*(nSubP(q)-1-patches.EdgyInt)*dx;
   if DQ<width*0.999999
-     warning('too many equispace patches (double overlapping)')
-     end
+     warning(['excess equispace patches (double overlap) in dirn ' qstr])
+  end%if
 %{
 \end{matlab}
 %: case chebyshev
@@ -719,7 +758,7 @@ distribution in order to reduce macro-interpolation errors,
 \(Q_i \propto -\cos(i\pi/N)\),  but with the extreme edges
 aligned with the spatial domain boundaries, modified by the
 offset, and modified by possible `boundary layers'.
-\footnote{ However, maybe overlapping patches near a
+\footnote{However, maybe overlapping patches near a
 boundary should be viewed as some sort of spatially analogue
 of the `christmas tree' of projective integration and its
 integration to a slow manifold.   Here maybe the overlapping
@@ -729,9 +768,10 @@ boundary layers.   Needs to be explored??}
 %}
 case 'chebyshev'
   halfWidth=dx(q)*(nSubP(q)-1)/2;
-  Q1 = Xlim(1)+halfWidth-Dom.bcOffset(qq)*dx(q);
-  Q2 = Xlim(2)-halfWidth+Dom.bcOffset(qq+1)*dx(q);
-%  Q = (Q1+Q2)/2-(Q2-Q1)/2*cos(linspace(0,pi,nPatch));
+  if nPatch(q)>1
+    Q1 = Xlim(1)+halfWidth-Dom.bcOffset(qq)*dx(q);
+    Q2 = Xlim(2)-halfWidth+Dom.bcOffset(qq+1)*dx(q);
+%    Q = (Q1+Q2)/2-(Q2-Q1)/2*cos(linspace(0,pi,nPatch));
 %{
 \end{matlab}
 Search for total width of `boundary layers' so that in the
@@ -740,22 +780,28 @@ the width for assessing overlap of patches is the following
 variable \verb|width|.
 \begin{matlab}
 %}
-  width=(1+patches.EdgyInt)/2*(nSubP(q)-1-patches.EdgyInt)*dx(q);
-  for b=0:2:nPatch(q)-2
-    DQmin=(Q2-Q1-b*width)/2*( 1-cos(pi/(nPatch(q)-b-1)) );
-    if DQmin>width, break, end
-  end%for
-  if DQmin<width*0.999999
-    warning('too many Chebyshev patches (mid-domain overlap)')
-  end%if
+    pEI=patches.EdgyInt; % abbreviation
+    pnE=patches.nEdge(q);% abbreviation
+    width=(1+pEI)/2*(nSubP(q)-pnE*(1+pEI))*dx(q);
+    for b=0:2:nPatch(q)-2
+      DQmin=(Q2-Q1-b*width)/2*( 1-cos(pi/(nPatch(q)-b-1)) );
+      if DQmin>width, break, end
+    end%for b
+    if DQmin<width*0.999999
+      warning(['excess Chebyshev patches (mid-domain overlap) in dirn ' qstr])
+    end%if
 %{
 \end{matlab}
 Assign the centre-patch coordinates.
 \begin{matlab}
 %}
-  Q =[ Q1+(0:b/2-1)*width ...
-       (Q1+Q2)/2-(Q2-Q1-b*width)/2*cos(linspace(0,pi,nPatch(q)-b)) ...
-       Q2+(1-b/2:0)*width ];
+    Q =[ Q1+(0:b/2-1)*width ...
+         (Q1+Q2)/2-(Q2-Q1-b*width)/2*cos(linspace(0,pi,nPatch(q)-b)) ...
+         Q2+(1-b/2:0)*width ];
+  else% nPatch(q)==1
+    warning(['nPatch(' qstr ')==1 so placing one patch at the mean of Xlim'])
+    Q=mean(Xlim(qq:qq+1));
+  end%if nPatch(q)
 %{
 \end{matlab}
 
@@ -789,21 +835,19 @@ end%for q
 
 
 \paragraph{Construct the micro-grids}
-Construct the microscale in each patch.  Reshape the grid
-to be 8D to suit dimensions (micro,Vars,Ens,macro).
+Fourth, construct the microscale grid in each patch, centred
+about the given mid-points~\verb|X,Y,Z|. Reshape the grid to be
+8D to suit dimensions (micro,Vars,Ens,macro).
 \begin{matlab}
 %}
-nSubP = reshape(nSubP,1,3); % force to be row vector
-assert(patches.EdgyInt | all(mod(nSubP,2)==1), ...
-    'configPatches3: nSubP must be odd')
-i0 = (nSubP(1)+1)/2;
-patches.x = reshape( dx(1)*(-i0+1:i0-1)'+X ...
+xs = dx(1)*( (1:nSubP(1))-mean(1:nSubP(1)) );
+patches.x = reshape( xs'+X ...
                    ,nSubP(1),1,1,1,1,nPatch(1),1,1);
-i0 = (nSubP(2)+1)/2;
-patches.y = reshape( dx(2)*(-i0+1:i0-1)'+Y ...
+ys = dx(2)*( (1:nSubP(2))-mean(1:nSubP(2)) );
+patches.y = reshape( ys'+Y ...
                    ,1,nSubP(2),1,1,1,1,nPatch(2),1);
-i0 = (nSubP(3)+1)/2;
-patches.z = reshape( dx(3)*(-i0+1:i0-1)'+Z ...
+zs = dx(3)*( (1:nSubP(3))-mean(1:nSubP(3)) );
+patches.z = reshape( zs'+Z ...
                    ,1,1,nSubP(3),1,1,1,1,nPatch(3));
 %{
 \end{matlab}

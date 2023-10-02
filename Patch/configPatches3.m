@@ -1,6 +1,6 @@
 % configPatches3() creates a data struct of the design of 3D
 % patches for later use by the patch functions such as
-% patchSys3().  AJR, Aug 2020 -- 12 Apr 2023
+% patchSys3().  AJR, Aug 2020 -- 2 Oct 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches3()}: configures spatial
@@ -19,7 +19,7 @@ of its use.
 %}
 function patches = configPatches3(fun,Xlim,Dom ...
     ,nPatch,ordCC,dx,nSubP,varargin)
-version = '2023-04-12';
+version = '2023-10-02';
 %{
 \end{matlab}
 
@@ -43,6 +43,11 @@ $[\verb|Xlim(1)|, \verb|Xlim(2)|] \times [\verb|Xlim(3)|,
 \verb|Xlim(4)| \times [\verb|Xlim(5)|, \verb|Xlim(6)|]$. If
 \verb|Xlim| has two elements, then the domain is the cubic
 domain of the same interval in all three directions.
+
+But, if \(\verb|nPatch(n)|=1\), then in the spatial 
+direction~\verb|n| the domain is the mean of 
+\verb|Xlim(2*n-1:2*n)| plus/minus half the patch-width 
+in that direction.
 
 \item \verb|Dom| sets the type of macroscale conditions for
 the patches, and reflects the type of microscale boundary
@@ -142,10 +147,12 @@ of $\verb|nEdge|=1$ and not \verb|EdgyInt|, then
 \verb|nSubP| must be odd.
 
 
-\item \verb|'nEdge'|, \emph{optional} (integer---scalar or three element), default=1, the width of face values set by interpolation at the
-face regions of each patch.  If two elements, then respectively the width in \(x,y\)-directions.  The default is one (suitable
-for microscale lattices with only nearest neighbour
-interactions).
+\item \verb|'nEdge'|, \emph{optional} (integer---scalar or
+three element), default=1, the width of face values set by
+interpolation at the face regions of each patch.  If two
+elements, then respectively the width in \(x,y\)-directions.
+ The default is one (suitable for microscale lattices with
+only nearest neighbour interactions).
 
 \item \verb|'EdgyInt'|, true/false, \emph{optional},
 default=false.  If true, then interpolate to left\slash
@@ -173,10 +180,11 @@ $n_c$~parameters in some macroscale formula.
 \begin{itemize}
 \item If $\verb|nEnsem|=1$, then the array of coefficients
 is just tiled across the patch size to fill up each patch,
-starting from the $(1,1,1)$-point in each patch.  Best accuracy 
-usually obtained when the periodicity of the coefficients 
-is a factor of \verb|nSubP-2*nEdge| for \verb|EdgyInt|, or 
-a factor of \verb|(nSubP-nEdge)/2| for not \verb|EdgyInt|.
+starting from the $(1,1,1)$-point in each patch.  Best
+accuracy usually obtained when the periodicity of the
+coefficients is a factor of \verb|nSubP-2*nEdge| for
+\verb|EdgyInt|, or a factor of \verb|(nSubP-nEdge)/2| for
+not \verb|EdgyInt|.
 
 \item If $\verb|nEnsem|>1$ (value immaterial), then reset
 $\verb|nEnsem|:=m_x\cdot m_y\cdot m_z$ and construct an
@@ -530,6 +538,8 @@ if numel(nSubP)==1,  nSubP = repmat(nSubP,1,3); end
 Check parameters.
 \begin{matlab}
 %}
+assert(all(nPatch==round(nPatch))&all(nPatch>0) ...
+      ,'nPatch must be integer(s) and at least one')
 assert(Xlim(1)<Xlim(2) ...
       ,'first pair of Xlim must be ordered increasing')
 assert(Xlim(3)<Xlim(4) ...
@@ -692,7 +702,7 @@ array of corresponding direction.
 \begin{matlab}
 %}
 for q=1:3
-qq=2*q-1;
+qq=2*q-1; qstr=num2str(q);
 %{
 \end{matlab}
 Distribution depends upon \verb|Dom.type|:
@@ -725,14 +735,21 @@ modified by the offset.
 \begin{matlab}
 %}
 case 'equispace'
-  Q=linspace(Xlim(qq)+((nSubP(q)-1)/2-Dom.bcOffset(qq))*dx(q) ...
-          ,Xlim(qq+1)-((nSubP(q)-1)/2-Dom.bcOffset(qq+1))*dx(q) ...
-          ,nPatch(q));
-  DQ=diff(Q(1:2));
+  halfWidth=dx(q)*(nSubP(q)-1)/2;
+  if nPatch(q)>1
+    Q=linspace(Xlim(qq)+halfWidth-Dom.bcOffset(qq)*dx(q) ...
+            ,Xlim(qq+1)-halfWidth+Dom.bcOffset(qq+1)*dx(q) ...
+            ,nPatch(q));
+    DQ=diff(Q(1:2));
+  else% nPatch(q)==1
+    warning(['nPatch(' qstr ')==1 so placing one patch at the mean of Xlim'])
+    Q=mean(Xlim(qq:qq+1));
+    DQ=Inf;
+  end%if nPatch(q)
   width=(1+patches.EdgyInt)/2*(nSubP(q)-1-patches.EdgyInt)*dx;
   if DQ<width*0.999999
-     warning('too many equispace patches (double overlapping)')
-     end
+     warning(['excess equispace patches (double overlap) in dirn ' qstr])
+  end%if
 %{
 \end{matlab}
 %: case chebyshev
@@ -741,7 +758,7 @@ distribution in order to reduce macro-interpolation errors,
 \(Q_i \propto -\cos(i\pi/N)\),  but with the extreme edges
 aligned with the spatial domain boundaries, modified by the
 offset, and modified by possible `boundary layers'.
-\footnote{ However, maybe overlapping patches near a
+\footnote{However, maybe overlapping patches near a
 boundary should be viewed as some sort of spatially analogue
 of the `christmas tree' of projective integration and its
 integration to a slow manifold.   Here maybe the overlapping
@@ -751,9 +768,10 @@ boundary layers.   Needs to be explored??}
 %}
 case 'chebyshev'
   halfWidth=dx(q)*(nSubP(q)-1)/2;
-  Q1 = Xlim(1)+halfWidth-Dom.bcOffset(qq)*dx(q);
-  Q2 = Xlim(2)-halfWidth+Dom.bcOffset(qq+1)*dx(q);
-%  Q = (Q1+Q2)/2-(Q2-Q1)/2*cos(linspace(0,pi,nPatch));
+  if nPatch(q)>1
+    Q1 = Xlim(1)+halfWidth-Dom.bcOffset(qq)*dx(q);
+    Q2 = Xlim(2)-halfWidth+Dom.bcOffset(qq+1)*dx(q);
+%    Q = (Q1+Q2)/2-(Q2-Q1)/2*cos(linspace(0,pi,nPatch));
 %{
 \end{matlab}
 Search for total width of `boundary layers' so that in the
@@ -762,24 +780,28 @@ the width for assessing overlap of patches is the following
 variable \verb|width|.
 \begin{matlab}
 %}
-  pEI=patches.EdgyInt; % abbreviation
-  pnE=patches.nEdge(q);% abbreviation
-  width=(1+pEI)/2*(nSubP(q)-pnE*(1+pEI))*dx(q);
-  for b=0:2:nPatch(q)-2
-    DQmin=(Q2-Q1-b*width)/2*( 1-cos(pi/(nPatch(q)-b-1)) );
-    if DQmin>width, break, end
-  end%for
-  if DQmin<width*0.999999
-    warning('too many Chebyshev patches (mid-domain overlap)')
-  end%if
+    pEI=patches.EdgyInt; % abbreviation
+    pnE=patches.nEdge(q);% abbreviation
+    width=(1+pEI)/2*(nSubP(q)-pnE*(1+pEI))*dx(q);
+    for b=0:2:nPatch(q)-2
+      DQmin=(Q2-Q1-b*width)/2*( 1-cos(pi/(nPatch(q)-b-1)) );
+      if DQmin>width, break, end
+    end%for b
+    if DQmin<width*0.999999
+      warning(['excess Chebyshev patches (mid-domain overlap) in dirn ' qstr])
+    end%if
 %{
 \end{matlab}
 Assign the centre-patch coordinates.
 \begin{matlab}
 %}
-  Q =[ Q1+(0:b/2-1)*width ...
-       (Q1+Q2)/2-(Q2-Q1-b*width)/2*cos(linspace(0,pi,nPatch(q)-b)) ...
-       Q2+(1-b/2:0)*width ];
+    Q =[ Q1+(0:b/2-1)*width ...
+         (Q1+Q2)/2-(Q2-Q1-b*width)/2*cos(linspace(0,pi,nPatch(q)-b)) ...
+         Q2+(1-b/2:0)*width ];
+  else% nPatch(q)==1
+    warning(['nPatch(' qstr ')==1 so placing one patch at the mean of Xlim'])
+    Q=mean(Xlim(qq:qq+1));
+  end%if nPatch(q)
 %{
 \end{matlab}
 
