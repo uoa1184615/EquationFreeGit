@@ -44,7 +44,7 @@ at extreme edges of top-bottom extreme patches.
   u(:, 1 ,:,:,:,:, 1 ,:)=u(:,  2  ,:,:,:,:, 1 ,:); % bottom-edge of bottommost
   u(:,end,:,:,:,:,end,:)=u(:,end-1,:,:,:,:,end,:); % top-edge of topmost
   u(:,:, 1 ,:,:,:,:, 1 )=0; % back-edge of rearmost is one
-  u(:,:,end,:,:,:,:,end)=0; % front-edge of frontmost is zero
+  u(:,:,end,:,:,:,:,end)=1; % front-edge of frontmost is zero
 %{
 \end{matlab}
 Reserve storage and then assign interior patch values to the

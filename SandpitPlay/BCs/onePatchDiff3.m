@@ -1,6 +1,6 @@
 % Simulate heterogeneous diffusion in 3D on one patch in at
-% least one direction to test the code for one patch.  Then
-% explore the Jacobian and eigenvalues.  AJR, Sep 2023
+% least one direction to test the code for one patch width.  
+% AJR, 4 Oct 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{onePatchDiff3}: computational homogenise a
@@ -16,7 +16,7 @@ decay time scale is roughly one.
 \begin{matlab}
 %}
 clear all
-mPeriod = [5 4 3]%randi([6 10],1,3)
+mPeriod = randi([5 10],1,3)
 cHetr = exp(1*randn([mPeriod 3]));
 cHetr = cHetr*mean(1./cHetr(:));
 %{
@@ -54,7 +54,7 @@ Integrate using standard integrators, unevenly spaced in
 time to better display transients.
 \begin{matlab}
 %}
-    [ts,us] = ode23(@patchSys3, min(nPatch)*0.2*linspace(0,1,21).^2, u0(:));
+    [ts,us] = ode23(@patchSys3, min(nPatch)*0.2*linspace(0,1,51).^2, u0(:));
 %{
 \end{matlab}
 
@@ -66,23 +66,21 @@ figure(1), clf, colormap(parula)
 %{
 \end{matlab}
 Get spatial coordinates and pad them with NaNs to separate
-patches.
+patches (works with function \verb|slices()|).
 \begin{matlab}
 %}
 x = squeeze(patches.x); 
 y = squeeze(shiftdim(patches.y,1));
 z = squeeze(patches.z);
-% slice() seems to choke on NaNs??
-%x(end+1,:)=nan;  y(end+1,:)=nan;  z(end+1,:)=nan; % pad with nans
-[X,Y,Z]=meshgrid(x(:),y(:),z(:));
+x(end+1,:)=nan;  y(end+1,:)=nan;  z(end+1,:)=nan; % pad with nans
+[X,Y,Z]=ndgrid(x(:),y(:),z(:));
 %{
 \end{matlab}
 For every time step draw the surface and pause for a short
 display.
 \begin{matlab}
 %}
-i = round(nSubP.*[.35;.65]);
-xsl=x(i(1:2),:); ysl=y(i(3:4),:); zsl=z(i(5:6),:);
+i = round(nSubP.*[.35;.65])
 for l = 1:length(ts)
 %{
 \end{matlab}
@@ -98,20 +96,22 @@ with Nans between patches, and reshape to suit the surf function.
     u(:, 1 ,:,:,:,:, 1 ,:)=u(:,  2  ,:,:,:,:, 1 ,:); % bottom-edge of bottommost
     u(:,end,:,:,:,:,end,:)=u(:,end-1,:,:,:,:,end,:); % top-edge of topmost
     u(:,:, 1 ,:,:,:,:, 1 )=0; % back-edge of rearmost is one
-    u(:,:,end,:,:,:,:,end)=0; % front-edge of frontmost is zero
+    u(:,:,end,:,:,:,:,end)=1; % front-edge of frontmost is zero
   end%if BC option
-% slice() seems to choke on NaNs??
-%  u(end+1,:,:,:)=nan; u(:,end+1,:,:)=nan; u(:,:,end+1,:)=nan;
+  u(end+1,:,:,:)=nan; u(:,end+1,:,:)=nan; u(:,:,end+1,:)=nan;
   u = reshape(permute(u,[1 6 2 7 3 8 4 5]), [numel(x) numel(y) numel(z)]);
-  u = permute(u,[2 1 3]); % transpose for slice()
 %{
 \end{matlab}
 If the initial time then draw the surface with labels,
-otherwise just update the surface data.
+otherwise just update the surface data. The ``+1'' in 
+indices is due to the padding by NaNs.
 \begin{matlab}
 %}
-  hSlice = slice(X,Y,Z,u, xsl(:),ysl(:),zsl(:));  
-  axis equal, colorbar%, clim([-1 1])  %view(60,40)
+  slices(X,Y,Z,u ...
+  , i(:,1)+(nSubP(1)+1)*(0:nPatch(1)-1) ...
+  , i(:,2)+(nSubP(2)+1)*(0:nPatch(2)-1) ...
+  , i(:,3)+(nSubP(3)+1)*(0:nPatch(3)-1) );  
+  axis equal, colorbar     %, clim([-1 1])  %view(60,40)
   xlabel('$x$'), ylabel('$y$'), zlabel('$z$')
   legend(['time = ' num2str(ts(l),2)],'Location','north')
   if l==1, pause, else pause(0.05), end
@@ -122,137 +122,9 @@ finish the animation loop and if-plot.
 %}
 end%for over time
 end%if-plot
-return%%%%%%%%%%%
 %{
 \end{matlab}
 
 
-
-
-
-
-\subsection{Compute Jacobian and its spectrum}
-Let's explore the Jacobian dynamics for a range of orders of
-interpolation, all for the same patch design and
-heterogeneity.  Except here use a small ratio as we do not
-plot.
-\begin{matlab}
-%}
-ratio = [0.1 0.1]
-nLeadEvals=prod(nPatch)+max(nPatch);
-leadingEvals=[];
-%{
-\end{matlab}
-
-Evaluate eigenvalues for spectral as the base case for
-polynomial interpolation of order \(2,4,\ldots\).
-\begin{matlab}
-%}
-maxords=10;
-for ord=0:2:maxords
-    ord=ord    
-%{
-\end{matlab} 
-Configure with same parameters, then because they are reset
-by this configuration, restore coupling.
-\begin{matlab}
-%}
-    configPatches3(@heteroDiff30,[-pi pi],nan,nPatch ...
-        ,ord,ratio,nSubP,'EdgyInt',edgyInt,'nEnsem',nEnsem ...
-        ,'hetCoeffs',cHetr);
-%{
-\end{matlab}
-Find which elements of the 6D array are interior micro-grid
-points and hence correspond to dynamical variables.
-\begin{matlab}
-%}
-    u0 = zeros([nSubP,1,nEnsem,nPatch]);
-    u0([1 end],:,:) = nan;
-    u0(:,[1 end],:) = nan;
-    i = find(~isnan(u0));
-%{
-\end{matlab}
-Construct the Jacobian of the scheme as the matrix of the
-linear transformation, obtained by transforming the standard
-unit vectors.
-\begin{matlab}
-%}
-    jac = nan(length(i));
-    sizeJacobian = size(jac)
-    for j = 1:length(i)
-      u = u0(:)+(i(j)==(1:numel(u0))');
-      tmp = patchSys2(0,u);
-      jac(:,j) = tmp(i);
-    end
-%{
-\end{matlab}
-Test for symmetry, with error if we know it should be
-symmetric.
-\begin{matlab}
-%}
-    notSymmetric=norm(jac-jac')    
-    if edgyInt, assert(notSymmetric<1e-7,'failed symmetry')
-    elseif notSymmetric>1e-7, disp('failed symmetry')
-    end 
-%{
-\end{matlab}
-Find all the eigenvalues (as \verb|eigs| is unreliable).
-\begin{matlab}
-%}
-    if edgyInt, [evecs,evals] = eig((jac+jac')/2,'vector');
-    else evals = eig(jac);
-    end
-    biggestImag=max(abs(imag(evals)));
-    if biggestImag>0, biggestImag=biggestImag, end
-%{
-\end{matlab}
-Sort eigenvalues on their real-part with most positive
-first, and most negative last. Store the leading eigenvalues
-in \verb|egs|, and write out when computed all orders.
-The number of zero eigenvalues, \verb|nZeroEv|, gives
-the number of decoupled systems in this patch configuration.
-\begin{matlab}
-%}
-    [~,k] = sort(-real(evals));
-    evals=evals(k); evecs=evecs(:,k);
-    if ord==0, nZeroEv=sum(abs(evals(:))<1e-5), end
-    if ord==0, evec0=evecs(:,1:nZeroEv*nLeadEvals); 
-    else % find evec closest to that of each leading spectral
-        [~,k]=max(abs(evecs'*evec0));
-        evals=evals(k); % sort in corresponding order
-    end
-    leadingEvals=[leadingEvals evals(nZeroEv*(1:nLeadEvals))];
-end 
-disp('     spectral    quadratic      quartic  sixth-order ...')
-leadingEvals=leadingEvals
-%{
-\end{matlab}
-
-Plot the errors in the eigenvalues using the spectral ones
-as accurate.  Only plot every second,~\verb|iEv|, as all are
-repeated eigenvalues.
-\begin{matlab}
-%}
-if maxords>2
-    iEv=2:2:12;
-    figure(2);
-    err=abs(leadingEvals-leadingEvals(:,1)) ...
-        ./(1e-7+abs(leadingEvals(:,1)));
-    semilogy(2:2:maxords,err(iEv,2:end)','o:')
-    xlabel('coupling order')
-    ylabel('eigenvalue relative error')
-    leg=legend( ...
-        strcat('$',num2str(real(leadingEvals(iEv,1)),'%.4f'),'$') ...
-        ,'Location','northeastoutside');
-    if ~exist('OCTAVE_VERSION','builtin')
-        title(leg,'eigenvalues'), end
-    legend boxoff 
-end%if-plot
-%{
-\end{matlab}
-
-
-\input{../Patch/heteroDiff3.m}
-
-Fin.
+\input{../Patch/heteroDiff30.m}
 %}
