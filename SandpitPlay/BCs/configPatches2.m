@@ -68,6 +68,8 @@ boundary conditions that apply at the left\slash right\slash
 bottom\slash top edges of the leftmost\slash rightmost\slash
 bottommost\slash topmost patches, respectively.
 
+%Todo: distinguish between strings and char-arrays.??
+
 \item \verb|.bcOffset|, optional one, two or four element
 vector/array, in the cases of \verb|'equispace'| or
 \verb|'chebyshev'| the patches are placed so the left\slash

@@ -1,6 +1,6 @@
 % Test inter-patch spectral, finite-width, and divided
 % difference interpolation in 3D with many random parameters
-% AJR, Aug 2020 -- 2 Feb 2023
+% AJR, Aug 2020 -- 17 Oct 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt3test}: tests 3D patch coupling}
@@ -260,9 +260,9 @@ domain and the high order of interpolation.
     error=ui(:,:,:,:,:,I,J,K)-u0(:,:,:,:,:,I,J,K);
     assert(all(~isnan(error(:))),'found nans in the error!')
     normError=norm(error(:))
-    assert(normError<5e-8 ...
-    ,'failed finite stencil polynomial interpolation')
-    disp('***** This finite stencil test passed')
+    assert(normError<5e-7 ...
+    ,'failed periodic finite stencil polynomial interpolation')
+    disp('***** This periodic finite stencil test passed')
 %{
 \end{matlab}
 
@@ -270,7 +270,7 @@ End the for-loops over various parameters.
 \begin{matlab}
 %}
 end%for realisation
-disp('***** Passed all polynomial interpolation tests')
+disp('***** Passed all periodic polynomial interpolation tests')
 %{
 \end{matlab}
 

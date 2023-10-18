@@ -1,9 +1,10 @@
-function h = slices(X,Y,Z,U,ix,iy,iz,fn)
+function hand = slices(X,Y,Z,U,ix,iy,iz,fn)
 % Analogous to slice() but better for contorted data grids
 % as no interpolation and allows NaNs in the data grid. 
 % If some elements of X,Y,Z are ever NaN, then those points
 % are not plotted. (It is not enough to NaN elements of U.)
-% AJR, 4 Oct 2023
+% The X,Y,Z arrays should be set sensibly via ndgrid or
+% equivalent, not meshgrid.   AJR, 5 Oct 2023
 
 % optional eighth argument is either @surf (default), or
 % @mesh, or @contour4
@@ -30,22 +31,23 @@ Z=Z+zeros(nX,nY,nZ);
 % x surfaces
 for i=ix(:)'
   fn(squeeze(X(i,:,:)),squeeze(Y(i,:,:)),squeeze(Z(i,:,:)) ...
-    ,squeeze(U(i,:,:)) )
+    ,squeeze(U(i,:,:)) );
   hold on
 end
 % y surfaces
 for i=iy(:)'
   fn(squeeze(X(:,i,:)),squeeze(Y(:,i,:)),squeeze(Z(:,i,:)) ...
-    ,squeeze(U(:,i,:)) )
+    ,squeeze(U(:,i,:)) );
   hold on
 end
 % z surfaces
 for i=iz(:)'
   fn(squeeze(X(:,:,i)),squeeze(Y(:,:,i)),squeeze(Z(:,:,i)) ...
-    ,squeeze(U(:,:,i)) )
+    ,squeeze(U(:,:,i)) );
   hold on
 end
 hold off
+hand = gca().Children;
 
 end%function slices
 

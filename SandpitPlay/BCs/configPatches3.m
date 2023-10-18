@@ -1,6 +1,6 @@
 % configPatches3() creates a data struct of the design of 3D
 % patches for later use by the patch functions such as
-% patchSys3().  AJR, Aug 2020 -- 2 Oct 2023
+% patchSys3().  AJR, Aug 2020 -- 18 Oct 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches3()}: configures spatial
@@ -19,7 +19,7 @@ of its use.
 %}
 function patches = configPatches3(fun,Xlim,Dom ...
     ,nPatch,ordCC,dx,nSubP,varargin)
-version = '2023-10-02';
+version = "2023-10-18";
 %{
 \end{matlab}
 
@@ -54,21 +54,21 @@ the patches, and reflects the type of microscale boundary
 conditions of the problem.   If \verb|Dom| is \verb|NaN| or
 \verb|[]|, then the field~\verb|u| is triply macro-periodic
 in the 3D spatial domain, and resolved on equi-spaced
-patches. If \verb|Dom| is a character string, then that
+patches.  If \verb|Dom| is a character array, then that
 specifies the \verb|.type| of the following structure, with
 \verb|.bcOffset| set to the default zero.  Otherwise
 \verb|Dom| is a structure with the following components.
 \begin{itemize}
 
-\item \verb|.type|, string, of either \verb|'periodic'| (the
-default), \verb|'equispace'|, \verb|'chebyshev'|,
-\verb|'usergiven'|.  For all cases except \verb|'periodic'|,
-users \emph{must} code into \verb|fun| the micro-grid
-boundary conditions that apply at the left\slash right\slash
-bottom\slash top\slash back\slash front faces of the
-leftmost\slash rightmost\slash bottommost\slash
-topmost\slash backmost\slash frontmost patches,
-respectively.
+\item \verb|.type|, char-array, of either
+\verb|'periodic'| (the default, equivalently \verb|'periodic '|), \verb|'equispace'|,
+\verb|'chebyshev'|, \verb|'usergiven'|.  For all cases
+except \verb|'periodic'|, users \emph{must} code into
+\verb|fun| the micro-grid boundary conditions that apply at
+the left\slash right\slash bottom\slash top\slash back\slash
+front faces of the leftmost\slash rightmost\slash
+bottommost\slash topmost\slash backmost\slash frontmost
+patches, respectively.
 
 \item \verb|.bcOffset|, optional one, three or six element
 vector/array, in the cases of \verb|'equispace'| or
@@ -131,9 +131,9 @@ However, if \verb|Dom| is~\verb|NaN| (as for pre-2023), then
 namely the ratio of (depending upon \verb|EdgyInt|) either
 the half-width or full-width of a patch to the equi-spacing
 of the patch mid-points---adjusted a little when $\verb|nEdge|>1$. So
-either $\verb|ratio|=\tfrac12$ means the patches abut and
+either if not \verb|EdgyInt| then $\verb|ratio|=\tfrac12$ means the patches abut and
 $\verb|ratio|=1$ is overlapping patches as in holistic
-discretisation, or $\verb|ratio|=1$ means the patches abut. 
+discretisation, or if \verb|EdgyInt| then $\verb|ratio|=1$ means the patches abut. 
 Small~\verb|ratio| should greatly reduce computational time.
 
 
@@ -205,9 +205,9 @@ separately invoke, say, a \textsc{gpu} to accelerate
 sub-patch computations. 
 
 If true, and it requires that you have \Matlab's Parallel
-Computing Toolbox, then it will distribute the patches over
+Computing Toolbox, then configPatches3 will distribute the patches over
 multiple \textsc{cpu}s\slash cores. In \Matlab, only one
-array dimension can be split in the distribution, so it
+array dimension can be split in the distribution, so configPatches3
 chooses the one space dimension~$x,y,z$ corresponding to
 the highest~\verb|nPatch| (if a tie, then chooses the
 rightmost of~$x,y,z$).  A user may correspondingly
@@ -276,7 +276,7 @@ microscale grid points in every patch.
 array of the regular spatial locations~$z_{kK}$ of the
 microscale grid points in every patch.  
 
-\item \verb|.ratio| $1\times 3$, only for macro-periodic
+\item \verb|.ratio| $1\times 3$, for macro-periodic
 conditions, are the size ratios of every patch.
 
 \item \verb|.nEdge|  $1\times 3$, is the width of face
@@ -571,7 +571,7 @@ For compatibility with pre-2023 functions, if parameter
 be the value of the so-called \verb|dx| vector.
 \begin{matlab}
 %}
-if ~isstruct(Dom), pre2023=isnan(Dom);
+if ~isstruct(Dom), pre2023=any(isnan(Dom));
 else pre2023=false; end
 if pre2023, ratio=dx; dx=nan; end
 %{
@@ -582,8 +582,8 @@ Default macroscale conditions are periodic with evenly
 spaced patches.
 \begin{matlab}
 %}
-if isempty(Dom), Dom=struct('type','periodic'); end
-if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic'); end
+if isempty(Dom), Dom=struct('type','periodic '); end
+if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic '); end
 %{
 \end{matlab}
 If \verb|Dom| is a string, then just set type to that
@@ -612,19 +612,22 @@ Dirichlet boundaries if no \verb|bcOffset| specified when
 needed.  Do so for all three directions independently.
 \begin{matlab}
 %}
-patches.periodic=false;
+patches.periodic = false(3,1);
 for p=1:3
 switch Dom.type(p,:)
-case 'periodic'
-    patches.periodic=true;
-    if isfield(Dom,'bcOffset')
-    warning('bcOffset not available for Dom.type = periodic'), end
+case {'periodic','periodic '}
+    patches.periodic(p) = true;
     msg=' not available for Dom.type = periodic';
+    if isfield(Dom,'bcOffset')&&~all(isnan(Dom.bcOffset(:,p)))
+        warning(['bcOffset' msg]), end
     if isfield(Dom,'X'), warning(['X' msg]), end
     if isfield(Dom,'Y'), warning(['Y' msg]), end
     if isfield(Dom,'Z'), warning(['Z' msg]), end
 case {'equispace','chebyshev'}
-    if ~isfield(Dom,'bcOffset'), Dom.bcOffset=zeros(2,3); end
+    if ~isfield(Dom,'bcOffset')
+      Dom.bcOffset=nan(2,3); Dom.bcOffset(:,p)=0;
+    else Dom.bcOffset( isnan(Dom.bcOffset(:,p)) ,p)=0; 
+    end
     % for mixed with usergiven, following should still work
     if numel(Dom.bcOffset)==1
         Dom.bcOffset=repmat(Dom.bcOffset,2,3); end
@@ -701,6 +704,7 @@ the distribution into~\verb|Q| and finally assigning to
 array of corresponding direction.
 \begin{matlab}
 %}
+patches.ratio = nan(1,3);
 for q=1:3
 qq=2*q-1; qstr=num2str(q);
 %{
@@ -716,7 +720,7 @@ The periodic case is evenly spaced within the spatial
 domain. Store the size ratio in \verb|patches|.
 \begin{matlab}
 %}
-case 'periodic'
+case {'periodic','periodic '}
   Q=linspace(Xlim(qq),Xlim(qq+1),nPatch(q)+1);
   DQ=Q(2)-Q(1);
   Q=Q(1:nPatch(q))+diff(Q)/2;
@@ -725,7 +729,7 @@ case 'periodic'
   if pre2023, dx(q) = ratio(q)*DQ/(nSubP(q)-pnE*(1+pEI))*(2-pEI);
   else        ratio(q) = dx(q)/DQ*(nSubP(q)-pnE*(1+pEI))/(2-pEI);  
   end
-  patches.ratio=ratio;
+  patches.ratio(q)=ratio(q);
 %{
 \end{matlab}
 %: case equispace
@@ -759,9 +763,9 @@ distribution in order to reduce macro-interpolation errors,
 aligned with the spatial domain boundaries, modified by the
 offset, and modified by possible `boundary layers'.
 \footnote{However, maybe overlapping patches near a
-boundary should be viewed as some sort of spatially analogue
+boundary should be viewed as some sort of spatial analogue
 of the `christmas tree' of projective integration and its
-integration to a slow manifold.   Here maybe the overlapping
+integration to a slow manifold \cite[e.g.,][]{Gear04, Gear2005, Maclean2020a}.   Here maybe the overlapping
 patches allow for a `christmas tree' approach to the
 boundary layers.   Needs to be explored??} 
 \begin{matlab}
@@ -858,16 +862,17 @@ patches.z = reshape( zs'+Z ...
 case of macro-periodicity, precompute the weightings to
 interpolate field values for coupling. \todo{Might sometime
 extend to coupling via derivative values.}
+\todo{Is this ratio stuff OK????}
 \begin{matlab}
 %}
-if patches.periodic
-  ratio = reshape(ratio,1,3); % force to be row vector
-  patches.ratio = ratio; 
+if any(patches.periodic) 
+%  ratio = reshape(ratio,1,3); % force to be row vector
+%  patches.ratio = ratio; 
   if ordCC>0
-      [Cwtsr,Cwtsl] = patchCwts(ratio,ordCC,patches.stag);
+      [Cwtsr,Cwtsl] = patchCwts(patches.ratio,ordCC,patches.stag);
       patches.Cwtsr = Cwtsr;  patches.Cwtsl = Cwtsl;
   end%if
-end%if patches.periodic
+end%if any patches.periodic
 %{
 \end{matlab}
 
@@ -972,6 +977,7 @@ without \verb|EdgyInt| is unknown.  Use auto-replication.
 Issue warning if the ensemble is likely to be affected by
 lack of scale separation.  \todo{Need to justify this and 
 the arbitrary threshold more carefully??}
+\todo{Is this ratio appropriate???? or patches.ratio??}
 \begin{matlab}
 %}
 if prod(ratio)*patches.nEnsem>0.9, warning( ...

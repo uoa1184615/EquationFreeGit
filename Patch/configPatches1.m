@@ -1,6 +1,6 @@
 % configPatches1() creates a data struct of the design of
 % 1D patches for later use by the patch functions such as
-% patchSys1(). AJR, Nov 2017 -- 27 Sep 2023
+% patchSys1(). AJR, Nov 2017 -- 12 Oct 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches1()}: configure spatial
@@ -18,7 +18,7 @@ example of its use.
 %}
 function patches = configPatches1(fun,Xlim,Dom ...
     ,nPatch,ordCC,dx,nSubP,varargin)
-version = '2023-09-27';
+version = '2023-10-12';
 %{
 \end{matlab}
 
@@ -48,14 +48,14 @@ the patches, and reflects the type of microscale boundary
 conditions of the problem.   If \verb|Dom| is \verb|NaN| or
 \verb|[]|, then the field~\verb|u| is macro-periodic in the
 1D spatial domain, and resolved on equi-spaced patches. If
-\verb|Dom| is a character string, then that specifies the
+\verb|Dom| is a character array, then that specifies the
 \verb|.type| of the following structure, with
 \verb|.bcOffset| set to the default zero. Otherwise
 \verb|Dom| is a structure with the following components.
 \begin{itemize}
 
-\item \verb|.type|, string, of either \verb|'periodic'| (the
-default), \verb|'equispace'|, \verb|'chebyshev'|,
+\item \verb|.type|, char-array, of either \verb|'periodic'|
+(the default), \verb|'equispace'|, \verb|'chebyshev'|,
 \verb|'usergiven'|.  For all cases except \verb|'periodic'|,
 users \emph{must} code into \verb|fun| the micro-grid
 boundary conditions that apply at the left(right) edge of
@@ -398,7 +398,7 @@ assert(rem(nSubP,patches.nEdge)==0 ...
 if ~patches.EdgyInt, assert(rem(nSubP/patches.nEdge,2)==1 ...
       ,'for non-edgyInt, nSubP/nEdge must be odd integer')
       end
-if (patches.nEnsem>1)&(patches.nEdge>1)
+if (patches.nEnsem>1)&&(patches.nEdge>1)
       warning('not yet tested when both nEnsem and nEdge non-one')
       end
 if patches.nCore>1
@@ -423,12 +423,12 @@ Default macroscale conditions are periodic with evenly
 spaced patches.
 \begin{matlab}
 %}
-if isempty(Dom), Dom=struct('type','periodic'); end
-if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic'); end
+if isempty(Dom), Dom=struct('type','periodic '); end
+if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic '); end
 %{
 \end{matlab}
-If \verb|Dom| is a string, then just set type to that
-string, and then get corresponding defaults for others
+If \verb|Dom| is a char-array, then just set type to that
+char-array, and then get corresponding defaults for others
 fields.
 \begin{matlab}
 %}
@@ -442,7 +442,7 @@ needed.
 %}
 patches.periodic=false;
 switch Dom.type
-case 'periodic'
+case {'periodic','periodic '}
     patches.periodic=true;
     if isfield(Dom,'bcOffset')
     warning('bcOffset not available for Dom.type = periodic'), end
@@ -517,7 +517,7 @@ The periodic case is evenly spaced within the spatial domain.
 Store the size ratio in \verb|patches|.
 \begin{matlab}
 %}
-case 'periodic'
+case {'periodic','periodic '}
   X=linspace(Xlim(1),Xlim(2),nPatch+1);
   DX=X(2)-X(1);
   X=X(1:nPatch)+diff(X)/2;

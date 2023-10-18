@@ -1,6 +1,6 @@
 % configPatches1() creates a data struct of the design of
 % 1D patches for later use by the patch functions such as
-% patchSys1(). AJR, Nov 2017 -- 27 Sep 2023
+% patchSys1(). AJR, Nov 2017 -- 6 Oct 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches1()}: configure spatial
@@ -18,7 +18,7 @@ example of its use.
 %}
 function patches = configPatches1(fun,Xlim,Dom ...
     ,nPatch,ordCC,dx,nSubP,varargin)
-version = '2023-09-27';
+version = "2023-10-06";
 %{
 \end{matlab}
 
@@ -54,15 +54,15 @@ conditions of the problem.   If \verb|Dom| is \verb|NaN| or
 \verb|Dom| is a structure with the following components.
 \begin{itemize}
 
-\item \verb|.type|, string, of either \verb|'periodic'| (the
-default), \verb|'equispace'|, \verb|'chebyshev'|,
-\verb|'usergiven'|.  For all cases except \verb|'periodic'|,
-users \emph{must} code into \verb|fun| the micro-grid
-boundary conditions that apply at the left(right) edge of
-the leftmost(rightmost) patches.
+\item \verb|.type|, string (or char-array), of either
+\verb|"periodic"| (the default), \verb|"equispace"|,
+\verb|"chebyshev"|, \verb|"usergiven"|.  For all cases
+except \verb|"periodic"|, users \emph{must} code into
+\verb|fun| the micro-grid boundary conditions that apply at
+the left(right) edge of the leftmost(rightmost) patches.
 
 \item \verb|.bcOffset|, optional one or two element array,
-in the cases of \verb|'equispace'| or \verb|'chebyshev'|
+in the cases of \verb|"equispace"| or \verb|"chebyshev"|
 the patches are placed so the left\slash right macroscale
 boundaries are aligned to the left\slash right edges of the
 corresponding extreme patches, but offset by \verb|bcOffset|
@@ -72,7 +72,7 @@ the extreme edge micro-grid points, whereas use
 \verb|bcOffset=0.5| when applying Neumann boundary conditions
 halfway between the extreme edge micro-grid points.
 
-\item \verb|.X|, optional array, in the case~\verb|'usergiven'|
+\item \verb|.X|, optional array, in the case~\verb|"usergiven"|
 it specifies the locations of the centres of the
 \verb|nPatch| patches---the user is responsible it makes
 sense.
@@ -284,7 +284,7 @@ each patch.
 %}
 global patches
 patches = configPatches1(@BurgersPDE, [0 2*pi], ...
-    'periodic', 8, 0, 0.06, 7);
+    "periodic", 8, 0, 0.06, 7);
 %{
 \end{matlab}
 Set some initial condition, with some microscale randomness.
@@ -413,7 +413,7 @@ For compatibility with pre-2023 functions, if parameter
 be the value of the so-called \verb|dx| parameter.
 \begin{matlab}
 %}
-if ~isstruct(Dom), pre2023=isnan(Dom);
+if ~isstruct(Dom), pre2023=ismissing(Dom);
 else pre2023=false; end
 if pre2023, ratio=dx; dx=nan; end
 %{
@@ -423,16 +423,17 @@ Default macroscale conditions are periodic with evenly
 spaced patches.
 \begin{matlab}
 %}
-if isempty(Dom), Dom=struct('type','periodic'); end
-if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic'); end
+if isempty(Dom), Dom=struct('type',"periodic"); end
+if (~isstruct(Dom))&ismissing(Dom), Dom=struct('type',"periodic"); end
 %{
 \end{matlab}
-If \verb|Dom| is a string, then just set type to that
-string, and then get corresponding defaults for others
-fields.
+If \verb|Dom| is a string or char-array, then just set type
+to that string, and then get corresponding defaults for
+others fields.
 \begin{matlab}
 %}
-if ischar(Dom), Dom=struct('type',Dom); end
+if ischar(Dom),  Dom=string(Dom); end
+if isstring(Dom), Dom=struct('type',Dom); end
 %{
 \end{matlab}
 Check what is and is not specified, and provide default of
@@ -442,25 +443,25 @@ needed.
 %}
 patches.periodic=false;
 switch Dom.type
-case 'periodic'
+case "periodic"
     patches.periodic=true;
     if isfield(Dom,'bcOffset')
     warning('bcOffset not available for Dom.type = periodic'), end
     if isfield(Dom,'X')
     warning('X not available for Dom.type = periodic'), end
-case {'equispace','chebyshev'}
+case {"equispace","chebyshev"}
     if ~isfield(Dom,'bcOffset'), Dom.bcOffset=[0;0]; end
     if length(Dom.bcOffset)==1
         Dom.bcOffset=repmat(Dom.bcOffset,2,1); end
     if isfield(Dom,'X')
     warning('X not available for Dom.type = equispace or chebyshev')
     end
-case 'usergiven'
+case "usergiven"
     if isfield(Dom,'bcOffset')
     warning('bcOffset not available for usergiven Dom.type'), end
     assert(isfield(Dom,'X'),'X required for Dom.type = usergiven')
 otherwise 
-    error([Dom.type ' is unknown Dom.type'])
+    error(Dom.type+" is unknown Dom.type")
 end%switch Dom.type
 %{
 \end{matlab}
@@ -517,7 +518,7 @@ The periodic case is evenly spaced within the spatial domain.
 Store the size ratio in \verb|patches|.
 \begin{matlab}
 %}
-case 'periodic'
+case "periodic"
   X=linspace(Xlim(1),Xlim(2),nPatch+1);
   DX=X(2)-X(1);
   X=X(1:nPatch)+diff(X)/2;
@@ -546,7 +547,7 @@ modified by the offset.
 %\todo{This warning needs refinement for multi-edges??}
 \begin{matlab}
 %}
-case 'equispace'
+case "equispace"
   halfWidth=dx*(nSubP-1)/2;
   if nPatch>1
     X=linspace(Xlim(1)+halfWidth-Dom.bcOffset(1)*dx ...
@@ -577,7 +578,7 @@ patches allow for a `christmas tree' approach to the
 boundary layers.   Needs to be explored??}
 \begin{matlab}
 %}
-case 'chebyshev'
+case "chebyshev"
   halfWidth=dx*(nSubP-1)/2;
   if nPatch>1
     X1 = Xlim(1)+halfWidth-Dom.bcOffset(1)*dx;
@@ -622,7 +623,7 @@ The user-given case is entirely up to a user to specify, we
 just force it to have the correct shape of a row.
 \begin{matlab}
 %}
-case 'usergiven'
+case "usergiven"
   X = reshape(Dom.X,1,[]);
 end%switch Dom.type
 %{

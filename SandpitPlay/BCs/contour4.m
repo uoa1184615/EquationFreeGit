@@ -1,28 +1,31 @@
-function contour4(X,Y,Z,C,nC)
+function hand = contour4(X,Y,Z,C,nC)
 % Draws contours of a quantity C on a surface in 3D-space
 % from data sampled on some deformed rectangular grid giving
 % the surface shape: X,Y,Z,C must all be the same sized 2D
 % arrays.  Uses the current colormap for contour colours. 
 % Optional nC, default=11, is the number of contour levels,
 % or if vector then specifies the specific contour levels.
-% AJR, 4 Oct 2023
+% The X,Y,Z arrays should be set sensibly via ndgrid (or
+% equivalent), not meshgrid.   AJR, 5 Oct 2023
 
 % if no arguments then draw an example
 if nargin==0
   [X,Y]=ndgrid(-0.8:0.1:1,-1:0.2:1);
   Z=0.5*(X.^2-Y.^2);
   clf, colormap(0.8*jet)
-  contour4(X,Y,Z, 0.5*exp(-X.^2-Y.^2) )
+  contour4(X,Y,Z, 0.5*exp(-X.^2-Y.^2));
   axis equal, colorbar
   xlabel('x'), ylabel('y'), zlabel('z')
   return
 end%if nargin
-if nargin<5, nC=11; end
 
 [ni,nj]=size(C);
-i=1:ni-1; j=1:nj-1;
 assert(all(size(X)==[ni nj] & size(Y)==[ni nj] & size(Z)==[ni nj]) ...
      ,'X,Y,Z,C must all be the same size of 2D array')
+i=1:ni-1; j=1:nj-1;
+
+% decide on contours and the colour mapping
+if nargin<5, nC=11; end
 if length(nC)==1
   cRng = quantile(C(:),[.1 .9]);
   cRng = cRng+[-1 1]*diff(cRng)/8;
@@ -33,6 +36,7 @@ else%length(nC)>1
   cLim = cs([1 end])+[-.5 .5]*(diff(cs([1 end]))/length(cs)+1e-6);
 end%length(C)
 theCols = colormap; % use the current colormap
+
 for c = cs
   xyzs=[];
   ccol = theCols( ceil(size(theCols,1)*(c-cLim(1))/diff(cLim)) ,:);
@@ -77,6 +81,7 @@ for c = cs
 end%for c
 hold off
 clim(cLim) % set color range used after the plots
+hand = gca().Children;
 
 function xyz=csegment(i,j,k)
 % Sub-function to compute contour line segment between grid
