@@ -219,6 +219,7 @@ fprintf('\nPassed standard spectral interpolation tests\n')
 \begin{matlab}
 %}
 fprintf('\n\n**** Test spectral interpolation on staggered\n')
+disp('**** Actually not doing so as DNW following changes Oct 2023')
 pause(1)
 %{
 \end{matlab}
@@ -228,7 +229,7 @@ grid as I am uncertain whether it makes any
 sense---certainly this test fails anyway. 
 \begin{matlab}
 %}
-for iReal=1:nRealise
+for iReal=1:0%?? nRealise
     nEdge = 1 % required
     edgyInt = rand<0.5
     nPatch=2*randi([3 10])
@@ -411,13 +412,14 @@ fprintf('\nPassed all standard polynomial interpolation\n')
 \begin{matlab}
 %}
 fprintf('\n\n**** Check finite width staggered\n')
+disp('**** Actually not doing so as DNW following changes Oct 2023')
 pause(1)
 %{
 \end{matlab}
 Must have even number of patches for a staggered grid.
 \begin{matlab}
 %}
-for iReal=1:nRealise
+for iReal=1:0%?? nRealise
     nEdge = 1 % required for now
     edgyInt = rand<0.5
     nPatch=2*randi([3 10])

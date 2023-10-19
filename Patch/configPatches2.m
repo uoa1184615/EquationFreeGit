@@ -1,6 +1,6 @@
 % configPatches2() creates a data struct of the design of 2D
 % patches for later use by the patch functions such as
-% patchSys2().  AJR, Nov 2018 -- 27 Sep 2023
+% patchSys2().  AJR, Nov 2018 -- 19 Oct 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{configPatches2()}: configures spatial
@@ -18,7 +18,7 @@ example of its use.
 %}
 function patches = configPatches2(fun,Xlim,Dom ...
     ,nPatch,ordCC,dx,nSubP,varargin)
-version = '2023-09-27';
+version = '2023-10-19';
 %{
 \end{matlab}
 
@@ -67,6 +67,8 @@ users \emph{must} code into \verb|fun| the micro-grid
 boundary conditions that apply at the left\slash right\slash
 bottom\slash top edges of the leftmost\slash rightmost\slash
 bottommost\slash topmost patches, respectively.
+
+%Todo: distinguish between strings and char-arrays.??
 
 \item \verb|.bcOffset|, optional one, two or four element
 vector/array, in the cases of \verb|'equispace'| or
@@ -122,11 +124,12 @@ However, if \verb|Dom| is~\verb|NaN| (as for pre-2023), then
 \verb|dx| actually is \verb|ratio| (scalar or two element),
 namely the ratio of (depending upon \verb|EdgyInt|) either
 the half-width or full-width of a patch to the equi-spacing
-of the patch mid-points---adjusted a little when $\verb|nEdge|>1$. So
-either $\verb|ratio|=\tfrac12$ means the patches abut and
-$\verb|ratio|=1$ is overlapping patches as in holistic
-discretisation, or $\verb|ratio|=1$ means the patches abut. 
-Small~\verb|ratio| should greatly reduce computational time.
+of the patch mid-points---adjusted a little when
+$\verb|nEdge|>1$. So either $\verb|ratio|=\tfrac12$ means
+the patches abut and $\verb|ratio|=1$ is overlapping patches
+as in holistic discretisation, or $\verb|ratio|=1$ means the
+patches abut. Small~\verb|ratio| should greatly reduce
+computational time.
 
 
 \item \verb|nSubP| is the number of equi-spaced microscale
@@ -138,10 +141,12 @@ is/are centre-patch lattice lines.  So for the defaults
 of $\verb|nEdge|=1$ and not \verb|EdgyInt|, then 
 \verb|nSubP| must be odd.
 
-\item \verb|'nEdge'|, \emph{optional} (integer---scalar or two element), default=1, the width of edge values set by interpolation at the
-edge regions of each patch.  If two elements, then respectively the width in \(x,y\)-directions.  The default is one (suitable
-for microscale lattices with only nearest neighbour
-interactions).
+\item \verb|'nEdge'|, \emph{optional} (integer---scalar or
+two element), default=1, the width of edge values set by
+interpolation at the edge regions of each patch.  If two
+elements, then respectively the width in \(x,y\)-directions.
+ The default is one (suitable for microscale lattices with
+only nearest neighbour interactions).
 
 \item \verb|EdgyInt|, true/false, \emph{optional},
 default=false.  If true, then interpolate to left\slash
@@ -517,8 +522,8 @@ Default macroscale conditions are periodic with evenly
 spaced patches.
 \begin{matlab}
 %}
-if isempty(Dom), Dom=struct('type','periodic'); end
-if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic'); end
+if isempty(Dom), Dom=struct('type','periodic '); end
+if (~isstruct(Dom))&isnan(Dom), Dom=struct('type','periodic '); end
 %{
 \end{matlab}
 If \verb|Dom| is a string, then just set type to that
@@ -548,18 +553,21 @@ zero
 needed.  Do so for both directions independently.
 \begin{matlab}
 %}
-patches.periodic=false;
+patches.periodic=false(2,1);
 for p=1:2
 switch Dom.type(p,:)
-case 'periodic'
-    patches.periodic=true;
-    if isfield(Dom,'bcOffset')
-    warning('bcOffset not available for Dom.type = periodic'), end
+case {'periodic','periodic '}
+    patches.periodic(p) = true;
     msg=' not available for Dom.type = periodic';
+    if isfield(Dom,'bcOffset')&&~all(isnan(Dom.bcOffset(:,p)))
+        warning(['bcOffset' msg]), end
     if isfield(Dom,'X'), warning(['X' msg]), end
     if isfield(Dom,'Y'), warning(['Y' msg]), end
 case {'equispace','chebyshev'}
-    if ~isfield(Dom,'bcOffset'), Dom.bcOffset=zeros(2,2); end
+    if ~isfield(Dom,'bcOffset')
+      Dom.bcOffset=nan(2,2); Dom.bcOffset(:,p)=0;
+    else Dom.bcOffset( isnan(Dom.bcOffset(:,p)) ,p)=0; 
+    end
     % for mixed with usergiven, following should still work
     if numel(Dom.bcOffset)==1
         Dom.bcOffset=repmat(Dom.bcOffset,2,2); end
@@ -575,7 +583,7 @@ case 'usergiven'
     if p==1, assert(isfield(Dom,'X'),['X' msg]), end
     if p==2, assert(isfield(Dom,'Y'),['Y' msg]), end
 otherwise 
-    error([Dom.type ' is unknown Dom.type'])
+    error([Dom.type(p,:) ' is unknown Dom.type'])
 end%switch Dom.type
 end%for p
 %{
@@ -632,6 +640,7 @@ the distribution into~\verb|Q| and finally assigning to
 array of corresponding direction.
 \begin{matlab}
 %}
+patches.ratio = nan(1,2);
 for q=1:2
 qq=2*q-1; qstr=num2str(q);
 %{
@@ -647,7 +656,7 @@ The periodic case is evenly spaced within the spatial domain.
 Store the size ratio in \verb|patches|.
 \begin{matlab}
 %}
-case 'periodic'
+case {'periodic','periodic '}
   Q=linspace(Xlim(qq),Xlim(qq+1),nPatch(q)+1);
   DQ=Q(2)-Q(1);
   Q=Q(1:nPatch(q))+diff(Q)/2;
@@ -656,7 +665,7 @@ case 'periodic'
   if pre2023, dx(q) = ratio(q)*DQ/(nSubP(q)-pnE*(1+pEI))*(2-pEI);
   else        ratio(q) = dx(q)/DQ*(nSubP(q)-pnE*(1+pEI))/(2-pEI);  
   end
-  patches.ratio=ratio;
+  patches.ratio(q)=ratio(q);
 %{
 \end{matlab}
 %: case equispace
@@ -786,9 +795,9 @@ to interpolate field values for coupling. \todo{Might sometime
 extend to coupling via derivative values.}   
 \begin{matlab}
 %}
-if patches.periodic
-  ratio = reshape(ratio,1,2); % force to be row vector
-  patches.ratio=ratio; 
+if any(patches.periodic)
+%  ratio = reshape(ratio,1,2); % force to be row vector
+%  patches.ratio=ratio; 
   if ordCC>0
     [Cwtsr,Cwtsl] = patchCwts(ratio,ordCC,patches.stag);
     patches.Cwtsr = Cwtsr;  patches.Cwtsl = Cwtsl;

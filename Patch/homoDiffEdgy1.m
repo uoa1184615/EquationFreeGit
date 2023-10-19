@@ -3,7 +3,7 @@
 % microscale is of known period so we interpolate
 % next-to-edge values to get opposite edge values. Then
 % explore the Jacobian and eigenvalues.  AJR, Nov 2019 --
-% Nov 2020
+% 19 Oct 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoDiffEdgy1}: computational
@@ -192,6 +192,10 @@ for p=1:2
   view(60,40), colormap(0.8*hsv)
   xlabel('time $t$'), ylabel('space $x$'), zlabel('$u(x,t)$') 
   ifOurCf2eps([mfilename 'U' num2str(p)])
+  switch p
+  case 1, title('short time of simulation showing transients')
+  case 2, title('simulation of $u(x,t)$ on patches in space')
+  end
 end
 pause(3)
 %{
@@ -280,8 +284,7 @@ the number of decoupled systems in this patch configuration.
   [evecs,evals]=eig(Jac);
   eval=-sort(-diag(real(evals)));
   nZeroEv=sum(eval(:)>-1e-5) 
-  leadingEvals=[leadingEvals eval(1:3*nPatch)];
-%  leadingEvals=[leadingEvals eval([1, (nZeroEv+1):2:(nZeroEv*nPatch+4)])];
+  leadingEvals=[leadingEvals eval(1:nPatch)];
 %{
 \end{matlab}
 End of the for-loop over orders of interpolation, and output

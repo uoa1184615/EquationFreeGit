@@ -127,26 +127,24 @@ directions, otherwise \verb|dx(1:3)| gives the spacing in
 each of the three directions.
 
 However, if \verb|Dom| is~\verb|NaN| (as for pre-2023), then
-\verb|dx| actually is \verb|ratio| (scalar or three
-elements), namely the ratio of (depending upon
-\verb|EdgyInt|) either the half-width or full-width of a
-patch to the equi-spacing of the patch mid-points---adjusted
-a little when $\verb|nEdge|>1$. So either if not
-\verb|EdgyInt| then $\verb|ratio|=\tfrac12$ means the
-patches abut and $\verb|ratio|=1$ is overlapping patches as
-in holistic discretisation, or if \verb|EdgyInt| then
-$\verb|ratio|=1$ means the patches abut. Small~\verb|ratio|
-should greatly reduce computational time.
+\verb|dx| actually is \verb|ratio| (scalar or three elements),
+namely the ratio of (depending upon \verb|EdgyInt|) either
+the half-width or full-width of a patch to the equi-spacing
+of the patch mid-points---adjusted a little when $\verb|nEdge|>1$. So
+either if not \verb|EdgyInt| then $\verb|ratio|=\tfrac12$ means the patches abut and
+$\verb|ratio|=1$ is overlapping patches as in holistic
+discretisation, or if \verb|EdgyInt| then $\verb|ratio|=1$ means the patches abut. 
+Small~\verb|ratio| should greatly reduce computational time.
 
 
 \item \verb|nSubP| is the number of equi-spaced microscale
 lattice points in each patch: if scalar, then use the same
 number in all three directions, otherwise \verb|nSubP(1:3)|
 gives the number in each direction. If not using
-\verb|EdgyInt|, then $\verb|nSubP./nEdge|$ must be odd
-integer(s) so that there is/are centre-patch lattice planes.
- So for the defaults of $\verb|nEdge|=1$ and not
-\verb|EdgyInt|, then \verb|nSubP| must be odd.
+\verb|EdgyInt|, then $\verb|nSubP./nEdge|$ must be odd integer(s) so that there 
+is/are centre-patch lattice planes.  So for the defaults 
+of $\verb|nEdge|=1$ and not \verb|EdgyInt|, then 
+\verb|nSubP| must be odd.
 
 
 \item \verb|'nEdge'|, \emph{optional} (integer---scalar or
@@ -207,18 +205,17 @@ separately invoke, say, a \textsc{gpu} to accelerate
 sub-patch computations. 
 
 If true, and it requires that you have \Matlab's Parallel
-Computing Toolbox, then configPatches3 will distribute the
-patches over multiple \textsc{cpu}s\slash cores. In \Matlab,
-only one array dimension can be split in the distribution,
-so configPatches3 chooses the one space dimension~$x,y,z$
-corresponding to the highest~\verb|nPatch| (if a tie, then
-chooses the rightmost of~$x,y,z$).  A user may
-correspondingly distribute arrays with property
-\verb|patches.codist|, or simply use formulas invoking the
-preset distributed arrays \verb|patches.x|,
-\verb|patches.y|, and \verb|patches.z|. If a user has not
-yet established a parallel pool, then a `local' pool is
-started.
+Computing Toolbox, then configPatches3 will distribute the patches over
+multiple \textsc{cpu}s\slash cores. In \Matlab, only one
+array dimension can be split in the distribution, so configPatches3
+chooses the one space dimension~$x,y,z$ corresponding to
+the highest~\verb|nPatch| (if a tie, then chooses the
+rightmost of~$x,y,z$).  A user may correspondingly
+distribute arrays with property \verb|patches.codist|, or
+simply use formulas invoking the preset distributed arrays
+\verb|patches.x|, \verb|patches.y|, and \verb|patches.z|. If
+a user has not yet established a parallel pool, then a
+`local' pool is started.
 
 \end{itemize}
 
@@ -648,7 +645,7 @@ case 'usergiven'
     if p==2, assert(isfield(Dom,'Y'),['Y' msg]), end
     if p==3, assert(isfield(Dom,'Z'),['Z' msg]), end
 otherwise 
-    error([Dom.type ' is unknown Dom.type'])
+    error([Dom.type(p,:) ' is unknown Dom.type'])
 end%switch Dom.type
 end%for p
 %{
@@ -765,11 +762,10 @@ distribution in order to reduce macro-interpolation errors,
 \(Q_i \propto -\cos(i\pi/N)\),  but with the extreme edges
 aligned with the spatial domain boundaries, modified by the
 offset, and modified by possible `boundary layers'.
-\footnote{However, maybe overlapping patches near a boundary
-should be viewed as some sort of spatial analogue of the
-`christmas tree' of projective integration and its
-integration to a slow manifold \cite[e.g.,][]{Gear04,
-Gear2005, Maclean2020a}.   Here maybe the overlapping
+\footnote{However, maybe overlapping patches near a
+boundary should be viewed as some sort of spatial analogue
+of the `christmas tree' of projective integration and its
+integration to a slow manifold \cite[e.g.,][]{Gear04, Gear2005, Maclean2020a}.   Here maybe the overlapping
 patches allow for a `christmas tree' approach to the
 boundary layers.   Needs to be explored??} 
 \begin{matlab}

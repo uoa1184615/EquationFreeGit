@@ -402,7 +402,7 @@ if (patches.nEnsem>1)&&(patches.nEdge>1)
       warning('not yet tested when both nEnsem and nEdge non-one')
       end
 if patches.nCore>1
-    warning('nCore>1 not yet tested in this version')
+    error('nCore>1 not yet available in this version')
     end
 %{
 \end{matlab}

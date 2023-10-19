@@ -116,8 +116,9 @@
 
 
 % for mini-local-tableofconents, best loaded last??
-\usepackage[twodeep]{etocx}
-
+%\usepackage[twodeep]{etocx}
+\def\localtableofcontents{}%?? as it DNW in 2023
+\def\secttoc{}
 
 \graphicspath{{../ProjInt/}{../Patch/}{../ProjInt/Figs/}{../Patch/Figs/}}
 \def\inputFigs#1{\input{\inputFigsFolder/#1}}

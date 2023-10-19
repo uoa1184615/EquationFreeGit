@@ -195,7 +195,7 @@ h=(nSubP-1)*dx;
 beta = pi^2*A0/h^2 % slowest rate of fast modes
 burstT = 2.5*log(beta*diff(ts(1:2)))/beta
 burstT = max(10,round(burstT/microTimePeriod))*microTimePeriod +1e-12
-addpath('../../ProjInt')
+%addpath('../../ProjInt')
 %{
 \end{matlab}
 Time the projective integration simulation.

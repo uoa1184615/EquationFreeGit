@@ -1,6 +1,6 @@
 % Simulate heterogeneous diffusion in 2D on one patch in at
 % least one direction to test the code for one patch.  Then
-% explore the Jacobian and eigenvalues.  AJR, Sep 2023
+% explore the Jacobian and eigenvalues.  AJR, 19 Oct 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{onePatchDiff2}: computational homogenise a
@@ -19,6 +19,7 @@ clear all
 mPeriod = randi([6 10],1,2)
 cHetr = exp(1*randn([mPeriod 2]));
 cHetr = cHetr*mean(1./cHetr(:));
+facRngHetero = exp(diff(log(quantile(cHetr(:),0:1))))
 %{
 \end{matlab}
 
@@ -27,9 +28,11 @@ domain, patches, size ratios.
 \begin{matlab}
 %}
 global patches
-nPatch = 2*randi(2,1,2)-1
+nPatch = randi(4,1,2)
 nSubP = mPeriod+1 
-if 0, Dom='equispace', else Dom='chebyshev', end
+% randomly select Domain types
+Doms = ['periodic '; 'equispace'; 'chebyshev'];
+Dom = Doms(randi(3,2,1),:) % chooses from all three
 configPatches2(@heteroDiff20,[-pi pi 0 2*pi],Dom,nPatch ...
     ,4,1./(nSubP-1),nSubP ,'EdgyInt',true ,'hetCoeffs',cHetr );
 %{
@@ -64,8 +67,8 @@ end
 \paragraph{Plot the solution} as an animation over time.
 \begin{matlab}
 %}
-if ts(end)>0.099, disp('plot animation of solution field')
-figure(1), clf, colormap(hsv)
+disp('plot animation of solution field')
+figure(1), clf, colormap(parula)
 %{
 \end{matlab}
 Get spatial coordinates and pad them with NaNs to separate
@@ -84,17 +87,19 @@ for i = 1:length(ts)
 %{
 \end{matlab}
 Get the row vector of data,  form into the 6D array via the
-interpolation to the edges, optionally apply macroscale BCs, then pad 
+interpolation to the edges, apply the macroscale BCs, then pad 
 with Nans between patches, and reshape to suit the surf function.
 \begin{matlab}
 %}
   u = patchEdgeInt2(us(i,:));
-  if 1 % optionally apply BCs
+  if ~patches.periodic(1)
     u( 1 ,:,:,:, 1 ,:)=0; % left-edge of leftmost is zero
     u(end,:,:,:,end,:)=0; % right-edge of rightmost is zero
+  end;
+  if ~patches.periodic(2)
     u(:, 1 ,:,:,:, 1 )=u(:,  2  ,:,:,:, 1 ); % bottom-edge of bottommost
     u(:,end,:,:,:,end)=u(:,end-1,:,:,:,end); % top-edge of topmost
-  end%if BC option
+  end;
   u(end+1,:,:)=nan; u(:,end+1,:)=nan;
   u = reshape(permute(u,[1 5 2 6 3 4]), [numel(x) numel(y)]);
 %{
@@ -105,8 +110,9 @@ otherwise just update the surface data.
 %}
   if i==1
        hsurf = surf(x(:),y(:),u'); view(60,40) 
-       axis equal, zlim([-1 1]),  %caxis([-1 1])
+       axis equal, zlim([-1 1])
        xlabel('$x$'), ylabel('$y$'), zlabel('$u(x,y)$')
+       caxis(quantile(u(:),0:1)), colorbar
        pause
   else set(hsurf,'ZData', u');
   end
@@ -118,138 +124,56 @@ finish the animation loop and if-plot.
 \begin{matlab}
 %}
 end%for over time
-end%if-plot
-return%%%%%%%%%%%
 %{
 \end{matlab}
 
 
 
 
+\subsection{\texttt{heteroDiff20()}: heterogeneous diffusion}
+\label{sec:heteroDiff20}
 
+This function codes the lattice heterogeneous diffusion
+inside the patches.  For 6D input arrays~\verb|u|, \verb|x|,
+and~\verb|y| (via edge-value interpolation of
+\verb|patchSys2|, \cref{sec:patchSys2}), computes the
+time derivative~\cref{eq:HomogenisationExample} at each
+point in the interior of a patch, output in~\verb|ut|.  The
+two 2D array of diffusivities,~$c^x_{ij}$ and~$c^y_{ij}$,
+have previously been stored in~\verb|patches.cs| (3D). 
+\begin{matlab}
+%}
+function ut = heteroDiff20(t,u,patches)
+  dx = diff(patches.x(2:3));  % x space step
+  dy = diff(patches.y(2:3));  % y space step
+  ix = 2:size(u,1)-1; % x interior points in a patch
+  iy = 2:size(u,2)-1; % y interior points in a patch
+  ut = nan+u;         % preallocate output array
+%{
+\end{matlab}
+The macroscale boundary conditions are Dirichlet zero at the
+extreme edges of left-right extreme patches, and Neumann zero 
+at extreme edges of top-bottom extreme patches.
+\begin{matlab}
+%}
+  if ~patches.periodic(1)
+  u( 1 ,:,:,:, 1 ,:)=0; % left-edge of leftmost is zero
+  u(end,:,:,:,end,:)=0; % right-edge of rightmost is zero
+  end;
+  if ~patches.periodic(2)
+  u(:, 1 ,:,:,:, 1 )=u(:,  2  ,:,:,:, 1 ); % bottom-edge of bottommost
+  u(:,end,:,:,:,end)=u(:,end-1,:,:,:,end); % top-edge of topmost
+  end;
+%{
+\end{matlab}
+Code the microscale diffusion.
+\begin{matlab}
+%}
+  ut(ix,iy,:,:,:,:) ...
+  = diff(patches.cs(:,iy,1,:).*diff(u(:,iy,:,:,:,:),1),1)/dx^2 ...
+   +diff(patches.cs(ix,:,2,:).*diff(u(ix,:,:,:,:,:),1,2),1,2)/dy^2; 
+end% function
+%{
+\end{matlab}
+%}
 
-\subsection{Compute Jacobian and its spectrum}
-Let's explore the Jacobian dynamics for a range of orders of
-interpolation, all for the same patch design and
-heterogeneity.  Except here use a small ratio as we do not
-plot.
-\begin{matlab}
-%}
-ratio = [0.1 0.1]
-nLeadEvals=prod(nPatch)+max(nPatch);
-leadingEvals=[];
-%{
-\end{matlab}
-
-Evaluate eigenvalues for spectral as the base case for
-polynomial interpolation of order \(2,4,\ldots\).
-\begin{matlab}
-%}
-maxords=10;
-for ord=0:2:maxords
-    ord=ord    
-%{
-\end{matlab} 
-Configure with same parameters, then because they are reset
-by this configuration, restore coupling.
-\begin{matlab}
-%}
-    configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
-        ,ord,ratio,nSubP,'EdgyInt',edgyInt,'nEnsem',nEnsem ...
-        ,'hetCoeffs',cHetr);
-%{
-\end{matlab}
-Find which elements of the 6D array are interior micro-grid
-points and hence correspond to dynamical variables.
-\begin{matlab}
-%}
-    u0 = zeros([nSubP,1,nEnsem,nPatch]);
-    u0([1 end],:,:) = nan;
-    u0(:,[1 end],:) = nan;
-    i = find(~isnan(u0));
-%{
-\end{matlab}
-Construct the Jacobian of the scheme as the matrix of the
-linear transformation, obtained by transforming the standard
-unit vectors.
-\begin{matlab}
-%}
-    jac = nan(length(i));
-    sizeJacobian = size(jac)
-    for j = 1:length(i)
-      u = u0(:)+(i(j)==(1:numel(u0))');
-      tmp = patchSys2(0,u);
-      jac(:,j) = tmp(i);
-    end
-%{
-\end{matlab}
-Test for symmetry, with error if we know it should be
-symmetric.
-\begin{matlab}
-%}
-    notSymmetric=norm(jac-jac')    
-    if edgyInt, assert(notSymmetric<1e-7,'failed symmetry')
-    elseif notSymmetric>1e-7, disp('failed symmetry')
-    end 
-%{
-\end{matlab}
-Find all the eigenvalues (as \verb|eigs| is unreliable).
-\begin{matlab}
-%}
-    if edgyInt, [evecs,evals] = eig((jac+jac')/2,'vector');
-    else evals = eig(jac);
-    end
-    biggestImag=max(abs(imag(evals)));
-    if biggestImag>0, biggestImag=biggestImag, end
-%{
-\end{matlab}
-Sort eigenvalues on their real-part with most positive
-first, and most negative last. Store the leading eigenvalues
-in \verb|egs|, and write out when computed all orders.
-The number of zero eigenvalues, \verb|nZeroEv|, gives
-the number of decoupled systems in this patch configuration.
-\begin{matlab}
-%}
-    [~,k] = sort(-real(evals));
-    evals=evals(k); evecs=evecs(:,k);
-    if ord==0, nZeroEv=sum(abs(evals(:))<1e-5), end
-    if ord==0, evec0=evecs(:,1:nZeroEv*nLeadEvals); 
-    else % find evec closest to that of each leading spectral
-        [~,k]=max(abs(evecs'*evec0));
-        evals=evals(k); % sort in corresponding order
-    end
-    leadingEvals=[leadingEvals evals(nZeroEv*(1:nLeadEvals))];
-end 
-disp('     spectral    quadratic      quartic  sixth-order ...')
-leadingEvals=leadingEvals
-%{
-\end{matlab}
-
-Plot the errors in the eigenvalues using the spectral ones
-as accurate.  Only plot every second,~\verb|iEv|, as all are
-repeated eigenvalues.
-\begin{matlab}
-%}
-if maxords>2
-    iEv=2:2:12;
-    figure(2);
-    err=abs(leadingEvals-leadingEvals(:,1)) ...
-        ./(1e-7+abs(leadingEvals(:,1)));
-    semilogy(2:2:maxords,err(iEv,2:end)','o:')
-    xlabel('coupling order')
-    ylabel('eigenvalue relative error')
-    leg=legend( ...
-        strcat('$',num2str(real(leadingEvals(iEv,1)),'%.4f'),'$') ...
-        ,'Location','northeastoutside');
-    if ~exist('OCTAVE_VERSION','builtin')
-        title(leg,'eigenvalues'), end
-    legend boxoff 
-end%if-plot
-%{
-\end{matlab}
-
-
-\input{../Patch/heteroDiff2.m}
-
-Fin.
-%}
