@@ -22,8 +22,8 @@ methods in their own applications. The document
 <tt>eqnFreeUserMan-newest.pdf</tt></a> describes how to use the
 main functions of interest to you.
 
-<p><a href="https://au.mathworks.com/matlabcentral/fileexchange/73632-equation-free-toolbox"> 
-View Equation-Free Toolbox on Matlab's File Exchange</a>
+<p>
+[![View Equation-Free Toolbox on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://au.mathworks.com/matlabcentral/fileexchange/73632-equation-free-toolbox)
 
 <p><strong>Please contact us</strong> via
 <a href="https://profajroberts.github.io">
