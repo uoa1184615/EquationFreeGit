@@ -18,8 +18,8 @@ bursts of of the microscale simulator, and often only
 computing on small patches of the spatial domain. This suite
 of functions empowers users to start implementing such
 methods in their own applications. The document
-<a href="https://github.com/uoa1184615/EquationFreeGit/raw/master/eqnFreeUserMan-newest.pdf">
-<tt>eqnFreeUserMan-newest.pdf</tt></a> describes how to use the
+<a href="https://github.com/uoa1184615/EquationFreeGit/raw/master/eqnFreeUserMan.pdf">
+<tt>eqnFreeUserMan.pdf</tt></a> describes how to use the
 main functions of interest to you.
 
 <p>
