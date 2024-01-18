@@ -15,10 +15,11 @@ simulation on small patches}
 \label{sec:homoWaveEdgy2}
 
 
-This section extends to 2D waves, in a microscale
-heterogeneous media, the 2D diffusion code discussed in
-\cref{sec:homoDiffEdgy2}.  It favourably compares to the
-examples of \cite{Maier2021}.
+This section addresses 2D waves in a media with microscale
+heterogeneity. It extends to waves the code for 2D diffusion
+\ifcsname r@sec:homoDiffEdgy2\endcsname\
+(\cref{sec:homoDiffEdgy2})\fi.  The results here favourably
+compare to the examples of \cite{Maier2021}.
 
 \begin{figure}
 \centering \caption{\label{fig:homoWaveEdgy2fig}results for

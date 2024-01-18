@@ -1,9 +1,10 @@
 function ifOurCf2eps(fileName,sz)
 % If global OurCf2eps variable exists with non-zero/true
-% value, then outputs the current figure to fileName.eps in
-% the local Figs folder, otherwise nothing happens. 
-% However, eps format does not work with isosurfaces, so
-% output those otherwise.  Include graphs with scale=0.8
+% value, then outputs the current figure to
+% Figs/fileName.eps in the local Figs folder, otherwise
+% nothing happens. However, eps format does not work with
+% isosurfaces, so output those otherwise.  Include graphs
+% into documents with scale=0.8
 % Optional: sz is of drawn size in cms (two element row).
 % AJR, 11 Dec 2020  -- 16 Apr 2023
 global OurCf2eps

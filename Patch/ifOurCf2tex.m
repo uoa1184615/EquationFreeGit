@@ -1,9 +1,9 @@
 function ifOurCf2tex(fileName)
 % If global OurCf2eps variable exists with non-zero/true
-% value, then outputs the current figure to fileName.tex in
-% the local Figs folder, otherwise nothing happens.  To
-% be used with \usepackage{pgfplots} \pgfplotsset{compat=newest}
-% AJR, 30 Mar 2023
+% value, then outputs the current figure to
+% Figs/fileName.tex in the local Figs folder, otherwise
+% nothing happens.  To be used with \usepackage{pgfplots}
+% \pgfplotsset{compat=newest}  AJR, 30 Mar 2023
 global OurCf2eps
 if ~isempty(OurCf2eps) && OurCf2eps
     ffn = ['Figs/' fileName];
