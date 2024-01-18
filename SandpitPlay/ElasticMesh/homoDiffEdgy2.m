@@ -255,7 +255,7 @@ repeated eigenvalues.
 \begin{matlab}
 %}
 if maxords>2
-    iEv=2:2:12;
+    iEv=2:2:10;
     figure(2);
     err=abs(leadingEvals-leadingEvals(:,1)) ...
         ./(1e-7+abs(leadingEvals(:,1)));

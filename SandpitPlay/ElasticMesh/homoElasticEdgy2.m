@@ -247,8 +247,8 @@ points and hence correspond to dynamical variables.
 \begin{matlab}
 %}
     u0 = zeros([nSubP,4,nEnsem,nPatch]);
-    u0([1 end],:,:,:,:) = nan;
-    u0(:,[1 end],:,:,:,:) = nan;
+   % u0([1 end],:,:,:,:) = nan;
+   % u0(:,[1 end],:,:,:,:) = nan;
     intXY = double(patches.intY==1|patches.intX==1);
     u0 = u0.* reshape(intXY,[1 1 1 1 size(u0,5:6)]);
     i = find(~isnan(u0));
