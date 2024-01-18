@@ -4,6 +4,7 @@
 % next-to-edge values to get opposite edge values. Then
 % explore the Jacobian and eigenvalues.  
 % JEB & AJR, May 2020 -- Nov 2020
+% Adapted for BC and no interpolation, JEB Dec 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoDiffEdgy2}: computational
@@ -43,9 +44,20 @@ else % when nEnsem>1 use fewer patches
     nSubP = mPeriod+randi([1 4],1,2) % +2 is decoupled
 end
 ratio = 0.2+0.2*rand(1,2)   
+
+% define patches which require X or Y interpolation
+intX = zeros(nPatch);
+intY = zeros(nPatch);
+intX(:,1:3:end,:) = 1;
+intY(1:3:end,:) = 1;
+
+global patches; 
 configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
-    ,0,ratio,nSubP ,'EdgyInt',edgyInt ,'nEnsem',nEnsem ...
-    ,'hetCoeffs',cHetr );
+   ,0,ratio,nSubP ,'EdgyInt',edgyInt ,'nEnsem',nEnsem ...
+   ,'hetCoeffs',cHetr,'intX',intX ,'intY',intY);
+
+patches.BC = @heteroDiffBC2; % define boundary conditions
+
 %{
 \end{matlab}
 
@@ -57,8 +69,11 @@ in the ensemble.
 %}
 global patches
 u0 = 0.8*cos(patches.x).*sin(patches.y) ...
-     +0.1*randn([nSubP,1,1,nPatch]); 
+     +0.8*randn([nSubP,1,1,nPatch]); 
 u0 = repmat(u0,1,1,1,nEnsem,1,1); 
+u0 = u0.* reshape((patches.intY~=0|patches.intX~=0),[1 1 1 1 size(u0,5:6)]); 
+u0 = patches.BC(u0,patches); % apply boundary conditions
+
 %{
 \end{matlab}
 Integrate using standard integrators, unevenly spaced in
@@ -66,7 +81,7 @@ time to better display transients.
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode23(@patchSys2, 0.3*linspace(0,1).^2, u0(:));
+    [ts,us] = ode23(@patchSys2, linspace(0,2), u0(:));
 else % octave version
     [ts,us] = odeOcts(@patchSys2, 0.3*linspace(0,1).^2, u0(:));
 end
@@ -103,6 +118,7 @@ patches, and reshape to suit the surf function.
   u = squeeze( mean( patchEdgeInt2(us(i,:)) ,4));
   u(end+1,:,:,:)=nan; u(:,end+1,:,:)=nan;
   u = reshape(permute(u,[1 3 2 4]), [numel(x) numel(y)]);
+  u(u==0)=NaN; % remove uncoupled patches
 %{
 \end{matlab}
 If the initial time then draw the surface with labels,
@@ -115,7 +131,7 @@ otherwise just update the surface data.
        xlabel('$x$'), ylabel('$y$'), zlabel('$u(x,y)$')
   else set(hsurf,'ZData', u');
   end
-  legend(['time = ' num2str(ts(i),2)],'Location','north')
+  title(['time = ' num2str(ts(i),'%4.2f')])
   pause(0.05)
 %{
 \end{matlab}
@@ -124,7 +140,6 @@ finish the animation loop and if-plot.
 %}
 end%for over time
 end
-
 %%
 %if-plot
 %{
@@ -143,7 +158,7 @@ plot.
 \begin{matlab}
 %}
 ratio = [0.1 0.1]
-nLeadEvals=prod(nPatch)+max(nPatch);
+nLeadEvals=10;% prod(nPatch)+max(nPatch);
 leadingEvals=[];
 %{
 \end{matlab}
@@ -163,7 +178,7 @@ by this configuration, restore coupling.
 %}
     configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
         ,ord,ratio,nSubP,'EdgyInt',edgyInt,'nEnsem',nEnsem ...
-        ,'hetCoeffs',cHetr);
+        ,'hetCoeffs',cHetr  ,'intX',intX ,'intY',intY);
 %{
 \end{matlab}
 Find which elements of the 6D array are interior micro-grid
@@ -173,6 +188,8 @@ points and hence correspond to dynamical variables.
     u0 = zeros([nSubP,1,nEnsem,nPatch]);
     u0([1 end],:,:) = nan;
     u0(:,[1 end],:) = nan;
+    intXY = double(patches.intY==1|patches.intX==1);
+    u0 = u0.* reshape(intXY,[1 1 1 1 size(u0,5:6)]);
     i = find(~isnan(u0));
 %{
 \end{matlab}

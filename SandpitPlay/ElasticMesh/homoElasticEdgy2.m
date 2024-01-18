@@ -1,28 +1,32 @@
-% Simulate heterogeneous diffusion in 2D on patches as an
+% Simulate heterogeneous elasticity in 2D on patches as an
 % example application of patches in space. Here the
 % microscale is of known period so we interpolate
 % next-to-edge values to get opposite edge values. Then
 % explore the Jacobian and eigenvalues.  
-% JEB & AJR, May 2020 -- Nov 2020
+% JEB, Dec 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoDiffEdgy2}: computational
-homogenisation of a 2D diffusion via simulation on small
+homogenisation of a 2D elasticity via simulation on small
 patches}
-\label{sec:homoDiffEdgy2}
+\label{sec:homoElasticEdgy2}
 
-
-
-This section extends to 2D the 1D code discussed in
-\cref{sec:homoDiffEdgy1}. First set random heterogeneous
-diffusivities of random period in each of the two
-directions. Crudely normalise by the harmonic mean so the
-decay time scale is roughly one. 
 \begin{matlab}
 %}
-mPeriod = randi([2 3],1,2)
-cHetr = exp(1*randn([mPeriod 2]));
-cHetr = cHetr*mean(1./cHetr(:)) 
+clear all
+
+mPeriod = randi([2 3],1,2)  % [2 2] %
+%cHetr = exp(1*randn([mPeriod 2]));
+%cHetr = cHetr*mean(1./cHetr(:)) 
+
+% E  =  1*exp( 0.5*(rand([mPeriod,3])-1));
+% nu =    0.3 +0.1*(rand([mPeriod,3])-1);
+% Equarts = quantile(E(:),0:0.25:1)
+% nuQuarts = quantile(nu(:),0:0.25:1)
+% lambda=nu(:,:,1:2).*E(:,:,1:2)./(1+nu(:,:,1:2))./(1-2*nu(:,:,1:2));
+% mu    =    E(:,:,3)./(1+nu(:,:,3))./2;
+% cElas= cat(3,mu,lambda);
+
 %{
 \end{matlab}
 
@@ -43,9 +47,39 @@ else % when nEnsem>1 use fewer patches
     nSubP = mPeriod+randi([1 4],1,2) % +2 is decoupled
 end
 ratio = 0.2+0.2*rand(1,2)   
-configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
-    ,0,ratio,nSubP ,'EdgyInt',edgyInt ,'nEnsem',nEnsem ...
-    ,'hetCoeffs',cHetr );
+
+nx=nSubP(1);
+ny=nSubP(2);
+Evar = 0.5
+viscosity = 1e-3
+eV = round(-log10(viscosity));
+eE = round(-log(Evar)/log(2));
+heteroPeriod = nx-2
+E  = exp( Evar*(2*rand(nx-2,ny-2,2)-1) );
+nu =  0.3 + 0.1*(2*rand(nx-2,ny-2,2)-1);
+if 0, E=1+0*E;  nu=0.3+0*nu; end% optionally homogenous
+EQuartiles  = quantile(E(:) ,0:0.25:1)
+nuQuartiles = quantile(nu(:),0:0.25:1)
+lambda=nu.*E./(1+nu)./(1-2*nu);
+mu    =    E./(1+nu)./2;
+cElas = cat(3,mu,lambda);
+
+% define patches which require X or Y interpolation
+intX = ones(nPatch);%zeros(nPatch);
+intY = ones(nPatch);%zeros(nPatch);
+%intX(:,1:3:end,:) = 1;
+%intY(1:3:end,:) = 1;
+
+global patches; 
+configPatches2(@heteroElastic2,[0 1 0 1],nan,nPatch ...
+   ,0,ratio,nSubP ,'EdgyInt',edgyInt ,'nEnsem',nEnsem ...
+   ,'hetCoeffs',cElas,'intX',intX ,'intY',intY);
+
+patches.BC = @heteroElasticBC2; % define boundary conditions
+patches.viscosity = viscosity; 
+patches.f = 0*patches.x+0*patches.y;
+x = squeeze(patches.x);
+y = squeeze(patches.y);
 %{
 \end{matlab}
 
@@ -55,10 +89,20 @@ Set initial conditions of a simulation, replicated for each
 in the ensemble.
 \begin{matlab}
 %}
+%global patches
+%u0 = 0.8*cos(patches.x).*sin(patches.y) ...
+%     +0.8*randn([nSubP,1,1,nPatch]); 
+%u0 = repmat(u0,1,1,1,nEnsem,1,1); 
 global patches
-u0 = 0.8*cos(patches.x).*sin(patches.y) ...
-     +0.1*randn([nSubP,1,1,nPatch]); 
-u0 = repmat(u0,1,1,1,nEnsem,1,1); 
+
+u01 = 0*(sin(patches.x*pi).*sin(patches.y*pi)).^2;
+u02 = -(sin(patches.x*pi).*sin(patches.y*pi)).^2;
+u0 = zeros([nSubP,4,1,nPatch]);
+u0(:,:,1,1,:,:)=reshape(u01,[nSubP,1,1,nPatch]);
+u0(:,:,2,1,:,:)=reshape(u02,[nSubP,1,1,nPatch]);
+u0 = u0.* reshape((patches.intY~=0|patches.intX~=0),[1 1 1 1 size(u0,5:6)]); 
+u0 = patches.BC(u0,patches); % apply boundary conditions
+
 %{
 \end{matlab}
 Integrate using standard integrators, unevenly spaced in
@@ -66,7 +110,7 @@ time to better display transients.
 \begin{matlab}
 %}
 if ~exist('OCTAVE_VERSION','builtin')
-    [ts,us] = ode23(@patchSys2, 0.3*linspace(0,1).^2, u0(:));
+    [ts,us] = ode23(@patchSys2, linspace(0,5), u0(:));
 else % octave version
     [ts,us] = odeOcts(@patchSys2, 0.3*linspace(0,1).^2, u0(:));
 end
@@ -100,22 +144,52 @@ interpolation to the edges, then pad with Nans between
 patches, and reshape to suit the surf function.
 \begin{matlab}
 %}
-  u = squeeze( mean( patchEdgeInt2(us(i,:)) ,4));
+  u = squeeze( mean( patchEdgeInt2(us(i,:),patches) ,4));
   u(end+1,:,:,:)=nan; u(:,end+1,:,:)=nan;
-  u = reshape(permute(u,[1 3 2 4]), [numel(x) numel(y)]);
+  u1 = (reshape(permute(squeeze(u(:,:,1,:,:)),[1 3 2 4]), [numel(x) numel(y)]));
+  u2 = (reshape(permute(squeeze(u(:,:,2,:,:)),[1 3 2 4]), [numel(x) numel(y)]));
+  u3 = (reshape(permute(squeeze(u(:,:,3,:,:)),[1 3 2 4]), [numel(x) numel(y)]));
+  u4 = (reshape(permute(squeeze(u(:,:,4,:,:)),[1 3 2 4]), [numel(x) numel(y)]));
+ 
+  % u1(u1==0)=NaN; % remove uncoupled patches---do this later when have
+ % uncoupled patches
 %{
 \end{matlab}
 If the initial time then draw the surface with labels,
 otherwise just update the surface data.
 \begin{matlab}
 %}
-  if i==1
-       hsurf = surf(x(:),y(:),u'); view(60,40) 
-       axis([-pi pi -pi pi -1 1]),   caxis([-1 1])
+ % if i==1
+       subplot(2,2,1)
+       hsurf = surf(x(:),y(:),u1'); view(60,40) 
+       axis([0 1 0 1 -1 1]),   caxis([-1 1])
        xlabel('$x$'), ylabel('$y$'), zlabel('$u(x,y)$')
-  else set(hsurf,'ZData', u');
-  end
-  legend(['time = ' num2str(ts(i),2)],'Location','north')
+
+       subplot(2,2,2)
+       hsurf = surf(x(:),y(:),u2'); view(60,40) 
+       axis([0 1 0 1 -1 1]),   caxis([-1 1])
+       xlabel('$x$'), ylabel('$y$'), zlabel('$v(x,y)$')
+
+       subplot(2,2,3)
+       hsurf = surf(x(:),y(:),u3'); view(60,40) 
+       axis([0 1 0 1 -5 5]),   caxis([-1 1])
+       xlabel('$x$'), ylabel('$y$'), zlabel('$du(x,y)/dt$')
+
+       subplot(2,2,4)
+       hsurf = surf(x(:),y(:),u4'); view(60,40) 
+       axis([0 1 0 1 -5 5]),   caxis([-1 1])
+       xlabel('$x$'), ylabel('$y$'), zlabel('$dv(x,y)/dt$')
+%   else 
+%       subplot(2,2,1)
+%       set(hsurf,'ZData', u1');
+%       subplot(2,2,2)
+%       set(hsurf,'ZData', u2');
+%       subplot(2,2,3)
+%       set(hsurf,'ZData', u3');
+%       subplot(2,2,4)
+%       set(hsurf,'ZData', u4');
+%   end
+  sgtitle(['time = ' num2str(ts(i),'%4.2f')])
   pause(0.05)
 %{
 \end{matlab}
@@ -124,7 +198,6 @@ finish the animation loop and if-plot.
 %}
 end%for over time
 end
-
 %%
 %if-plot
 %{
@@ -143,7 +216,7 @@ plot.
 \begin{matlab}
 %}
 ratio = [0.1 0.1]
-nLeadEvals=prod(nPatch)+max(nPatch);
+nLeadEvals=10;% prod(nPatch)+max(nPatch);
 leadingEvals=[];
 %{
 \end{matlab}
@@ -161,18 +234,23 @@ Configure with same parameters, then because they are reset
 by this configuration, restore coupling.
 \begin{matlab}
 %}
-    configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
-        ,ord,ratio,nSubP,'EdgyInt',edgyInt,'nEnsem',nEnsem ...
-        ,'hetCoeffs',cHetr);
+%     configPatches2(@heteroDiff2,[-pi pi -pi pi],nan,nPatch ...
+%         ,ord,ratio,nSubP,'EdgyInt',edgyInt,'nEnsem',nEnsem ...
+%         ,'hetCoeffs',cElas  ,'intX',intX ,'intY',intY);
+    configPatches2(@heteroElastic2,[0 1 0 1],nan,nPatch ...
+   ,0,ratio,nSubP ,'EdgyInt',edgyInt ,'nEnsem',nEnsem ...
+   ,'hetCoeffs',cElas,'intX',intX ,'intY',intY);
 %{
 \end{matlab}
 Find which elements of the 6D array are interior micro-grid
 points and hence correspond to dynamical variables.
 \begin{matlab}
 %}
-    u0 = zeros([nSubP,1,nEnsem,nPatch]);
-    u0([1 end],:,:) = nan;
-    u0(:,[1 end],:) = nan;
+    u0 = zeros([nSubP,4,nEnsem,nPatch]);
+    u0([1 end],:,:,:,:) = nan;
+    u0(:,[1 end],:,:,:,:) = nan;
+    intXY = double(patches.intY==1|patches.intX==1);
+    u0 = u0.* reshape(intXY,[1 1 1 1 size(u0,5:6)]);
     i = find(~isnan(u0));
 %{
 \end{matlab}
@@ -238,7 +316,7 @@ repeated eigenvalues.
 \begin{matlab}
 %}
 if maxords>2
-    iEv=2:2:12;
+    iEv=2:2:10;
     figure(2);
     err=abs(leadingEvals-leadingEvals(:,1)) ...
         ./(1e-7+abs(leadingEvals(:,1)));
