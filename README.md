@@ -25,6 +25,8 @@ main functions of interest to you.
 <p>
 [![View Equation-Free Toolbox on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://au.mathworks.com/matlabcentral/fileexchange/73632-equation-free-toolbox)
 
+<p>[![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=uoa1184615/EquationFreeGit&file=README.md)
+
 <p><strong>Please contact us</strong> via
 <a href="https://profajroberts.github.io">
 https://profajroberts.github.io</a>
