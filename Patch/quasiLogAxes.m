@@ -1,7 +1,7 @@
 % quasiLogAxes() transforms all plots currently drawn on the
 % current axes to a quasi-log axes (via asinh), including
 % possibly transforming color axis. 
-% AJR, 25 Sep 2021 -- 15 May 2023
+% AJR, 25 Sep 2021 -- 19 Sep 2024
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{quasiLogAxes()}: transforms current axes of
@@ -178,22 +178,30 @@ if ~isinf(xScale),
     if xlim('mode')=="manual"
          xlim1=xFac*asinh(xlim0/xScale);
     else xlim1=xlim1+0.04*diff(xlim1)*[-1 1]; 
-    end, end
+    end
+    if diff(xlim1)<=norm(xlim1)*1e-14, xlim1=xlim1+[-1 1]*xFac; end
+    end
 if ~isinf(yScale), 
     if ylim('mode')=="manual"
          ylim1=yFac*asinh(ylim0/yScale);
-    else ylim1=ylim1+0.04*diff(ylim1)*[-1 1];  
-    end, end
+    else ylim1=ylim1+0.04*diff(ylim1)*[-1 1];
+    end
+    if diff(ylim1)<=norm(ylim1)*1e-14, ylim1=ylim1+[-1 1]*yFac; end
+    end
 if ~isinf(zScale), 
     if zlim('mode')=="manual"
          zlim1=zFac*asinh(zlim0/zScale);
     else zlim1=zlim1+0.04*diff(zlim1)*[-1 1];  
-    end, end
+    end
+    if diff(zlim1)<=norm(zlim1)*1e-14, zlim1=zlim1+[-1 1]*zFac; end
+    end
 if ~isinf(cScale), 
     if theAxes.CLimMode=="manual"
          clim1=cFac*asinh(clim0/cScale);
     else clim1=clim1+   0*diff(clim1)*[-1 1];  
-    end, end
+    end
+    if diff(ylim1)<=norm(clim1)*1e-14, clim1=clim1+[-1 1]*cFac; end
+    end
 %{
 \end{matlab}
 
