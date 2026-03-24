@@ -149,9 +149,9 @@ of $\verb|nEdge|=1$ and not \verb|EdgyInt|, then
 
 \item \verb|'nEdge'|, \emph{optional} (integer---scalar or
 three element), default=1, the width of face values set by
-interpolation at the face regions of each patch.  If two
-elements, then respectively the width in \(x,y\)-directions.
- The default is one (suitable for microscale lattices with
+interpolation at the face regions of each patch.  If three
+elements, then respectively the width in \(x,y,z\)-directions.
+The default is one (suitable for microscale lattices with
 only nearest neighbour interactions).
 
 \item \verb|'EdgyInt'|, true/false, \emph{optional},

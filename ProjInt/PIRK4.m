@@ -48,7 +48,7 @@ time-step \(\Delta=-1\).
 \begin{matlab}
 %}
 global MMepsilon
-MMepsilon = 0.1
+MMepsilon = 0.05
 ts = 0:-1:-5
 bT = MMepsilon*log(abs(ts(2)-ts(1))/MMepsilon)
 [x,tms,xms,rm,svf] = PIRK4(@MMburst, ts, 0.2*[1;1], bT);

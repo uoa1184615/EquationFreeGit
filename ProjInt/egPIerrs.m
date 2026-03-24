@@ -89,8 +89,8 @@ different burst lengths.
 %}
 clf(),loglog(dts,xerrs,'o:'), ylim([1e-6 1])
 xlabel('macro time-step'), ylabel('error at Tend')
-title(['\epsilon = ' num2str(MMepsilon) ',  for different burst lengths'])
-legend(num2str(meps', '%i\\epsilon'))
+title(['epsilon = ' num2str(MMepsilon) ',  for different burst lengths'])
+legend(num2str(meps', '%i eps'))
 grid off, grid
 ifOurCf2eps(mfilename)
 %{
