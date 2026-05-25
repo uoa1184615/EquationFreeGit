@@ -1,5 +1,5 @@
-% Short explanation for users typing "help fun"
-% Author, date
+% Code a burst of Michaelis--Menten enzyme kinetics
+% AJR, 1 Nov 2023
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \paragraph{Code a burst of Michaelis--Menten enzyme kinetics}

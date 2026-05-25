@@ -1,13 +1,13 @@
-% input *.m files for Projective Integration  AJR, Oct 2017
+% input *.m files for Projective Integration  AJR, Oct 2017 -- May 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 \chapter{Projective integration of deterministic ODEs}
 \label{sec:ProjInt}
 \localtableofcontents
 
 
-\section{Introduction}
+%\section{Introduction}
 
-This section provides some good projective integration functions \cite[e.g.]{Gear02b, Gear03c, Givon06, Marschler2014b, Maclean2015, Sieber2018}.
+This chapter provides some good projective integration functions \cite[e.g.]{Gear02b, Gear03c, Givon06, Marschler2014b, Maclean2015, Sieber2018}.
 The goal is to enable computationally expensive multiscale dynamic simulations\slash integrations to efficiently compute over very long time~scales.
 
 \paragraph{Quick start} 
@@ -25,6 +25,11 @@ Each function implements over a long-time scale a variant of a standard numerica
 Each function has standardised inputs and outputs.
 
 \cite{Petersik2019} is also developing, in python, some projective integration functions.
+
+
+\paragraph{Time homogenisation}
+\cref{sec:ExPIRFode} introduces projective integration to efficiently time-homogenise rapid microscale fluctuations in a system.  
+Inspired by \cite{Bunder2013a, vonOertzen2026}.
 
 
 \begin{figure}
@@ -172,6 +177,7 @@ Descriptions for the minor functions follow, and an example using~\verb|cdmc()|.
 \input{../ProjInt/egPIMM.m}
 \input{../ProjInt/PIG.m}
 \input{../ProjInt/PIRK4.m}
+\input{../ProjInt/timeHomogenise.m}
 \input{../ProjInt/cdmc.m}
 
 \begin{devMan}

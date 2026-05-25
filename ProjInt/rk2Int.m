@@ -36,7 +36,7 @@ approximate solution row vector at the specified times.
 
 Compute the time-steps and create storage for outputs. Guess
 that ten time-steps is often adequate, but need at least
-sixty for homogenisationExample.
+sixty for ../Patch/homogenisationExample.
 \begin{matlab}
 %}
 ndt=max(10,numel(ts)-1);

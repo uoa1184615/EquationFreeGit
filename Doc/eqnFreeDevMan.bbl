@@ -29,6 +29,13 @@ Bunder, J.~E., Kevrekidis, I.~G. \harvardand\ Roberts, A.~J.  \harvardyearleft
   computational homogenisation via self-adjoint coupling, Technical report,
   \url{http://arxiv.org/abs/2007.06815}.
 
+\harvarditem{Bunder \harvardand\ Roberts}{2015}{Bunder2013a}
+Bunder, J.~E. \harvardand\ Roberts, A.~J.  \harvardyearleft
+  2015\harvardyearright , `Numerical integration of ordinary differential
+  equations with rapidly oscillatory factors', {\em Journal of Computational
+  and Applied Mathematics} {\bf 282},~54--70.
+\newline\harvardurl{http://dx.doi.org/10.1016/j.cam.2014.12.033}
+
 \harvarditem{Bunder \harvardand\ Roberts}{2018}{Bunder2018a}
 Bunder, J.~E. \harvardand\ Roberts, A.~J.  \harvardyearleft
   2018\harvardyearright , Nonlinear emergent macroscale {PDEs}, with error
@@ -338,6 +345,12 @@ Svard, M. \harvardand\ Nordstrom, J.  \harvardyearleft 2006\harvardyearright ,
 Taylor, G.~I.  \harvardyearleft 1953\harvardyearright , `Dispersion of soluble
   matter in solvent flowing slowly through a tube', {\em Proc. Roy. Soc.
   Lond.~A} {\bf 219},~186--203.
+
+\harvarditem{{von Oertzen} \harvardand\ Kiefer}{2026}{vonOertzen2026}
+{von Oertzen}, V. \harvardand\ Kiefer, B.  \harvardyearleft
+  2026\harvardyearright , Time {Homogenization} of {Nonlinear}
+  {Mechanically}-{Coupled} {Phase}-{Field} {Models} {Based} on {Low}-{Pass}
+  {Convolution}, Technical report, TU Bergakademie Freiberg.
 
 \harvarditem{Watt \harvardand\ Roberts}{1995}{Watt94b}
 Watt, S.~D. \harvardand\ Roberts, A.~J.  \harvardyearleft 1995\harvardyearright
