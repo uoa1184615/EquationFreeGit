@@ -1,8 +1,8 @@
-% Simulate heterogeneous wave propagation in 1D on patches as
-% an example application of patches in space. Here the
+% Simulate heterogeneous wave propagation in 1D on patches
+% as an example application of patches in space. Here the
 % microscale is of known period so we interpolate
-% next-to-edge values to get opposite edge values. AJR, 25
-% Nov 2019
+% next-to-edge values to get opposite edge values. Revised
+% for AutoDiff.  AJR, 25 Nov 2019 -- 10 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoWaveEdgy1}: computational
@@ -190,12 +190,18 @@ patches and hence are the systems variables.
 u0=repmat(0*patches.x,1,2); u0([1 end],:)=nan; u0=u0(:);
 i=find(~isnan(u0));
 nJ=length(i);
-Jac=nan(nJ);
-for j=1:nJ
-   u0(i)=((1:nJ)==j);
-   dudt=patchSys1(0,u0);
-   Jac(:,j)=dudt(i);
-end
+if exist('AutoDiff','class')
+    disp('**** computing Jacobian with AutoDiff')
+    Jac=AutoDiffJacobianAutoDiff(@(u) patchSys1(0,u),u0,i);
+    Jac=full(Jac(i,:));
+else% compute Jac by finite-diff
+    Jac=nan(nJ);
+    for j=1:nJ
+       u0(i)=((1:nJ)==j);
+       dudt=patchSys1(0,u0);
+       Jac(:,j)=dudt(i);
+    end
+end%if exist
 Jac(abs(Jac)<1e-12)=0;
 %{
 \end{matlab}

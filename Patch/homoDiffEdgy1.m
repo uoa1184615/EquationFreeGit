@@ -3,7 +3,7 @@
 % microscale is of known period so we interpolate
 % next-to-edge values to get opposite edge values. Then
 % explore the Jacobian and eigenvalues.  AJR, Nov 2019 --
-% 19 Oct 2023
+% 19 Oct 2023 -- 11 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoDiffEdgy1}: computational
@@ -87,7 +87,8 @@ the heterogeneity is repeated to fill each patch, and
 phase-shifted for an ensemble.
 \begin{matlab}
 %}
-mPeriod = 3%randi([2 5])
+clear all
+mPeriod = randi([2 5])
 % set random diffusion coefficients
 cHetr=exp(0.3*randn(mPeriod,1));
 %cHetr = [3.966;2.531;0.838;0.331;7.276];
@@ -116,9 +117,10 @@ period of the heterogeneous diffusion.
 global patches
 nPatch = 9
 ratio = 0.25;
-nSubP = mPeriod+1 %randi([mPeriod+1 2*mPeriod+2])
-nEnsem = mPeriod % number realisations in ensemble
-if mod(nSubP,mPeriod)==2, nEnsem=1, end
+nSubP = randi([mPeriod+1 2*mPeriod+2])
+if mod(nSubP,mPeriod)==2, nEnsem=1, 
+else nEnsem = mPeriod % number realisations in ensemble
+end
 configPatches1(@heteroDiff,[-pi pi],nan,nPatch ...
     ,4,ratio,nSubP,'EdgyInt',true,'nEnsem',nEnsem ...
     ,'hetCoeffs',cHetr);
@@ -193,7 +195,7 @@ for p=1:2
   xlabel('time $t$'), ylabel('space $x$'), zlabel('$u(x,t)$') 
   ifOurCf2eps([mfilename 'U' num2str(p)])
   switch p
-  case 1, title('short time of simulation showing transients')
+  case 1, title('short time simulation shows any transients')
   case 2, title('simulation of $u(x,t)$ on patches in space')
   end
 end
@@ -231,6 +233,7 @@ patches and hence are the system variables.
   u0 = zeros(nSubP,1,nEnsem,nPatch);
   u0([1 end],:,:,:)=nan; u0=u0(:);
   i=find(~isnan(u0));
+  tic
   nJ=length(i);
   Jac=nan(nJ);
   for j=1:nJ
@@ -238,9 +241,30 @@ patches and hence are the system variables.
     dudt=patchSys1(0,u0);
     Jac(:,j)=dudt(i);
   end
+  finiteDiffTime=toc
   nonSymmetric=norm(Jac-Jac')
   assert(nonSymmetric<5e-9,'failed symmetry')
   Jac(abs(Jac)<1e-12)=0;
+%{
+\end{matlab}
+If AutoDiff is available, then compare the Jacobian computed
+by AutoDiff.   This confirms the two Jacobians are the
+same---generally AutoDiff should be more accurate.  In this 
+case it is usually slower to compute than the
+finite-difference Jacobian, but in large problems is quicker.
+\begin{matlab}
+%}
+  if exist('AutoDiff','class')
+      disp('**** starting AutoDiff Jac')
+      tic
+      Jad=AutoDiffJacobianAutoDiff(@(u) patchSys1(0,u),u0,i);
+      autoDiffTime=toc
+      Jad=Jad(i,:);
+      disp('**** finished AutoDiff Jac')
+      figure(3),spy(Jac,'b+'),hold on,spy(Jad,'rx'),hold off
+      JacDiff=norm(Jac-Jad)
+      assert(JacDiff<1e-7,'jacobians differ significantly')
+  end%if exist
 %{
 \end{matlab}
 \begin{table}
@@ -292,7 +316,7 @@ the tables of eigenvalues.
 \begin{matlab}
 %}
 end
-disp('     spectral    quadratic      quartic  sixth-order  ...')
+disp('  spectral quadratic   quartic     sixth    ...')
 leadingEvals=leadingEvals
 %{
 \end{matlab}

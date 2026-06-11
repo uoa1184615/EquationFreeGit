@@ -3,8 +3,8 @@
 % coupling interpolates next-to-edge values to get opposite
 % edge values.  Here the microscale has 'wave-speeds'
 % dependent upon x, and randomly chosen but specified
-% period.   Then explore stability and consistency.  
-% AJR, 17 Dec 2019 -- 19 Jun 2020
+% period.   Then explore stability and consistency---using
+% AutoDiff if available. AJR, 17 Dec 2019 -- 10 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{waveEdgy1}: simulate a 1D, first-order,
@@ -206,21 +206,28 @@ for ord=0:2:8
 %{
 \end{matlab}
 
-Form the Jacobian matrix, linear operator, by numerical
-construction about a zero field.  Use~\verb|i| to store the
-indices of the micro-grid points that are interior to the
-patches and hence are the system variables.
+Form the Jacobian matrix, linear operator, by
+auto-differentiation or by numerical construction about a
+zero field.  Use~\verb|i| to store the indices of the
+micro-grid points that are interior to the patches and hence
+are the system variables.
 \begin{matlab}
 %}
     u0=0*patches.x; u0([1 end],:)=nan; u0=u0(:);
     i=find(~isnan(u0));
     nJ=length(i);
-    Jac=nan(nJ);
-    for j=1:nJ
-       u0(i)=((1:nJ)==j);
-       dudt=patchSys1(0,u0);
-       Jac(:,j)=dudt(i);
-    end
+    if exist('AutoDiff','class')
+        disp('**** computing Jacobian with AutoDiff')
+        Jac=AutoDiffJacobianAutoDiff(@(u) patchSys1(0,u),u0,i);
+        Jac=full(Jac(i,:));
+    else% compute Jac by finite-diff
+        Jac=nan(nJ);
+        for j=1:nJ
+           u0(i)=((1:nJ)==j);
+           dudt=patchSys1(0,u0);
+           Jac(:,j)=dudt(i);
+        end
+    end%if exist
     nonSkewSymmetric=norm(Jac+Jac')
     assert(nonSkewSymmetric<1e-10,'failed skew-symmetry')
     Jac(abs(Jac)<1e-12)=0;

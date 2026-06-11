@@ -1,6 +1,6 @@
 % Computes the time derivatives of a 1D, heterogeneous,
-% first-order, wave PDE in 1D on patches. AJR, 17 Dec 2019
-% -- Nov 2020
+% first-order, wave PDE in 1D on patches.  Now revised for
+% potential AutoDiff.  AJR, 17 Dec 2019 -- 10 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{waveFirst()}: first-order wave PDE}
@@ -17,8 +17,8 @@ of a patch, output in~\verb|ut|.
 function ut = waveFirst(t,u,patches)
   u=squeeze(u);
   dx = diff(patches.x(2:3)); % space step
-  i = 2:size(u,1)-1; % interior points in a patch
-  ut = nan+u;        % preallocate output array
+  i = 2:size(u,1)-1;            % interior points in a patch
+  ut = nan(size(u),'like',u);   % preallocate output array
   ut(i,:) = -(patches.cs(i).*u(i+1,:) ...
              -patches.cs(i-1).*u(i-1,:))/(2*dx) ...
             +patches.nu*diff(u,2)/dx^2; 

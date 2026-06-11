@@ -1,7 +1,7 @@
 % Explore errors in the steady state of twoscale
 % heterogeneous diffusion in 2D on patches as an example,
 % inspired by section 5.3.1 of Freese et al., 2211.13731.
-% AJR, 31 Jan 2023
+% Revised for AutoDiff.   AJR, 31 Jan 2023 -- 11 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{twoscaleDiffEquil2Errs}: errors in
@@ -109,7 +109,7 @@ full-domain simulation---can compute \(\verb|log2Nmax|=5\)
 (\(\epsilon=0.06\)) within minutes:
 \begin{matlab}
 %}
-log2Nmax = 4 % >2 up to 6 OKish
+log2Nmax = 6 % >2 up to 6 OKish
 nPatchMax=2^log2Nmax+1
 %{
 \end{matlab}
@@ -223,10 +223,16 @@ Jacobian which is expensive to find (four minutes for
         disp(['Computing Jacobian: wait roughly ' ...
               num2str(nPatch^4/4500,2) ' secs'])
         tic  
-        Jac=sparse(nVariables,nVariables);
-        for j=1:nVariables
-            Jac(:,j)=sparse( rhsb-theRes((1:nVariables)'==j) );
-        end
+        if exist('AutoDiff','class')
+              disp('**** using AutoDiff Jac')
+              Jac=AutoDiffJacobianAutoDiff( ...
+                  @(u) rhsb-theRes(u) ,u0(patches.i));
+        else
+            Jac=sparse(nVariables,nVariables);
+            for j=1:nVariables
+                Jac(:,j)=sparse( rhsb-theRes((1:nVariables)'==j) );
+            end
+        end%if exist
         formJacTime=toc
 %{
 \end{matlab}
@@ -309,7 +315,7 @@ for p=1:size(u,3)
 end, hold off
 view(60,55) 
 colorbar('Ticks',1:size(u,3) ...
-    ,'TickLabels',[num2str(nPs) ['x';'x';'x'] num2str(nPs)]);
+    ,'TickLabels',num2str(nPs)+"x"+num2str(nPs));
 xlabel('space $x$'), ylabel('space $y$'), zlabel('$u(x,y)$')
 ifOurCf2eps([mfilename 'us'])%optionally save
 %{
@@ -332,7 +338,7 @@ for p=1:size(u,3)
 end, hold off
 view(60,55)
 colorbar('Ticks',1:size(u,3) ...
-    ,'TickLabels',[num2str(nPs) ['x';'x';'x'] num2str(nPs)]);
+    ,'TickLabels',num2str(nPs)+"x"+num2str(nPs));
 xlabel('space $x$'), ylabel('space $y$')
 zlabel('errors in $u(x,y)$')
 ifOurCf2eps(mfilename)%optionally save

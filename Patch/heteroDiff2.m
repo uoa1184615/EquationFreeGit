@@ -1,6 +1,6 @@
 % Computes the time derivatives of heterogeneous diffusion
 % in 2D on patches.  Adapted from 1D heterogeneous diffusion.
-% JEB & AJR, May 2020 -- Nov 2020 
+% Tweaked for AutoDiff.  JEB & AJR, May 2020 -- 11 Jun 2026 
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{heteroDiff2()}: heterogeneous diffusion}
@@ -21,7 +21,7 @@ function ut = heteroDiff2(t,u,patches)
   dy = diff(patches.y(2:3));  % y space step
   ix = 2:size(u,1)-1; % x interior points in a patch
   iy = 2:size(u,2)-1; % y interior points in a patch
-  ut = nan+u;         % preallocate output array
+  ut = nan(size(u),'like',u);  % preallocate output array
   ut(ix,iy,:,:,:,:) ...
   = diff(patches.cs(:,iy,1,:).*diff(u(:,iy,:,:,:,:),1),1)/dx^2 ...
    +diff(patches.cs(ix,:,2,:).*diff(u(ix,:,:,:,:,:),1,2),1,2)/dy^2; 

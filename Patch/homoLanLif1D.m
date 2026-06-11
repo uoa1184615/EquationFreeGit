@@ -1,8 +1,7 @@
 % Simulate heterogeneous Landau--Lifshitz PDE in 1D on
-% patches as an example application of patches in space. 
-% From Leitenmaier & Runborg,
-% http://arxiv.org/abs/2108.09463
-% AJR, Sep 2021
+% patches as an example application of patches in space.
+% From Leitenmaier & Runborg, arxiv.org/abs/2108.09463 
+% Revised for AutoDiff. AJR, Sep 2021 -- 10 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoLanLif1D}: computational homogenisation
@@ -282,7 +281,7 @@ f0 = patchSys1(0,Me(:));
 assert(abs( norm(f0(:)) )<1e-8,'not equilibrium')
 %{
 \end{matlab}
-Form the Jacobian by numerical differentiation.
+Form the Jacobian by auto-differentiation or by numerical differentiation.
 \begin{matlab}
 %}
 delta=1e-7;
@@ -293,6 +292,18 @@ for j=1:nJac
   fj=patchSys1(0,M(:));
   Jac(:,j)=(fj(i)-f0(i))/delta;
 end
+if exist('AutoDiff','class')
+    disp('**** computing Jacobian with AutoDiff')
+    Jac=AutoDiffJacobianAutoDiff(@(M) patchSys1(0,M),Me(:),i);
+    Jac=full(Jac(i,:));
+else% compute Jac by finite-diff
+    Jac=nan(nJac);
+    for j=1:nJac
+      M=Me; M(i(j))=M(i(j))+delta;
+      fj=patchSys1(0,M(:));
+      Jac(:,j)=(fj(i)-f0(i))/delta;
+    end
+end%if exist
 %{
 \end{matlab}
 Compute eigenvalues, sort, and count some groups

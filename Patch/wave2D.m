@@ -1,6 +1,7 @@
 % Simulate the linear wave PDE in 2D on patches.
 % First it checks the spectrum of the system.
-% AJR, Nov 2018 -- 17 Apr 2020
+% Revised for Jacobian via AutoDiff.
+% AJR, Nov 2018 -- 11 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{wave2D}: example of a wave on patches in 2D}
@@ -32,6 +33,7 @@ visualisation), and with a \(5\times5\) micro-grid within
 each patch.
 \begin{matlab}
 %}
+clear all
 global patches
 nSubP = 5;
 nPatch = 9;
@@ -53,21 +55,27 @@ uv0 = zeros(nSubP,nSubP,2,1,nPatch,nPatch);
 uv0([1 end],:,:,:,:,:) = nan;
 uv0(:,[1 end],:,:,:,:) = nan;
 i = find(~isnan(uv0));
+nJac = length(i)
 %{
 \end{matlab}
 Now construct the Jacobian. Since this is a \emph{linear}
 wave \pde, use large perturbations.
 \begin{matlab}
 %}
-small = 1;
-jac = nan(length(i));
-sizeJacobian = size(jac)
-for j = 1:length(i)
-  uv = uv0(:);
-  uv(i(j)) = uv(i(j))+small;
-  tmp = patchSys2(0,uv)/small;
-  jac(:,j) = tmp(i);
-end
+    if exist('AutoDiff','class')
+      disp('**** using AutoDiff Jac')
+      Jac=AutoDiffJacobianAutoDiff(@(u) patchSys2(0,u),uv0,i);
+      Jac=full(Jac(i,:));
+else
+    small = 1;
+    Jac = nan(nJac);
+    for j = 1:nJac
+      uv = uv0(:);
+      uv(i(j)) = uv(i(j))+small;
+      tmp = patchSys2(0,uv)/small;
+      Jac(:,j) = tmp(i);
+    end
+end%if exist
 %{
 \end{matlab}
 Now explore the eigenvalues a little: find the ten with the
@@ -75,7 +83,7 @@ biggest real-part; if these are small enough, then the
 method may be good.
 \begin{matlab}
 %}
-evals = eig(jac);
+evals = eig(Jac);
 nEvals = length(evals)
 [~,k] = sort(-abs(real(evals)));
 evalsWithBiggestRealPart = evals(k(1:10))

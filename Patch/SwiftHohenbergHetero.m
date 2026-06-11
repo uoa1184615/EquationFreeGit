@@ -1,7 +1,8 @@
 % Simulate a heterogeneous version of Swift--Hohenberg PDE
 % in 1D on patches as an example application with pairs of
 % edge points needing to be interpolated between patches in
-% space.  AJR, 28 Mar 2023
+% space.  Now revised for AutoDiff Jacobian.  
+% AJR, 28 Mar 2023 -- 11 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{SwiftHohenbergHetero}: patterns of a
@@ -135,8 +136,11 @@ nSubP = 2*nPtsPeriod+4 % +2 for not-edgyInt
 %nSubP = 2*nGap*nPtsPeriod+4 % approx full-domain 
 Len = nPatch;
 ordCC = 0;
-dom.type='equispace'; 
-dom.bcOffset=0.5
+if 1,  dom.type='periodic'
+else % equispace currently ruins symmetry
+	dom.type='periodic';
+    dom.bcOffset=0.5
+end
 patches = configPatches1(@heteroSwiftHohenbergPDE,[0 Len],dom ...
     ,nPatch,ordCC,dx,nSubP,'EdgyInt',true,'nEdge',2 ...
     ,'hetCoeffs',cl);
@@ -157,10 +161,17 @@ u0 = 0*patches.x;
 u0([1:2 end-1:end],:) = nan;
 patches.i = find(~isnan(u0));
 nVars = numel(patches.i)
-Jac = nan(nVars);
-for j=1:nVars
-    Jac(:,j)=theRes((1:nVars)==j,patches,k0,0,0);
-end
+if exist('AutoDiff','class')
+    disp('**** computing Jacobian with AutoDiff')
+    Jac=AutoDiffJacobianAutoDiff( ...
+        @(u) SHres(u,patches,k0,0,0) ,u0(patches.i));
+    Jac=full(Jac);
+else% compute Jac by finite-diff
+    Jac = nan(nVars);
+    for j=1:nVars
+        Jac(:,j)=SHres(double((1:nVars)==j),patches,k0,0,0);
+    end
+end%if exist
 %{
 \end{matlab}
 Check on the symmetry of the Jacobian
@@ -308,12 +319,12 @@ patches.i = find(~isnan(u));
 %{
 \end{matlab}
 Seek the equilibrium, and report the norm of the residual,
-via the generic patch system wrapper \verb|theRes|
-(\cref{sec:theResSWhetero}).
+via the generic patch system wrapper \verb|SHres|
+(\cref{sec:SHresSWhetero}).
 \begin{matlab}
 %}
 tic
-[u(patches.i),res] = fsolve(@(v) theRes(v,patches,k0,Ra,1) ...
+[u(patches.i),res] = fsolve(@(v) SHres(v,patches,k0,Ra,1) ...
     ,u(patches.i) ,optimoptions('fsolve','Display','off'));
 solveTime = toc
 normRes = norm(res)
@@ -412,7 +423,7 @@ squeeze out the two singleton dimensions.
 Here code straightforward centred discretisation in space. 
 \begin{matlab}
 %}
-  ut = nan+u;         % preallocate output array
+  ut = nan(size(u),'like',u);         % preallocate output array
   v = u(2:end-1,:)+diff(patches.cs(:      ,2).*diff(u))/dx^2/k0^2;
   v = v.*patches.cs(2:end,1);
   v = v(2:end-1,:)+diff(patches.cs(2:end-1,2).*diff(v))/dx^2/k0^2;
@@ -424,20 +435,20 @@ end
 
 
 
-\subsection{\texttt{theRes()}: a wrapper function}
-\label{sec:theResSWhetero}
+\subsection{\texttt{SHres()}: a wrapper function}
+\label{sec:SHresSWhetero}
 This functions converts a vector of values into the interior
 values of the patches, then evaluates the time derivative of
 the system at time zero, and returns the vector of
 patch-interior time derivatives.
 \begin{matlab}
 %}
-function f=theRes(u,patches,k0,Ra,cubic)
-  v=nan(size(patches.x));
+function f=SHres(u,patches,k0,Ra,cubic)
+  v=nan(size(patches.x),'like',u);
   v(patches.i) = u;
   f = patchSys1(0,v(:),patches,k0,Ra,cubic);
   f = f(patches.i);
-end%function theRes
+end%function SHres
 %{
 \end{matlab}
 %}

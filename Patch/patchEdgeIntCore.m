@@ -1,6 +1,7 @@
 % patchEdgeIntCore() provides the interpolation across 1D of
 % space for multi-D patches of a lattice system such as PDE
-% discretisations.  AJR, 19 Oct 2023
+% discretisations.  Revised for AutoDiff.
+% AJR, 19 Oct 2023 -- 11 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeIntCore()}: sets multi-D patch
@@ -25,6 +26,21 @@ struct~\verb|patches|.
 %}
 function u = patchEdgeIntCore(l,u,q,patches,stagShift ...
             ,n1,nl,n2,nEnsem,N1,Nl,N2,lLo,lHi)
+%disp('* starting patchEdgeIntCore' )
+% if isa(l,'AutoDiff'), disp('* intCore0: l is AD'), end
+% if isa(u,'AutoDiff'), disp('* intCore0: u is AD'), end
+% if isa(q,'AutoDiff'), disp('* intCore0: q is AD'), end
+% if isa(patches,'AutoDiff'), disp('* intCore0: patches is AD'), end
+% if isa(stagShift,'AutoDiff'), disp('* intCore0: stagShift is AD'), end
+% if isa(n1,'AutoDiff'), disp('* intCore0: n1 is AD'), end
+% if isa(nl,'AutoDiff'), disp('* intCore0: nl is AD'), end
+% if isa(n2,'AutoDiff'), disp('* intCore0: n2 is AD'), end
+% if isa(nEnsem,'AutoDiff'), disp('* intCore0: nEnsem is AD'), end
+% if isa(N1,'AutoDiff'), disp('* intCore0: N1 is AD'), end
+% if isa(Nl,'AutoDiff'), disp('* intCore0: Nl is AD'), end
+% if isa(N2,'AutoDiff'), disp('* intCore0: N2 is AD'), end
+% if isa(lLo,'AutoDiff'), disp('* intCore0: lLo is AD'), end
+% if isa(lHi,'AutoDiff'), disp('* intCore0: lHi is AD'), end
 %{
 \end{matlab}
 
@@ -34,9 +50,10 @@ function u = patchEdgeIntCore(l,u,q,patches,stagShift ...
 
 \item \verb|l| the direction in space of this interpolation.
 
-\item \verb|u| is a vector\slash array with number of elements
-$\verb|n1| \cdot (\verb|nl|-2) \cdot \verb|n2| \cdot \verb|nEnsem|
-\cdot \verb|N1| \cdot \verb|Nl| \cdot \verb|N2|$.
+\item \verb|u| is a vector\slash array with number of
+elements $\verb|n1| \cdot (\verb|nl|-2) \cdot \verb|n2|
+\cdot \verb|nEnsem| \cdot \verb|N1| \cdot \verb|Nl| \cdot
+\verb|N2|$.
  
 \item \verb|q| spatial coordinates in the direction with
 number of elements $\verb|nl| \cdot \verb|Nl|$.
@@ -66,6 +83,19 @@ interpolation.
 
 
 
+For AutoDiff (as at Jun2026) we have to use \verb|lLo| 
+and \verb|lHi| in inverse fashion, that is, only in 
+right-hand sides.
+\begin{matlab}
+%}
+[lLoInv,j]=find(sparse(1:length(lLo),lLo,1));
+assert(all(lLoInv(lLo)==(1:length(lLo))'),'lLo inverse error')
+[lHiInv,j]=find(sparse(1:length(lHi),lHi,1));
+assert(all(lHiInv(lHi)==(1:length(lHi))'),'lHi inverse error')
+%{
+\end{matlab}
+
+
 
 Test for reality of the field values, and define a function
 accordingly.  Could be problematic if some variables are
@@ -83,11 +113,13 @@ different sizes.
 Reshape the field values accordingly, fattened for the new
 edge values, reshape the coordinate values, and set
 macroscale indices and periodic neighbours.
+Need the NaNs here for some reason.
 \begin{matlab}
 %}
 u = cat(2,nan(n1,  1 ,n2,nEnsem,N1,Nl,N2) ...
-   ,reshape(u,n1,nl-2,n2,nEnsem,N1,Nl,N2) ...
+     ,reshape(u,n1,nl-2,n2,nEnsem,N1,Nl,N2) ...
          ,nan(n1,  1 ,n2,nEnsem,N1,Nl,N2) );
+% if isa(u,'AutoDiff'), disp('* intCore_2: u is AD'), end 
 q = reshape(q,1,nl,1,1,1,Nl,1);
 Il=1:Nl; Ip=mod(Il,Nl)+1; Im=mod(Il-2,Nl)+1;
 l0 = round((nl+1)/2);
@@ -129,6 +161,7 @@ general).  Have not yet implemented core averages.
   else % interpolate centre-cross values
     U = u(:,   l0   ,:,:,:,:,:);
   end;%if patches.EdgyInt
+% if isa(U,'AutoDiff'), disp('* intCore_3: U is AD'), end 
 %{
 \end{matlab}
 Just in case any last array dimension(s) are one, we force a
@@ -146,7 +179,7 @@ to preserve the distributed array structure we use an index
 at the end for the differences.
 \begin{matlab}
 %}
-  if ~patches.parallel, dmu = zeros(szUO); % 8D
+  if ~patches.parallel, dmu = zeros(szUO,'like',U); % 8D, AJR 3/6/26
   else   dmu = zeros(szUO,patches.codist); % 8D
   end%if patches.parallel
 %{
@@ -154,7 +187,6 @@ at the end for the differences.
 First compute differences $\mu\delta$ and $\delta^2$.
 \begin{matlab}
 %}
-  %disp('starting standard interpolation')  
   dmu(:,:,:,:,:,Il,:,1) = (U(:,:,:,:,:,Ip,:) ...
                           -U(:,:,:,:,:,Im,:))/2; %\mu\delta 
   dmu(:,:,:,:,:,Il,:,2) = (U(:,:,:,:,:,Ip,:) ...
@@ -169,6 +201,7 @@ higher order centred differences in space.
     dmu(:,:,:,:,:,Il,:,k) =     dmu(:,:,:,:,:,Ip,:,k-2) ...
     -2*dmu(:,:,:,:,:,Il,:,k-2) +dmu(:,:,:,:,:,Im,:,k-2);    
   end
+% if isa(dmu,'AutoDiff'), disp('* intCore_4: dmu is AD'), end 
 %{
 \end{matlab}
 Interpolate macro-values to be Dirichlet face values for
@@ -186,12 +219,12 @@ each other, as specified in \verb|lLo| and~\verb|lHi| (from
 \begin{matlab}
 %}
 k=1+patches.EdgyInt; % use centre or two faces
-u(:,nl,:,lHi,:,:,:) ...
-  = U(:,1,:,:,:,:,:)*(1-patches.stag) ...
+tmp  = U(:,1,:,:,:,:,:)*(1-patches.stag) ...
   +sum( shiftdim(patches.Cwtsr(:,l),-7).*dmu(:,1,:,:,:,:,:,:) ,8);  
-u(:,1 ,:,lLo,:,:,:) ...
-  = U(:,k,:,:,:,:,:)*(1-patches.stag) ...
+u(:,nl,:,:,:,:,:) = tmp(:,:,:,lHiInv,:,:,:);
+tmp = U(:,k,:,:,:,:,:)*(1-patches.stag) ...
   +sum( shiftdim(patches.Cwtsl(:,l),-7).*dmu(:,k,:,:,:,:,:,:) ,8);
+u(:,1 ,:,:,:,:,:) = tmp(:,:,:,lLoInv,:,:,:);
 %{
 \end{matlab}
 
@@ -305,7 +338,7 @@ patch. \todo{Have no plans to implement core averaging as
 yet.}
 \begin{matlab}
 %}
-  F = nan(n1,patches.EdgyInt+1,n2,nEnsem,N1,Nl,N2,pl+1);
+  F = zeros(n1,patches.EdgyInt+1,n2,nEnsem,N1,Nl,N2,pl+1,'like',u);%AJR 3/6/26
   if patches.EdgyInt % interpolate next-to-face values
     F(:,:,:,:,:,:,:,1) = u(:,[nl-1 2],:,:,:,:,:);
     Q = q(:,[nl-1 2],:,:,:,:,:);
@@ -360,11 +393,12 @@ asymmetric near the boundaries of the rectangular domain.
 \end{matlab}
 
 Finally, insert face values into the array of field values,
-using the required ensemble shifts.  
+using the required ensemble shifts.  For AutoDiff, put the 
+permutation in the right-hand-side.
 \begin{matlab}
 %}
-u(:,1 ,:,lLo,:,:,:) = Uface(:,1,:,:,:,:,:);
-u(:,nl,:,lHi,:,:,:) = Uface(:,2,:,:,:,:,:);
+u(:,1 ,:,:,:,:,:) = Uface(:,1,:,lLoInv,:,:,:);
+u(:,nl,:,:,:,:,:) = Uface(:,2,:,lHiInv,:,:,:);
 %{
 \end{matlab}
 

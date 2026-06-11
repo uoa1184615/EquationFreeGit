@@ -2,8 +2,8 @@
 % example application of patches in space. Here the
 % microscale is of known period so we interpolate
 % next-to-edge values to get opposite edge values. Then
-% explore the Jacobian and eigenvalues.  
-% JEB & AJR, May 2020 -- Nov 2020
+% explore the Jacobian and eigenvalues.  Revised for 
+% AutoDiff of Jac.   JEB & AJR, May 2020 -- 11 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoDiffEdgy2}: computational
@@ -174,27 +174,33 @@ points and hence correspond to dynamical variables.
     u0([1 end],:,:) = nan;
     u0(:,[1 end],:) = nan;
     i = find(~isnan(u0));
+    nJac = length(i)
 %{
 \end{matlab}
 Construct the Jacobian of the scheme as the matrix of the
 linear transformation, obtained by transforming the standard
-unit vectors.
+unit vectors or via auto-differentiation.
 \begin{matlab}
 %}
-    jac = nan(length(i));
-    sizeJacobian = size(jac)
-    for j = 1:length(i)
-      u = u0(:)+(i(j)==(1:numel(u0))');
-      tmp = patchSys2(0,u);
-      jac(:,j) = tmp(i);
-    end
+    if exist('AutoDiff','class')
+          disp('**** using AutoDiff Jac')
+          Jac=AutoDiffJacobianAutoDiff(@(u) patchSys2(0,u),u0,i);
+          Jac=full(Jac(i,:));
+    else
+        Jac = nan(nJac);
+        for j = 1:nJac
+          u = u0(:)+(i(j)==(1:numel(u0))');
+          tmp = patchSys2(0,u);
+          Jac(:,j) = tmp(i);
+        end
+    end%if exist
 %{
 \end{matlab}
 Test for symmetry, with error if we know it should be
 symmetric.
 \begin{matlab}
 %}
-    notSymmetric=norm(jac-jac')    
+    notSymmetric=norm(Jac-Jac')    
     if edgyInt, assert(notSymmetric<1e-7,'failed symmetry')
     elseif notSymmetric>1e-7, disp('failed symmetry')
     end 
@@ -203,8 +209,8 @@ symmetric.
 Find all the eigenvalues (as \verb|eigs| is unreliable).
 \begin{matlab}
 %}
-    if edgyInt, [evecs,evals] = eig((jac+jac')/2,'vector');
-    else evals = eig(jac);
+    if edgyInt, [evecs,evals] = eig((Jac+Jac')/2,'vector');
+    else evals = eig(Jac);
     end
     biggestImag=max(abs(imag(evals)));
     if biggestImag>0, biggestImag=biggestImag, end

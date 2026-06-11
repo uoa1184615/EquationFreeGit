@@ -1,6 +1,7 @@
 % patchEdgeInt1() provides the interpolation across 1D space
 % for 1D patches of simulations of a lattice system such as
-% PDE discretisations.  AJR & JB, Sep 2018 -- 19 Oct 2023
+% PDE discretisations.  AJR & JB, Sep 2018 -- 8 Jun 2026
+% No change needed for AutoDiff (except call new Core())
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{patchEdgeInt1()}: sets patch-edge values
@@ -18,7 +19,7 @@ maintains symmetry.  This function is primarily used by
 When using core averages (not fully implemented), assumes
 the averages are sensible macroscale variables: then patch
 edge values are determined by macroscale interpolation of
-the core averages \citep{Bunder2013b}. \footnote{Script
+the core averages \citep{Bunder2013b}.\footnote{Script
 \texttt{patchEdgeInt1test.m} verifies this code.}
 
 

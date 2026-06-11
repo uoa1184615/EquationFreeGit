@@ -4,8 +4,8 @@
 % opposite edge values.  Then compute macroscale eigenvalues
 % of the patch scheme applied to this heterogeneous
 % diffusion to validate and to compare various orders of
-% inter-patch interpolation.
-% JEB & AJR, May 2020 -- Nov 2020
+% inter-patch interpolation.  Revised for 
+% AutoDiff of Jac.   JEB & AJR, May 2020 -- 11 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoDiffEdgy3}: computational
@@ -26,7 +26,7 @@ directions. Crudely normalise by the harmonic mean so the
 decay time scale is roughly one. 
 \begin{matlab}
 %}
-mPeriod = randi([2 3],1,3)
+mPeriod = randi([3 4],1,3)
 cHetr = exp(0.3*randn([mPeriod 3]));
 cHetr = cHetr*mean(1./cHetr(:))
 %{
@@ -207,8 +207,8 @@ points and hence correspond to dynamical variables.
     u0(:,[1 end],:,:) = nan;
     u0(:,:,[1 end],:) = nan;
     i = find(~isnan(u0));
-    sizeJacobian = length(i)
-    assert(sizeJacobian<4000 ...
+    nJac = length(i)
+    assert(nJac<9000 ...
         ,'Jacobian is too big to quickly generate and analyse')
 %{
 \end{matlab}
@@ -240,23 +240,31 @@ Configure with same heterogeneity.
 \end{matlab}
 Construct the Jacobian of the scheme as the matrix of the
 linear transformation, obtained by transforming the standard
-unit vectors.
+unit vectors or via auto-differentiation.
 \begin{matlab}
 %}
-    jac = nan(length(i));
-    for j = 1:length(i)
-      u = u0(:)+(i(j)==(1:numel(u0))');
-      tmp = patchSys3(0,u);
-      jac(:,j) = tmp(i);
-    end
+    tic
+    if exist('AutoDiff','class')
+          disp('**** using AutoDiff Jac')
+          Jac=AutoDiffJacobianAutoDiff(@(u) patchSys3(0,u),u0,i);
+          Jac=full(Jac(i,:));
+    else
+        Jac = nan(nJac);
+        for j = 1:nJac
+          u = u0(:)+(i(j)==(1:numel(u0))');
+          tmp = patchSys3(0,u);
+          Jac(:,j) = tmp(i);
+        end
+    end%if exist
+    JacTime=toc
 %{
 \end{matlab}
 Test for symmetry, with error if we know it should be
 symmetric.
 \begin{matlab}
 %}
-    notSymmetric=norm(jac-jac')   
-%    if notSymmetric>1e-7, spy(abs(jac-jac')>1e-7), end%??
+    notSymmetric=norm(Jac-Jac')   
+%    if notSymmetric>1e-7, spy(abs(Jac-Jac')>1e-7), end%??
     assert(notSymmetric<1e-7,'failed symmetry')
 %{
 \end{matlab}
@@ -264,7 +272,7 @@ Find all the eigenvalues (as \verb|eigs| is unreliable),
 and put eigenvalues in a vector.
 \begin{matlab}
 %}
-    [evecs,evals] = eig((jac+jac')/2,'vector');
+    [evecs,evals] = eig((Jac+Jac')/2,'vector');
     biggestImag=max(abs(imag(evals)));
     if biggestImag>0, biggestImag=biggestImag, end
 %{

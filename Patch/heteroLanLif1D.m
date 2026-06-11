@@ -1,7 +1,8 @@
 % Computes the time derivatives of heterogeneous
 % Landau--Lifshitz PDE on 1D lattice within spatial patches.
 % From Leitenmaier & Runborg, arxiv.org/abs/2108.09463 and
-% used by homoLanLif1D.m   AJR, Sep 2021
+% used by homoLanLif1D.m  Revised for AutoDiff   
+% AJR, Sep 2021 -- 10 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{heteroLanLif1D()}: heterogeneous Landau--Lifshitz PDE}
@@ -45,15 +46,15 @@ give the time derivative \(\Mv_t=-\Mv\times \Hv -\alpha \Mv\times (\Mv\times \Hv
 \begin{matlab}
 %}
   i = 2:size(M,1)-1;   % interior points in a patch
-  MH=nan+H; % preallocate for MxH
+  MH=nan(size(H),'like',H); % preallocate for MxH
   MH(:,3,:,:) = M(i,1,:,:).*H(:,2,:,:)-M(i,2,:,:).*H(:,1,:,:);
   MH(:,2,:,:) = M(i,3,:,:).*H(:,1,:,:)-M(i,1,:,:).*H(:,3,:,:);
   MH(:,1,:,:) = M(i,2,:,:).*H(:,3,:,:)-M(i,3,:,:).*H(:,2,:,:);
-  MMH=nan+H; % preallocate for MxMxH
+  MMH=nan(size(H),'like',H); % preallocate for MxMxH
   MMH(:,3,:,:)= M(i,1,:,:).*MH(:,2,:,:)-M(i,2,:,:).*MH(:,1,:,:);
   MMH(:,2,:,:)= M(i,3,:,:).*MH(:,1,:,:)-M(i,1,:,:).*MH(:,3,:,:);
   MMH(:,1,:,:)= M(i,2,:,:).*MH(:,3,:,:)-M(i,3,:,:).*MH(:,2,:,:);
-  Mt = nan+M; % preallocate output array
+  Mt = nan(size(M),'like',M); % preallocate output array
   Mt(i,:,:,:) = -MH-alpha*MMH; 
 end% function
 %{

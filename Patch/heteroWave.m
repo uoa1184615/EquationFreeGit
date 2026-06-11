@@ -1,6 +1,6 @@
-% Computes the time derivatives of heterogeneous wave
-% in 1D on patches.  Used by homoWaveEdgy1.m,
-% AJR, 26 Nov 2019 -- Nov 2020
+% Computes the time derivatives of heterogeneous wave in 1D
+% on patches.  Used by homoWaveEdgy1.m.  Now adapted for
+% AutoDiff AJR, 26 Nov 2019 -- 10 Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{heteroWave()}: wave in heterogeneous
@@ -27,8 +27,8 @@ struct~\verb|patches|.
 function ut = heteroWave(t,u,patches)
   u = squeeze(u);
   dx = diff(patches.x(2:3));    % space step
-  i = 2:size(u,1)-1;    % interior points in a patch
-  ut = nan(size(u));    % preallocate output array
+  i = 2:size(u,1)-1;         % interior points in a patch
+  ut = nan(size(u),'like',u);% preallocate output array
   ut(i,1,:) = u(i,2,:); % du/dt=v then dvdt=
   ut(i,2,:) = diff(patches.cs.*diff(u(:,1,:)))/dx^2 ...
         +0.02*diff(u(:,2,:),2)/dx^2; 
