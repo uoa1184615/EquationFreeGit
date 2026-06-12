@@ -1,6 +1,6 @@
 % License FreeBSD:
 %
-% Copyright (c) 2016  Martin de La Gorce, with modifications
+% Copyright (c) 2016  Martin de La Gorce, with extensions
 % by Chris Noble C.2025, and Tony Roberts (AJR) June 2026.
 % All rights reserved.
 %
@@ -35,20 +35,25 @@
 % documentation are those of the authors and should not be
 % interpreted as representing official policies, either
 % expressed or implied, of the FreeBSD Project.
+% 
+% Sometimes info obtained by command such as "help AutoDiff.svd"
+
 
 classdef AutoDiff
 
     %
-    %    This class implement a forward automatic differentation method based
-    %    on operator overloading. This class allows precise and efficient
-    %    computation of function Jacobians by calling AutoDiffJacobianAutoDiff
+    %    This class implement a forward automatic differentation
+    %    method based on operator overloading. This class allows
+    %    precise and efficient computation of function Jacobians
+    %    by calling AutoDiffJacobianAutoDiff
     %
     %   In contrast with most AD matlab tools
     %    - Derivatives are represented as sparse matrices
     %    - N dimensional array are supported
     %
-    %   The speed could be improved by representing jacobian matrices by
-    %   their transposed matrix , due to the way matlab store sparse matrices
+    %   The speed could be improved by representing jacobian
+    %   matrices by their transposed matrix, due to the way
+    %   matlab store sparse matrices
     %
 
 
@@ -99,6 +104,11 @@ classdef AutoDiff
                 ' - create a cell array of the elements and then concatenate them\n', ...
                 'see troubleshoot example 1 in autodiff_troubleshoot.m for a more detailed examples and solutions\n', ...
                 'Note that vectorizing your code is likely to avoid the preallocation is likely to lead to faster execution']);
+        end
+
+        function y = isinf(x)
+        % isinf() for AutoDiff x is true for infinite values
+            y = isinf(x.values);
         end
 
         function x = sinh(x)
@@ -185,6 +195,28 @@ classdef AutoDiff
             x.values = atan(x.values);
         end
 
+        function x = erf(x)
+        % erf(x) for AutoDiff x is Error function and derivatives
+            tmp = 2*exp(-1*x.values.^2)/sqrt(pi);
+            x.derivatives = AutoDiff.spdiag(tmp) * x.derivatives;
+            x.values = erf(x.values);
+        end
+
+        function x = erfc(x)
+        % erfc(x) for AutoDiff x is Complementary Error function and
+        % derivatives.
+            tmp = 2*exp(-1*x.values.^2)/sqrt(pi);
+            x.derivatives = -1*AutoDiff.spdiag(tmp) * x.derivatives;
+            x.values = erfc(x.values);
+        end
+
+        function x = gamma(x)
+        % gamma(x) for AutoDiff x is Gamma function and derivatives
+            tmp = gamma(x.values).*psi(x.values);
+            x.values = gamma(x.values);
+            x.derivatives = AutoDiff.spdiag(tmp) * x.derivatives;
+        end
+
         function x = exp(x)
             x.values = exp(x.values);
             x.derivatives = AutoDiff.spdiag(x.values) * x.derivatives;
@@ -207,11 +239,16 @@ classdef AutoDiff
         end
 
         function y = fft(x,varargin)
-        % fft(), C.2025 by Chris Noble, github.com/noblec04/MatlabGP
-        % Revised AJR 7 Jun 2026. In many problems, although the
-        % fft-dirn may be dense, a lot of the variables may have no
-        % influence (e.g., Eqn-Free Patch scheme), that is, the
-        % 'columns' of derivatives would be sparse.  
+            % y=fft(x,...) for AutoDiff x gives a 1D Fourier Transform
+            % of x and its derivatives.  Optional arguments are passed
+            % to the usual fft.  Cater for sparse derivatives as in many
+            % problems, although the fft-dirn may be dense, a lot of the
+            % variables may have no influence (e.g., Eqn-Free Patch
+            % scheme), that is, the 'columns' of derivatives would be
+            % sparse.   
+            %
+            % Original C.2025 by Chris Noble, github.com/noblec04/MatlabGP
+            % Vectorized by AJR 7 Jun 2026.
             y.values = fft(x.values,varargin{:});
             nz = size(x.derivatives,2);
             nx = numel(x.values);
@@ -234,8 +271,13 @@ classdef AutoDiff
         end
 
         function y = ifft(x,varargin)
-        % ifft(), C.2025 by Chris Noble, github.com/noblec04/MatlabGP
-        % Revised AJR 8 Jun 2026. See fft() for discussion.  
+            % y=ifft(x,...) for AutoDiff x gives a 1D inverse Fourier
+            % Transform of x and its derivatives.  Optional arguments
+            % are passed to the usual fft.  Cater for sparse
+            % derivatives.   
+            %
+            % Original C.2025 by Chris Noble, github.com/noblec04/MatlabGP
+            % Vectorized by AJR 7 Jun 2026.
             y.values = ifft(x.values,varargin{:});
             nz = size(x.derivatives,2);
             nx = numel(x.values);
@@ -263,7 +305,6 @@ classdef AutoDiff
 
 
         function y = cat(dim, varargin)
-%        disp('AutoDiff:cat()')%AJR trace
 
             y.values = [];
             nbvarargin = nargin - 1;
@@ -600,6 +641,37 @@ classdef AutoDiff
             x.derivatives = -M2 * M1 * x.derivatives;
         end
 
+        function x = pinv(x,tol)
+        % pinv(x) for AutoDiff x is Moore-Penrose pseudoinverse of
+        % x, and derivatives. By Chris Noble C.2025
+            if nargin==1
+                tol=0;
+            end
+            x.values = pinv(x.values,tol);
+            M1 = kron(speye(size(x.values, 2)), x.values);
+            M2 = kron(x.values', speye(size(x.values, 1)));
+            x.derivatives = -M2 * M1 * x.derivatives;
+        end
+
+        function [y,flag] = chol(x,shape)
+        % chol(x,shape) for AutoDiff x is Cholesky factorization of
+        % x, and derivatives. By Chris Noble C.2025
+            if nargin<2, shape='lower'; end
+            [L,flag] = chol(x.values,shape);
+            if flag~=0, y=L; return, end
+            for i = 1:size(x.derivatives,2)
+                A = L\reshape(x.derivatives(:,i),size(x))/L';
+                n = size(A,1);
+                A(1:(n+1):end) = 0.5*A(1:(n+1):end);
+                U = tril(0*A+1);
+                A(U~=1) = 0;
+                A = L*A;
+                y.derivatives(:,i) = A(:);
+            end
+            y.values = L;
+            y = AutoDiff(y);
+        end
+
         function z = mldivide(x, y)
             if isa(y, 'AutoDiff')
                 if isa(x, 'AutoDiff')
@@ -763,9 +835,84 @@ classdef AutoDiff
             end
         end
 
-        function [U, S, V] = svd(x)
-            error('not coded yet, could look at the eig implementation')
-        end
+        function [Uad, Sad, Vad] = svd(A)
+            % Economy-size SVD A=USV' for AutoDiff matrix A, mxn real:
+            % gives mxk U, kxk S, nxk V and its derivatives, for rank
+            % k=number of non-zero singular values [k<=min(m,n)].
+            % Assumes matrix is real (somewhy?), and assumes there are
+            % no coincident singular values (as otherwise F divides by
+            % zero).  Only compute the economy rank k decomposition
+            % because for (multiple) zero-rows/columns of S the
+            % corresponding columns of U&V are not unique, and so their
+            % derivative is meaningless.
+            %
+            % AJR 13/6/2026, much revised from Chris Noble's MatlabGP,
+            % see "Differentiating the SVD", James Townsend, 2016
+            %
+            % AutoDiffsvdRankThresh (global) sets threshold on singular
+            % values for determining the rank of the SVD and its
+            % derivatives: singular values such that s_i/s_1 < threshold
+            % are zeroed, and rank reduced accordingly.  Reason? 
+            % derivatives of U&V involve division by singular values so
+            % are very sensitive to very small ones.
+            global AutoDiffsvdRankThresh
+            if ~exist('AutoDiffsvdRankThresh')
+                AutoDiffsvdRankThresh = 1e-10;  % guess useful default
+            end%if exist
+            [m,n] = size(A.values);
+            [U,S,V] = svd(A.values);
+            s = diag(S); 
+            k = max(find(s>AutoDiffsvdRankThresh*s(1))); 
+            s = s(1:k);     % kx1 col.vector of singular values
+            U = U(:,1:k);   % mxk as in T2016
+            S = diag(s);    % kxk matrix
+            V = V(:,1:k);   % nxk as in T2016
+            sDiv = 1./s;    % kx1 vector
+            Ik = speye(k);  % kxk sparse Ident
+            F = (1-Ik)./(s'.^2-s.^2+Ik); % kxk desingularised unless
+            QU = speye(m)-U*U'; % mxm projection matrix
+            QV = speye(n)-V*V'; % nxn projection matrix
+            
+            nz = size(A.derivatives,2);
+            dU = sparse(m*k,nz); 
+            dS = sparse(k*k,nz);
+            dV = sparse(n*k,nz);
+            % cater for sparse columns in A.derivatives
+            inz = find(max(abs(A.derivatives))>0); % find non-zero columns
+            ninz = length(inz); % number of non-zero cols
+            if ~exist('pagemtimes')
+              for i = inz % non-vectorized without pagemtimes
+                dAi = reshape(A.derivatives(:,i),m,n);
+                % A*S=A.*s' and S*A=s.*A where s=col.vector of diagonal S
+                dU(:,i) = reshape( ...
+                    U*(F.*(U'*dAi*(V.*s') + (s.*V')*dAi'*U)) ...
+                    + QU*dAi*(V.*sDiv')    ,[],1);
+                dS(:,i) = reshape( Ik.*(U'*dAi*V) ,[],1);
+                dV(:,i) = reshape( ...
+                    V*(F.*((s.*U')*dAi*V + V'*dAi'*(U.*s'))) ...
+                    + QV*dAi'*(U.*sDiv')   ,[],1);
+              end%for
+            else % vectorize with Matlab's pagemtimes()
+                T='ctranspose'; N='none';
+                dA = reshape(full(A.derivatives(:,inz)),m,n,ninz);
+                dU(:,inz) = reshape(  pagemtimes(U, ...
+                    F.*( pagemtimes(U,T,pagemtimes(dA,V.*s'),N) ...
+                    + pagemtimes(pagemtimes(s.*V',N,dA,T),U)) ) ...
+                    + pagemtimes(QU,pagemtimes(dA,V.*sDiv'))    ...
+                    ,[],ninz);
+                dS(:,inz) = reshape( ...
+                    full(Ik).*pagemtimes(U,T,pagemtimes(dA,V),N) ...
+                    ,[],ninz);
+                dV(:,inz) = reshape( pagemtimes(V, ...
+                    F.*( pagemtimes(s.*U',pagemtimes(dA,V))        ...
+                    + pagemtimes(pagemtimes(V,T,dA,T),U.*s') ))    ...
+                    + pagemtimes(QV,pagemtimes(dA,'T',U.*sDiv',N)) ...
+                    ,[],ninz);
+            end%if
+            Uad = AutoDiff(U,dU);
+            Sad = AutoDiff(S,dS);
+            Vad = AutoDiff(V,dV);
+        end% svd()
 
         function n = numel(x)
             n = numel(x.values);
@@ -855,7 +1002,7 @@ classdef AutoDiff
         end
 
         
-       function x = cumsum(x, varargin)
+        function x = cumsum(x, varargin)
             val = cumsum(x.values, varargin{:});
  
             if isvector(x.values)
@@ -910,7 +1057,6 @@ classdef AutoDiff
         end
 
         function y = subsasgn(y, S, x)
-%        disp('AutoDiff:subsasgn()')%AJR trace
             if isempty(S.subs{1})
                 return;
             end
@@ -1171,7 +1317,6 @@ classdef AutoDiff
         end
 
         function x = permute(x, l)
-%        disp('AutoDiff:permute()')%AJR trace
             t = reshape(1:numel(x.values), size(x.values));
             t = permute(t, l);
             x.values = permute(x.values, l);
@@ -1221,7 +1366,8 @@ classdef AutoDiff
         end
 
         function x = nan(varargin)
-        % AJR, 9 Jun 2026  New, seems to be OK.
+        % nan(...) for AutoDiff-likeness gives nan-matrix according
+        % to varargin, and sparse-zero derivatives. AJR, 9 Jun 2026 
             k = find(cellfun(@isnumeric, varargin), 1, 'last');
             assert(length(varargin) == k+2);
             assert(strcmp(varargin{k + 1}, 'like'));
