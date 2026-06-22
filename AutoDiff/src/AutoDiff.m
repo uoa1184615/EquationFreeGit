@@ -836,18 +836,17 @@ classdef AutoDiff
         end
 
         function [Uad, Sad, Vad] = svd(A)
-            % Economy-size SVD A=USV' for AutoDiff matrix A, mxn real:
-            % gives mxk U, kxk S, nxk V and its derivatives, for rank
-            % k=number of non-zero singular values [k<=min(m,n)].
-            % Assumes matrix is real (somewhy?), and assumes there are
-            % no coincident singular values (as otherwise F divides by
-            % zero).  Only compute the economy rank k decomposition
-            % because for (multiple) zero-rows/columns of S the
-            % corresponding columns of U&V are not unique, and so their
-            % derivative is meaningless.
+            % Economy-size SVD A=USV' for AutoDiff matrix A, mxn real or
+            % complex: gives mxk U, kxk S, nxk V and its derivatives,
+            % for rank k=number of non-zero singular values
+            % [k<=min(m,n)]. Assumes there are no coincident singular
+            % values (as otherwise F divides by zero).  Only compute the
+            % economy rank k decomposition because for (multiple)
+            % zero-rows/columns of S the corresponding columns of U&V
+            % are not unique, and so their derivative is meaningless.
             %
-            % AJR 13/6/2026, much revised from Chris Noble's MatlabGP,
-            % see "Differentiating the SVD", James Townsend, 2016
+            % AJR 22/6/2026, much revised from Chris Noble's MatlabGP,
+            % and see "Differentiating the SVD", James Townsend, 2016
             %
             % AutoDiffsvdRankThresh (global) sets threshold on singular
             % values for determining the rank of the SVD and its
@@ -856,59 +855,62 @@ classdef AutoDiff
             % derivatives of U&V involve division by singular values so
             % are very sensitive to very small ones.
             global AutoDiffsvdRankThresh
-            if ~exist('AutoDiffsvdRankThresh')
+            if ~( exist('AutoDiffsvdRankThresh') ...
+                    && ~isempty(AutoDiffsvdRankThresh) )
                 AutoDiffsvdRankThresh = 1e-10;  % guess useful default
             end%if exist
             [m,n] = size(A.values);
             [U,S,V] = svd(A.values);
-            s = diag(S); 
+            s = diag(S);
             k = max(find(s>AutoDiffsvdRankThresh*s(1))); 
             s = s(1:k);     % kx1 col.vector of singular values
             U = U(:,1:k);   % mxk as in T2016
             S = diag(s);    % kxk matrix
             V = V(:,1:k);   % nxk as in T2016
-            sDiv = 1./s;    % kx1 vector
-            Ik = speye(k);  % kxk sparse Ident
-            F = (1-Ik)./(s'.^2-s.^2+Ik); % kxk desingularised unless
-            QU = speye(m)-U*U'; % mxm projection matrix
-            QV = speye(n)-V*V'; % nxn projection matrix
+            % 'rotate' each column of U&V so largest-V is real-positive
+            % Means computed U&V is almost-always unique.
+            [~,iVM]=max(abs(V));
+            c=nan(1,k);
+            for j=1:k, c(j)=conj(V(iVM(j),j))/abs(V(iVM(j),j)); end
+            U=U.*c;  V=V.*c;
             
-            nz = size(A.derivatives,2);
-            dU = sparse(m*k,nz); 
-            dS = sparse(k*k,nz);
-            dV = sparse(n*k,nz);
+            N = size(A.derivatives,2);
+            dU = sparse(m*k,N); 
+            dS = sparse(k*k,N);
+            dV = sparse(n*k,N);
             % cater for sparse columns in A.derivatives
-            inz = find(max(abs(A.derivatives))>0); % find non-zero columns
-            ninz = length(inz); % number of non-zero cols
-            if ~exist('pagemtimes')
-              for i = inz % non-vectorized without pagemtimes
-                dAi = reshape(A.derivatives(:,i),m,n);
-                % A*S=A.*s' and S*A=s.*A where s=col.vector of diagonal S
-                dU(:,i) = reshape( ...
-                    U*(F.*(U'*dAi*(V.*s') + (s.*V')*dAi'*U)) ...
-                    + QU*dAi*(V.*sDiv')    ,[],1);
-                dS(:,i) = reshape( Ik.*(U'*dAi*V) ,[],1);
-                dV(:,i) = reshape( ...
-                    V*(F.*((s.*U')*dAi*V + V'*dAi'*(U.*s'))) ...
-                    + QV*dAi'*(U.*sDiv')   ,[],1);
-              end%for
-            else % vectorize with Matlab's pagemtimes()
-                T='ctranspose'; N='none';
-                dA = reshape(full(A.derivatives(:,inz)),m,n,ninz);
-                dU(:,inz) = reshape(  pagemtimes(U, ...
-                    F.*( pagemtimes(U,T,pagemtimes(dA,V.*s'),N) ...
-                    + pagemtimes(pagemtimes(s.*V',N,dA,T),U)) ) ...
-                    + pagemtimes(QU,pagemtimes(dA,V.*sDiv'))    ...
-                    ,[],ninz);
-                dS(:,inz) = reshape( ...
-                    full(Ik).*pagemtimes(U,T,pagemtimes(dA,V),N) ...
-                    ,[],ninz);
-                dV(:,inz) = reshape( pagemtimes(V, ...
-                    F.*( pagemtimes(s.*U',pagemtimes(dA,V))        ...
-                    + pagemtimes(pagemtimes(V,T,dA,T),U.*s') ))    ...
-                    + pagemtimes(QV,pagemtimes(dA,'T',U.*sDiv',N)) ...
-                    ,[],ninz);
-            end%if
+            [~,jN] = find(A.derivatives); % find non-zero columns
+            jN = unique(jN);
+            N = length(jN);  % redefined to number of non-zero cols
+            % use fast pagemtimes if available
+            if exist('pagemtimes')==5,  Mx = @pagemtimes; 
+            else Mx = @AutoDiff.pageMmult;
+            end%if exist
+            T = 'ctranspose';   O = 'none';
+            dA = reshape(full(A.derivatives(:,jN)),m,n,N);
+            dP = Mx(U,T,Mx(dA,V),O); % U'*dA*V  k.k.N
+            iDiag = find(speye(k));
+            dP2D = reshape(dP,k^2,N);
+            dS(iDiag,jN) = real(dP2D(iDiag,:)); % diag(real(diag(dP)));
+            dP = dP-reshape(full(dS(:,jN)),k,k,N);
+            Foff=(1-eye(k))./(s'.^2-s.^2+eye(k)); % k.k
+            symM=@(X) X+conj(permute(X,[2 1 3]));
+            UdUoff=Foff.*symM(dP.*s'); % Foff.*(dP*S+S*dP'), k.k.N
+            VdVoff=Foff.*symM( s.*dP); % Foff.*(S*dP+dP'*S), k.k.N
+            dVi = Mx(V, VdVoff ); % V*( VdVoff ), n.k.N
+            dP2D = reshape(dP,k^2,N);
+            UdUoff = reshape(UdUoff,k^2,N);  % UdUoff+diag(diag(dP)./s)
+            UdUoff(iDiag,:) = UdUoff(iDiag,:)+dP2D(iDiag,:)./s;
+            dUi = Mx(U, reshape(UdUoff,k,k,N) ); % U*( UdUoff ), m.k.N
+            if m>k, dUi=dUi+Mx(Mx(eye(m)-U*U',O,dA,O),V./s'); end
+            if n>k, dVi=dVi+Mx(Mx(eye(n)-V*V',O,dA,T),U./s'); end
+            c = nan(1,k,N);
+            for j=1:k
+                c(1,j,:) = (-1i./abs(V(iVM(j),j))).*imag(dVi(iVM(j),j,:));
+            end%for j
+            dV(:,jN) = reshape( dVi+V.*c ,n*k,N);
+            dU(:,jN) = reshape( dUi+U.*c ,m*k,N);
+            % form results as AutoDiff entities
             Uad = AutoDiff(U,dU);
             Sad = AutoDiff(S,dS);
             Vad = AutoDiff(V,dV);
@@ -1384,6 +1386,48 @@ classdef AutoDiff
     end
 
     methods (Static)
+
+
+        function AB = pageMmult(A,At,B,Bt)
+        % Computes matrix product A*B for ensemble of matrices. 
+        % Arguments are either two (A,B), or four (A,At,B,Bt), where
+        % A & B are 3-D arrays.  For each l computes
+        % A(:,:,l)*B(:,:,l) where A&B may be transposed according to
+        % At & Bt being either 'none' (default) or 'ctranspose'. 
+        % AJR, 22 Jun 2026
+        if nargin==2, B=At; At='none'; Bt='none'; 
+        else assert(nargin==4 ...
+            ,'AutoDiff.pageMmult: must have 2 or 4 arguments')
+        end%if
+        [a1,a2,a3]=size(A); [b1,b2,b3]=size(B);
+        k = max(a3,b3);
+        if a3>1, a=@(l) l; else a=@(l) 1; end
+        if b3>1, b=@(l) l; else b=@(l) 1; end
+        switch At
+        case 'none'
+            switch Bt
+            case 'none'
+                AB=nan(a1,b2,k);
+                for l=1:k, AB(:,:,l)=A(:,:,a(l))*B(:,:,b(l)); end
+            case 'ctranspose'
+                AB=nan(a1,b1,k);
+                for l=1:k, AB(:,:,l)=A(:,:,a(l))*B(:,:,b(l))'; end
+            otherwise error('unknown B-transpose')
+            end%switch Bt
+        case 'ctranspose'
+            switch Bt
+            case 'none'
+                AB=nan(a2,b2,k);
+                for l=1:k, AB(:,:,l)=A(:,:,a(l))'*B(:,:,b(l)); end
+            case 'ctranspose'
+                AB=nan(a2,b1,k);
+                for l=1:k, AB(:,:,l)=A(:,:,a(l))'*B(:,:,b(l))'; end
+            otherwise error('unknown B-transpose')
+            end%switch Bt
+        otherwise error('unknown A-transpose')
+        end%switch At
+        end%function pageMmult
+
 
         function M = spDiagFromVec(v)
             M = sparse((1:numel(v)), (1:numel(v)), v(:));

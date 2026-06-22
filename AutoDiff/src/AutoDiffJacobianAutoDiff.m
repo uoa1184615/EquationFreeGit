@@ -1,7 +1,7 @@
 function [J, f] = AutoDiffJacobianAutoDiff(func, x, range)
 
-% AutoDiffJacobianAutoDiff returns the jacobian of function evaluated at x using Automatic
-% Differentiation
+% AutoDiffJacobianAutoDiff returns the jacobian of function
+% evaluated at x using Automatic Differentiation
 %
 %
 %  J = AutoDiffJacobianAutoDiff(func,x)
@@ -15,12 +15,14 @@ function [J, f] = AutoDiffJacobianAutoDiff(func, x, range)
 %     J       : jacobian matrix of function f evaluated at x
 %
 % Description:
-%     returns the jacobian matrix of function f evaluated at x
-%     if a range is specified , only the columns corresponding to the range
-%     indices are computed. The computation is donc using Automatic
-%     Differentiation (Not to be confounded with Finite Differences method)
-%     This is numerically more precise and, if the Jacobian is large and
-%     sparse this might be much faster (see examples)
+%     returns the jacobian matrix of function f evaluated at
+%     x if a range is specified , only the columns
+%     corresponding to the range indices are computed. The
+%     computation is donc using Automatic Differentiation
+%     (Not to be confounded with Finite Differences method)
+%     This is numerically more precise and, if the Jacobian
+%     is large and sparse this might be much faster (see
+%     examples)
 %
 % Examples:
 %
@@ -68,7 +70,9 @@ catch exception
     func(x);
     warning('It seems like to original function is ok with the plain data , The class AutoDiff needs debugging')
     % rethrow(exception)
-    [~] = func(xAD); % better to call again the function instead of using exception as it makes it possible to use matlab's stop-if -error debugging functionality
+    [~] = func(xAD); % better to call again the function instead of using
+% exception as it makes it possible to use matlab's stop-if
+% -error debugging functionality
 end
 
 
