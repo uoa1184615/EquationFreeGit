@@ -1388,13 +1388,13 @@ classdef AutoDiff
     methods (Static)
 
 
-        function AB = pageMmult(A,At,B,Bt)
+        function C = pageMmult(A,At,B,Bt)
         % Computes matrix product A*B for ensemble of matrices. 
         % Arguments are either two (A,B), or four (A,At,B,Bt), where
         % A & B are 3-D arrays.  For each l computes
         % A(:,:,l)*B(:,:,l) where A&B may be transposed according to
-        % At & Bt being either 'none' (default) or 'ctranspose'. 
-        % AJR, 22 Jun 2026
+        % At & Bt: 'none' (default), 'ctranspose' or 'transpose' 
+        % AJR, 25 Jun 2026
         if nargin==2, B=At; At='none'; Bt='none'; 
         else assert(nargin==4 ...
             ,'AutoDiff.pageMmult: must have 2 or 4 arguments')
@@ -1404,28 +1404,19 @@ classdef AutoDiff
         if a3>1, a=@(l) l; else a=@(l) 1; end
         if b3>1, b=@(l) l; else b=@(l) 1; end
         switch At
-        case 'none'
-            switch Bt
-            case 'none'
-                AB=nan(a1,b2,k);
-                for l=1:k, AB(:,:,l)=A(:,:,a(l))*B(:,:,b(l)); end
-            case 'ctranspose'
-                AB=nan(a1,b1,k);
-                for l=1:k, AB(:,:,l)=A(:,:,a(l))*B(:,:,b(l))'; end
-            otherwise error('unknown B-transpose')
-            end%switch Bt
-        case 'ctranspose'
-            switch Bt
-            case 'none'
-                AB=nan(a2,b2,k);
-                for l=1:k, AB(:,:,l)=A(:,:,a(l))'*B(:,:,b(l)); end
-            case 'ctranspose'
-                AB=nan(a2,b1,k);
-                for l=1:k, AB(:,:,l)=A(:,:,a(l))'*B(:,:,b(l))'; end
-            otherwise error('unknown B-transpose')
-            end%switch Bt
-        otherwise error('unknown A-transpose')
+        case 'none',       opA=@(X) X;      c1=a1;
+        case 'ctranspose', opA=@ctranspose; c1=a2;
+        case 'transpose',  opA=@transpose;  c1=a2;
+        otherwise error('AutoDiff.pageMmult: unknown A-transpose')
         end%switch At
+        switch Bt
+        case 'none',       opB=@(X) X;      c2=b2;
+        case 'ctranspose', opB=@ctranspose; c2=b1;
+        case 'transpose',  opB=@transpose;  c2=b1;
+        otherwise error('AutoDiff.pageMmult: unknown B-transpose')
+        end%switch Bt
+        C=nan(c1,c2,k);
+        for l=1:k, C(:,:,l)=opA(A(:,:,a(l)))*opB(B(:,:,b(l))); end
         end%function pageMmult
 
 
