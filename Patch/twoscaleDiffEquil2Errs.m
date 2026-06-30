@@ -365,7 +365,7 @@ function ut = twoscaleDiffForce2(t,u,patches)
   dy = diff(patches.y(2:3));  % y space step
   i = 2:size(u,1)-1; % x interior points in a patch
   j = 2:size(u,2)-1; % y interior points in a patch
-  ut = nan+u;         % preallocate output array
+  ut = nan(size(u),'like',u); % preallocate output array
 %{
 \end{matlab}
 Set Dirichlet boundary value of zero around the square

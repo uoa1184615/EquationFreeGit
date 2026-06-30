@@ -66,7 +66,11 @@ computation.
 
 
 <h4>Contributors</h4> 
-This project aims to collectively develop a powerful and
+This project has been significantly funded by the Australian
+Research Council via Discovery Project grants DP200103097
+and DP220103156.
+
+<p>The project aims to collectively develop a powerful and
 flexible Matlab/Octave toolbox of <em>equation-free</em>
 algorithms. Initially the algorithms are basic, and the
 ongoing program is developing more and more capability.

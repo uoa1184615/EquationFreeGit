@@ -43,7 +43,7 @@ heterogeneous diffusion time derivatives. Using \verb|nan+u|
 appears quicker than \verb|nan(size(u),patches.codist)|
 \begin{matlab}
 %}
-  ut = nan+u;  % preallocate output array
+  ut = nan(size(u),'like',u);  % preallocate output array
   ut(i,j,k,1,:) = u(i,j,k,2,:);
   ut(i,j,k,2,:) ...
   =diff(patches.cs(:,j,k,1,:).*diff(u(:,j,k,1,:),1),1)/dx^2 ...

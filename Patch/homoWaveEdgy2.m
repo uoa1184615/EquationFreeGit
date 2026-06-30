@@ -6,7 +6,7 @@
 % compare with "Numerical upscaling for wave equations with
 % time-dependent multiscale coefficients", Bernhard Maier
 % and Barbara Verfurth, arxiv.org:2107.14069 This code was
-% adapted from homoDiffEdgy2.m by AJR, Aug 2021
+% adapted from homoDiffEdgy2.m by AJR,  Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoWaveEdgy2}: computational
@@ -180,7 +180,7 @@ takes~287\,s for \verb|nPatch=2*32| and roughly~4000\,s for
 full domain \verb|nPatch=2*128|.
 \begin{matlab}
 %}
-disp('Now simulate over time')
+disp('Now simulate over time, via simple ode23')
 tic
 [ts,us] = ode23(@patchSys2, linspace(0,1,11), uv0(:));
 if iPat==0,  odeTime0=toc
@@ -252,7 +252,7 @@ end%for iPat
 figure(1), clf
 loglog(H,relrmserr,'o:'),  grid on
 xlabel('$H$'), ylabel('relative error')
-return
+%return
 %{
 \end{matlab}
 \input{../Patch/heteroWave2.m}
@@ -324,11 +324,11 @@ otherwise just update the surface data.
 %       axis([-1 1 -1 1 -maxu maxu]), caxis(maxu*[-1 1])
        axis([0 1 0 1 0 maxu]), caxis(maxu*[0 1])
        xlabel('$x$'), ylabel('$y$'), zlabel('$u(x,y)$')
-       pause
+       disp("pausing, any key to continue"),pause
   else set(hsurf,'ZData', u');
   end
   legend(['time = ' num2str(ts(i),2)],'Location','north')
-  pause(0.05)
+  pause(0.1)
 %{
 \end{matlab}
 finish the animation loop and if-plot.
@@ -357,10 +357,11 @@ points and hence correspond to dynamical variables.
 uv0([1 end],:,:) = nan;
 uv0(:,[1 end],:) = nan;
 i = find(~isnan(uv0));
-if length(i)>4000
-  disp('System too large to compute eigenvalues')
+nJac = length(i)
+if nJac>4000
+    disp('System too large to compute eigenvalues')
 else
-  disp('Computing Jacobian, and its eigenvalues')
+    disp('Computing Jacobian, and its eigenvalues')
 %{
 \end{matlab}
 Construct the Jacobian of the scheme as the matrix of the
@@ -368,13 +369,18 @@ linear transformation, obtained by transforming the standard
 unit vectors (as the system is linear).
 \begin{matlab}
 %}
-    jac = nan(length(i));
-    sizeJacobian = size(jac)
-    for j = 1:length(i)
-      uv = uv0(:)+(i(j)==(1:numel(uv0))');
-      tmp = patchSys2(0,uv);
-      jac(:,j) = tmp(i);
-    end
+    if exist('AutoDiff','class')
+          disp('**** using AutoDiff Jac')
+          Jac=AutoDiffJacobianAutoDiff(@(uv) patchSys2(0,uv),uv0,i);
+          Jac=full(Jac(i,:));
+    else
+        Jac = nan(nJac);
+        for j = 1:nJac
+          uv = uv0(:)+(i(j)==(1:numel(uv0))');
+          tmp = patchSys2(0,uv);
+          Jac(:,j) = tmp(i);
+        end
+    end%if exist AutoDiff
 %{
 \end{matlab}
 It is not symmetric, but nonetheless the eigenvalues are
@@ -382,13 +388,13 @@ good (presumably because the system represents nice wave
 dynamics).
 \begin{matlab}
 %}
-    notSymmetric=norm(jac-jac')    
+    notSymmetric = norm(Jac-Jac')    
 %{
 \end{matlab}
 Find all the eigenvalues (as \verb|eigs| is unreliable).
 \begin{matlab}
 %}
-    [evecs,evals] = eig(jac,'vector');
+    [evecs,evals] = eig(Jac,'vector');
     biggestImag=max(abs(imag(evals)))
     biggestReal=max(abs(real(evals)))
     smallestMag=min(abs(evals))
@@ -410,8 +416,7 @@ of decoupled systems in this patch configuration.
     plot(real(evals),imag(evals),'.')
     xlabel('$\Re\lambda$'), ylabel('$\Im\lambda$')
     quasiLogAxes(1,1);
-    pause
-end%if compute eigenvals
+end%if-else nJac
 %{
 \end{matlab}
 Fin.

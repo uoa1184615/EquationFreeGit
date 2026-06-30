@@ -2,7 +2,7 @@
 % in 1D on patches.  Used by homogenisationExample.m,
 % homoDiffEdgy1.m  Optionally becomes Burgers PDE with
 % heterogeneous advection. AJR, Apr 2019 -- Jun 2026
-% AutoDiff requires  ,'like'u  in preallocation.
+% AutoDiff prefers  ,'like',u  in preallocation.
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{heteroDiff()}: heterogeneous diffusion}
@@ -25,9 +25,9 @@ function ut = heteroDiff(t,u,patches)
         u(end,:,:,end)=0; % right-edge of rightmost is zero
     end%if not periodic
 
-  dx = diff(patches.x(2:3));   % space step
-  i = 2:size(u,1)-1;           % interior points in a patch
-  ut = nan(size(u),'like',u);% preallocate output array
+  dx = diff(patches.x(2:3));  % space step
+  i = 2:size(u,1)-1;          % interior points in a patch
+  ut = nan(size(u),'like',u); % preallocate output array, nan+u poss
   ut(i,:,:,:) = diff(patches.cs(:,1,:).*diff(u))/dx^2; 
   % possibly include heterogeneous Burgers' advection 
   if size(patches.cs,2)>1 % check for advection coeffs

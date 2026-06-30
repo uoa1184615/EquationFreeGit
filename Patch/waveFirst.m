@@ -16,9 +16,9 @@ of a patch, output in~\verb|ut|.
 %}
 function ut = waveFirst(t,u,patches)
   u=squeeze(u);
-  dx = diff(patches.x(2:3)); % space step
-  i = 2:size(u,1)-1;            % interior points in a patch
-  ut = nan(size(u),'like',u);   % preallocate output array
+  dx = diff(patches.x(2:3));  % space step
+  i = 2:size(u,1)-1;          % interior points in a patch
+  ut = nan(size(u),'like',u); % preallocate output array
   ut(i,:) = -(patches.cs(i).*u(i+1,:) ...
              -patches.cs(i-1).*u(i-1,:))/(2*dx) ...
             +patches.nu*diff(u,2)/dx^2; 

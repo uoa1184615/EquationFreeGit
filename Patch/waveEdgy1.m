@@ -215,15 +215,15 @@ are the system variables.
 %}
     u0=0*patches.x; u0([1 end],:)=nan; u0=u0(:);
     i=find(~isnan(u0));
-    nJ=length(i);
+    nJac=length(i);
     if exist('AutoDiff','class')
         disp('**** computing Jacobian with AutoDiff')
         Jac=AutoDiffJacobianAutoDiff(@(u) patchSys1(0,u),u0,i);
         Jac=full(Jac(i,:));
     else% compute Jac by finite-diff
-        Jac=nan(nJ);
-        for j=1:nJ
-           u0(i)=((1:nJ)==j);
+        Jac=nan(nJac);
+        for j=1:nJac
+           u0(i)=((1:nJac)==j);
            dudt=patchSys1(0,u0);
            Jac(:,j)=dudt(i);
         end

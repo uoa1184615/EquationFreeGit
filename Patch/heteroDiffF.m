@@ -1,5 +1,5 @@
 % Computes the time derivatives of forced heterogeneous
-% diffusion in 1D on patches.  AJR, Apr 2019 -- 3 Jan 2023
+% diffusion in 1D on patches.  AJR, Apr 2019 -- Jun 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{heteroDiffF()}: forced heterogeneous diffusion}
@@ -33,8 +33,8 @@ Two basic parameters, and initialise result array to NaNs.
 \begin{matlab}
 %}
   dx = diff(patches.x(2:3));   % space step
-  i = 2:size(u,1)-1;   % interior points in a patch
-  ut = nan+u;          % preallocate output array
+  i = 2:size(u,1)-1;           % interior points in a patch
+  ut = nan(size(u),'like',u);  % preallocate output array
 %{
 \end{matlab}
 The macroscale Dirichlet boundary conditions are zero at the

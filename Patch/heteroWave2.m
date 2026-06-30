@@ -1,5 +1,5 @@
 % Computes the time derivatives of forced heterogeneous
-% waves (slightly damped) in 2D on patches.  AJR, Aug 2021 
+% waves (slightly damped) in 2D on patches.  AJR, Jun 2026 
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{heteroWave2()}: heterogeneous Waves}
@@ -78,7 +78,7 @@ then assign time derivatives for interior patch values due
 to the heterogeneous interaction and forcing.
 \begin{matlab}
 %}
-  ut = nan+u;  % preallocate output array
+  ut = nan(size(u),'like',u); % preallocate output array
   ut(i,j,1,:) = u(i,j,2,:);
   ut(i,j,2,:) ...
   = diff(ax(:,j).*diff(u(:,j,1,:),1),1)/dx^2 ...

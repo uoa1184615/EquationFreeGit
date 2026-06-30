@@ -1,6 +1,6 @@
 % heteroDiff3() computes the time derivatives of
 % heterogeneous diffusion in 3D on patches.  Adapted from 2D
-% heterogeneous diffusion. JEB & AJR, May--Sep 2020 
+% heterogeneous diffusion. JEB & AJR, May--Jun 2026 
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{heteroDiff3()}: heterogeneous diffusion}
@@ -41,7 +41,7 @@ heterogeneous diffusion time derivatives. Using \verb|nan+u|
 appears quicker than \verb|nan(size(u),patches.codist)|
 \begin{matlab}
 %}
-  ut = nan+u; % reserve storage
+  ut = nan(size(u),'like',u); % reserve storage
   ut(i,j,k,:,:,:,:,:) ...
   = diff(patches.cs(:,j,k,1,:).*diff(u(:,j,k,:,:,:,:,:),1),1)/dx^2 ...
    +diff(patches.cs(i,:,k,2,:).*diff(u(i,:,k,:,:,:,:,:),1,2),1,2)/dy^2 ...
