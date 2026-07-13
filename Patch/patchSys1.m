@@ -1,6 +1,6 @@
-% patchSys1() provides an interface to time integrators for
-% the dynamics on patches  coupled across space. The system
-% must be a  lattice system such as PDE discretisations. 
+% patchSys1(t,u) provides an interface to macro-system tasks
+% for the dynamics on patches coupled across space. The 
+% system must be a lattice system such as PDE discretisation. 
 % AJR, Nov 2017 -- 8 Jun 2026
 % No change needed for AutoDiff.
 %!TEX root = ../Doc/eqnFreeDevMan.tex

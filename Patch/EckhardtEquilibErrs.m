@@ -5,7 +5,7 @@
 % example of Eckhardt (2210.04536, sec 6.2.1).  Implement
 % Dirichlet BCs using new facilities in the patch toolbox,
 % and try various distributions of patches.  
-% AJR, 29 Jan 2023
+% AJR, 13 Jul 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{EckhardtEquilibErrs}: explore errors in
@@ -166,7 +166,7 @@ full-domain simulation---can compute \(\verb|log2Nmax|=129\)
 (\(\epsilon=0.008\)) in a few seconds:
 \begin{matlab}
 %}
-log2Nmax = 7 % 5 for plots, 7 for choice
+log2Nmax = 8 % 5 for plots, 7 for choice
 nPatchMax=2^log2Nmax+1
 %{
 \end{matlab}
@@ -256,20 +256,23 @@ points, and the number of unknowns is then its length.
     else u0 = u0(:,:,:,1:2:end);
     end
     u0([1 end],:) = nan;  
-    patches.i = find(~isnan(u0));
-    nVariables = numel(patches.i)
+    i = find(~isnan(u0));
+    nVariables = numel(i)
 %{
 \end{matlab}
-Solve via \verb|fsolve| for simplicity and robustness (and
-using \verb|optimoptions| to omit trace information), via
-the generic patch system wrapper \verb|theRes|
-(\cref{sec:theRes}).
+Could solve via \verb|fsolve| for simplicity and robustness,
+via the generic patch system wrapper \verb|theRes|
+(\cref{sec:theRes}).   However, for this linear problem it
+is much faster to use the AutoDiff package to get the
+Jacobian, and use that.
 \begin{matlab}
 %}
-    tic;
-    [uSoln,resSoln] = fsolve(@theRes,u0(patches.i) ...
-        ,optimoptions('fsolve','Display','off'));
-    fsolveTime = toc
+    U0=AutoDiff(0*u0); % set an AD array of zeros
+    tic
+    F0 = patchSys1(1,U0); % evaluate patch fn and its derivatives
+    Jac = getderivs(F0);  % the Jacobian is the derivatives
+    uSoln = -Jac(i,i)\getvalue(F0(i)); % solve linear system
+    ADsolveTime = toc
 %{
 \end{matlab}
 Store the solution into the patches, and give
@@ -277,8 +280,9 @@ magnitudes---Inf norm is max(abs()).
 \begin{matlab}
 %}
     normSoln = norm(uSoln,Inf)
-    normResidual = norm(resSoln,Inf)
-    u0(patches.i) = uSoln;
+    u0(i) = uSoln;
+    f0 = patchSys1(1,u0);
+    normResidual = norm(f0(i),Inf)
     u0 = patchEdgeInt1(u0);
     u0( 1 ,:,:, 1 ) = 0;
     u0(end,:,:,end) = 0;
