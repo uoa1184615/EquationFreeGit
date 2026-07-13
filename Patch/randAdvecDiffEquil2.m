@@ -1,7 +1,7 @@
 % Solve for steady state of two-scale heterogeneous
 % diffusion in 2D on patches as an example application
 % involving Neumann boundary conditions, from section 6.2 of
-% Bonizzoni, 2211.15221.  AJR, 1 Feb 2023
+% Bonizzoni, 2211.15221.  AJR, Feb 2023 -- 14 Jul 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{randAdvecDiffEquil2}: equilibrium of a 2D
@@ -117,22 +117,22 @@ number of elements.
 %}
 u0 = zeros(nSubP,nSubP,1,1,nPatch,nPatch);
 u0([1 end],:,:) = nan;  u0(:,[1 end],:) = nan;
-patches.i = find(~isnan(u0));
-nVariables = numel(patches.i)
+i = find(~isnan(u0));
+nVariables = numel(i)
 %{
 \end{matlab}
-Solve by iteration.  Use \verb|fsolve| for simplicity and
-robustness (and using \verb|optimoptions| to omit trace
-information), via the generic patch system wrapper
-\verb|theRes| (\cref{sec:theRes}).
+Could use \verb|fsolve| for simplicity and robustness, via
+the generic patch wrapper \verb|theRes()|.  However, for
+such linear problems it is many times faster to use AutoDiff
+to get Jacobian, and then solve directly.
 \begin{matlab}
 %}
-tic;
-uSoln = fsolve(@theRes,u0(patches.i) ...
-        ,optimoptions('fsolve','Display','off')); 
-solnTime = toc
-normResidual = norm(theRes(uSoln))
-normSoln = norm(uSoln)
+U0=AutoDiff(0*u0); % set an AD array of zeros
+tic
+F0 = patchSys2(1,U0); % evaluate patch system and its derivatives
+Jac = getderivs(F0);  % the Jacobian is the derivatives
+uSoln = -Jac(i,i)\getvalue(F0(i)); % solve linear system
+ADsolveTime = toc
 %{
 \end{matlab}
 Store the solution vector into the patches, and interpolate,
@@ -140,7 +140,11 @@ but have not bothered to set boundary values so they stay
 NaN from the interpolation.
 \begin{matlab}
 %}
-u0(patches.i) = uSoln;
+normSoln = norm(uSoln)
+u0(i) = uSoln;
+f0 = patchSys2(1,u0);
+normResidual = norm(f0(i),Inf)
+assert(normResidual<1e-10)
 u0 = patchEdgeInt2(u0);
 %{
 \end{matlab}
@@ -189,7 +193,7 @@ function ut = randAdvecDiffForce2(t,u,patches)
   dy = diff(patches.y(2:3));  % y space step
   i = 2:size(u,1)-1; % x interior points in a patch
   j = 2:size(u,2)-1; % y interior points in a patch
-  ut = nan+u;         % preallocate output array
+  ut = nan(size(u),'like',u); % preallocate output array
 %{
 \end{matlab}
 Set Neumann boundary condition of zero derivative around the

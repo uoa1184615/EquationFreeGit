@@ -3,7 +3,7 @@
 % conditions are Neumann on the right face of the cube, and
 % Dirichlet on the other faces.  The microscale is of known
 % period so we interpolate next-to-edge values to get
-% opposite edge values.  AJR, 1 Feb 2023
+% opposite edge values.  AJR, Feb 2023 -- 14 Jul 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{homoDiffBdryEquil3}: equilibrium via
@@ -50,18 +50,19 @@ cDiff = cDiff*mean(1./cDiff(:))
 \end{matlab}
 
 Configure the patch scheme with some arbitrary choices of
-cubic domain, patches, and micro-grid spacing~\(0.05\). 
-Use high order interpolation as few patches in each
-direction.  Configure for Dirichlet boundaries except for
-Neumann on the right \(x\)-face.
+cubic domain, patches, and micro-grid spacing~\(0.02\)
+(patches cover less than~1\% of space). Use high order
+interpolation as few patches in each direction.  Configure
+for Dirichlet boundaries except for Neumann on the right
+\(x\)-face.
 \begin{matlab}
 %}
 nSubP = mPeriod+2;
-nPatch = 5;
+nPatch = 7;
 Dom.type = 'equispace';
 Dom.bcOffset = zeros(2,3);  Dom.bcOffset(2) = 0.5;
 configPatches3(@microDiffBdry3, [-1 1], Dom ...
-    , nPatch, 0, 0.05, nSubP, 'EdgyInt',true  ...
+    , nPatch, 0, 0.02, nSubP, 'EdgyInt',true  ...
     ,'hetCoeffs',cDiff );
 %{
 \end{matlab}
@@ -88,28 +89,33 @@ u0 = zeros([nSubP,1,1,nPatch,nPatch,nPatch]);
 u0([1 end],:,:,:) = nan;  
 u0(:,[1 end],:,:) = nan;
 u0(:,:,[1 end],:) = nan;
-patches.i = find(~isnan(u0));
-nVariables = numel(patches.i)
+i = find(~isnan(u0));
+nVariables = numel(i)
 %{
 \end{matlab}
-Solve by iteration.  Use \verb|fsolve| for simplicity and
-robustness (optionally \verb|optimoptions| to omit trace
-information), via the generic patch system wrapper
-\verb|theRes| (\cref{sec:theRes}).
+Could use \verb|fsolve| for simplicity and robustness, via
+the generic patch system wrapper \verb|theRes|
+(\cref{sec:theRes}).  However, for such linear problems it
+is 100 times faster to use AutoDiff to get Jacobian, and
+then solve directly.
 \begin{matlab}
 %}
-disp('Solving system, takes 10--40 secs'),tic
-uSoln = fsolve(@theRes,u0(patches.i) ...
-        ,optimoptions('fsolve','Display','off')); 
-solveTime = toc
-normResidual = norm(theRes(uSoln))
-normSoln = norm(uSoln)
+U0=AutoDiff(0*u0); % set an AD array of zeros
+tic
+F0 = patchSys3(1,U0); % evaluate patch system and its derivatives
+Jac = getderivs(F0);  % the Jacobian is the derivatives
+uSoln = -Jac(i,i)\getvalue(F0(i)); % solve linear system
+ADsolveTime = toc
 %{
 \end{matlab}
 Store the solution into the patches, and give magnitudes.
 \begin{matlab}
 %}
-u0(patches.i) = uSoln;
+normSoln = norm(uSoln)
+u0(i) = uSoln;
+f0 = patchSys3(1,u0);
+normResidual = norm(f0(i),Inf)
+assert(normResidual<1e-10)
 u0 = patchEdgeInt3(u0);
 %{
 \end{matlab}
@@ -221,7 +227,7 @@ heterogeneous diffusion time derivatives. Using \verb|nan+u|
 appears quicker than \verb|nan(size(u),patches.codist)|
 \begin{matlab}
 %}
-  ut = nan+u; % reserve storage
+  ut = nan(size(u),'like',u); % reserve storage
   ut(i,j,k,:) ...
   = diff(patches.cs(:,j,k,1).*diff(u(:,j,k,:),1,1),1,1)/dx^2 ...
    +diff(patches.cs(i,:,k,2).*diff(u(i,:,k,:),1,2),1,2)/dy^2 ...

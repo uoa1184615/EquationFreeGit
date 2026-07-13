@@ -261,10 +261,10 @@ points, and the number of unknowns is then its length.
 %{
 \end{matlab}
 Could solve via \verb|fsolve| for simplicity and robustness,
-via the generic patch system wrapper \verb|theRes|
-(\cref{sec:theRes}).   However, for this linear problem it
+via the generic patch wrapper \verb|theRes|
+(\cref{sec:theRes}).   However, for such linear problems it
 is much faster to use the AutoDiff package to get the
-Jacobian, and use that.
+Jacobian, and then solve directly.
 \begin{matlab}
 %}
     U0=AutoDiff(0*u0); % set an AD array of zeros

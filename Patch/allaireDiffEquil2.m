@@ -1,7 +1,7 @@
 % Solve for steady state of multiscale heterogeneous diffusion
 % in 2D on patches as an example application, varied from
 % example of section 5.1 of Allaire & Brizzi (2005).  
-% **** just exploratory AJR, 3 Feb 2026
+% **** just exploratory AJR, Feb 2026 -- 14 Jul 2026
 %{
 \section{\texttt{allaireDiffEquil2}: equilibrium of a 2D
 multiscale heterogeneous diffusion via small patches}
@@ -74,7 +74,7 @@ Loop over increasing number of patches to assess errors
 %}
 nPatchs=[]; rmsErrs=[];
 nPatch = 3; % to start with five 
-for iPatch=1:2
+for iPatch=1:4
     nPatch=2*nPatch-1
     nPatchs(iPatch)=nPatch; % store
 %{
@@ -115,34 +115,20 @@ if iPatch>1%interpolate interpolation of previous solution
                             +u0(:,:,:,:,:,3:2:end  ))/2;
 end%if iPatch
 u0([1 end],:,:) = nan;  u0(:,[1 end],:) = nan;
-patches.i = find(~isnan(u0));
-nVariables = numel(patches.i)
+i = find(~isnan(u0));
+nVariables = numel(i)
 %{
 \end{matlab}
-Solve by iteration.  Use \verb|fsolve| for simplicity and
-robustness (and using \verb|optimoptions| to omit trace
-information), via the generic patch system wrapper
-\verb|theRes| (\cref{sec:theRes}), and give magnitudes.
-Presumably the interpolation generates large residuals 
-around the patch edges, but the residual would be small 
-within each patch.  Whereas if just an initial-zero field 
-is used then there is no such interpolation residual, only 
-the uniform interior residual.
+For such linear problems it is fastest to use AutoDiff to
+get Jacobian, and then solve directly.
 \begin{matlab}
 %}
-meanInitialRes=mean(abs( theRes(u0(patches.i)) ))
-tic;
-if 1
-    uSoln = fsolve(@theRes,u0(patches.i) ...
-            ,optimoptions('fsolve','Display','off')); 
-else
-    restart=floor(sqrt(nVariables)); maxit=restart;
-    b=-theRes(zeros(nVariables,1));
-    uSoln = gmres(@(u) theRes(u)+b ,b ...
-            ,restart,[],maxit,[],[],u0(patches.i)); 
-end
-solnTime = toc
-meanResidual = mean(abs( theRes(uSoln) ))
+U0=AutoDiff(0*u0); % set an AD array of zeros
+tic
+F0 = patchSys2(1,U0); % evaluate patch system and its derivatives
+Jac = getderivs(F0);  % the Jacobian is the derivatives
+uSoln = -Jac(i,i)\getvalue(F0(i)); % solve linear system
+ADsolveTime = toc
 normSoln = norm(uSoln)
 rmsSoln = rms(uSoln)
 %{
@@ -152,7 +138,10 @@ but have not bothered to set boundary values so they stay
 NaN from the interpolation.
 \begin{matlab}
 %}
-if iPatch<99, u0(patches.i) = uSoln; end
+u0(i) = uSoln; 
+f0 = patchSys2(1,u0);
+normResidual = norm(f0(i),Inf)
+assert(normResidual<1e-8)
 u0 = patchEdgeInt2(u0);
 %{
 \end{matlab}
@@ -161,7 +150,9 @@ Error of previous one compared to this one.
 %}
   if iPatch>1,
     errp = up-u0(:,:,:,:,1:2:end,1:2:end);
+    format short e
     rmsErrs(iPatch-1) = rms(errp(:),"omitnan")/rmsSoln
+    format short
   end%if iPatch
   up = u0;%save for next iteration
 %{

@@ -1,7 +1,7 @@
 % Explore errors in the steady state of twoscale
 % heterogeneous diffusion in 2D on patches as an example,
 % inspired by section 5.3.1 of Freese et al., 2211.13731.
-% Revised for AutoDiff.   AJR, 31 Jan 2023 -- 11 Jun 2026
+% Revised for AutoDiff.   AJR, 31 Jan 2023 -- 14 Jul 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{twoscaleDiffEquil2Errs}: errors in
@@ -86,7 +86,7 @@ switch 1
     case 2, Dom.type = 'chebyshev'
     case 3, Dom.type = 'usergiven'
 end% switch
-ordInt = 4
+ordInt = 6
 %{
 \end{matlab}
 
@@ -185,9 +185,9 @@ Compute the time-constant forcing, and store in struct
 
 \paragraph{Solve for steady state} Set initial guess of
 either zero or a subsample of the previous, next-finer,
-solution. \verb|NaN| indicates patch-edge values. 
+solution. \verb|NaN| indicates patch-edge values.
 Index~\verb|i| are the indices of patch-interior points, and
-the number of unknowns is then its length.
+the number of unknowns is then its length, circa 150,000.
 \begin{matlab}
 %}
     if log2N==log2Nmax
@@ -195,74 +195,39 @@ the number of unknowns is then its length.
     else u0 = u0(:,:,:,:,1:2:end,1:2:end);
     end
     u0([1 end],:,:) = nan;  u0(:,[1 end],:) = nan;
-    patches.i = find(~isnan(u0));
-    nVariables = numel(patches.i)
+    i = find(~isnan(u0));
+    nVariables = numel(i)
 %{
 \end{matlab}
-First try to solve via iterative solver \verb|bicgstab|, via
+Could solve via iterative solver \verb|bicgstab|, using
 the generic patch system wrapper \verb|theRes|
-(\cref{sec:theRes}).
+(\cref{sec:theRes}).   However, for such linear problems it
+is 100 times faster to use AutoDiff to get Jacobian, and
+then solve directly.
 \begin{matlab}
 %}
-    tic;
-    maxIt = ceil(nVariables/10);
-    rhsb = theRes( zeros(size(patches.i)) );
-    [uSoln,flag] = bicgstab(@(u) rhsb-theRes(u),rhsb ...
-                   ,1e-9,maxIt,[],[],u0(patches.i));
-    bicgTime = toc
-%{
-\end{matlab}
-However, the above often fails (and \verb|fsolve| sometimes
-takes too long here), so then try a preconditioned version
-of \verb|bicgstab|.  The preconditioner is derived from the
-Jacobian which is expensive to find (four minutes for
-\(N=33\), one hour for $N=65$), but we do so as follows. 
-\begin{matlab}
-%}
-    if flag>0, disp('**** bicg failed, trying ILU preconditioner')
-        disp(['Computing Jacobian: wait roughly ' ...
-              num2str(nPatch^4/4500,2) ' secs'])
-        tic  
-        if exist('AutoDiff','class')
-              disp('**** using AutoDiff Jac')
-              Jac=AutoDiffJacobianAutoDiff( ...
-                  @(u) rhsb-theRes(u) ,u0(patches.i));
-        else
-            Jac=sparse(nVariables,nVariables);
-            for j=1:nVariables
-                Jac(:,j)=sparse( rhsb-theRes((1:nVariables)'==j) );
-            end
-        end%if exist
-        formJacTime=toc
-%{
-\end{matlab}
-Compute an incomplete \(LU\)-factorization, and use it as
-preconditioner to \verb|bicgstab|.
-\begin{matlab}
-%}
-        tic
-        [L,U] = ilu(Jac,struct('type','ilutp','droptol',1e-4));
-        LUfillFactor = (nnz(L)+nnz(U))/nnz(Jac)
-        [uSoln,flag] = bicgstab(@(u) rhsb-theRes(u),rhsb ...
-                   ,1e-9,maxIt,L,U,u0(patches.i));
-        precondSolveTime=toc
-        assert(flag==0,'preconditioner fails bicgstab. Lower droptol?')
-    end%if flag
+    U0=AutoDiff(0*u0); % set an AD array of zeros
+    tic
+    F0 = patchSys2(1,U0); % evaluate patch system and its derivatives
+    Jac = getderivs(F0);  % the Jacobian is the derivatives
+    uSoln = -Jac(i,i)\getvalue(F0(i)); % solve linear system
+    ADsolveTime = toc
 %{
 \end{matlab}
 Store the solution into the patches, and give
 magnitudes---Inf norm is max(abs()).
 \begin{matlab}
 %}
-    normResidual = norm(theRes(uSoln),Inf)
     normSoln = norm(uSoln,Inf)
-    u0(patches.i) = uSoln;
+    u0(i) = uSoln;
+    f0 = patchSys2(1,u0);
+    normResidual = norm(f0(i),Inf)
+    assert(normResidual<1e-8,'bad solution')
     u0 = patchEdgeInt2(u0);
     u0( 1 ,:,:,:, 1 ,:)=0; % left edge of left patches
     u0(end,:,:,:,end,:)=0; % right edge of right patches
     u0(:, 1 ,:,:,:, 1 )=0; % bottom edge of bottom patches
     u0(:,end,:,:,:,end)=0; % top edge of top patches
-    assert(normResidual<1e-5,'poor--bad solution found')
 %{
 \end{matlab}
 Concatenate the solution on common patches into stores.
@@ -284,7 +249,9 @@ end%for log2N
 assert(max(abs(reshape(diff(xs,1,3),[],1)))<1e-12,'x-coord failure')
 assert(max(abs(reshape(diff(ys,1,3),[],1)))<1e-12,'y-coord failure')
 errs = us-us(:,:,:,:,1);
+format short e
 meanAbsErrs = mean(abs(reshape(errs,[],size(us,5))))
+format short
 ratioErrs = meanAbsErrs(2:end)./meanAbsErrs(1:end-1)
 %{
 \end{matlab}
