@@ -1,6 +1,14 @@
 This version of auto-differentiation for Matlab, and maybe
-Octave, is due to Tony Roberts,
+Octave, is due to revisions by Tony Roberts,
 http://orcid.org/0000-0001-8930-1552
+
+* warning: some of these AutoDiff functions are not
+analytic/holomorphic/... For those functions the
+'perturbation variable' of the derivative is assumed to be
+real.  For those functions, to compute derivatives with
+respect to a comples perturbation one must explicitly
+include columns for pure-imaginary perturbations.  For
+example,  z=AutoDiff(1+2i,[1 1i]),  sign(z)  cf  sin(z)
 
 * extension of the base established by Martin de La Gorce, 2016, 
 
@@ -11,7 +19,8 @@ https://github.com/uoa1184615/EquationFreeGit/AutoDiff
 
 Sometimes info obtained by command such as "help AutoDiff.svd"
 
-2026-06 list of AD functions is the following:
+2026-07-14  grep -e '^ *function ' AutoDiff.m  
+gives following list of AD functions:
         function x = AutoDiff(values, derivatives)
         function Jac = getderivs(x)
         function val = getvalue(x)
@@ -103,6 +112,7 @@ Sometimes info obtained by command such as "help AutoDiff.svd"
         function x = zeros(varargin)
         function x = nan(varargin)
         function r = rank(x, varargin)
+        function C = pageMmult(A,At,B,Bt)
         function M = spDiagFromVec(v)
         function d = spdiag(a)
         function D = transposeDiff(sizeM)
