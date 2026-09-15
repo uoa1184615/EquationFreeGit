@@ -5,7 +5,7 @@
 % example of Eckhardt (2210.04536, sec 6.2.1).  Implement
 % Dirichlet BCs using new facilities in the patch toolbox,
 % and try various distributions of patches.  
-% AJR, 13 Jul 2026
+% AJR, 15 Sep 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \section{\texttt{EckhardtEquilibErrs}: explore errors in
@@ -136,7 +136,7 @@ is good start).
 clear all
 global patches 
 %global OurCf2eps, OurCf2eps=true %option to save plots
-switch 1
+switch 1    % change to select patch distribution
     case 1, Dom.type = 'equispace'
     case 2, Dom.type = 'chebyshev'
     case 3, Dom.type = 'usergiven'
@@ -149,12 +149,16 @@ ordInt = 4
 \paragraph{First configure the patch system}
 Establish the microscale heterogeneity has micro-period
 \verb|mPeriod| on the lattice, and coefficients to match
-Eckhardt2210.04536 \S6.2.1. 
+Eckhardt2210.04536 \S6.2.1,  or alternatively random. 
 \begin{matlab}
 %}
 mPeriod = 6
 z = (0.5:mPeriod)'/mPeriod;  
-a = 1./(2-cos(2*pi*z))
+if 1 % select microscale Eckhardt or random
+     a = 1./(2-cos(2*pi*z)) % in [1/3,1]
+else a = 2*rand(mPeriod,1); 
+     a = 1./(2-a+mean(a)) 
+end
 global microTimePeriod; microTimePeriod=0;
 %{
 \end{matlab}
@@ -166,15 +170,16 @@ full-domain simulation---can compute \(\verb|log2Nmax|=129\)
 (\(\epsilon=0.008\)) in a few seconds:
 \begin{matlab}
 %}
-log2Nmax = 8 % 5 for plots, 7 for choice
+log2Nmax = 7 % 5 for plots, 7 for choice
 nPatchMax=2^log2Nmax+1
+log2Nmin = 3 % evaluate and plot errors on Nmin+1 patches
 %{
 \end{matlab}
 Set the periodicity~\(\epsilon\), and other microscale
 parameters. 
 \begin{matlab}
 %}
-nPeriodsPatch = 1 % any integer
+nPeriodsPatch = 1 % any integer, =1 is minimal
 nSubP = nPeriodsPatch*mPeriod+2 % for edgy int
 epsilon = 1/(nPatchMax*nPeriodsPatch+1/mPeriod)
 dx = epsilon/mPeriod
@@ -191,10 +196,10 @@ boundary-adjacent patches.
 \begin{matlab}
 %}
 us=[]; xs=[]; nPs=[];
-for log2N=log2Nmax:-1:2
+for log2N=log2Nmax:-1:log2Nmin
     if log2N==log2Nmax
          Ps=linspace(1,nPatchMax ...
-           ,5-2*all(Dom.type=='chebyshev'))
+           ,2^log2Nmin+1-2*all(Dom.type=='chebyshev'))
     else Ps=(Ps+1)/2
     end
 %{
@@ -337,7 +342,7 @@ Use quasi-log axis to separate the errors.
 err = u(:,1)-u;  
 figure(2), clf
 plot(x(:),err,'.-'); legend(num2str(nPs))
-quasiLogAxes(10,sqrt(prod(meanAbsErrs(2:3))))
+quasiLogAxes(Inf,sqrt(prod(meanAbsErrs(2:3))))
 xlabel('space $x$'), ylabel('errors in $u(x)$')
 ifOurCf2tex(mfilename)%optionally save
 %{

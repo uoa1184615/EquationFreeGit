@@ -1,10 +1,9 @@
 isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
 
-% AJR: report current generator setting, or ...
-if 1, randGen0 = rng
-else % specify random seed to reproduce
-    if isOctave, rand ("seed", 1), else rng(1), end
-end
+% AJR: specify random seed to random or toreproduce
+if 1, ADseed = floor(1e5*rand(1));
+else  ADseed = 1;  end
+if isOctave, rand ("seed", ADseed), else rng(ADseed), end
 
 if ~exist('pagemtimes')
     addpath("./backports")    
