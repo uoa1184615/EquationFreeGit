@@ -12,6 +12,8 @@ difference, polynomial interpolation of function
 normal grids, and also tests centre and edge interpolation. 
 But does not yet test staggered grids, core averaging, etc
 as they are not yet implemented.
+\todo{Change power law tests to Chebyshev polynomials, as in 1D}
+
 
 Start by establishing global data struct for the range of
 various cases.  Choose a number of realisations for every type, 
