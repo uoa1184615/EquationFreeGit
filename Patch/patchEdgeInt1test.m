@@ -1,9 +1,9 @@
 % Test the spectral, finite-width, and divided difference 1D
 % interpolation of patchEdgeInt1(), for one or several
 % variables, including normal grid and staggered grid, and
-% also edgy interpolation. All tests passed in 2019--2023,
+% also edgy interpolation. All tests passed in 2019--2026,
 % except not testing the zig-zag modes.
-% AJR, 26 Sep 2018 -- 23 Mar 2023
+% AJR, 26 Sep 2018 -- 15 Oct 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt1test}: test the 1D patch coupling}
@@ -19,7 +19,7 @@ Start by establishing global data struct, and the number of
 realisations of cases.
 \begin{matlab}
 %}
-clear all, close all
+clear all
 global patches
 nRealise = 20 
 %{
@@ -48,34 +48,46 @@ for iReal=1:nRealise
     nEdge = randi(3)% =1,2, or 3
     edgyInt = rand<0.5
     nSubP = nEdge*( (2-edgyInt)*randi(2)+1+edgyInt )
-    ordCC = 2*randi(4)
-    nPatch = ordCC+randi([2 4])
+    ordCC = 2*randi(4) % in 2,4,6,8
+    nPatch = ordCC+randi([2 6])
     Domain=5*[-rand rand]
     dx=rand*diff(Domain)/nPatch/nSubP
     configPatches1(@sin,Domain,'equispace',nPatch,ordCC,dx,nSubP ...
         ,'EdgyInt',edgyInt,'nEdge',nEdge);
     patches.intTest = true; 
+    assert(~patches.periodic,"should not be periodic")
 %{
 \end{matlab}
 Displace patches to a random non-uniform spacing.
 \begin{matlab}
 %}
 H = diff(patches.x(1,:,:,1:2));
-patches.x = patches.x+0.8*H*(rand(1,1,1,nPatch)-0.5);
-%H = squeeze( diff(patches.x(1,:,:,:)) )% for information only
+patches.x = patches.x+0.9*H*(rand(1,1,1,nPatch)-0.5);
 %{
 \end{matlab}
 
 
 
 \paragraph{Check multiple fields simultaneously}
-Set profiles to be various powers of~\(x\), \verb|ps|, and
+Set profiles to be Chebyshev polynomials in~\(x\), 
+optionally multiplied by random coefficients, and
 store as different `variables' at each point.  
 \begin{matlab}
 %}
-    ps=1:ordCC
-    cs=randn(size(ps));
-    u0=patches.x.^ps.*cs+randn;
+%    ps=0:ordCC;
+%    cs=randn(size(ps));
+%    u0=patches.x.^ps.*cs+randn;
+    xMin=min(patches.x(:));
+    xMax=max(patches.x(:));
+    xi=(patches.x-(xMax+xMin)/2)*2/(xMax-xMin);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"Chebyshev scaling incorrect")
+    u0=nan(nSubP,ordCC+1,1,nPatch);
+    u0(:,1,:,:)=1;
+    u0(:,2,:,:)=xi;
+    for n=2:ordCC
+        u0(:,n+1,:,:)=2*xi.*u0(:,n,:,:)-u0(:,n-1,:,:);
+    end;
+    u0=u0.*randn(1,ordCC+1);
 %{
 \end{matlab}
 Copy data, and set edges to \verb|inf| so we can be certain that
@@ -102,10 +114,10 @@ seems to be more affected by round-off so relax error size.
 %}
     j=1:nPatch;
     iError=ui(:,:,j)-u0(:,:,j);
-    hist(log10(abs(iError(abs(iError)>0))),-17:-9)
+    hist(log10(abs(iError(abs(iError)>0))),-17:-2)
     xlabel('log10 iError'),pause(0.3)%??
     normError=norm(iError(:))
-    assert(normError<1e-13*4^ordCC ...
+    assert(normError<1e-12 ...
     ,'failed divided difference interpolation')
 %{
 \end{matlab}
@@ -115,6 +127,7 @@ End the for-loop over random parameters.
 %}
 end%for iReal
 fprintf('\n\nPassed all divided difference interpolation\n')
+%assert(0,"stop here---only testing finite domain divided differences")
 %{
 \end{matlab}
 
@@ -357,13 +370,25 @@ for iReal=1:nRealise
 \end{matlab}
 
 \paragraph{Check multiple fields simultaneously}
-Set profiles to be various powers of~\(x\), \verb|ps|, and
+Set profiles to be Chebyshev polynomials in~\(x\), 
+optionally multiplied by random coefficients, and
 store as different `variables' at each point.  
 \begin{matlab}
 %}
-    ps=1:ordCC
-    cs=randn(size(ps));
-    u0=patches.x.^ps.*cs+randn;
+%    ps=0:ordCC;
+%    cs=randn(size(ps));
+%    u0=patches.x.^ps.*cs+randn;
+    xMin=min(patches.x(:));
+    xMax=max(patches.x(:));
+    xi=(patches.x-(xMax+xMin)/2)*2/(xMax-xMin);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"Chebyshev scaling incorrect")
+    u0=nan(nSubP,ordCC+1,1,nPatch);
+    u0(:,1,:,:)=1;
+    u0(:,2,:,:)=xi;
+    for n=2:ordCC
+        u0(:,n+1,:,:)=2*xi.*u0(:,n,:,:)-u0(:,n-1,:,:);
+    end;
+    u0=u0.*randn(1,ordCC+1);
 %{
 \end{matlab}
 Copy data, and set edges to NaN so we can be certain that
@@ -419,7 +444,7 @@ pause(1)
 Must have even number of patches for a staggered grid.
 \begin{matlab}
 %}
-for iReal=1:0%?? nRealise
+for iReal=1:0%DNW now?? nRealise
     nEdge = 1 % required for now
     edgyInt = rand<0.5
     nPatch=2*randi([3 10])
