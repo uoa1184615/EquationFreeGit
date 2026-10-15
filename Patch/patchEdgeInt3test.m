@@ -1,6 +1,6 @@
 % Test inter-patch spectral, finite-width, and divided
 % difference interpolation in 3D with many random parameters
-% AJR, Aug 2020 -- 13 Apr 2023
+% AJR, Aug 2020 -- 16 Oct 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt3test}: tests 3D patch coupling}
@@ -12,7 +12,6 @@ difference, polynomial interpolation of function
 normal grids, and also tests centre and edge interpolation. 
 But does not yet test staggered grids, core averaging, etc
 as they are not yet implemented.
-\todo{Change power law tests to Chebyshev polynomials, as in 1D}
 
 
 Start by establishing global data struct for the range of
@@ -20,7 +19,7 @@ various cases.  Choose a number of realisations for every type,
 but beware that some realisations take several minutes.
 \begin{matlab}
 %}
-clear all, close all
+clear all
 global patches
 nRealise = 10
 %{
@@ -76,23 +75,48 @@ Hz = squeeze( diff(patches.z(1,1,1,:,:,1,1,:)) )';% for information only
 
 
 
-\paragraph{Check multiple fields simultaneously} Set
-profiles to be various powers of~\(x\), \(y\) and~\(z\),
-\verb|ps|, \verb|qs| and~\verb|rs|, and store as different
-`variables' at each point. First, limit the order of test
-polynomials by the order of interpolation and by the number
-of patches.
+\paragraph{Check multiple fields simultaneously} 
+Set profiles to be products of all Chebyshev polynomials
+in~\(x,y,z\), optionally multiplied by random coefficients,
+and store as different `variables' at each point. Limit the
+order of test polynomials by the order of interpolation and
+by the number of patches.
 \begin{matlab}
 %}
-    ox=min(ordCC,nPatch(1)-1); 
-    oy=min(ordCC,nPatch(2)-1);
-    oz=min(ordCC,nPatch(3)-1);
-    [ps,qs,rs]=ndgrid(0:ox,0:oy,0:oz);
-    ps=reshape(ps,1,1,1,[]);
-    qs=reshape(qs,1,1,1,[]);
-    rs=reshape(rs,1,1,1,[]);
-    cs=2*rand(size(ps))-1;
-    u0=cs.*patches.x.^ps.*patches.y.^qs.*patches.z.^rs;
+    nox=min(ordCC+1,nPatch(1)); 
+    noy=min(ordCC+1,nPatch(2));
+    noz=min(ordCC+1,nPatch(3));
+    u0=nan([nSubP,nox*noy*noz,1,nPatch]);
+    % 1st fillin Chebyshev in x, constant in y,z
+    xx=quantile(patches.x(:),[0 1]);
+    xi=(patches.x-mean(xx))*2/diff(xx);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"x-Chebyshev scaling incorrect")
+    u0(:,:,:,1,:,:,:,:)=1;
+    u0(:,:,:,2,:,:,:,:)=repmat(xi,[1,nSubP(2:3),1,1,1,nPatch(2:3)]);
+    for n=2:nox-1
+        u0(:,:,:,n+1,:,:,:,:)=2*xi.*u0(:,:,:,n,:,:,:,:) ...
+                                 -u0(:,:,:,n-1,:,:,:,:);
+    end;
+    % 2nd fillin by multiplying by y-recurrence
+    yy=quantile(patches.y(:),[0 1]);
+    xi=(patches.y-mean(yy))*2/diff(yy);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"y-Chebyshev scaling incorrect")
+    n=1:nox;  u0(:,:,:,n+nox,:,:,:,:)=xi.*u0(:,:,:,n,:,:,:,:);
+    for n=nox+1:(noy-1)*nox
+        u0(:,:,:,n+nox,:,:,:,:)=2*xi.*u0(:,:,:,n,:,:,:,:) ...
+                                 -u0(:,:,:,n-nox,:,:,:,:);
+    end;
+    % 3rd fillin by multiplying by z-recurrence
+    zz=quantile(patches.z(:),[0 1]);
+    xi=(patches.z-mean(zz))*2/diff(zz);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"z-Chebyshev scaling incorrect")
+    N=nox*noy;
+    n=1:N;  u0(:,:,:,n+N,:,:,:,:)=xi.*u0(:,:,:,n,:,:,:,:);
+    for n=N+1:(noz-1)*N
+        u0(:,:,:,n+N,:,:,:,:)=2*xi.*u0(:,:,:,n,:,:,:,:) ...
+                                 -u0(:,:,:,n-N,:,:,:,:);
+    end;
+    u0=u0.*randn(1,1,1,nox*noy*noz);
 %{
 \end{matlab}
 Then evaluate the interpolation, setting faces to \verb|inf|
@@ -115,10 +139,10 @@ seems to be more affected by round-off so relax error size.
 %}
     error = ui-u0;
     hist(log10(abs(error(abs(error)>1e-20))),-20:-6)
-    xlabel('log10 error'), pause(0.3)%??
+    xlabel('log10 error'), pause(0.3)
     maxError=max(abs(error(:)))
     maxErrors=[maxErrors maxError];
-    assert(maxError<1e-10*4^ordCC ...
+    assert(maxError<1e-10 ...
     ,'failed divided difference interpolation')
     disp('*** This divided difference test passed')
 %{
@@ -131,6 +155,7 @@ end% for realisation
 maxMaxErrorDividedDiffs = max(maxErrors)
 disp('***** Passed all divided difference interpolation')
 pause(1)
+%assert(0,"stop here---only testing finite domain divided differences")
 %{
 \end{matlab}
 
@@ -252,17 +277,47 @@ for realisations=1:nRealise
 \end{matlab}
 
 \paragraph{Check multiple fields simultaneously}
-Set profiles to be various powers of~\(x,y,z\), namely
-\verb|ps|, \verb|qs|, \verb|rs|, and store as different
-`variables' at each point.  
+Set profiles to be products of all Chebyshev polynomials
+in~\(x,y,z\), optionally multiplied by random coefficients,
+and store as different `variables' at each point. Limit the
+order of test polynomials by the order of interpolation and
+by the number of patches.
 \begin{matlab}
 %}
-    [ps,qs,rs]=meshgrid(0:ordCC);
-    ps=reshape(ps,1,1,1,[]); 
-    qs=reshape(qs,1,1,1,[]);
-    rs=reshape(rs,1,1,1,[]);
-    cs=2*rand(size(ps))-1;
-    u0=cs.*patches.x.^ps.*patches.y.^qs.*patches.z.^rs;
+    nox=min(ordCC+1,nPatch(1)); 
+    noy=min(ordCC+1,nPatch(2));
+    noz=min(ordCC+1,nPatch(3));
+    u0=nan([nSubP,nox*noy*noz,1,nPatch]);
+    % 1st fillin Chebyshev in x, constant in y,z
+    xx=quantile(patches.x(:),[0 1]);
+    xi=(patches.x-mean(xx))*2/diff(xx);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"x-Chebyshev scaling incorrect")
+    u0(:,:,:,1,:,:,:,:)=1;
+    u0(:,:,:,2,:,:,:,:)=repmat(xi,[1,nSubP(2:3),1,1,1,nPatch(2:3)]);
+    for n=2:nox-1
+        u0(:,:,:,n+1,:,:,:,:)=2*xi.*u0(:,:,:,n,:,:,:,:) ...
+                                 -u0(:,:,:,n-1,:,:,:,:);
+    end;
+    % 2nd fillin by multiplying by y-recurrence
+    yy=quantile(patches.y(:),[0 1]);
+    xi=(patches.y-mean(yy))*2/diff(yy);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"y-Chebyshev scaling incorrect")
+    n=1:nox;  u0(:,:,:,n+nox,:,:,:,:)=xi.*u0(:,:,:,n,:,:,:,:);
+    for n=nox+1:(noy-1)*nox
+        u0(:,:,:,n+nox,:,:,:,:)=2*xi.*u0(:,:,:,n,:,:,:,:) ...
+                                 -u0(:,:,:,n-nox,:,:,:,:);
+    end;
+    % 3rd fillin by multiplying by z-recurrence
+    zz=quantile(patches.z(:),[0 1]);
+    xi=(patches.z-mean(zz))*2/diff(zz);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"z-Chebyshev scaling incorrect")
+    N=nox*noy;
+    n=1:N;  u0(:,:,:,n+N,:,:,:,:)=xi.*u0(:,:,:,n,:,:,:,:);
+    for n=N+1:(noz-1)*N
+        u0(:,:,:,n+N,:,:,:,:)=2*xi.*u0(:,:,:,n,:,:,:,:) ...
+                                 -u0(:,:,:,n-N,:,:,:,:);
+    end;
+    u0=u0.*randn(1,1,1,nox*noy*noz);
 %{
 \end{matlab}
 Then evaluate the interpolation.
@@ -271,9 +326,7 @@ Then evaluate the interpolation.
     ui=patchEdgeInt3(u0(:));
 %{
 \end{matlab}
-The interior patches should have zero error. Appear to need
-error tolerance of~\(10^{-8}\) because of the size of the
-domain and the high order of interpolation.
+The interior patches should have zero error. 
 \begin{matlab}
 %}
     I=ordCC/2+1:nPatch(1)-ordCC/2;
@@ -284,7 +337,7 @@ domain and the high order of interpolation.
     hist(log10(abs(error(abs(error)>1e-20))),-20:-6)
     xlabel('log10 error'), pause(0.3)%??
     normError=norm(error(:))
-    assert(normError<5e-8 ...
+    assert(normError<1e-12 ...
     ,'failed finite stencil polynomial interpolation')
     disp('*** This finite stencil test passed')
 %{

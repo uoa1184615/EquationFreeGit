@@ -3,7 +3,7 @@
 % variables, including normal grid and staggered grid, and
 % also edgy interpolation. All tests passed in 2019--2026,
 % except not testing the zig-zag modes.
-% AJR, 26 Sep 2018 -- 15 Oct 2026
+% AJR, 26 Sep 2018 -- 16 Oct 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt1test}: test the 1D patch coupling}
@@ -74,12 +74,8 @@ optionally multiplied by random coefficients, and
 store as different `variables' at each point.  
 \begin{matlab}
 %}
-%    ps=0:ordCC;
-%    cs=randn(size(ps));
-%    u0=patches.x.^ps.*cs+randn;
-    xMin=min(patches.x(:));
-    xMax=max(patches.x(:));
-    xi=(patches.x-(xMax+xMin)/2)*2/(xMax-xMin);
+    xx=quantile(patches.x(:),[0 1]);
+    xi=(patches.x-mean(xx))*2/diff(xx);
     assert(abs(1-max(abs(xi(:))))<1e-10,"Chebyshev scaling incorrect")
     u0=nan(nSubP,ordCC+1,1,nPatch);
     u0(:,1,:,:)=1;

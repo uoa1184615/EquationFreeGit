@@ -1,6 +1,6 @@
 % Test spectral, finite-width, and divided difference
 % interpolation in 2D with many random parameters. 
-% AJR, Nov 2018 -- 13 Apr 2023
+% AJR, Nov 2018 -- 16 Oct 2026
 %!TEX root = ../Doc/eqnFreeDevMan.tex
 %{
 \subsection{\texttt{patchEdgeInt2test}: tests 2D patch coupling}
@@ -12,14 +12,13 @@ difference, polynomial interpolation of function
 normal grids, and also tests centre and edge interpolation.
 But does not yet test staggered grids, core averaging, etc
 as they are not yet implemented.
-\todo{Change power law tests to Chebyshev polynomials, as in 1D}
 
 Start by establishing global data struct for the range of
 various cases.  Choose a number of realisations for every
 type.
 \begin{matlab}
 %}
-clear all, close all
+clear all
 global patches
 nRealise = 20
 %{
@@ -62,30 +61,45 @@ Second, displace patches to a random non-uniform spacing.
 \begin{matlab}
 %}
 Hx = diff(patches.x(1,1,:,:,1:2,1));
-patches.x = patches.x+0.8*Hx*(rand(1,1,1,1,nPatch(1),1)-0.5);
+patches.x = patches.x+0.9*Hx*(rand(1,1,1,1,nPatch(1),1)-0.5);
 Hx = squeeze( diff(patches.x(1,1,:,:,:,1)) );% for information only
 Hy = diff(patches.y(1,1,:,:,:,1:2));
-patches.y = patches.y+0.8*Hy*(rand(1,1,1,1,1,nPatch(2))-0.5);
+patches.y = patches.y+0.9*Hy*(rand(1,1,1,1,1,nPatch(2))-0.5);
 Hy = squeeze( diff(patches.y(1,1,:,:,1,:)) );% for information only
 %{
 \end{matlab}
 
 
 
-\paragraph{Check multiple fields simultaneously} Set
-profiles to be various powers of~\(x\) and~\(y\), \verb|ps|
-and~\verb|qs|, and store as different `variables' at each
-point. First, limit the order of test polynomials by the
-order of interpolation and by the number of patches.
+\paragraph{Check multiple fields simultaneously} 
+Set profiles to be products of all Chebyshev polynomials
+in~\(x,y\), optionally multiplied by random coefficients,
+and store as different `variables' at each point. Limit the
+order of test polynomials by the order of interpolation and
+by the number of patches.
 \begin{matlab}
 %}
-    ox=min(ordCC,nPatch(1)-1); 
-    oy=min(ordCC,nPatch(2)-1);
-    [ps,qs]=ndgrid(0:ox,0:oy);
-    ps=reshape(ps,1,1,[]);
-    qs=reshape(qs,1,1,[]);
-    cs=2*rand(size(ps))-1;
-    u0=cs.*patches.x.^ps.*patches.y.^qs;
+    nox=min(ordCC+1,nPatch(1)); 
+    noy=min(ordCC+1,nPatch(2));
+    u0=nan([nSubP,nox*noy,1,nPatch]);
+    % first fillin Chebyshev in x, constant in y
+    xx=quantile(patches.x(:),[0 1]);
+    xi=(patches.x-mean(xx))*2/diff(xx);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"x-Chebyshev scaling incorrect")
+    u0(:,:,1,:,:,:)=1;
+    u0(:,:,2,:,:,:)=repmat(xi,[1,nSubP(2),1,1,1,nPatch(2)]);
+    for n=2:nox-1
+        u0(:,:,n+1,:,:,:)=2*xi.*u0(:,:,n,:,:,:)-u0(:,:,n-1,:,:,:);
+    end;
+    % 2nd fillin by multiplying by y-recurrence
+    yy=quantile(patches.y(:),[0 1]);
+    xi=(patches.y-mean(yy))*2/diff(yy);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"y-Chebyshev scaling incorrect")
+    n=1:nox;  u0(:,:,n+nox,:,:,:)=xi.*u0(:,:,n,:,:,:);
+    for n=nox+1:(noy-1)*nox
+        u0(:,:,n+nox,:,:,:)=2*xi.*u0(:,:,n,:,:,:)-u0(:,:,n-nox,:,:,:);
+    end;
+    u0=u0.*randn(1,1,nox*noy);
 %{
 \end{matlab}
 Then evaluate the interpolation, setting edges to \verb|inf|
@@ -110,7 +124,7 @@ seems to be more affected by round-off so relax error size.
     xlabel('log10 error'), pause(0.3)%??
     maxError=max(abs(error(:)))
     maxErrors=[maxErrors maxError];
-    assert(maxError<3e-12*4^ordCC ...
+    assert(maxError<1e-11 ...
     ,'failed divided difference interpolation')
     disp('*** This divided difference test passed')
 %{
@@ -123,6 +137,7 @@ end% for realisation
 maxMaxErrorDividedDiffs = max(maxErrors)
 disp('***** Passed all divided difference interpolation')
 pause(1)
+%assert(0,"stop here---only testing finite domain divided differences")
 %{
 \end{matlab}
 
@@ -245,15 +260,34 @@ for realisations=1:nRealise
 %{
 \end{matlab}
 
-\paragraph{Check multiple fields simultaneously} Set
-profiles to be various powers of~\(x\), \verb|ps|, and store
-as different `variables' at each point.  
+\paragraph{Check multiple fields simultaneously} 
+Set profiles to be products of all Chebyshev polynomials in~\(x,y\), 
+optionally multiplied by random coefficients, and
+store as different `variables' at each point.  
+Limit the order of test polynomials by the
+order of interpolation and by the number of patches.  
 \begin{matlab}
 %}
-    [ps,qs]=meshgrid(0:ordCC);
-    ps=reshape(ps,1,1,[]); qs=reshape(qs,1,1,[]);
-    cs=2*rand(size(ps))-1;
-    u0=cs.*patches.x.^ps.*patches.y.^qs;
+    nox=ordCC+1;	noy=ordCC+1;
+    u0=nan([nSubP,nox*noy,1,nPatch]);
+    % first fillin Chebyshev in x, constant in y
+    xx=quantile(patches.x(:),[0 1]);
+    xi=(patches.x-mean(xx))*2/diff(xx);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"x-Chebyshev scaling incorrect")
+    u0(:,:,1,:,:,:)=1;
+    u0(:,:,2,:,:,:)=repmat(xi,[1,nSubP(2),1,1,1,nPatch(2)]);
+    for n=2:nox-1
+        u0(:,:,n+1,:,:,:)=2*xi.*u0(:,:,n,:,:,:)-u0(:,:,n-1,:,:,:);
+    end;
+    % 2nd fillin by multiplying by y-recurrence
+    yy=quantile(patches.y(:),[0 1]);
+    xi=(patches.y-mean(yy))*2/diff(yy);
+    assert(abs(1-max(abs(xi(:))))<1e-10,"y-Chebyshev scaling incorrect")
+    n=1:nox;  u0(:,:,n+nox,:,:,:)=xi.*u0(:,:,n,:,:,:);
+    for n=nox+1:(noy-1)*nox
+        u0(:,:,n+nox,:,:,:)=2*xi.*u0(:,:,n,:,:,:)-u0(:,:,n-nox,:,:,:);
+    end;
+    u0=u0.*randn(1,1,nox*noy);
 %{
 \end{matlab}
 Then evaluate the interpolation.
